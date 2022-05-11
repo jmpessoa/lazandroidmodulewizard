@@ -23,7 +23,7 @@ jSelectDirectoryDialog = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -70,17 +70,17 @@ begin
   inherited Destroy;
 end;
 
-procedure jSelectDirectoryDialog.Init(refApp: jApp);
+procedure jSelectDirectoryDialog.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
   if FjObject = nil then exit;
 
-  jSelectDirectoryDialog_SetInitialDirectory(FjEnv, FjObject, Ord(FInitialDirectory));
+  jSelectDirectoryDialog_SetInitialDirectory(gApp.jni.jEnv, FjObject, Ord(FInitialDirectory));
 
   FInitialized:= True;
 end;
@@ -88,35 +88,35 @@ end;
 
 function jSelectDirectoryDialog.jCreate(): jObject;
 begin
-   Result:= jSelectDirectoryDialog_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSelectDirectoryDialog_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jSelectDirectoryDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSelectDirectoryDialog_jFree(FjEnv, FjObject);
+     jSelectDirectoryDialog_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSelectDirectoryDialog.SetInitialEnvDirectory(_initialEnvDirectory: TEnvDirectory);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSelectDirectoryDialog_SetInitialDirectory(FjEnv, FjObject, Ord(_initialEnvDirectory));
+     jSelectDirectoryDialog_SetInitialDirectory(gApp.jni.jEnv, FjObject, Ord(_initialEnvDirectory));
 end;
 
 procedure jSelectDirectoryDialog.Show(_initialEnvDirectory: TEnvDirectory);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSelectDirectoryDialog_Show(FjEnv, FjObject, Ord(_initialEnvDirectory) );
+     jSelectDirectoryDialog_Show(gApp.jni.jEnv, FjObject, Ord(_initialEnvDirectory) );
 end;
 
 procedure jSelectDirectoryDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSelectDirectoryDialog_Show(FjEnv, FjObject);
+     jSelectDirectoryDialog_Show(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSelectDirectoryDialog.GenEvent_OnDirectorySelected(Sender:TObject;path:string);

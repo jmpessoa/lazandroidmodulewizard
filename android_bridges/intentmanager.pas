@@ -36,7 +36,7 @@ jIntentManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure NewIntent(); // by ADiV
     function GetIntent(): jObject;
     function GetActivityStartedIntent(): jObject;
@@ -212,7 +212,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -220,39 +220,39 @@ begin
   inherited Destroy;
 end;
 
-procedure jIntentManager.Init(refApp: jApp);
+procedure jIntentManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jIntentManager_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jIntentManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
   FInitialized:= True;
   if FIntentAction <> iaNone then
-      jni_proc_i(FjEnv, FjObject, 'SetAction', Ord(FIntentAction));
+      jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAction', Ord(FIntentAction));
 end;
 
 function jIntentManager.GetIntent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_int(FjEnv, FjObject, 'GetIntent');
+   Result:= jni_func_out_int(gApp.jni.jEnv, FjObject, 'GetIntent');
 end;
 
 function jIntentManager.GetActivityStartedIntent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_int(FjEnv, FjObject, 'GetActivityStartedIntent');
+   Result:= jni_func_out_int(gApp.jni.jEnv, FjObject, 'GetActivityStartedIntent');
 end;
 
 procedure jIntentManager.SetAction(_intentAction: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetAction', _intentAction);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetAction', _intentAction);
 end;
 
 procedure jIntentManager.SetAction(_intentAction: TIntentAction);
@@ -260,21 +260,21 @@ begin
   //in designing component state: set value here...
   FIntentAction:= _intentAction;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAction', Ord(_intentAction));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAction', Ord(_intentAction));
 end;
 
 procedure jIntentManager.SetMimeType(_mimeType: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetMimeType', _mimeType);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetMimeType', _mimeType);
 end;
 
 procedure jIntentManager.SetDataUriAsString(_uriAsString: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetDataUriAsString', _uriAsString);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetDataUriAsString', _uriAsString);
 end;
 
 function jIntentManager.StartActivityForResult(_requestCode: integer) : boolean;
@@ -282,7 +282,7 @@ begin
   Result := false;
   //in designing component state: set value here...
   if FInitialized then
-   Result := jni_func_i_out_z(FjEnv, FjObject, 'StartActivityForResult', _requestCode);
+   Result := jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'StartActivityForResult', _requestCode);
 end;
 
 function jIntentManager.StartActivity() : boolean;
@@ -290,7 +290,7 @@ begin
   Result := false;
   //in designing component state: set value here...
   if FInitialized then
-   Result := jni_func_out_z(FjEnv, FjObject, 'StartActivity');
+   Result := jni_func_out_z(gApp.jni.jEnv, FjObject, 'StartActivity');
 end;
 
 function jIntentManager.StartActivity(_chooserTitle: string) : boolean;
@@ -298,7 +298,7 @@ begin
   Result := false;
   //in designing component state: set value here...
   if FInitialized then
-   Result := jni_func_t_out_z(FjEnv, FjObject, 'StartActivity', _chooserTitle);
+   Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'StartActivity', _chooserTitle);
 end;
 
 function jIntentManager.StartActivityForResult(_requestCode: integer; _chooserTitle: string) : boolean;
@@ -306,14 +306,14 @@ begin
   Result := false;
   //in designing component state: set value here...
   if FInitialized then
-   Result := jni_func_it_out_z(FjEnv, FjObject, 'StartActivityForResult', _requestCode ,_chooserTitle);
+   Result := jni_func_it_out_z(gApp.jni.jEnv, FjObject, 'StartActivityForResult', _requestCode ,_chooserTitle);
 end;
 
 procedure jIntentManager.SendBroadcast();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SendBroadcast');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SendBroadcast');
 end;
 
 function jIntentManager.GetAction(_intent: jObject): string;
@@ -321,7 +321,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetAction(FjEnv, FjObject, _intent);
+   Result:= jIntentManager_GetAction(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jIntentManager.HasExtra(_intent: jObject; _dataName: string): boolean;
@@ -329,14 +329,14 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_HasExtra(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_HasExtra(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraBundle(_bundleExtra: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraBundle(FjEnv, FjObject, _bundleExtra);
+     jIntentManager_PutExtraBundle(gApp.jni.jEnv, FjObject, _bundleExtra);
 end;
 
 function jIntentManager.GetExtraBundle(_intent: jObject): jObject;
@@ -344,7 +344,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraBundle(FjEnv, FjObject, _intent);
+   Result:= jIntentManager_GetExtraBundle(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jIntentManager.GetExtraDoubleArray(_intent: jObject; _dataName: string): TDynArrayOfDouble;
@@ -352,14 +352,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraDoubleArray(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraDoubleArray(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraDoubleArray(_dataName: string; var _values: TDynArrayOfDouble);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraDoubleArray(FjEnv, FjObject, _dataName ,_values);
+     jIntentManager_PutExtraDoubleArray(gApp.jni.jEnv, FjObject, _dataName ,_values);
 end;
 
 function jIntentManager.GetExtraDouble(_intent: jObject; _dataName: string): double;
@@ -367,28 +367,28 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraDouble(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraDouble(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraDouble(_dataName: string; _value: double);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraDouble(FjEnv, FjObject, _dataName ,_value);
+     jIntentManager_PutExtraDouble(gApp.jni.jEnv, FjObject, _dataName ,_value);
 end;
 
 procedure jIntentManager.PutExtraBool(_dataName: string; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tz(FjEnv, FjObject, 'PutExtraBool', _dataName ,_value);
+     jni_proc_tz(gApp.jni.jEnv, FjObject, 'PutExtraBool', _dataName ,_value);
 end;
 
 procedure jIntentManager.PutExtraContactWebSite(_website: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'PutExtraContactWebSite', _website);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'PutExtraContactWebSite', _website);
 end;
 
 function jIntentManager.GetExtraFloatArray(_intent: jObject; _dataName: string): TDynArrayOfSingle;
@@ -396,14 +396,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraFloatArray(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraFloatArray(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraFloatArray(_dataName: string; var _values: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraFloatArray(FjEnv, FjObject, _dataName ,_values);
+     jIntentManager_PutExtraFloatArray(gApp.jni.jEnv, FjObject, _dataName ,_values);
 end;
 
 function jIntentManager.GetExtraFloat(_intent: jObject; _dataName: string): single;
@@ -411,14 +411,14 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraFloat(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraFloat(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraFloat(_dataName: string; _value: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraFloat(FjEnv, FjObject, _dataName ,_value);
+     jIntentManager_PutExtraFloat(gApp.jni.jEnv, FjObject, _dataName ,_value);
 end;
 
 function jIntentManager.GetExtraIntArray(_intent: jObject; _dataName: string): TDynArrayOfInteger;
@@ -426,14 +426,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraIntArray(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraIntArray(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraIntArray(_dataName: string; var _values: TDynArrayOfInteger);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraIntArray(FjEnv, FjObject, _dataName ,_values);
+     jIntentManager_PutExtraIntArray(gApp.jni.jEnv, FjObject, _dataName ,_values);
 end;
 
 function jIntentManager.GetExtraInt(_intent: jObject; _dataName: string): integer;
@@ -441,21 +441,21 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraInt(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraInt(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraInt(_dataName: string; _value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'PutExtraInt', _dataName, _value);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'PutExtraInt', _dataName, _value);
 end;
 
 procedure jIntentManager.PutExtraLong(_dataName: string; _value: int64);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tj(FjEnv, FjObject, 'PutExtraLong', _dataName, _value);
+     jni_proc_tj(gApp.jni.jEnv, FjObject, 'PutExtraLong', _dataName, _value);
 end;
 
 
@@ -464,14 +464,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraStringArray(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraStringArray(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraStringArray(_dataName: string; var _values: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraStringArray(FjEnv, FjObject, _dataName ,_values);
+     jIntentManager_PutExtraStringArray(gApp.jni.jEnv, FjObject, _dataName ,_values);
 end;
 
 function jIntentManager.GetExtraString(_intent: jObject; _dataName: string): string;
@@ -479,28 +479,28 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraString(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraString(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraString(_dataName: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'PutExtraString', _dataName ,_value);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'PutExtraString', _dataName ,_value);
 end;
 
 procedure jIntentManager.SetDataUri(_dataUri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_uri(FjEnv, FjObject, 'SetDataUri', _dataUri);
+     jni_proc_uri(gApp.jni.jEnv, FjObject, 'SetDataUri', _dataUri);
 end;
 
 procedure jIntentManager.SetDataPackage;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetDataPackage');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetDataPackage');
 end;
 
 function jIntentManager.GetDataUri(_intent: jObject): jObject;
@@ -508,7 +508,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetDataUri(FjEnv, FjObject, _intent);
+   Result:= jIntentManager_GetDataUri(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jIntentManager.GetDataUriAsString(_intent: jObject): string;
@@ -516,70 +516,70 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetDataUriAsString(FjEnv, FjObject, _intent);
+   Result:= jIntentManager_GetDataUriAsString(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 procedure jIntentManager.PutExtraFile(_environmentDirectoryPath: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'PutExtraFile', _environmentDirectoryPath ,_fileName);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'PutExtraFile', _environmentDirectoryPath ,_fileName);
 end;
 
 procedure jIntentManager.PutExtraMailSubject(_mailSubject: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'PutExtraMailSubject', _mailSubject);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'PutExtraMailSubject', _mailSubject);
 end;
 
 procedure jIntentManager.PutExtraMailBody(_mailBody: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'PutExtraMailBody', _mailBody);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'PutExtraMailBody', _mailBody);
 end;
 
 procedure jIntentManager.PutExtraMailCCs(var _mailCCs: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_das(FjEnv, FjObject, 'PutExtraMailCCs', _mailCCs);
+     jni_proc_das(gApp.jni.jEnv, FjObject, 'PutExtraMailCCs', _mailCCs);
 end;
 
 procedure jIntentManager.PutExtraMailBCCs(var _mailBCCs: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_das(FjEnv, FjObject, 'PutExtraMailBCCs', _mailBCCs);
+     jni_proc_das(gApp.jni.jEnv, FjObject, 'PutExtraMailBCCs', _mailBCCs);
 end;
 
 procedure jIntentManager.PutExtraMailTos(var _mailTos: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_das(FjEnv, FjObject, 'PutExtraMailTos', _mailTos);
+     jni_proc_das(gApp.jni.jEnv, FjObject, 'PutExtraMailTos', _mailTos);
 end;
 
 procedure jIntentManager.PutExtraPhoneNumbers(var _callPhoneNumbers: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_das(FjEnv, FjObject, 'PutExtraPhoneNumbers', _callPhoneNumbers);
+     jni_proc_das(gApp.jni.jEnv, FjObject, 'PutExtraPhoneNumbers', _callPhoneNumbers);
 end;
 
 function jIntentManager.GetContactsContentUri(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetContactsContentUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetContactsContentUri');
 end;
 
 function jIntentManager.GetContactsPhoneUri(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetContactsPhoneUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetContactsPhoneUri');
 end;
 
 function jIntentManager.GetAudioExternContentUri(): jObject;
@@ -587,7 +587,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetAudioExternContentUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetAudioExternContentUri');
 end;
 
 function jIntentManager.GetFilesExternContentUri(): jObject;
@@ -595,7 +595,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetFilesExternContentUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetFilesExternContentUri');
 end;
 
 function jIntentManager.GetImagesExternContentUri(): jObject;
@@ -603,7 +603,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetImagesExternContentUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetImagesExternContentUri');
 end;
 
 function jIntentManager.GetVideoExternContentUri(): jObject;
@@ -611,7 +611,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetVideoExternContentUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetVideoExternContentUri');
 end;
 
 function jIntentManager.ParseUri(_uriAsString: string): jObject;
@@ -619,7 +619,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_uri(FjEnv, FjObject, 'ParseUri', _uriAsString);
+   Result:= jni_func_t_out_uri(gApp.jni.jEnv, FjObject, 'ParseUri', _uriAsString);
 end;
 
 function jIntentManager.GetActionViewAsString(): string;
@@ -627,7 +627,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionViewAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionViewAsString');
 end;
 
 function jIntentManager.GetActionPickAsString(): string;
@@ -635,7 +635,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionPickAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionPickAsString');
 end;
 
 function jIntentManager.GetActionSendtoAsString(): string;
@@ -643,7 +643,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionSendtoAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionSendtoAsString');
 end;
 
 function jIntentManager.GetActionSendAsString(): string;
@@ -651,7 +651,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionSendAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionSendAsString');
 end;
 
 function jIntentManager.GetActionEditAsString(): string;
@@ -659,7 +659,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionEditAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionEditAsString');
 end;
 
 function jIntentManager.GetActionDialAsString(): string;
@@ -667,7 +667,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionDialAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionDialAsString');
 end;
 
 function jIntentManager.GetActionCallButtonAsString(): string;
@@ -675,7 +675,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionCallButtonAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionCallButtonAsString');
 end;
 
 function jIntentManager.ResolveActivity(): boolean;
@@ -683,7 +683,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'ResolveActivity');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'ResolveActivity');
 end;
 
 function jIntentManager.GetMailtoUri(): jObject;
@@ -691,7 +691,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetMailtoUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetMailtoUri');
 end;
 
 function jIntentManager.GetMailtoUri(_email: string): jObject;
@@ -699,7 +699,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_uri(FjEnv, FjObject, 'GetMailtoUri', _email);
+   Result:= jni_func_t_out_uri(gApp.jni.jEnv, FjObject, 'GetMailtoUri', _email);
 end;
 
 function jIntentManager.GetTelUri(): jObject;
@@ -707,7 +707,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_uri(FjEnv, FjObject, 'GetTelUri');
+   Result:= jni_func_out_uri(gApp.jni.jEnv, FjObject, 'GetTelUri');
 end;
 
 function jIntentManager.GetTelUri(_telNumber: string): jObject;
@@ -715,7 +715,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_uri(FjEnv, FjObject, 'GetTelUri', _telNumber);
+   Result:= jni_func_t_out_uri(gApp.jni.jEnv, FjObject, 'GetTelUri', _telNumber);
 end;
 
 function jIntentManager.GetActionGetContentUri(): string;
@@ -723,21 +723,21 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionGetContentUri');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionGetContentUri');
 end;
 
 procedure jIntentManager.PutExtraFile(_uri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_uri(FjEnv, FjObject, 'PutExtraFile', _uri);
+     jni_proc_uri(gApp.jni.jEnv, FjObject, 'PutExtraFile', _uri);
 end;
 
 procedure jIntentManager.PutExtraImage( _bmp : jObject; _title : string );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_t(FjEnv, FjObject, 'PutExtraImage', _bmp, _title);
+     jni_proc_bmp_t(gApp.jni.jEnv, FjObject, 'PutExtraImage', _bmp, _title);
 end;
 
 function jIntentManager.GetShareItemsCount() : integer;
@@ -745,7 +745,7 @@ begin
   Result := 0;
 
   if FInitialized then
-   Result := jni_func_out_i(FjEnv, FjObject, 'GetShareItemsCount');
+   Result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetShareItemsCount');
 end;
 
 function jIntentManager.GetShareItemLabel(_pos: integer) : String;
@@ -753,7 +753,7 @@ begin
   Result := '';
 
   if FInitialized then
-   Result := jni_func_i_out_t(FjEnv, FjObject, 'GetShareItemLabel', _pos);
+   Result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetShareItemLabel', _pos);
 end;
 
 function jIntentManager.GetShareItemPackageName(_pos: integer) : String;
@@ -761,7 +761,7 @@ begin
   Result := '';
 
   if FInitialized then
-   Result := jni_func_i_out_t(FjEnv, FjObject, 'GetShareItemPackageName', _pos);
+   Result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetShareItemPackageName', _pos);
 end;
 
 function jIntentManager.GetShareItemBitmap( _pos : integer ) : jObject;
@@ -769,25 +769,25 @@ begin
  Result := nil;
 
   if FInitialized then
-   Result := jni_func_i_out_bmp(FjEnv, FjObject, 'GetShareItemBitmap', _pos);
+   Result := jni_func_i_out_bmp(gApp.jni.jEnv, FjObject, 'GetShareItemBitmap', _pos);
 end;
 
 procedure jIntentManager.GetShareItemsClear;
 begin
  if FInitialized then
-   jni_proc(FjEnv, FjObject, 'GetShareItemsClear');
+   jni_proc(gApp.jni.jEnv, FjObject, 'GetShareItemsClear');
 end;
 
 procedure jIntentManager.SetShareItemClass( _pos : integer );
 begin
  if FInitialized then
-   jni_proc_i(FjEnv, FjObject, 'SetShareItemClass', _pos);
+   jni_proc_i(gApp.jni.jEnv, FjObject, 'SetShareItemClass', _pos);
 end;
 
 procedure jIntentManager.NewIntent();
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'NewIntent');
+     jni_proc(gApp.jni.jEnv, FjObject, 'NewIntent');
 end;
 
 function jIntentManager.GetActionCallAsString(): string;
@@ -795,7 +795,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionCallAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionCallAsString');
 end;
 
 function jIntentManager.GetContactNumber(_contactUri: jObject): string;
@@ -803,7 +803,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_uri_out_t(FjEnv, FjObject, 'GetContactNumber', _contactUri);
+   Result:= jni_func_uri_out_t(gApp.jni.jEnv, FjObject, 'GetContactNumber', _contactUri);
 end;
 
 function jIntentManager.GetContactEmail(_contactUri: jObject): string;
@@ -811,7 +811,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_uri_out_t(FjEnv, FjObject, 'GetContactEmail', _contactUri);
+   Result:= jni_func_uri_out_t(gApp.jni.jEnv, FjObject, 'GetContactEmail', _contactUri);
 end;
 
 function jIntentManager.GetBundleContent(_intent: jObject): TDynArrayOfString;
@@ -819,7 +819,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetBundleContent(FjEnv, FjObject, _intent);
+   Result:= jIntentManager_GetBundleContent(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jIntentManager.IsCallable(_intent: jObject): boolean;
@@ -827,7 +827,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_IsCallable(FjEnv, FjObject, _intent);
+   Result:= jIntentManager_IsCallable(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jIntentManager.IsCallable(_intentAction: string): boolean;
@@ -835,7 +835,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsCallable', _intentAction);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'IsCallable', _intentAction);
 end;
 
 function jIntentManager.IsActionEqual(_intent: jObject; _intentAction: string): boolean;
@@ -843,14 +843,14 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_IsActionEqual(FjEnv, FjObject, _intent ,_intentAction);
+   Result:= jIntentManager_IsActionEqual(gApp.jni.jEnv, FjObject, _intent ,_intentAction);
 end;
 
 procedure jIntentManager.PutExtraMediaStoreOutput(_environmentDirectoryPath: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'PutExtraMediaStoreOutput', _environmentDirectoryPath ,_fileName);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'PutExtraMediaStoreOutput', _environmentDirectoryPath ,_fileName);
 end;
 
 function jIntentManager.GetActionCameraCropAsString(): string;
@@ -858,77 +858,77 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionCameraCropAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionCameraCropAsString');
 end;
 
 procedure jIntentManager.AddCategory(_intentCategory: TIntentCategory);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'AddCategory', Ord(_intentCategory));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'AddCategory', Ord(_intentCategory));
 end;
 
 procedure jIntentManager.SetFlag(_intentFlag: TIntentFlag);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetFlag', Ord(_intentFlag));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFlag', Ord(_intentFlag));
 end;
 
 procedure jIntentManager.AddFlag(_intentFlag: TIntentFlag);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'AddFlag', Ord(_intentFlag));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'AddFlag', Ord(_intentFlag));
 end;
 
 procedure jIntentManager.SetComponent(_packageName: string; _javaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SetComponent', _packageName ,_javaClassName);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetComponent', _packageName ,_javaClassName);
 end;
 
 procedure jIntentManager.SetClassName(_packageName: string; _javaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SetClassName', _packageName ,_javaClassName);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetClassName', _packageName ,_javaClassName);
 end;
 
 procedure jIntentManager.SetClass(_fullJavaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetClass', _fullJavaClassName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetClass', _fullJavaClassName);
 end;
 
 procedure jIntentManager.StartService();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'StartService');
+     jni_proc(gApp.jni.jEnv, FjObject, 'StartService');
 end;
 
 procedure jIntentManager.SetClass(_packageName: string; _javaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SetClass', _packageName ,_javaClassName);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetClass', _packageName ,_javaClassName);
 end;
 
 procedure jIntentManager.PutExtraText(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'PutExtraText', _text);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'PutExtraText', _text);
 end;
 
 procedure jIntentManager.SetPackage(_packageName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetPackage', _packageName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetPackage', _packageName);
 end;
 
 function jIntentManager.IsPackageInstalled(_packageName: string): boolean;
@@ -936,7 +936,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsPackageInstalled', _packageName);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'IsPackageInstalled', _packageName);
 end;
 
 function jIntentManager.GetActionMainAsString(): string;
@@ -944,28 +944,28 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionMainAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionMainAsString');
 end;
 
 procedure jIntentManager.TryDownloadPackage(_packageName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'TryDownloadPackage', _packageName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'TryDownloadPackage', _packageName);
 end;
 
 procedure jIntentManager.SetDataAndType(_uriData: jObject; _mimeType: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_SetDataAndType(FjEnv, FjObject, _uriData ,_mimeType);
+     jIntentManager_SetDataAndType(gApp.jni.jEnv, FjObject, _uriData ,_mimeType);
 end;
 
 procedure jIntentManager.SetDataAndType(_uriAsString: string; _mimeType: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SetDataAndType', _uriAsString ,_mimeType);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetDataAndType', _uriAsString ,_mimeType);
 end;
 
 function jIntentManager.HasLaunchIntentForPackage(_packageName: string): boolean;
@@ -973,7 +973,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'HasLaunchIntentForPackage', _packageName);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'HasLaunchIntentForPackage', _packageName);
 end;
 
 function jIntentManager.GetExtraSMS(_intent: jObject; _addressBodyDelimiter: string): string;
@@ -981,7 +981,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraSMS(FjEnv, FjObject, _intent ,_addressBodyDelimiter);
+   Result:= jIntentManager_GetExtraSMS(gApp.jni.jEnv, FjObject, _intent ,_addressBodyDelimiter);
 end;
 
 function jIntentManager.GetActionInstallPackageAsString(): string;
@@ -989,7 +989,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionInstallPackageAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionInstallPackageAsString');
 end;
 
 function jIntentManager.GetActionDeleteAsString(): string;
@@ -997,7 +997,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetActionDeleteAsString');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetActionDeleteAsString');
 end;
 
 function jIntentManager.GetExtraByteArray(_intent: jObject; _dataName: string): TDynArrayOfJByte;
@@ -1005,21 +1005,21 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetExtraByteArray(FjEnv, FjObject, _intent ,_dataName);
+   Result:= jIntentManager_GetExtraByteArray(gApp.jni.jEnv, FjObject, _intent ,_dataName);
 end;
 
 procedure jIntentManager.PutExtraByteArray(_dataName: string; var _values: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jIntentManager_PutExtraByteArray(FjEnv, FjObject, _dataName ,_values);
+     jIntentManager_PutExtraByteArray(gApp.jni.jEnv, FjObject, _dataName ,_values);
 end;
 
 function jIntentManager.JByteArrayToString(var _byteArray: TDynArrayOfJByte): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_ByteArrayToString(FjEnv, FjObject, _byteArray);
+   Result:= jIntentManager_ByteArrayToString(gApp.jni.jEnv, FjObject, _byteArray);
 end;
 
 
@@ -1027,7 +1027,7 @@ function jIntentManager.GetBundleContent(_intent: jObject; keyValueDelimiter: st
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jIntentManager_GetBundleContent(FjEnv, FjObject, _intent ,keyValueDelimiter);
+   Result:= jIntentManager_GetBundleContent(gApp.jni.jEnv, FjObject, _intent ,keyValueDelimiter);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}

@@ -23,7 +23,7 @@ jsDrawerLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -116,27 +116,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jsDrawerLayout.Init(refApp: jApp);
+procedure jsDrawerLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jsDrawerLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsDrawerLayout_SetId(FjEnv, FjObject, Self.Id);
+   jsDrawerLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsDrawerLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                   -1); // OnlyWork MATCH_PARENT
@@ -145,32 +145,32 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsDrawerLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsDrawerLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsDrawerLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsDrawerLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsDrawerLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsDrawerLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsDrawerLayout_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsDrawerLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -178,13 +178,13 @@ procedure jsDrawerLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsDrawerLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsDrawerLayout.UpdateLayout;
@@ -195,13 +195,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsDrawerLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -214,42 +214,42 @@ end;
 
 function jsDrawerLayout.jCreate(): jObject;
 begin
-   Result:= jsDrawerLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsDrawerLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsDrawerLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_jFree(FjEnv, FjObject);
+     jsDrawerLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsDrawerLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsDrawerLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsDrawerLayout.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsDrawerLayout_GetParent(FjEnv, FjObject);
+   Result:= jsDrawerLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsDrawerLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jsDrawerLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsDrawerLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsDrawerLayout_GetView(FjEnv, FjObject);
+   Result:= jsDrawerLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 function jsDrawerLayout.GetWidth(): integer;
@@ -260,7 +260,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamWidth' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetLParamWidth' );
 end;
 
 function jsDrawerLayout.GetHeight(): integer;
@@ -271,49 +271,49 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLParamHeight' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetLParamHeight' );
 end;
 
 procedure jsDrawerLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_SetLGravity(FjEnv, FjObject, _g);
+     jsDrawerLayout_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jsDrawerLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_SetLWeight(FjEnv, FjObject, _w);
+     jsDrawerLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsDrawerLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsDrawerLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsDrawerLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsDrawerLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsDrawerLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsDrawerLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsDrawerLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsDrawerLayout.ClearLayout();
@@ -324,15 +324,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsDrawerLayout_clearLayoutAll(FjEnv, FjObject);
+     jsDrawerLayout_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsDrawerLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsDrawerLayout_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsDrawerLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsDrawerLayout_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -341,7 +341,7 @@ procedure jsDrawerLayout.CloseDrawer();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_CloseDrawer(FjEnv, FjObject);
+     jsDrawerLayout_CloseDrawer(gApp.jni.jEnv, FjObject);
 end;
 }
 
@@ -349,21 +349,21 @@ procedure jsDrawerLayout.CloseDrawers();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_CloseDrawers(FjEnv, FjObject);
+     jsDrawerLayout_CloseDrawers(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsDrawerLayout.OpenDrawer();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_OpenDrawer(FjEnv, FjObject);
+     jsDrawerLayout_OpenDrawer(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsDrawerLayout.SetupDrawerToggle(_toolbar: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsDrawerLayout_SetupDrawerToggle(FjEnv, FjObject, _toolbar);
+     jsDrawerLayout_SetupDrawerToggle(gApp.jni.jEnv, FjObject, _toolbar);
 end;
 
 procedure jsDrawerLayout.SetFitsSystemWindows(_value: boolean);
@@ -371,7 +371,7 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsDrawerLayout_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsDrawerLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 {-------- jsDrawerLayout_JNI_Bridge ----------}

@@ -42,7 +42,7 @@ jSurfaceView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     //procedure GenEvent_OnClick(Obj: TObject);
@@ -208,26 +208,26 @@ begin
   inherited Destroy;
 end;
 
-procedure jSurfaceView.Init(refApp: jApp);
+procedure jSurfaceView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
-   jSurfaceView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jSurfaceView_SetId(FjEnv, FjObject, Self.Id);
+   jSurfaceView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jSurfaceView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jSurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jSurfaceView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -236,33 +236,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jSurfaceView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jSurfaceView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jSurfaceView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jSurfaceView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jSurfaceView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jSurfaceView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if  FPaintColor <> colbrDefault  then
-    jSurfaceView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
+    jSurfaceView_SetPaintColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -270,13 +270,13 @@ procedure jSurfaceView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jSurfaceView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jSurfaceView.UpdateLayout;
@@ -287,13 +287,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jSurfaceView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -306,77 +306,77 @@ end;
 
 function jSurfaceView.jCreate(): jObject;
 begin
-   Result:= jSurfaceView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSurfaceView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jSurfaceView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_jFree(FjEnv, FjObject);
+     jSurfaceView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSurfaceView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jSurfaceView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jSurfaceView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_RemoveFromViewParent(FjEnv, FjObject);
+     jSurfaceView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jSurfaceView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSurfaceView_GetView(FjEnv, FjObject);
+   Result:= jSurfaceView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSurfaceView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetLParamWidth(FjEnv, FjObject, _w);
+     jSurfaceView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jSurfaceView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetLParamHeight(FjEnv, FjObject, _h);
+     jSurfaceView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jSurfaceView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jSurfaceView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSurfaceView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jSurfaceView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jSurfaceView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jSurfaceView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jSurfaceView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jSurfaceView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jSurfaceView.ClearLayout();
@@ -387,15 +387,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jSurfaceView_clearLayoutAll(FjEnv, FjObject);
+     jSurfaceView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jSurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jSurfaceView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jSurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jSurfaceView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -404,35 +404,35 @@ procedure jSurfaceView.SetHolderFixedSize(_width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetHolderFixedSize(FjEnv, FjObject, _width ,_height);
+     jSurfaceView_SetHolderFixedSize(gApp.jni.jEnv, FjObject, _width ,_height);
 end;
 
 procedure jSurfaceView.DrawLine(_canvas: jObject; _x1: single; _y1: single; _x2: single; _y2: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawLine(FjEnv, FjObject, _canvas ,_x1 ,_y1 ,_x2 ,_y2);
+     jSurfaceView_DrawLine(gApp.jni.jEnv, FjObject, _canvas ,_x1 ,_y1 ,_x2 ,_y2);
 end;
 
 procedure jSurfaceView.DrawPoint(_canvas: jObject; _x1: single; _y1: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawPoint(FjEnv, FjObject, _canvas ,_x1 ,_y1);
+     jSurfaceView_DrawPoint(gApp.jni.jEnv, FjObject, _canvas ,_x1 ,_y1);
 end;
 
 procedure jSurfaceView.SetPaintStrokeWidth(_width: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetPaintStrokeWidth(FjEnv, FjObject, _width);
+     jSurfaceView_SetPaintStrokeWidth(gApp.jni.jEnv, FjObject, _width);
 end;
 
 procedure jSurfaceView.SetPaintStyle(_style: TPaintStyle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetPaintStyle(FjEnv, FjObject, Ord(_style));
+     jSurfaceView_SetPaintStyle(gApp.jni.jEnv, FjObject, Ord(_style));
 end;
 
 procedure jSurfaceView.SetPaintColor(_color: TARGBColorBridge);
@@ -440,42 +440,42 @@ begin
   //in designing component state: set value here...
   FPaintColor:= _color;
   if FInitialized then
-     jSurfaceView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jSurfaceView_SetPaintColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jSurfaceView.SetPaintTextSize(_textsize: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetPaintTextSize(FjEnv, FjObject, _textsize);
+     jSurfaceView_SetPaintTextSize(gApp.jni.jEnv, FjObject, _textsize);
 end;
 
 procedure jSurfaceView.DrawText(_canvas: jObject; _text: string; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawText(FjEnv, FjObject, _canvas ,_text ,_x ,_y);
+     jSurfaceView_DrawText(gApp.jni.jEnv, FjObject, _canvas ,_text ,_x ,_y);
 end;
 
 procedure jSurfaceView.DrawBitmap(_canvas: jObject; _bitmap: jObject; _b: integer; _l: integer; _r: integer; _t: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawBitmap(FjEnv, FjObject, _canvas ,_bitmap ,_b ,_l ,_r ,_t);
+     jSurfaceView_DrawBitmap(gApp.jni.jEnv, FjObject, _canvas ,_bitmap ,_b ,_l ,_r ,_t);
 end;
 
 procedure jSurfaceView.DispatchOnDraw(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DispatchOnDraw(FjEnv, FjObject, _value);
+     jSurfaceView_DispatchOnDraw(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jSurfaceView.SaveToFile(_path: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SaveToFile(FjEnv, FjObject, _path, _fileName);
+     jSurfaceView_SaveToFile(gApp.jni.jEnv, FjObject, _path, _fileName);
 end;
 
 procedure jSurfaceView.GenEvent_OnSurfaceViewCreated(Obj: TObject; surfaceHolder: jObject);
@@ -517,112 +517,112 @@ function jSurfaceView.GetLockedCanvas(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSurfaceView_GetLockedCanvas(FjEnv, FjObject);
+   Result:= jSurfaceView_GetLockedCanvas(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSurfaceView.UnLockCanvas(_canvas: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_UnLockCanvas(FjEnv, FjObject, _canvas);
+     jSurfaceView_UnLockCanvas(gApp.jni.jEnv, FjObject, _canvas);
 end;
 
 procedure jSurfaceView.DoDrawingInBackground(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DoDrawingInBackground(FjEnv, FjObject, _value);
+     jSurfaceView_DoDrawingInBackground(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jSurfaceView.DrawBitmap(_canvas: jObject; _bitmap: jObject; _left: single; _top: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawBitmap(FjEnv, FjObject, _canvas ,_bitmap ,_left ,_top);
+     jSurfaceView_DrawBitmap(gApp.jni.jEnv, FjObject, _canvas ,_bitmap ,_left ,_top);
 end;
 
 procedure jSurfaceView.DrawCircle(_canvas: jObject; _cx: single; _cy: single; _radius: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawCircle(FjEnv, FjObject, _canvas ,_cx ,_cy ,_radius);
+     jSurfaceView_DrawCircle(gApp.jni.jEnv, FjObject, _canvas ,_cx ,_cy ,_radius);
 end;
 
 procedure jSurfaceView.DrawBackground(_canvas: jObject; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawBackground(FjEnv, FjObject, _canvas , GetARGB(FCustomColor, _color));
+     jSurfaceView_DrawBackground(gApp.jni.jEnv, FjObject, _canvas , GetARGB(FCustomColor, _color));
 end;
 
 procedure jSurfaceView.DrawRect(_canvas: jObject; _left: single; _top: single; _right: single; _bottom: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawRect(FjEnv, FjObject, _canvas ,_left ,_top ,_right ,_bottom);
+     jSurfaceView_DrawRect(gApp.jni.jEnv, FjObject, _canvas ,_left ,_top ,_right ,_bottom);
 end;
 
 procedure jSurfaceView.PostInvalidate();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_PostInvalidate(FjEnv, FjObject);
+     jSurfaceView_PostInvalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSurfaceView.Invalidate();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_Invalidate(FjEnv, FjObject);
+     jSurfaceView_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSurfaceView.SetDrawingInBackgroundSleeptime(_sleepTime: int64);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetDrawingInBackgroundSleeptime(FjEnv, FjObject, _sleepTime);
+     jSurfaceView_SetDrawingInBackgroundSleeptime(gApp.jni.jEnv, FjObject, _sleepTime);
 end;
 
 procedure jSurfaceView.SetKeepScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetKeepScreenOn(FjEnv, FjObject, _value);
+     jSurfaceView_SetKeepScreenOn(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jSurfaceView.SetFocusable(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetFocusable(FjEnv, FjObject, _value);
+     jSurfaceView_SetFocusable(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jSurfaceView.SetProgress(_startValue: single; _step: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_SetProgress(FjEnv, FjObject, _startValue ,_step);
+     jSurfaceView_SetProgress(gApp.jni.jEnv, FjObject, _startValue ,_step);
 end;
 
 procedure jSurfaceView.DrawLine(_canvas: jObject; var _points: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSurfaceView_DrawLine(FjEnv, FjObject, _canvas ,_points);
+     jSurfaceView_DrawLine(gApp.jni.jEnv, FjObject, _canvas ,_points);
 end;
 
 function jSurfaceView.GetDrawingCache(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSurfaceView_GetDrawingCache(FjEnv, FjObject);
+   Result:= jSurfaceView_GetDrawingCache(gApp.jni.jEnv, FjObject);
 end;
 
 function jSurfaceView.GetImage(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSurfaceView_GetDrawingCache(FjEnv, FjObject);
+   Result:= jSurfaceView_GetDrawingCache(gApp.jni.jEnv, FjObject);
 end;
 
 

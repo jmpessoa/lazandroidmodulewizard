@@ -28,7 +28,7 @@ jAlarmManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -89,10 +89,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jAlarmManager.Init(refApp: jApp);
+procedure jAlarmManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -100,14 +100,14 @@ end;
 
 function jAlarmManager.jCreate(): jObject;
 begin
-   Result:= jAlarmManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jAlarmManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jAlarmManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAlarmManager_jFree(FjEnv, FjObject);
+     jAlarmManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -115,70 +115,70 @@ procedure jAlarmManager.SetYearMonthDay(_year: integer; _month: integer; _day: i
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAlarmManager_SetYearMonthDay(FjEnv, FjObject, _year ,_month ,_day);
+     jAlarmManager_SetYearMonthDay(gApp.jni.jEnv, FjObject, _year ,_month ,_day);
 end;
 
 procedure jAlarmManager.SetHourMinute(_hour: integer; _minute: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAlarmManager_SetHourMinute(FjEnv, FjObject, _hour ,_minute);
+     jAlarmManager_SetHourMinute(gApp.jni.jEnv, FjObject, _hour ,_minute);
 end;
 
 procedure jAlarmManager.SetRepeatInterval(_RepeatIntervalMinute: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAlarmManager_SetRepeatInterval(FjEnv, FjObject, _RepeatIntervalMinute);
+     jAlarmManager_SetRepeatInterval(gApp.jni.jEnv, FjObject, _RepeatIntervalMinute);
 end;
 
 procedure jAlarmManager.SetIntentExtraString(_extraName: string; _extraValue: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAlarmManager_SetIntentExtraString(FjEnv, FjObject, _extraName ,_extraValue);
+     jAlarmManager_SetIntentExtraString(gApp.jni.jEnv, FjObject, _extraName ,_extraValue);
 end;
 
 procedure jAlarmManager.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAlarmManager_Clear(FjEnv, FjObject);
+     jAlarmManager_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 function jAlarmManager.Exists(_id: integer; _intentAction: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAlarmManager_Exists(FjEnv, FjObject, _id ,_intentAction);
+   Result:= jAlarmManager_Exists(gApp.jni.jEnv, FjObject, _id ,_intentAction);
 end;
 
 function jAlarmManager.Stop(_id: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAlarmManager_Stop(FjEnv, FjObject, _id);
+   Result:= jAlarmManager_Stop(gApp.jni.jEnv, FjObject, _id);
 end;
 
 function jAlarmManager.Stop(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAlarmManager_Stop(FjEnv, FjObject);
+   Result:= jAlarmManager_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 function jAlarmManager.Start(_intentAction: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAlarmManager_Start(FjEnv, FjObject, _intentAction);
+   Result:= jAlarmManager_Start(gApp.jni.jEnv, FjObject, _intentAction);
 end;
 
 function jAlarmManager.Count(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAlarmManager_Count(FjEnv, FjObject);
+   Result:= jAlarmManager_Count(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jAlarmManager_JNI_Bridge ----------}

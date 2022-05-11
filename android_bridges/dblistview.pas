@@ -42,7 +42,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -172,7 +172,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jDBListView.Init(refApp: jApp);
+procedure jDBListView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -181,37 +181,37 @@ var
 begin
   if not FInitialized then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate();  //jSelf !
 
    if FFontColor <> colbrDefault then
-    jDBListView_setFontColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    jDBListView_setFontColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
    if FFontSizeUnit <> unitDefault then
-    jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+    jDBListView_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(FFontSizeUnit));
 
    if FFontSize > 0 then
-    jDBListView_setFontSize(FjEnv, FjObject , FFontSize);
+    jDBListView_setFontSize(gApp.jni.jEnv, FjObject , FFontSize);
 
    if FColWeights.Count > 0 then
    begin
     SetLength(weights, FColWeights.Count);
     for i := 0 to FColWeights.Count-1 do
       weights[i] := StrToFloat(FColWeights[i]);
-    jDBListView_SetColumnWeights(FjEnv, FjObject, weights);
+    jDBListView_SetColumnWeights(gApp.jni.jEnv, FjObject, weights);
    end;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jDBListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jDBListView_SetId(FjEnv, FjObject, Self.Id);
+   jDBListView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jDBListView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jDBListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jDBListView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -221,7 +221,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jDBListView_AddLParamsAnchorRule(FjEnv, FjObject,
+      jDBListView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject,
         GetPositionRelativeToAnchor(rToA));
     end;
   end;
@@ -229,7 +229,7 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jDBListView_AddLParamsParentRule(FjEnv, FjObject,
+      jDBListView_AddLParamsParentRule(gApp.jni.jEnv, FjObject,
         GetPositionRelativeToParent(rToP));
     end;
   end;
@@ -239,16 +239,16 @@ begin
   else
     Self.AnchorId := -1; //dummy
 
-  jDBListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jDBListView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -256,7 +256,7 @@ procedure jDBListView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 procedure jDBListView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -283,7 +283,7 @@ begin
     SetLength(weights, Value.Count);
     for i := 0 to Value.Count-1 do
       weights[i] := StrToFloat(Value[i]);
-    jDBListView_SetColumnWeights(FjEnv, FjObject, weights);
+    jDBListView_SetColumnWeights(gApp.jni.jEnv, FjObject, weights);
   end;
 end;
 
@@ -315,7 +315,7 @@ procedure jDBListView.SetVisible(Value: boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jDBListView.UpdateLayout;
@@ -326,13 +326,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jDBListView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -351,70 +351,70 @@ end;
 function jDBListView.jCreate(): jObject;
 begin
   //in designing component state: result value here...
-  Result := jDBListView_jCreate(FjEnv, int64(Self), FjThis);
+  Result := jDBListView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jDBListView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_jFree(FjEnv, FjObject);
+    jDBListView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jDBListView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetView(FjEnv, FjObject);
+    Result := jDBListView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDBListView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetViewParent(FjEnv, FjObject, _viewgroup);
+    jDBListView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jDBListView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_RemoveFromViewParent(FjEnv, FjObject);
+    jDBListView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jDBListView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetParent(FjEnv, FjObject);
+    Result := jDBListView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDBListView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLParamWidth(FjEnv, FjObject, _w);
+    jDBListView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jDBListView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLParamHeight(FjEnv, FjObject, _h);
+    jDBListView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jDBListView.setLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_setLGravity(FjEnv, FjObject, _g);
+    jDBListView_setLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jDBListView.setLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_setLWeight(FjEnv, FjObject, _w);
+    jDBListView_setLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
@@ -422,7 +422,7 @@ procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+    jDBListView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
       _left, _top, _right, _bottom, _w, _h);
 end;
 
@@ -430,21 +430,21 @@ procedure jDBListView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+    jDBListView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDBListView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+    jDBListView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDBListView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+    jDBListView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jDBListView.ClearLayout();
@@ -455,15 +455,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jDBListView_clearLayoutAll(FjEnv, FjObject);
+     jDBListView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jDBListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jDBListView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jDBListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jDBListView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -471,49 +471,49 @@ procedure jDBListView.UpdateView();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_UpdateView(FjEnv, FjObject);
+    jDBListView_UpdateView(gApp.jni.jEnv, FjObject);
 end;
 (*
 procedure jDBListView.SetItemsLayout(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetItemsLayout(FjEnv, FjObject, _value);
+    jDBListView_SetItemsLayout(gApp.jni.jEnv, FjObject, _value);
 end;
 *)
 function jDBListView.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetItemIndex(FjEnv, FjObject);
+    Result := jDBListView_GetItemIndex(gApp.jni.jEnv, FjObject);
 end;
 
 function jDBListView.GetItemCaption(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jDBListView_GetItemCaption(FjEnv, FjObject);
+    Result := jDBListView_GetItemCaption(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDBListView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetSelection(FjEnv, FjObject, _index);
+    jDBListView_SetSelection(gApp.jni.jEnv, FjObject, _index);
 end;
 (*
 procedure jDBListView.DispatchOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_DispatchOnDrawItemTextColor(FjEnv, FjObject, _value);
+    jDBListView_DispatchOnDrawItemTextColor(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jDBListView.DispatchOnDrawItemBitmap(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_DispatchOnDrawItemBitmap(FjEnv, FjObject, _value);
+    jDBListView_DispatchOnDrawItemBitmap(gApp.jni.jEnv, FjObject, _value);
 end;
 *)
 procedure jDBListView.SetFontSize(_size: DWord);
@@ -521,7 +521,7 @@ begin
   //in designing component state: set value here...
   FFontSize := _size;
   if FInitialized then
-    jDBListView_SetFontSize(FjEnv, FjObject, _size);
+    jDBListView_SetFontSize(gApp.jni.jEnv, FjObject, _size);
 end;
 
 procedure jDBListView.SetFontColor(_color: TARGBColorBridge);
@@ -529,7 +529,7 @@ begin
   //in designing component state: set value here...
   FFontColor := _color;
   if FInitialized then
-    jDBListView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+    jDBListView_SetFontColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jDBListView.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -537,14 +537,14 @@ begin
   //in designing component state: set value here...
   FFontSizeUnit := _unit;
   if FInitialized then
-    jDBListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+    jDBListView_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(_unit));
 end;
 
 procedure jDBListView.ChangeCursor(NewCursor: jSqliteCursor);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_ChangeCursor(FjEnv, FjObject, NewCursor.Cursor);
+    jDBListView_ChangeCursor(gApp.jni.jEnv, FjObject, NewCursor.Cursor);
 end;
 
 {-------- jDBListView_JNI_Bridge ----------}

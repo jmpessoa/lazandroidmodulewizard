@@ -298,7 +298,7 @@ Type
 
    Constructor Create(AOwner: TComponent); override;
    Destructor  Destroy; override;
-   procedure Init(refApp: jApp); override;
+   procedure Init; override;
 
    procedure ClearLayout();
    Procedure UpdateLayout; override;
@@ -1353,7 +1353,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-          jni_free(FjEnv, FjObject );
+          jni_free(gApp.jni.jEnv, FjObject );
           FjObject := nil;
         end;
   end;
@@ -1383,24 +1383,24 @@ begin
   inherited Destroy;
 end;
 
-Procedure jCanvasES2.Init(refApp: jApp);
+Procedure jCanvasES2.Init;
 var
    rToP: TPositionRelativeToParent;
    rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject:= jGLSurfaceView_Create2(FjEnv, FjThis, Self,cjOpenGLESv2);
+   FjObject:= jGLSurfaceView_Create2(gApp.jni.jEnv, gApp.jni.jThis, Self,cjOpenGLESv2);
 
    if FjObject = nil then exit;
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -1409,7 +1409,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -1417,20 +1417,20 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    SetAutoRefresh(FAutoRefresh);
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
 
    // IsFirstInit:= True;
   end;
@@ -1440,7 +1440,7 @@ Procedure jCanvasES2.SetVisible  (Value : Boolean);
 begin
   FVisible := Value;
   if FInitialized then
-     View_SetVisible(FjEnv, FjObject , FVisible);
+     View_SetVisible(gApp.jni.jEnv, FjObject , FVisible);
 end;
 
 function jCanvasES2.GetVisible: Boolean;
@@ -1451,7 +1451,7 @@ end;
 Procedure jCanvasES2.Refresh;
 begin
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'Refresh' );
+    jni_proc(gApp.jni.jEnv, FjObject, 'Refresh' );
 end;
 
 Procedure jCanvasES2.SetAutoRefresh(Value: boolean);
@@ -1459,7 +1459,7 @@ begin
   FAutoRefresh := Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetAutoRefresh', FAutoRefresh);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAutoRefresh', FAutoRefresh);
 end;
 
 //
@@ -2061,12 +2061,12 @@ begin
 
   Case TileMode of
 
-   //True : Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID,_cAlpha_MaskOff, _cTile_On );
-   True : Texture.Active := _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID,_cAlpha_MaskOff, _cTile_On );
+   //True : Texture.Active := _glTexture_Load_wJava(gApp.jni.jEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID,_cAlpha_MaskOff, _cTile_On );
+   True : Texture.Active := _glTexture_Load_wJava(gApp.jni.jEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID,_cAlpha_MaskOff, _cTile_On );
 
 
-   //False: Texture.Active := _glTexture_Load_wJava(FjEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
-   False: Texture.Active := _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
+   //False: Texture.Active := _glTexture_Load_wJava(gApp.jni.jEnv, gApp.jni.jThis, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
+   False: Texture.Active := _glTexture_Load_wJava(gApp.jni.jEnv, FjObject, gApp.Path.Dat+'/'+filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
 
   End;
 
@@ -2075,7 +2075,7 @@ begin
   Case TileMode of
    True : Texture.Active := _glTexture_Load_wPascal(
                                 filename,Texture.ID,_cAlpha_MaskOff,_cTile_On );
-   False: Texture.Active := _glTexture_Load_wPascal(FjEnv,gApp.jni.jThis,
+   False: Texture.Active := _glTexture_Load_wPascal(gApp.jni.jEnv,gApp.jni.jThis,
                                 filename,Texture.ID,_cAlpha_MaskOn ,_cTile_Off);
   End;
   }
@@ -2108,7 +2108,7 @@ begin
   Case Texture.Active of
    True : begin
            glDeleteTextures(1, @Texture.ID );
-           //jGLSurfaceView_deleteTexture(FjEnv, FjObject ,Texture.Id);
+           //jGLSurfaceView_deleteTexture(gApp.jni.jEnv, FjObject ,Texture.Id);
           end;
    False:  ; //dbg('Delete Texture Skip ' + IntToStr(Texture.ID) );
   end;
@@ -2139,7 +2139,7 @@ begin
     //begin
       Textures[i].Active := False;
       glDeleteTextures(1,@Textures[i].ID);
-      //jGLSurfaceView_deleteTexture(FjEnv, FjObject ,Textures[i].ID);
+      //jGLSurfaceView_deleteTexture(gApp.jni.jEnv, FjObject ,Textures[i].ID);
     //end;
   end;
   TexturesCount:= 0;
@@ -2149,7 +2149,7 @@ end;
 Procedure jCanvasES2.Request_GLThread;
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'glThread');
+     jni_proc(gApp.jni.jEnv, FjObject, 'glThread');
 end;
 
 //
@@ -2193,7 +2193,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jCanvasES2.GetHeight: integer;
@@ -2204,7 +2204,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jCanvasES2.ClearLayout();
@@ -2215,15 +2215,15 @@ begin
   //in designing component state: set value here...
   if not FInitialized then exit;
 
-  View_ClearLayoutAll(FjEnv, FjObject);
+  View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
   for rToP := rpBottom to rpCenterVertical do
     if rToP in FPositionRelativeToParent then
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
   for rToA := raAbove to raAlignRight do
     if rToA in FPositionRelativeToAnchor then
-       View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 end;
 
 procedure jCanvasES2.UpdateLayout();
@@ -2234,42 +2234,42 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jCanvasES2.Pause();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Pause');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Pause');
 end;
 
 procedure jCanvasES2.Resume();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Resume');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Resume');
 end;
 
 procedure jCanvasES2.DispatchTouchDown(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchTouchDown', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchTouchDown', _value);
 end;
 
 procedure jCanvasES2.DispatchTouchMove(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchTouchMove', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchTouchMove', _value);
 end;
 
 procedure jCanvasES2.DispatchTouchUp(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchTouchUp', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchTouchUp', _value);
 end;
 
 end.

@@ -63,7 +63,7 @@ jsRecyclerView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh; overload;
     procedure Refresh( position : integer ); overload;
     procedure UpdateLayout; override;
@@ -203,7 +203,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -212,22 +212,22 @@ begin
   inherited Destroy;
 end;
 
-procedure jsRecyclerView.Init(refApp: jApp);
+procedure jsRecyclerView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    //FjObject := jCreate(); if FjObject = nil then exit;
-   FjObject:= jsRecyclerView_jCreate(FjEnv, int64(Self), Ord(FLayoutModel), Ord(FLayoutOrientation), FColumns, FjThis);
+   FjObject:= jsRecyclerView_jCreate(gApp.jni.jEnv, int64(Self), Ord(FLayoutModel), Ord(FLayoutOrientation), FColumns, gApp.jni.jThis);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
@@ -235,10 +235,10 @@ begin
      SetLGravity(FGravityInParent);
 
    SetViewParent(FjPRLayout);
-   View_setId(FjEnv, FjObject, Self.Id);
+   View_setId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
@@ -261,9 +261,9 @@ begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -271,13 +271,13 @@ procedure jsRecyclerView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsRecyclerView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsRecyclerView.UpdateLayout;
@@ -288,19 +288,19 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsRecyclerView.Refresh;
 begin
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'Refresh');
+    jni_proc(gApp.jni.jEnv, FjObject, 'Refresh');
 end;
 
 procedure jsRecyclerView.Refresh( position : integer );
 begin
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'Refresh', position);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'Refresh', position);
 end;
 
 //Event : Java -> Pascal
@@ -361,56 +361,56 @@ procedure jsRecyclerView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsRecyclerView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsRecyclerView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsRecyclerView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsRecyclerView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsRecyclerView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsRecyclerView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamWidth(FjEnv, FjObject);
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsRecyclerView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamHeight(FjEnv, FjObject);
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsRecyclerView.SetLGravity(_gravity: TLayoutGravity);
@@ -418,42 +418,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FjObject <> nil then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jsRecyclerView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLWeight(FjEnv, FjObject, _w);
+     View_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsRecyclerView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsRecyclerView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsRecyclerView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsRecyclerView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsRecyclerView.ClearLayout();
@@ -464,7 +464,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
@@ -481,7 +481,7 @@ begin
   //in designing component state: set value here...
   FItemContentDelimiter:= _delimiter;
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SetItemContentDictionary', _delimitedContentFormat ,_delimiter);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetItemContentDictionary', _delimitedContentFormat ,_delimiter);
 end;
 
 procedure jsRecyclerView.SetItemContentFormat(_contentFormat: string);
@@ -499,70 +499,70 @@ procedure jsRecyclerView.Add(_delimitedContent: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'Add', _delimitedContent);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'Add', _delimitedContent);
 end;
 
 procedure jsRecyclerView.SetItemContentLayout(_itemViewLayout: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetlayoutView(FjEnv, FjObject, _itemViewLayout);
+     jsRecyclerView_SetlayoutView(gApp.jni.jEnv, FjObject, _itemViewLayout);
 end;
 
 procedure jsRecyclerView.SetItemContentLayout(_itemViewLayout: jObject; _forceCardStyle: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsRecyclerView_SetItemViewLayout(FjEnv, FjObject, _itemViewLayout ,_forceCardStyle);
+     jsRecyclerView_SetItemViewLayout(gApp.jni.jEnv, FjObject, _itemViewLayout ,_forceCardStyle);
 end;
 
 procedure jsRecyclerView.Moved( fromPosition, toPosition : integer );
 begin
  //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'Moved', fromPosition, toPosition );
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'Moved', fromPosition, toPosition );
 end;
 
 procedure jsRecyclerView.SetItemSeparatorColorHeight(_color: TARGBColorBridge; _height : single );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_if(FjEnv, FjObject, 'SetItemSeparatorColorHeight', GetARGB(FCustomColor, _color), _height );
+     jni_proc_if(gApp.jni.jEnv, FjObject, 'SetItemSeparatorColorHeight', GetARGB(FCustomColor, _color), _height );
 end;
 
 procedure jsRecyclerView.SetItemPadding( _paddingInside, _paddingLeft, _paddingTop, _paddingRight, _paddingBottom : integer );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iiiii(FjEnv, FjObject, 'SetItemPadding', _paddingInside, _paddingLeft, _paddingTop, _paddingRight, _paddingBottom );
+     jni_proc_iiiii(gApp.jni.jEnv, FjObject, 'SetItemPadding', _paddingInside, _paddingLeft, _paddingTop, _paddingRight, _paddingBottom );
 end;
 
 procedure jsRecyclerView.SetAppBarLayoutScrollingViewBehavior();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetAppBarLayoutScrollingViewBehavior');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetAppBarLayoutScrollingViewBehavior');
 end;
 
 procedure jsRecyclerView.RemoveAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveAll');
+     jni_proc(gApp.jni.jEnv, FjObject, 'RemoveAll');
 end;
 
 procedure jsRecyclerView.Remove(_position: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Remove', _position);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'Remove', _position);
 end;
 
 function jsRecyclerView.GetItemCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetItemCount');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemCount');
 end;
 
 procedure jsRecyclerView.SetFitsSystemWindows(_value: boolean);
@@ -570,35 +570,35 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jsRecyclerView.SetClipToPadding(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetClipToPadding', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetClipToPadding', _value);
 end;
 
 procedure jsRecyclerView.SmoothScrollToPosition( position :integer );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SmoothScrollToPosition', position );
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SmoothScrollToPosition', position );
 end;
 
 procedure jsRecyclerView.ScrollToPosition( position :integer );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'ScrollToPosition', position );
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'ScrollToPosition', position );
 end;
 
 procedure jsRecyclerView.ClearItemsSelect;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ClearItemsSelect' );
+     jni_proc(gApp.jni.jEnv, FjObject, 'ClearItemsSelect' );
 end;
 
 function jsRecyclerView.GetItemsSelect() : integer;
@@ -606,7 +606,7 @@ begin
  result := 0;
  //in designing component state: set value here...
  if FInitialized then
-  result := jni_func_out_i(FjEnv, FjObject, 'GetItemsSelect');
+  result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemsSelect');
 end;
 
 function jsRecyclerView.GetItemSelectFirst( _int : integer ) : integer;
@@ -614,7 +614,7 @@ begin
  result := -1;
  //in designing component state: set value here...
  if FInitialized then
-  result := jni_func_i_out_i(FjEnv, FjObject, 'GetItemSelectFirst', _int);
+  result := jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetItemSelectFirst', _int);
 end;
 
 function jsRecyclerView.GetItemSelectFirst() : integer;
@@ -622,14 +622,14 @@ begin
  result := -1;
  //in designing component state: set value here...
  if FInitialized then
-  result := jni_func_out_i(FjEnv, FjObject, 'GetItemSelectFirst');
+  result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemSelectFirst');
 end;
 
 procedure jsRecyclerView.SetItemSelect( position :integer; select: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetItemSelect', position, select);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetItemSelect', position, select);
 end;
 
 function jsRecyclerView.GetItemSelect( position :integer ) : integer;
@@ -637,14 +637,14 @@ begin
   result := 0;
   //in designing component state: set value here...
   if FInitialized then
-   result := jni_func_i_out_i(FjEnv, FjObject, 'GetItemSelect', position);
+   result := jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetItemSelect', position);
 end;
 
 procedure jsRecyclerView.SetItemTag( position :integer; tagString: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'SetItemTag', position, tagString);
+     jni_proc_it(gApp.jni.jEnv, FjObject, 'SetItemTag', position, tagString);
 end;
 
 function jsRecyclerView.GetItemTag( position :integer ) : string;
@@ -652,28 +652,28 @@ begin
   Result := '';
   //in designing component state: set value here...
   if FInitialized then
-   result := jni_func_i_out_t(FjEnv, FjObject, 'GetItemTag', position);
+   result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetItemTag', position);
 end;
 
 procedure jsRecyclerView.SetCardBackgroundColor(value: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetCardBackgroundColor', GetARGB(FCustomColor, value));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetCardBackgroundColor', GetARGB(FCustomColor, value));
 end;
 
 procedure jsRecyclerView.SetItemsRound(round : integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetItemsRound', round);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetItemsRound', round);
 end;
 
 procedure jsRecyclerView.SetItemBackgroundColor(position: integer; value: TARGBColorBridge; cornerRadiusRound : integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iii(FjEnv, FjObject, 'SetItemBackgroundColor', position, GetARGB(FCustomColor, value), cornerRadiusRound);
+     jni_proc_iii(gApp.jni.jEnv, FjObject, 'SetItemBackgroundColor', position, GetARGB(FCustomColor, value), cornerRadiusRound);
 end;
 
 function jsRecyclerView.GetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer ) : string;
@@ -681,25 +681,25 @@ begin
   result := '';
 
   if FInitialized then
-   result := jni_func_iii_out_t(FjEnv, FjObject, 'GetWidgetText', position, ord(widget), widgetId);
+   result := jni_func_iii_out_t(gApp.jni.jEnv, FjObject, 'GetWidgetText', position, ord(widget), widgetId);
 end;
 
 procedure jsRecyclerView.SetWidgetText( position : integer; widget : TItemContentFormat; widgetId : integer; strText : string );
 begin
   if FInitialized then
-     jni_proc_iiit(FjEnv, FjObject, 'SetWidgetText', position, ord(widget), widgetId, strText);
+     jni_proc_iiit(gApp.jni.jEnv, FjObject, 'SetWidgetText', position, ord(widget), widgetId, strText);
 end;
 
 procedure jsRecyclerView.SetWidgetPanelRound( position, widgetId, round : integer );
 begin
   if FInitialized then
-     jni_proc_iii(FjEnv, FjObject, 'SetWidgetPanelRound', position, widgetId, round);
+     jni_proc_iii(gApp.jni.jEnv, FjObject, 'SetWidgetPanelRound', position, widgetId, round);
 end;
 
 procedure jsRecyclerView.SetWidgetTextColor( position : integer; widget: TItemContentFormat; widgetId : integer; value: TARGBColorBridge );
 begin
   if FInitialized then
-     jni_proc_iiii(FjEnv, FjObject, 'SetWidgetTextColor', position, ord(widget), widgetId, GetARGB(FCustomColor, value));
+     jni_proc_iiii(gApp.jni.jEnv, FjObject, 'SetWidgetTextColor', position, ord(widget), widgetId, GetARGB(FCustomColor, value));
 end;
 
 procedure jsRecyclerView.ClearItemContentFormat;

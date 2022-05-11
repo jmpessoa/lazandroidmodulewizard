@@ -5,16 +5,16 @@ unit commonparent;
 interface
 
 uses
-  Classes, AndroidWidget, And_jni, And_jni_Bridge;
+  Classes, AndroidWidget, And_jni;
 
-function tryCommonParent(var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
+function tryCommonParent(var FjPRLayout: jObject; FParent: TAndroidWidget ): boolean;
 
 implementation
 
 uses
   Laz_And_Controls, customdialog, viewflipper, toolbar, radiogroup, framelayout, linearlayout;
 
-function tryCommonParent(var FjPRLayout: jObject; FParent: TAndroidWidget; FjEnv: PJNIEnv; refApp: jApp): boolean;
+function tryCommonParent(var FjPRLayout: jObject; FParent: TAndroidWidget ): boolean;
 begin
 
  Result:= False;
@@ -23,55 +23,55 @@ begin
 
  if FParent is jPanel then
  begin
-   if not jVisualControl(FParent).Initialized then jPanel(FParent).Init(refApp);
+   if not jVisualControl(FParent).Initialized then jPanel(FParent).Init;
    FjPRLayout:= jPanel(FParent).View;
    Result:= True;
  end else
  if FParent is jScrollView then
  begin
-   if not jVisualControl(FParent).Initialized then jScrollView(FParent).Init(refApp);
-   FjPRLayout:= View_GetViewGroup(FjEnv, jScrollView(FParent).jSelf);
+   if not jVisualControl(FParent).Initialized then jScrollView(FParent).Init;
+   FjPRLayout:= View_GetViewGroup(gApp.jni.jEnv, jScrollView(FParent).jSelf);
    Result:= True;
  end else
  if FParent is jHorizontalScrollView then
  begin
-   if not jVisualControl(FParent).Initialized then jHorizontalScrollView(FParent).Init(refApp);
-   FjPRLayout:= View_GetViewGroup(FjEnv, jHorizontalScrollView(FParent).jSelf);
+   if not jVisualControl(FParent).Initialized then jHorizontalScrollView(FParent).Init;
+   FjPRLayout:= View_GetViewGroup(gApp.jni.jEnv, jHorizontalScrollView(FParent).jSelf);
    Result:= True;
  end  else
  if FParent is jCustomDialog then
  begin
-   if not jVisualControl(FParent).Initialized then jCustomDialog(FParent).Init(refApp);
+   if not jVisualControl(FParent).Initialized then jCustomDialog(FParent).Init;
    FjPRLayout:= jCustomDialog(FParent).View;
    Result:= True;
  end else
  if FParent is jViewFlipper then
  begin
-   if not jVisualControl(FParent).Initialized then jViewFlipper(FParent).Init(refApp);
+   if not jVisualControl(FParent).Initialized then jViewFlipper(FParent).Init;
    FjPRLayout:= jViewFlipper(FParent).View;
    Result:= True;
  end else
  if FParent is jToolbar then
  begin
-   if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init(refApp);
+   if not jVisualControl(FParent).Initialized then jToolbar(FParent).Init;
    FjPRLayout:= jToolbar(FParent).View;
    Result:= True;
  end  else
  if FParent is jRadioGroup then
  begin
-     if not jVisualControl(FParent).Initialized then jRadioGroup(FParent).Init(refApp);
+     if not jVisualControl(FParent).Initialized then jRadioGroup(FParent).Init;
      FjPRLayout:= jRadioGroup(FParent).View;
      Result:= True;
  end else
  if FParent is jFrameLayout then
   begin
-    if not jVisualControl(FParent).Initialized then jFrameLayout(FParent).Init(refApp);
+    if not jVisualControl(FParent).Initialized then jFrameLayout(FParent).Init;
     FjPRLayout:= jFrameLayout(FParent).View;
     Result:= True;
   end else
   if FParent is jLinearLayout then
   begin
-    if not jVisualControl(FParent).Initialized then jLinearLayout(FParent).Init(refApp);
+    if not jVisualControl(FParent).Initialized then jLinearLayout(FParent).Init;
     FjPRLayout:= jLinearLayout(FParent).View;
     Result:= True;
   end;

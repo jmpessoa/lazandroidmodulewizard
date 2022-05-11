@@ -21,7 +21,7 @@ jFileProvider = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function GetTextContent(_textfilename: string): string;
@@ -71,41 +71,41 @@ begin
   inherited Destroy;
 end;
 
-procedure jFileProvider.Init(refApp: jApp);
+procedure jFileProvider.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
-  jFileProvider_SetFileSource(FjEnv, FjObject, Ord(FFileSource));
+  jFileProvider_SetFileSource(gApp.jni.jEnv, FjObject, Ord(FFileSource));
 end;
 
 
 function jFileProvider.jCreate(): jObject;
 begin
-   Result:= jFileProvider_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jFileProvider_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jFileProvider.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFileProvider_jFree(FjEnv, FjObject);
+     jFileProvider_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jFileProvider.GetTextContent(_textfilename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFileProvider_GetTextContent(FjEnv, FjObject, _textfilename);
+   Result:= jFileProvider_GetTextContent(gApp.jni.jEnv, FjObject, _textfilename);
 end;
 
 procedure jFileProvider.SetAuthorities(_authorities: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFileProvider_SetAuthorities(FjEnv, FjObject, _authorities);
+     jFileProvider_SetAuthorities(gApp.jni.jEnv, FjObject, _authorities);
 end;
 
 procedure jFileProvider.SetFileSource(_filesource: TFileProviderSource);
@@ -113,21 +113,21 @@ begin
   //in designing component state: set value here...
   FFileSource:= _filesource;
   if FInitialized then
-     jFileProvider_SetFileSource(FjEnv, FjObject, Ord(_filesource));
+     jFileProvider_SetFileSource(gApp.jni.jEnv, FjObject, Ord(_filesource));
 end;
 
 function jFileProvider.GetImageContent(_imagefilename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFileProvider_GetImageContent(FjEnv, FjObject, _imagefilename);
+   Result:= jFileProvider_GetImageContent(gApp.jni.jEnv, FjObject, _imagefilename);
 end;
 
 function jFileProvider.GetContent(_filename: string): TDynArrayOfJByte;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFileProvider_GetContent(FjEnv, FjObject, _filename);
+   Result:= jFileProvider_GetContent(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 {-------- jFileProvider_JNI_Bridge ----------}

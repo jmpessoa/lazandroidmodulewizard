@@ -67,7 +67,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor  Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
   procedure Refresh;
   procedure UpdateLayout; override;
   function jCreate( _bufferedDraw: boolean; _backgroundColor: integer): jObject;
@@ -458,29 +458,29 @@ begin
   inherited Destroy;
 end;
 
-procedure jDrawingView.Init(refApp: jApp);
+procedure jDrawingView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-    inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+    inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
     //your code here: set/initialize create params....
     FjObject:= jCreate(FBufferedDraw, GetARGB(FCustomColor, FColor)); //jSelf !
    	
     if FParent <> nil then
-      sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+      sysTryNewParent( FjPRLayout, FParent);
 
     FjPRLayoutHome:= FjPRLayout;
 
-    jDrawingView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-    jDrawingView_SetId(FjEnv, FjObject, Self.Id);
+    jDrawingView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+    jDrawingView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
 
-    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
   end;
 
-  jDrawingView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jDrawingView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -489,73 +489,73 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jDrawingView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jDrawingView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jDrawingView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jDrawingView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jDrawingView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jDrawingView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
     FInitialized := True;
 
     if FPaintStrokeWidth > 1 then
-      jDrawingView_SetPaintWidth(FjEnv, FjObject, FPaintStrokeWidth);
+      jDrawingView_SetPaintWidth(gApp.jni.jEnv, FjObject, FPaintStrokeWidth);
 
     if  FPaintStyle <> psDefault then
-      jDrawingView_SetPaintStyle(FjEnv, FjObject, ord(FPaintStyle));
+      jDrawingView_SetPaintStyle(gApp.jni.jEnv, FjObject, ord(FPaintStyle));
 
     if  FPaintColor <> colbrDefault then
-      jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
+      jDrawingView_SetPaintColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FPaintColor));
 
     if FFontSize <> 0 then
-      jDrawingView_SetTextSize(FjEnv, FjObject, FFontSize);
+      jDrawingView_SetTextSize(gApp.jni.jEnv, FjObject, FFontSize);
 
-    if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then //jDrawingView_SetTypeface(FjEnv, FjObject, Ord(FFontFace));
-      jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+    if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then //jDrawingView_SetTypeface(gApp.jni.jEnv, FjObject, Ord(FFontFace));
+      jDrawingView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
     if FPaintStrokeJoin <>  sjDefault then
-      jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(FPaintStrokeJoin));
+      jDrawingView_SetPaintStrokeJoin(gApp.jni.jEnv, FjObject, Ord(FPaintStrokeJoin));
 
     if FPaintStrokeCap <>  scDefault then
-      jDrawingView_SetPaintStrokeCap(FjEnv, FjObject, Ord(FPaintStrokeCap));
+      jDrawingView_SetPaintStrokeCap(gApp.jni.jEnv, FjObject, Ord(FPaintStrokeCap));
 
     if FImageIdentifier <> '' then
-      jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject , FImageIdentifier);
+      jDrawingView_SetImageByResourceIdentifier(gApp.jni.jEnv, FjObject , FImageIdentifier);
 
     // if  FColor <> colbrDefault then
-    //View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    //View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 
     // PaintShader new!
     if FPaintShader <> nil then
-      FPaintShader.Init(refApp, GetPaint);
+      FPaintShader.Init(gApp, GetPaint);
   end;
 end;
 
 procedure jDrawingView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
-  if (FInitialized = True) and (FColor <> colbrDefault)  then //View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
-    jDrawingView_SetBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+  if (FInitialized = True) and (FColor <> colbrDefault)  then //View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
+    jDrawingView_SetBackgroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 procedure jDrawingView.SetVisible(Value: Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jDrawingView.UpdateLayout;
@@ -566,13 +566,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jDrawingView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -585,7 +585,7 @@ end;
 
 function jDrawingView.jCreate( _bufferedDraw: boolean;  _backgroundColor: integer): jObject;
 begin
-   Result:= jDrawingView_jCreate(FjEnv, int64(Self) ,_bufferedDraw, _backgroundColor, FjThis);
+   Result:= jDrawingView_jCreate(gApp.jni.jEnv, int64(Self) ,_bufferedDraw, _backgroundColor, gApp.jni.jThis);
 end;
 
 
@@ -593,70 +593,70 @@ procedure jDrawingView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_jFree(FjEnv, FjObject);
+     jDrawingView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDrawingView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jDrawingView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jDrawingView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_RemoveFromViewParent(FjEnv, FjObject);
+     jDrawingView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetView(FjEnv, FjObject);
+   Result:= jDrawingView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDrawingView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetLParamWidth(FjEnv, FjObject, _w);
+     jDrawingView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jDrawingView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetLParamHeight(FjEnv, FjObject, _h);
+     jDrawingView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jDrawingView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jDrawingView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jDrawingView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jDrawingView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDrawingView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jDrawingView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDrawingView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jDrawingView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jDrawingView.ClearLayout();
@@ -667,15 +667,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jDrawingView_clearLayoutAll(FjEnv, FjObject);
+     jDrawingView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jDrawingView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jDrawingView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jDrawingView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jDrawingView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -683,20 +683,20 @@ function jDrawingView.GetDrawingCache(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetDrawingCache(FjEnv, FjObject);
+   Result:= jDrawingView_GetDrawingCache(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.GetImage(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetDrawingCache(FjEnv, FjObject);
+   Result:= jDrawingView_GetDrawingCache(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.GetPaint(): jObject;
 begin
   if FInitialized then
-    Result := jDrawingView_GetPaint(FjEnv, FjObject);
+    Result := jDrawingView_GetPaint(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.GetWidth(): integer;
@@ -707,7 +707,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jDrawingView_GetWidth(FjEnv, FjObject );
+   Result:= jDrawingView_GetWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jDrawingView.GetHeight(): integer;
@@ -718,58 +718,58 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jDrawingView_GetHeight(FjEnv, FjObject );
+   Result:= jDrawingView_GetHeight(gApp.jni.jEnv, FjObject );
 end;
 
 (*
 procedure jDrawingView.DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom: Integer);
 begin
   if FInitialized then
-    jDrawingView_DrawBitmap(FjEnv, FjObject, bitMap, srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom);
+    jDrawingView_DrawBitmap(gApp.jni.jEnv, FjObject, bitMap, srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom);
 end;
 
 procedure jDrawingView.DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH, X, Y, W, H: Integer; rotateDegree: Single);
 begin
   if FInitialized then
-    jDrawingView_DrawFrame(FjEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, W, H, rotateDegree);
+    jDrawingView_DrawFrame(gApp.jni.jEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, W, H, rotateDegree);
 end;
 
 procedure jDrawingView.DrawFrame(bitMap: jObject; X, Y, Index, Size: LongInt; scaleFactor: Single; rotateDegree: Single);
 begin
   if FInitialized then
-    jDrawingView_DrawFrame(FjEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
+    jDrawingView_DrawFrame(gApp.jni.jEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
 end;
 *)
 procedure jDrawingView.DrawBitmap(bitMap: jObject; srcLeft, srcTop, srcRight, srcBottom: Integer; dstLeft, dstTop, dstRight, dstBottom: Single);
 begin
   if FInitialized then
-    jDrawingView_DrawBitmap(FjEnv, FjObject, bitMap, srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom);
+    jDrawingView_DrawBitmap(gApp.jni.jEnv, FjObject, bitMap, srcLeft, srcTop, srcRight, srcBottom, dstLeft, dstTop, dstRight, dstBottom);
 end;
 
 procedure jDrawingView.DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, W, H, rotateDegree: Single);
 begin
   if FInitialized then
-    jDrawingView_DrawFrame(FjEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, W, H, rotateDegree);
+    jDrawingView_DrawFrame(gApp.jni.jEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, W, H, rotateDegree);
 end;
 
 procedure jDrawingView.DrawFrame(bitMap: jObject; X, Y: Single; Index, Size: Integer; scaleFactor: Single; rotateDegree: Single);
 begin
   if FInitialized then
-    jDrawingView_DrawFrame(FjEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
+    jDrawingView_DrawFrame(gApp.jni.jEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
 end;
 
 procedure jDrawingView.DrawBitmap(_bitmap: jObject; _width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
+     jDrawingView_DrawBitmap(gApp.jni.jEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
 procedure jDrawingView.DrawBitmap(_bitmap: jObject; _left: integer; _top: integer; _right: integer; _bottom: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawBitmap(FjEnv, FjObject, _bitmap ,_left ,_top ,_right ,_bottom);
+     jDrawingView_DrawBitmap(gApp.jni.jEnv, FjObject, _bitmap ,_left ,_top ,_right ,_bottom);
 end;
 
 procedure jDrawingView.SetPaintStrokeWidth(_width: single);
@@ -777,7 +777,7 @@ begin
   //in designing component state: set value here...
   FPaintStrokeWidth:= _width;
   if FInitialized then
-     jDrawingView_SetPaintWidth(FjEnv, FjObject, _width);
+     jDrawingView_SetPaintWidth(gApp.jni.jEnv, FjObject, _width);
 end;
 
 procedure jDrawingView.SetPaintStyle(_style: TPaintStyle);
@@ -785,7 +785,7 @@ begin
   //in designing component state: set value here...
   FPaintStyle:=  _style;
   if FInitialized then
-     jDrawingView_SetPaintStyle(FjEnv, FjObject, Ord(_style));
+     jDrawingView_SetPaintStyle(gApp.jni.jEnv, FjObject, Ord(_style));
 end;
 
 procedure jDrawingView.SetPaintColor(_color: TARGBColorBridge);
@@ -796,7 +796,7 @@ begin
   FFontColor:= _color;
 
   if FInitialized then
-     jDrawingView_SetPaintColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jDrawingView_SetPaintColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jDrawingView.SetTextSize(_textsize: DWord);
@@ -804,42 +804,42 @@ begin
   //in designing component state: set value here...
   FFontSize:= _textSize;
   if FInitialized then
-     jDrawingView_SetTextSize(FjEnv, FjObject, _textSize);
+     jDrawingView_SetTextSize(gApp.jni.jEnv, FjObject, _textSize);
 end;
 
 procedure jDrawingView.DrawLine(_x1: single; _y1: single; _x2: single; _y2: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawLine(FjEnv, FjObject, _x1 ,_y1 ,_x2 ,_y2);
+     jDrawingView_DrawLine(gApp.jni.jEnv, FjObject, _x1 ,_y1 ,_x2 ,_y2);
 end;
 
 procedure jDrawingView.DrawText(_text: string; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y);
+     jDrawingView_DrawText(gApp.jni.jEnv, FjObject, _text ,_x ,_y);
 end;
 
 procedure jDrawingView.DrawText(_text: string; _x: single; _y: single; _angleDegree: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree);
+     jDrawingView_DrawText(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree);
 end;
 
 procedure jDrawingView.DrawBitmap(_bitmap: jObject; _x: single; _y: single; _angleDegree: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawBitmap(FjEnv, FjObject, _bitmap ,_x ,_y ,_angleDegree);
+     jDrawingView_DrawBitmap(gApp.jni.jEnv, FjObject, _bitmap ,_x ,_y ,_angleDegree);
 end;
 
 procedure jDrawingView.DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+     jDrawingView_DrawText(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
 end;
 
 procedure jDrawingView.GenEvent_OnDrawingViewTouch(Obj: TObject; Act,
@@ -883,55 +883,55 @@ procedure jDrawingView.DrawLine(var _points: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawLine(FjEnv, FjObject, _points);
+     jDrawingView_DrawLine(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jDrawingView.DrawLine(_points: array of single);
 begin
   if FInitialized then
-     jDrawingView_DrawLine(FjEnv, FjObject, _points);
+     jDrawingView_DrawLine(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jDrawingView.DrawPoint(_x1: single; _y1: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawPoint(FjEnv, FjObject, _x1 ,_y1);
+     jDrawingView_DrawPoint(gApp.jni.jEnv, FjObject, _x1 ,_y1);
 end;
 
 procedure jDrawingView.DrawCircle(_cx: single; _cy: single; _radius: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawCircle(FjEnv, FjObject, _cx ,_cy ,_radius);
+     jDrawingView_DrawCircle(gApp.jni.jEnv, FjObject, _cx ,_cy ,_radius);
 end;
 
 procedure jDrawingView.DrawBackground(_color: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawBackground(FjEnv, FjObject, _color);
+     jDrawingView_DrawBackground(gApp.jni.jEnv, FjObject, _color);
 end;
 
 procedure jDrawingView.DrawRect(_left: single; _top: single; _right: single; _bottom: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawRect(FjEnv, FjObject, _left ,_top ,_right ,_bottom);
+     jDrawingView_DrawRect(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom);
 end;
 
 procedure jDrawingView.DrawRect(var _xyArray8: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawRect(FjEnv, FjObject, _xyArray8);
+     jDrawingView_DrawRect(gApp.jni.jEnv, FjObject, _xyArray8);
 end;
 
 procedure jDrawingView.DrawRect(var _xyArray8: array of single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawRect(FjEnv, FjObject, _xyArray8);
+     jDrawingView_DrawRect(gApp.jni.jEnv, FjObject, _xyArray8);
 end;
 
 procedure jDrawingView.SetImageByResourceIdentifier(_imageResIdentifier: string);
@@ -939,14 +939,14 @@ begin
   //in designing component state: set value here...
   FImageIdentifier:= _imageResIdentifier;
   if FInitialized then
-     jDrawingView_SetImageByResourceIdentifier(FjEnv, FjObject, _imageResIdentifier);
+     jDrawingView_SetImageByResourceIdentifier(gApp.jni.jEnv, FjObject, _imageResIdentifier);
 end;
 
 procedure jDrawingView.DrawBitmap(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawBitmap(FjEnv, FjObject, _bitmap);
+     jDrawingView_DrawBitmap(gApp.jni.jEnv, FjObject, _bitmap);
 end;
 
 (*
@@ -1078,28 +1078,28 @@ procedure jDrawingView.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SaveToFile(FjEnv, FjObject, _filename);
+     jDrawingView_SaveToFile(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 procedure jDrawingView.SaveToFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SaveToFile(FjEnv, FjObject, _path ,_filename);
+     jDrawingView_SaveToFile(gApp.jni.jEnv, FjObject, _path ,_filename);
 end;
 
 procedure jDrawingView.SetMinZoomFactor(_minZoomFactor: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetMinZoomFactor(FjEnv, FjObject, _minZoomFactor);
+     jDrawingView_SetMinZoomFactor(gApp.jni.jEnv, FjObject, _minZoomFactor);
 end;
 
 procedure jDrawingView.SetMaxZoomFactor(_maxZoomFactor: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetMaxZoomFactor(FjEnv, FjObject, _maxZoomFactor);
+     jDrawingView_SetMaxZoomFactor(gApp.jni.jEnv, FjObject, _maxZoomFactor);
 end;
 
 (*
@@ -1118,14 +1118,14 @@ procedure jDrawingView.SetTimeClick(Value: Integer);
 begin
   FTimeClick := Value;
   if FInitialized then
-    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
 end;
 
 procedure jDrawingView.SetTimeDoubleClick(Value: Integer);
 begin
   FTimeDoubleClick := Value;
   if FInitialized then
-    jni_proc_ii(FjEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetTimeClicks', FTimeClick, FTimeDoubleClick);
 end;
 
 function jDrawingView.GetCanvas(): jObject;
@@ -1133,7 +1133,7 @@ begin
   //in designing component state: result value here...
   Result := nil;
   if FInitialized then
-    Result := jDrawingView_GetCanvas(FjEnv, FjObject);
+    Result := jDrawingView_GetCanvas(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDrawingView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -1176,7 +1176,7 @@ begin
   end;
   if FInitialized then
   begin
-    jDrawingView_DrawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer);
+    jDrawingView_DrawTextAligned(gApp.jni.jEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer);
   end;
 end;
 
@@ -1184,14 +1184,14 @@ function jDrawingView.GetPath(var _points: TDynArrayOfSingle): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetPath(FjEnv, FjObject, _points);
+   Result:= jDrawingView_GetPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 function jDrawingView.GetPath(_points: array of single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetPath(FjEnv, FjObject, _points);
+   Result:= jDrawingView_GetPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 
@@ -1199,21 +1199,21 @@ procedure jDrawingView.DrawPath(_path: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawPath(FjEnv, FjObject, _path);
+     jDrawingView_DrawPath(gApp.jni.jEnv, FjObject, _path);
 end;
 
 procedure jDrawingView.DrawPath(var _points: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawPath(FjEnv, FjObject, _points);
+     jDrawingView_DrawPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jDrawingView.DrawPath(_points: array of single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawPath(FjEnv, FjObject, _points);
+     jDrawingView_DrawPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jDrawingView.SetPaintStrokeJoin(_strokeJoin: TStrokeJoin);
@@ -1221,7 +1221,7 @@ begin
   //in designing component state: set value here...
   FPaintStrokeJoin:= _strokeJoin;
   if FInitialized then
-     jDrawingView_SetPaintStrokeJoin(FjEnv, FjObject, Ord(_strokeJoin));
+     jDrawingView_SetPaintStrokeJoin(gApp.jni.jEnv, FjObject, Ord(_strokeJoin));
 end;
 
 procedure jDrawingView.SetPaintStrokeCap(_strokeCap: TStrokeCap);
@@ -1229,154 +1229,154 @@ begin
   //in designing component state: set value here...
   FPaintStrokeCap:= _strokeCap;
   if FInitialized then
-     jDrawingView_SetPaintStrokeCap(FjEnv, FjObject, Ord(_strokeCap));
+     jDrawingView_SetPaintStrokeCap(gApp.jni.jEnv, FjObject, Ord(_strokeCap));
 end;
 
 procedure jDrawingView.SetPaintCornerPathEffect(_radius: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetPaintCornerPathEffect(FjEnv, FjObject, _radius);
+     jDrawingView_SetPaintCornerPathEffect(gApp.jni.jEnv, FjObject, _radius);
 end;
 
 procedure jDrawingView.SetPaintDashPathEffect(_lineDash: single; _dashSpace: single; _phase: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetPaintDashPathEffect(FjEnv, FjObject, _lineDash ,_dashSpace ,_phase);
+     jDrawingView_SetPaintDashPathEffect(gApp.jni.jEnv, FjObject, _lineDash ,_dashSpace ,_phase);
 end;
 
 function jDrawingView.GetPath(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetPath(FjEnv, FjObject);
+   Result:= jDrawingView_GetPath(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.ResetPath(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_ResetPath(FjEnv, FjObject);
+   Result:= jDrawingView_ResetPath(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.ResetPath(_path: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_ResetPath(FjEnv, FjObject, _path);
+   Result:= jDrawingView_ResetPath(gApp.jni.jEnv, FjObject, _path);
 end;
 
 procedure jDrawingView.AddCircleToPath(_x: single; _y: single; _r: single; _pathDirection: TPathDirection);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_AddCircleToPath(FjEnv, FjObject, _x ,_y ,_r , Ord(_pathDirection));
+     jDrawingView_AddCircleToPath(gApp.jni.jEnv, FjObject, _x ,_y ,_r , Ord(_pathDirection));
 end;
 
 procedure jDrawingView.AddCircleToPath(_path: jObject; _x: single; _y: single; _r: single; _pathDirection: TPathDirection);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_AddCircleToPath(FjEnv, FjObject, _path ,_x ,_y ,_r ,Ord(_pathDirection));
+     jDrawingView_AddCircleToPath(gApp.jni.jEnv, FjObject, _path ,_x ,_y ,_r ,Ord(_pathDirection));
 end;
 
 function jDrawingView.GetNewPath(var _points: TDynArrayOfSingle): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetNewPath(FjEnv, FjObject, _points);
+   Result:= jDrawingView_GetNewPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 function jDrawingView.GetNewPath(_points: array of single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetNewPath(FjEnv, FjObject, _points);
+   Result:= jDrawingView_GetNewPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 function jDrawingView.GetNewPath(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetNewPath(FjEnv, FjObject);
+   Result:= jDrawingView_GetNewPath(gApp.jni.jEnv, FjObject);
 end;
 
 function jDrawingView.AddPointsToPath(_path: jObject; var _points: TDynArrayOfSingle): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_AddPointsToPath(FjEnv, FjObject, _path ,_points);
+   Result:= jDrawingView_AddPointsToPath(gApp.jni.jEnv, FjObject, _path ,_points);
 end;
 
 function jDrawingView.AddPointsToPath(_path: jObject; _points: array of single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_AddPointsToPath(FjEnv, FjObject, _path ,_points);
+   Result:= jDrawingView_AddPointsToPath(gApp.jni.jEnv, FjObject, _path ,_points);
 end;
 
 function jDrawingView.AddPathToPath(_srcPath: jObject; _targetPath: jObject; _dx: single; _dy: single): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_AddPathToPath(FjEnv, FjObject, _srcPath ,_targetPath ,_dx ,_dy);
+   Result:= jDrawingView_AddPathToPath(gApp.jni.jEnv, FjObject, _srcPath ,_targetPath ,_dx ,_dy);
 end;
 
 procedure jDrawingView.DrawTextOnPath(_path: jObject; _text: string; _xOffset: single; _yOffset: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _path ,_text ,_xOffset ,_yOffset);
+     jDrawingView_DrawTextOnPath(gApp.jni.jEnv, FjObject, _path ,_text ,_xOffset ,_yOffset);
 end;
 
 procedure jDrawingView.DrawTextOnPath(_text: string; _xOffset: single; _yOffset: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawTextOnPath(FjEnv, FjObject, _text ,_xOffset ,_yOffset);
+     jDrawingView_DrawTextOnPath(gApp.jni.jEnv, FjObject, _text ,_xOffset ,_yOffset);
 end;
 
 procedure jDrawingView.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF ,_startAngle ,_sweepAngle ,_useCenter);
+     jDrawingView_DrawArc(gApp.jni.jEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF ,_startAngle ,_sweepAngle ,_useCenter);
 end;
 
 procedure jDrawingView.DrawOval(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawOval(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF);
+     jDrawingView_DrawOval(gApp.jni.jEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF ,_bottomRectF);
 end;
 
 procedure jDrawingView.DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
+     jDrawingView_DrawTextMultiLine(gApp.jni.jEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
 end;
 
 procedure jDrawingView.Invalidate();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_Invalidate(FjEnv, FjObject);
+     jDrawingView_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDrawingView.Clear(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_Clear(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jDrawingView_Clear(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jDrawingView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_Clear(FjEnv, FjObject);
+     jDrawingView_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDrawingView.SetBufferedDraw(_value: boolean);
@@ -1384,105 +1384,105 @@ begin
   //in designing component state: set value here...
   FBufferedDraw:= _value;
   if FInitialized then
-     jDrawingView_SetBufferedDraw(FjEnv, FjObject, _value);
+     jDrawingView_SetBufferedDraw(gApp.jni.jEnv, FjObject, _value);
 end;
 
 function jDrawingView.GetTextHeight(_text: string): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetTextHeight(FjEnv, FjObject, _text);
+   Result:= jDrawingView_GetTextHeight(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jDrawingView.GetTextWidth(_text: string): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetTextWidth(FjEnv, FjObject, _text);
+   Result:= jDrawingView_GetTextWidth(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jDrawingView.GetTextLeft(_text: string): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetTextLeft(FjEnv, FjObject, _text);
+   Result:= jDrawingView_GetTextLeft(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jDrawingView.GetTextBottom(_text: string): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetTextBottom(FjEnv, FjObject, _text);
+   Result:= jDrawingView_GetTextBottom(gApp.jni.jEnv, FjObject, _text);
 end;
 
 procedure jDrawingView.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;
  if(FInitialized) then
-   jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jDrawingView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 procedure jDrawingView.SetTextTypeFace(AValue: TTextTypeFace);
 begin
   FTextTypeFace:= AValue ;
   if(FInitialized) then
-    jDrawingView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+    jDrawingView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 procedure jDrawingView.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_SetFontFromAssets(FjEnv, FjObject, _fontName);
+     jDrawingView_SetFontFromAssets(gApp.jni.jEnv, FjObject, _fontName);
 end;
 
 procedure jDrawingView.DrawTextFromAssetsFont(_text: string; _x: single; _y: single; _assetsFontName: string; _size: integer; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawTextFromAssetsFont(FjEnv, FjObject, _text ,_x ,_y ,_assetsFontName ,_size ,GetARGB(FCustomColor, _color));
+     jDrawingView_DrawTextFromAssetsFont(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_assetsFontName ,_size ,GetARGB(FCustomColor, _color));
 end;
 
 function jDrawingView.GetTextBox(_text: string; _x: single; _y: single): TDynArrayOfSingle;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetTextBox(FjEnv, FjObject, _text ,_x ,_y);
+   Result:= jDrawingView_GetTextBox(gApp.jni.jEnv, FjObject, _text ,_x ,_y);
 end;
 
 function jDrawingView.GetTextBox(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_GetTextBox(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+   Result:= jDrawingView_GetTextBox(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
 end;
 
 function jDrawingView.DrawTextEx(_text: string; _x: single; _y: single): TDynArrayOfSingle;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_DrawTextEx(FjEnv, FjObject, _text ,_x ,_y);
+   Result:= jDrawingView_DrawTextEx(gApp.jni.jEnv, FjObject, _text ,_x ,_y);
 end;
 
 function jDrawingView.DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean): TDynArrayOfSingle;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_DrawTextEx(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+   Result:= jDrawingView_DrawTextEx(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
 end;
 
 function jDrawingView.DrawTextEx(_text: string; _x: single; _y: single; _angleDegree: single): TDynArrayOfSingle;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_DrawTextEx(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree);
+   Result:= jDrawingView_DrawTextEx(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree);
 end;
 
 function jDrawingView.DrawTextAlignedEx(_text: string; _left: single; _top: single; _right: single; _bottom: single; _alignHorizontal: single; _alignVertical: single): TDynArrayOfSingle;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDrawingView_DrawTextAlignedEx(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom ,_alignHorizontal ,_alignVertical);
+   Result:= jDrawingView_DrawTextAlignedEx(gApp.jni.jEnv, FjObject, _text ,_left ,_top ,_right ,_bottom ,_alignHorizontal ,_alignVertical);
 end;
 
 procedure jDrawingView.SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);
@@ -1553,44 +1553,44 @@ procedure jDrawingView.DrawCroppedBitmap(_bitmap: jObject; _x: single; _y: singl
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDrawingView_DrawCroppedBitmap(FjEnv, FjObject, _bitmap ,_x ,_y ,_cropOffsetLeft ,_cropOffsetTop ,_cropWidth ,_cropHeight);
+     jDrawingView_DrawCroppedBitmap(gApp.jni.jEnv, FjObject, _bitmap ,_x ,_y ,_cropOffsetLeft ,_cropOffsetTop ,_cropWidth ,_cropHeight);
 end;
 
 procedure jDrawingView.SetPaintColor(Color: TAlphaColor);
 begin
   if FInitialized then
-     jDrawingView_SetPaintColor(FjEnv, FjObject, Color);
+     jDrawingView_SetPaintColor(gApp.jni.jEnv, FjObject, Color);
 end;
 
 procedure jDrawingView.DrawRoundRect(Left, Top, Right, Bottom, radiusX, radiusY: Single);
 begin
   if FInitialized then
-     jDrawingView_DrawRoundRect(FjEnv, FjObject, Left, Top, Right, Bottom, radiusX, radiusY);
+     jDrawingView_DrawRoundRect(gApp.jni.jEnv, FjObject, Left, Top, Right, Bottom, radiusX, radiusY);
 end;
 
 function jDrawingView.GetDensity(): Single;
 begin
   Result := 1;
   if not FInitialized then Exit;
-  Result := jDrawingView_GetDensity(FjEnv, FjObject);
+  Result := jDrawingView_GetDensity(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDrawingView.SetLayerType(Value: TLayerType);
 begin
   if FInitialized then
-    jDrawingView_SetLayerType(FjEnv, FjObject, Byte(Value));
+    jDrawingView_SetLayerType(gApp.jni.jEnv, FjObject, Byte(Value));
 end;
 
 procedure jDrawingView.ClipRect(Left, Top, Right, Bottom: Single);
 begin
   if FInitialized then
-    jDrawingView_ClipRect(FjEnv, FjObject, Left, Top, Right, Bottom);
+    jDrawingView_ClipRect(gApp.jni.jEnv, FjObject, Left, Top, Right, Bottom);
 end;
 
 procedure jDrawingView.DrawGrid(Left, Top, Width, Height: Single; cellsX, cellsY: Integer);
 begin
   if FInitialized then
-    jDrawingView_DrawGrid(FjEnv, FjObject, Left, Top, Width, Height, cellsX, cellsY);
+    jDrawingView_DrawGrid(gApp.jni.jEnv, FjObject, Left, Top, Width, Height, cellsX, cellsY);
 end;
 
 {-------- jDrawingView_JNI_Bridge ----------}

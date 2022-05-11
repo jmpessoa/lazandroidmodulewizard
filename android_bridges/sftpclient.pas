@@ -37,7 +37,7 @@ jSFTPClient = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -112,11 +112,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jSFTPClient.Init(refApp: jApp);
+procedure jSFTPClient.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -125,84 +125,84 @@ end;
 
 function jSFTPClient.jCreate(): jObject;
 begin
-   Result:= jSFTPClient_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSFTPClient_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jSFTPClient.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_jFree(FjEnv, FjObject);
+     jSFTPClient_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSFTPClient.Disconnect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_Disconnect(FjEnv, FjObject);
+     jSFTPClient_Disconnect(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSFTPClient.SetHost(_host: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_SetHost(FjEnv, FjObject, _host);
+     jSFTPClient_SetHost(gApp.jni.jEnv, FjObject, _host);
 end;
 
 procedure jSFTPClient.SetPort(_port: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_SetPort(FjEnv, FjObject, _port);
+     jSFTPClient_SetPort(gApp.jni.jEnv, FjObject, _port);
 end;
 
 procedure jSFTPClient.SetIdentityCertificateKey(_certificateKey: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_SetIdentityCertificateKey(FjEnv, FjObject, _certificateKey);
+     jSFTPClient_SetIdentityCertificateKey(gApp.jni.jEnv, FjObject, _certificateKey);
 end;
 
 procedure jSFTPClient.SetPassword(_password: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_SetPassword(FjEnv, FjObject, _password);
+     jSFTPClient_SetPassword(gApp.jni.jEnv, FjObject, _password);
 end;
 
 procedure jSFTPClient.SetUsername(_username: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_SetUsername(FjEnv, FjObject, _username);
+     jSFTPClient_SetUsername(gApp.jni.jEnv, FjObject, _username);
 end;
 
 procedure jSFTPClient.Connect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_Connect(FjEnv, FjObject);
+     jSFTPClient_Connect(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSFTPClient.Download(_fromRemote: string; _toLocal: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_Download(FjEnv, FjObject, _fromRemote ,_toLocal);
+     jSFTPClient_Download(gApp.jni.jEnv, FjObject, _fromRemote ,_toLocal);
 end;
 
 procedure jSFTPClient.Upload(_fromLocal: string; _toRemote: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_Upload(FjEnv, FjObject, _fromLocal ,_toRemote);
+     jSFTPClient_Upload(gApp.jni.jEnv, FjObject, _fromLocal ,_toRemote);
 end;
 
 procedure jSFTPClient.ListFiles(_remotePath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSFTPClient_ListFiles(FjEnv, FjObject, _remotePath);
+     jSFTPClient_ListFiles(gApp.jni.jEnv, FjObject, _remotePath);
 end;
 
 procedure jSFTPClient.GenEvent_OnSFTPClientTryConnect(Sender:TObject;success:boolean);

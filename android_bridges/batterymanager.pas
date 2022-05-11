@@ -32,7 +32,7 @@ jBatteryManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function GetBatteryPercent(): integer;
@@ -80,11 +80,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jBatteryManager.Init(refApp: jApp);
+procedure jBatteryManager.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -96,21 +96,21 @@ end;
 
 function jBatteryManager.jCreate(): jObject;
 begin
-   Result:= jBatteryManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jBatteryManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jBatteryManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBatteryManager_jFree(FjEnv, FjObject);
+     jBatteryManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jBatteryManager.GetBatteryPercent(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBatteryManager_GetBatteryPercent(FjEnv, FjObject);
+   Result:= jBatteryManager_GetBatteryPercent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBatteryManager.GenEvent_OnBatteryCharging(Sender:TObject;batteryAtPercentLevel:integer;pluggedBy:integer);

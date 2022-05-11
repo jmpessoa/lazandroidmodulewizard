@@ -22,7 +22,7 @@ jsFirebasePushNotificationListener = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure GetFirebaseMessagingTokenAsync();
@@ -61,11 +61,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jsFirebasePushNotificationListener.Init(refApp: jApp);
+procedure jsFirebasePushNotificationListener.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -77,21 +77,21 @@ end;
 
 function jsFirebasePushNotificationListener.jCreate(): jObject;
 begin
-   Result:= jsFirebasePushNotificationListener_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsFirebasePushNotificationListener_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsFirebasePushNotificationListener.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsFirebasePushNotificationListener_jFree(FjEnv, FjObject);
+     jsFirebasePushNotificationListener_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsFirebasePushNotificationListener.GetFirebaseMessagingTokenAsync();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsFirebasePushNotificationListener_GetFirebaseMessagingTokenAsync(FjEnv, FjObject);
+     jsFirebasePushNotificationListener_GetFirebaseMessagingTokenAsync(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsFirebasePushNotificationListener.GenEvent_OnGetTokenComplete(Sender:TObject;token:string;isSuccessful:boolean;statusMessage:string);

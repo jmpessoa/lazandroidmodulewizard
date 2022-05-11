@@ -40,7 +40,7 @@ jFTPClient = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -115,11 +115,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jFTPClient.Init(refApp: jApp);
+procedure jFTPClient.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -128,21 +128,21 @@ end;
 
 function jFTPClient.jCreate(): jObject;
 begin
-   Result:= jFTPClient_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jFTPClient_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jFTPClient.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_jFree(FjEnv, FjObject);
+     jFTPClient_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jFTPClient.Disconnect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_Disconnect(FjEnv, FjObject);
+     jFTPClient_Disconnect(gApp.jni.jEnv, FjObject);
 end;
 
 function jFTPClient.GetWorkingDirectory(): string;
@@ -150,7 +150,7 @@ begin
   //in designing component state: result value here...
   Result:= FWorkingDirectory;
   if FInitialized then
-   Result:= jFTPClient_GetWorkingDirectory(FjEnv, FjObject);
+   Result:= jFTPClient_GetWorkingDirectory(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jFTPClient.SetWorkingDirectory(_remotePath: string);
@@ -158,70 +158,70 @@ begin
   //in designing component state: result value here...
   FWorkingDirectory:= _remotePath;
   if FInitialized then
-    jFTPClient_SetWorkingDirectory(FjEnv, FjObject, _remotePath);
+    jFTPClient_SetWorkingDirectory(gApp.jni.jEnv, FjObject, _remotePath);
 end;
 
 procedure jFTPClient.SetHost(_host: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_SetHost(FjEnv, FjObject, _host);
+     jFTPClient_SetHost(gApp.jni.jEnv, FjObject, _host);
 end;
 
 procedure jFTPClient.SetPort(_port: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_SetPort(FjEnv, FjObject, _port);
+     jFTPClient_SetPort(gApp.jni.jEnv, FjObject, _port);
 end;
 
 procedure jFTPClient.SetPassword(_password: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_SetPassword(FjEnv, FjObject, _password);
+     jFTPClient_SetPassword(gApp.jni.jEnv, FjObject, _password);
 end;
 
 procedure jFTPClient.SetUsername(_username: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_SetUsername(FjEnv, FjObject, _username);
+     jFTPClient_SetUsername(gApp.jni.jEnv, FjObject, _username);
 end;
 
 procedure jFTPClient.Connect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_Connect(FjEnv, FjObject);
+     jFTPClient_Connect(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jFTPClient.Download(_url: string; _saveToLocal: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_Download(FjEnv, FjObject, _url ,_saveToLocal);
+     jFTPClient_Download(gApp.jni.jEnv, FjObject, _url ,_saveToLocal);
 end;
 
 procedure jFTPClient.Upload(_fromLocal: string; _url: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_Upload(FjEnv, FjObject, _fromLocal ,_url);
+     jFTPClient_Upload(gApp.jni.jEnv, FjObject, _fromLocal ,_url);
 end;
 
 procedure jFTPClient.ListFiles(_remotePath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_ListFiles(FjEnv, FjObject, _remotePath);
+     jFTPClient_ListFiles(gApp.jni.jEnv, FjObject, _remotePath);
 end;
 
 procedure jFTPClient.CountFiles(_remotePath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFTPClient_CountFiles(FjEnv, FjObject, _remotePath);
+     jFTPClient_CountFiles(gApp.jni.jEnv, FjObject, _remotePath);
 end;
 
 procedure jFTPClient.GenEvent_OnFTPClientTryConnect(Sender:TObject;success:boolean);

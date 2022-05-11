@@ -22,7 +22,7 @@ jShareFile = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     //_mimetype [lowercase!]:  "image/jpeg" or "text/plain" or "image/*" or "*/*" etc...
@@ -71,10 +71,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jShareFile.Init(refApp: jApp);
+procedure jShareFile.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -84,42 +84,42 @@ end;
 
 function jShareFile.jCreate(): jObject;
 begin
-   Result:= jShareFile_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jShareFile_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jShareFile.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_jFree(FjEnv, FjObject);
+     jShareFile_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jShareFile.ShareFromSdCard(_filename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFromSdCard(FjEnv, FjObject, _filename ,LowerCase(_mimetype));
+     jShareFile_ShareFromSdCard(gApp.jni.jEnv, FjObject, _filename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.ShareFromAssets(_filename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFromAssets(FjEnv, FjObject, _filename ,LowerCase(_mimetype));
+     jShareFile_ShareFromAssets(gApp.jni.jEnv, FjObject, _filename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.ShareFromInternalAppStorage(_filename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFromInternalAppStorage(FjEnv, FjObject, _filename ,LowerCase(_mimetype));
+     jShareFile_ShareFromInternalAppStorage(gApp.jni.jEnv, FjObject, _filename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.ShareFrom(_fullFilename: string; _mimetype: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShareFile_ShareFrom(FjEnv, FjObject, _fullFilename ,LowerCase(_mimetype));
+     jShareFile_ShareFrom(gApp.jni.jEnv, FjObject, _fullFilename ,LowerCase(_mimetype));
 end;
 
 procedure jShareFile.SetTransitoryEnvironmentDirectory(_index: TEnvDirectory);
@@ -131,7 +131,7 @@ begin
     FTransitoryEnvironmentDirectory:= dirDownloads;
 
   if FInitialized then
-     jShareFile_SetTransitoryEnvironmentDirectory(FjEnv, FjObject, Ord(FTransitoryEnvironmentDirectory));
+     jShareFile_SetTransitoryEnvironmentDirectory(gApp.jni.jEnv, FjObject, Ord(FTransitoryEnvironmentDirectory));
 end;
 
 {-------- jShareFile_JNI_Bridge ----------}

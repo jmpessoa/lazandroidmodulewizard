@@ -34,7 +34,7 @@ jCalendarView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -167,27 +167,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jCalendarView.Init(refApp: jApp);
+procedure jCalendarView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jCalendarView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jCalendarView_SetId(FjEnv, FjObject, Self.Id);
+   jCalendarView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jCalendarView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jCalendarView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jCalendarView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -196,44 +196,44 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jCalendarView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jCalendarView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jCalendarView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jCalendarView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jCalendarView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jCalendarView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   jCalendarView_SetFirstDayOfWeek(FjEnv, FjObject, FFirstDayOfWeek);
+   jCalendarView_SetFirstDayOfWeek(gApp.jni.jEnv, FjObject, FFirstDayOfWeek);
 
    if FFocusedMonthDateColor <> colbrDefault then
-    jCalendarView_SetFocusedMonthDateColor(FjEnv, FjObject, GetARGB(FCustomColor, FFocusedMonthDateColor));
+    jCalendarView_SetFocusedMonthDateColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFocusedMonthDateColor));
 
    if FSelectedWeekBackgroundColor <> colbrDefault then
-    jCalendarView_SetSelectedWeekBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FSelectedWeekBackgroundColor));
+    jCalendarView_SetSelectedWeekBackgroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FSelectedWeekBackgroundColor));
 
    if FWeekSeparatorLineColor <> colbrDefault then
-    jCalendarView_SetWeekSeparatorLineColor(FjEnv, FjObject, GetARGB(FCustomColor, FWeekSeparatorLineColor));
+    jCalendarView_SetWeekSeparatorLineColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FWeekSeparatorLineColor));
 
    if FWeekNumberColor <> colbrDefault then
-    jCalendarView_SetWeekNumberColor(FjEnv, FjObject, GetARGB(FCustomColor, FWeekNumberColor));
+    jCalendarView_SetWeekNumberColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FWeekNumberColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -241,13 +241,13 @@ procedure jCalendarView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jCalendarView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jCalendarView.UpdateLayout;
@@ -258,13 +258,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jCalendarView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -275,112 +275,112 @@ end;
 
 function jCalendarView.jCreate(): jObject;
 begin
-   Result:= jCalendarView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jCalendarView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jCalendarView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_jFree(FjEnv, FjObject);
+     jCalendarView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCalendarView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jCalendarView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jCalendarView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetParent(FjEnv, FjObject);
+   Result:= jCalendarView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCalendarView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_RemoveFromViewParent(FjEnv, FjObject);
+     jCalendarView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jCalendarView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetView(FjEnv, FjObject);
+   Result:= jCalendarView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCalendarView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetLParamWidth(FjEnv, FjObject, _w);
+     jCalendarView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jCalendarView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetLParamHeight(FjEnv, FjObject, _h);
+     jCalendarView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jCalendarView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jCalendarView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jCalendarView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jCalendarView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCalendarView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetLGravity(FjEnv, FjObject, _g);
+     jCalendarView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jCalendarView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetLWeight(FjEnv, FjObject, _w);
+     jCalendarView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jCalendarView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jCalendarView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jCalendarView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jCalendarView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jCalendarView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jCalendarView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jCalendarView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jCalendarView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jCalendarView.ClearLayout();
@@ -391,15 +391,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jCalendarView_clearLayoutAll(FjEnv, FjObject);
+     jCalendarView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jCalendarView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jCalendarView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jCalendarView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jCalendarView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -412,14 +412,14 @@ begin
   if FFirstDayOfWeek > 7 then  FFirstDayOfWeek:= 7;
 
   if FInitialized then
-     jCalendarView_SetFirstDayOfWeek(FjEnv, FjObject, _firstDayOfWeek);
+     jCalendarView_SetFirstDayOfWeek(gApp.jni.jEnv, FjObject, _firstDayOfWeek);
 end;
 
 function jCalendarView.GetFirstDayOfWeek(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetFirstDayOfWeek(FjEnv, FjObject);
+   Result:= jCalendarView_GetFirstDayOfWeek(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCalendarView.SetFocusedMonthDateColor(_color: TARGBColorBridge);
@@ -427,7 +427,7 @@ begin
   //in designing component state: set value here...
   FFocusedMonthDateColor:= _color;
   if FInitialized then
-     jCalendarView_SetFocusedMonthDateColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jCalendarView_SetFocusedMonthDateColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jCalendarView.SetUnfocusedMonthDateColor(_color: TARGBColorBridge);
@@ -435,7 +435,7 @@ begin
   //in designing component state: set value here...
   //FUnFocusedMonthDateColor:= _color;
   if FInitialized then
-     jCalendarView_SetUnfocusedMonthDateColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jCalendarView_SetUnfocusedMonthDateColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jCalendarView.SetSelectedWeekBackgroundColor(_color: TARGBColorBridge);
@@ -443,7 +443,7 @@ begin
   //in designing component state: set value here...
   FSelectedWeekBackgroundColor:= _color;
   if FInitialized then
-     jCalendarView_SetSelectedWeekBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jCalendarView_SetSelectedWeekBackgroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jCalendarView.SetWeekSeparatorLineColor(_color: TARGBColorBridge);
@@ -451,7 +451,7 @@ begin
   //in designing component state: set value here...
   FWeekSeparatorLineColor:= _color;
   if FInitialized then
-     jCalendarView_SetWeekSeparatorLineColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jCalendarView_SetWeekSeparatorLineColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jCalendarView.SetWeekNumberColor(_color: TARGBColorBridge);
@@ -459,56 +459,56 @@ begin
   //in designing component state: set value here...
   FWeekNumberColor:= _color;
   if FInitialized then
-     jCalendarView_SetWeekNumberColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jCalendarView_SetWeekNumberColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 function jCalendarView.GetDate(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetDate(FjEnv, FjObject);
+   Result:= jCalendarView_GetDate(gApp.jni.jEnv, FjObject);
 end;
 
 function jCalendarView.GetMaxDate(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetMaxDate(FjEnv, FjObject);
+   Result:= jCalendarView_GetMaxDate(gApp.jni.jEnv, FjObject);
 end;
 
 function jCalendarView.GetMinDate(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCalendarView_GetMinDate(FjEnv, FjObject);
+   Result:= jCalendarView_GetMinDate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCalendarView.SetShowWeekNumber(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetShowWeekNumber(FjEnv, FjObject, _value);
+     jCalendarView_SetShowWeekNumber(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jCalendarView.SetDate(_year: integer; _month: integer; _day: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetDate(FjEnv, FjObject, _year ,_month ,_day);
+     jCalendarView_SetDate(gApp.jni.jEnv, FjObject, _year ,_month ,_day);
 end;
 
 procedure jCalendarView.SetMaxDate(_year: integer; _month: integer; _day: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetMaxDate(FjEnv, FjObject, _year ,_month ,_day);
+     jCalendarView_SetMaxDate(gApp.jni.jEnv, FjObject, _year ,_month ,_day);
 end;
 
 procedure jCalendarView.SetMinDate(_year: integer; _month: integer; _day: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCalendarView_SetMinDate(FjEnv, FjObject, _year ,_month ,_day);
+     jCalendarView_SetMinDate(gApp.jni.jEnv, FjObject, _year ,_month ,_day);
 end;
 
 

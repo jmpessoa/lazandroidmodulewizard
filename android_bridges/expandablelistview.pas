@@ -55,7 +55,7 @@ jExpandableListView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -224,7 +224,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jExpandableListView.Init(refApp: jApp);
+procedure jExpandableListView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -232,20 +232,20 @@ var
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jExpandableListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jExpandableListView_SetId(FjEnv, FjObject, Self.Id);
+   jExpandableListView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jExpandableListView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jExpandableListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jExpandableListView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -254,74 +254,74 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jExpandableListView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jExpandableListView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jExpandableListView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jExpandableListView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if not FInitialized then
   begin
    if FFontSizeUnit <> unitDefault then
-    jExpandableListView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+    jExpandableListView_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(FFontSizeUnit));
 
    if FFontSize > 0 then
-    jExpandableListView_SetFontSize(FjEnv, FjObject , FFontSize);
+    jExpandableListView_SetFontSize(gApp.jni.jEnv, FjObject , FFontSize);
 
    if FFontColor <> colbrDefault  then
-    jExpandableListView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+    jExpandableListView_SetFontColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
    if FFontChildColor <> colbrDefault  then
-    jExpandableListView_SetFontChildColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontChildColor));
+    jExpandableListView_SetFontChildColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontChildColor));
 
    if FBackgroundChildColor <>  colbrDefault then
-     jExpandableListView_SetBackgroundChild(FjEnv, FjObject, GetARGB(FCustomColor, FBackgroundChildColor));
+     jExpandableListView_SetBackgroundChild(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FBackgroundChildColor));
 
    if FTextAlign <> alLeft then
-    jExpandableListView_SetTextAlign(FjEnv, FjObject, Ord(FTextAlign));
+    jExpandableListView_SetTextAlign(gApp.jni.jEnv, FjObject, Ord(FTextAlign));
 
    if FTextChildAlign <> alLeft then
-    jExpandableListView_SetTextChildAlign(FjEnv, FjObject, Ord(FTextChildAlign));
+    jExpandableListView_SetTextChildAlign(gApp.jni.jEnv, FjObject, Ord(FTextChildAlign));
 
    if FFontFace <> ffNormal then
-    jExpandableListView_SetFontFace(FjEnv, FjObject, Ord(FFontFace));
+    jExpandableListView_SetFontFace(gApp.jni.jEnv, FjObject, Ord(FFontFace));
 
    if FTextTypeFace <> tfNormal then
-    jExpandableListView_SetTextTypeFace(FjEnv, FjObject, Ord(FTextTypeFace));
+    jExpandableListView_SetTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FTextTypeFace));
 
    if FImageItemIdentifier <> '' then
-    jExpandableListView_SetImageItemIdentifier(FjEnv, FjObject, FImageItemIdentifier);
+    jExpandableListView_SetImageItemIdentifier(gApp.jni.jEnv, FjObject, FImageItemIdentifier);
 
    if FImageChildItemIdentifier <> '' then
-    jExpandableListView_SetImageChildItemIdentifier(FjEnv, FjObject, FImageChildItemIdentifier);
+    jExpandableListView_SetImageChildItemIdentifier(gApp.jni.jEnv, FjObject, FImageChildItemIdentifier);
 
    if FHighLightSelectedChildItemColor <> colbrDefault then
-      jExpandableListView_SetHighLightSelectedChildItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedChildItemColor));
+      jExpandableListView_SetHighLightSelectedChildItemColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedChildItemColor));
 
    for i:= 0 to FItems.Count - 1 do
    begin
     if FItems.Strings[i] <> '' then
-         jExpandableListView_Add(FjEnv, FjObject , FItems.Strings[i], FGroupItemDelimiter, FChildItemDelimiter);
+         jExpandableListView_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i], FGroupItemDelimiter, FChildItemDelimiter);
    end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jExpandableListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jExpandableListView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -329,13 +329,13 @@ procedure jExpandableListView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jExpandableListView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jExpandableListView.UpdateLayout;
@@ -346,13 +346,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jExpandableListView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -363,70 +363,70 @@ end;
 
 function jExpandableListView.jCreate(): jObject;
 begin
-   Result:= jExpandableListView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jExpandableListView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jExpandableListView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_jFree(FjEnv, FjObject);
+     jExpandableListView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jExpandableListView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jExpandableListView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jExpandableListView.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpandableListView_GetParent(FjEnv, FjObject);
+   Result:= jExpandableListView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jExpandableListView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_RemoveFromViewParent(FjEnv, FjObject);
+     jExpandableListView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jExpandableListView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpandableListView_GetView(FjEnv, FjObject);
+   Result:= jExpandableListView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jExpandableListView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetLParamWidth(FjEnv, FjObject, _w);
+     jExpandableListView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jExpandableListView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetLParamHeight(FjEnv, FjObject, _h);
+     jExpandableListView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jExpandableListView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpandableListView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jExpandableListView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jExpandableListView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpandableListView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jExpandableListView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jExpandableListView.SetLGravity(_gravity: TLayoutGravity);
@@ -434,42 +434,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jExpandableListView_SetLGravity(FjEnv, FjObject, Ord(_gravity));
+     jExpandableListView_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jExpandableListView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetLWeight(FjEnv, FjObject, _w);
+     jExpandableListView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jExpandableListView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jExpandableListView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jExpandableListView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jExpandableListView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jExpandableListView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jExpandableListView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jExpandableListView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jExpandableListView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jExpandableListView.ClearLayout();
@@ -480,15 +480,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jExpandableListView_clearLayoutAll(FjEnv, FjObject);
+     jExpandableListView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jExpandableListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jExpandableListView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jExpandableListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jExpandableListView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -496,7 +496,7 @@ Procedure jExpandableListView.SetFontColor(_color: TARGBColorBridge);
 begin
   FFontColor:= _color;
   if (FInitialized = True) and (FFontColor <> colbrDefault ) then
-      jExpandableListView_SetFontColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+      jExpandableListView_SetFontColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jExpandableListView.SetFontChildColor(_color: TARGBColorBridge);
@@ -504,7 +504,7 @@ begin
   //in designing component state: set value here...
   FFontChildColor := _color;
   if (FInitialized = True) and (FFontColor <> colbrDefault ) then
-     jExpandableListView_SetFontChildColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontChildColor));
+     jExpandableListView_SetFontChildColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontChildColor));
 end;
 
 procedure jExpandableListView.SetItems(Value: TStrings);
@@ -518,7 +518,7 @@ begin
     for i:= 0 to FItems.Count - 1 do
     begin
        if FItems.Strings[i] <> '' then
-         jExpandableListView_Add(FjEnv, FjObject , FItems.Strings[i], FGroupItemDelimiter, FChildItemDelimiter);
+         jExpandableListView_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i], FGroupItemDelimiter, FChildItemDelimiter);
     end;
   end;
 
@@ -528,14 +528,14 @@ procedure jExpandableListView.Add(_header: string; _delimitedChildItems: string)
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_Add(FjEnv, FjObject, _header , _delimitedChildItems);
+     jExpandableListView_Add(gApp.jni.jEnv, FjObject, _header , _delimitedChildItems);
 end;
 
 procedure jExpandableListView.Add(_delimitedItem: string; _headerDelimiter: string; _childInnerDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_Add(FjEnv, FjObject, _delimitedItem ,_headerDelimiter , _childInnerDelimiter);
+     jExpandableListView_Add(gApp.jni.jEnv, FjObject, _delimitedItem ,_headerDelimiter , _childInnerDelimiter);
 end;
 
 procedure jExpandableListView.SetGroupItemDelimiter(_itemGroupDelimiter: string);
@@ -543,7 +543,7 @@ begin
   //in designing component state: set value here...
   FGroupItemDelimiter:=  _itemGroupDelimiter;
   if FInitialized then
-     jExpandableListView_SetItemHeaderDelimiter(FjEnv, FjObject, _itemGroupDelimiter);
+     jExpandableListView_SetItemHeaderDelimiter(gApp.jni.jEnv, FjObject, _itemGroupDelimiter);
 end;
 
 procedure jExpandableListView.SetChildItemDelimiter(_itemChildDelimiter: string);
@@ -551,21 +551,21 @@ begin
   //in designing component state: set value here...
   FChildItemDelimiter:= _itemChildDelimiter;
   if FInitialized then
-     jExpandableListView_SetItemChildInnerDelimiter(FjEnv, FjObject, _itemChildDelimiter);
+     jExpandableListView_SetItemChildInnerDelimiter(gApp.jni.jEnv, FjObject, _itemChildDelimiter);
 end;
 
 procedure jExpandableListView.SetFontColorAll(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetFontColorAll(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jExpandableListView_SetFontColorAll(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jExpandableListView.SetFontChildColorAll(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_SetFontChildColorAll(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jExpandableListView_SetFontChildColorAll(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jExpandableListView.SetBackgroundChild(_color: TARGBColorBridge);
@@ -573,7 +573,7 @@ begin
   //in designing component state: set value here...
   FBackgroundChildColor:= _color;
   if FInitialized then
-     jExpandableListView_SetBackgroundChild(FjEnv, FjObject, GetARGB(FCustomColor, FBackgroundChildColor));
+     jExpandableListView_SetBackgroundChild(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FBackgroundChildColor));
 end;
 
 procedure jExpandableListView.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -581,7 +581,7 @@ begin
   //in designing component state: set value here...
   FFontSizeUnit:=_unit;
   if FInitialized then
-     jExpandableListView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit) );
+     jExpandableListView_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(_unit) );
 end;
 
 procedure jExpandableListView.SetFontSize(_fontSize: DWord);
@@ -589,7 +589,7 @@ begin
   //in designing component state: set value here...
   FFontSize:= _fontSize;
   if FInitialized then
-     jExpandableListView_SetFontSize(FjEnv, FjObject, _fontSize);
+     jExpandableListView_SetFontSize(gApp.jni.jEnv, FjObject, _fontSize);
 end;
 
 procedure jExpandableListView.SetFontChildSize(_fontSize: DWord);
@@ -597,7 +597,7 @@ begin
   //in designing component state: set value here...
   FFontChildSize:= _fontSize;
   if FInitialized then
-     jExpandableListView_SetFontChildSize(FjEnv, FjObject, _fontSize);
+     jExpandableListView_SetFontChildSize(gApp.jni.jEnv, FjObject, _fontSize);
 end;
 
 procedure jExpandableListView.SetTextAlign(_align: TTextAlign);
@@ -605,7 +605,7 @@ begin
   //in designing component state: set value here...
   FTextAlign := _align;
   if FInitialized then
-     jExpandableListView_SetTextAlign(FjEnv, FjObject, Ord(_align));
+     jExpandableListView_SetTextAlign(gApp.jni.jEnv, FjObject, Ord(_align));
 end;
 
 procedure jExpandableListView.SetTextChildAlign(_align: TTextAlign);
@@ -613,7 +613,7 @@ begin
   //in designing component state: set value here...
   FTextChildAlign:= _align;
   if FInitialized then
-     jExpandableListView_SetTextChildAlign(FjEnv, FjObject, Ord(_align) );
+     jExpandableListView_SetTextChildAlign(gApp.jni.jEnv, FjObject, Ord(_align) );
 end;
 
 procedure jExpandableListView.SetFontFace(_fontFace: TFontFace);
@@ -621,7 +621,7 @@ begin
   //in designing component state: set value here...
   FFontFace:=  _fontFace;
   if FInitialized then
-     jExpandableListView_SetFontFace(FjEnv, FjObject, Ord(_fontFace));
+     jExpandableListView_SetFontFace(gApp.jni.jEnv, FjObject, Ord(_fontFace));
 end;
 
 procedure jExpandableListView.SetTextChildTypeFace(_typeface: TTextTypeFace);
@@ -629,7 +629,7 @@ begin
   //in designing component state: set value here...
   FTextChildTypeFace:= _typeface;
   if FInitialized then
-     jExpandableListView_SetTextChildTypeFace(FjEnv, FjObject, Ord(_typeface));
+     jExpandableListView_SetTextChildTypeFace(gApp.jni.jEnv, FjObject, Ord(_typeface));
 end;
 
 procedure jExpandableListView.GenEvent_OnGroupExpand(Obj: TObject;  groupPosition: integer; groupHeader: string);
@@ -642,7 +642,7 @@ begin
   //in designing component state: set value here...
   FTextTypeFace:= _typeface;
   if FInitialized then
-     jExpandableListView_SetTextTypeFace(FjEnv, FjObject, Ord(_typeface));
+     jExpandableListView_SetTextTypeFace(gApp.jni.jEnv, FjObject, Ord(_typeface));
 end;
 
 procedure jExpandableListView.SetImageItemIdentifier(_imageResIdentifier: string);
@@ -650,7 +650,7 @@ begin
   //in designing component state: set value here...
   FImageItemIdentifier:= _imageResIdentifier;
   if FInitialized then
-     jExpandableListView_SetImageItemIdentifier(FjEnv, FjObject, FImageItemIdentifier);
+     jExpandableListView_SetImageItemIdentifier(gApp.jni.jEnv, FjObject, FImageItemIdentifier);
 end;
 
 procedure jExpandableListView.SetImageChildItemIdentifier(_imageResIdentifier: string);
@@ -658,7 +658,7 @@ begin
   //in designing component state: set value here...
   FImageChildItemIdentifier:= _imageResIdentifier;
   if FInitialized  then
-     jExpandableListView_SetImageChildItemIdentifier(FjEnv, FjObject, ImageChildItemIdentifier);
+     jExpandableListView_SetImageChildItemIdentifier(gApp.jni.jEnv, FjObject, ImageChildItemIdentifier);
 end;
 
 procedure jExpandableListView.SetHighLightSelectedChildItemColor(_color: TARGBColorBridge);
@@ -666,28 +666,28 @@ begin
   //in designing component state: set value here...
   FHighLightSelectedChildItemColor:= _color;
   if FInitialized then
-     jExpandableListView_SetHighLightSelectedChildItemColor(FjEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedChildItemColor));
+     jExpandableListView_SetHighLightSelectedChildItemColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FHighLightSelectedChildItemColor));
 end;
 
 procedure jExpandableListView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_Clear(FjEnv, FjObject);
+     jExpandableListView_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jExpandableListView.ClearChildren(_groupPosition: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_ClearChildren(FjEnv, FjObject, _groupPosition);
+     jExpandableListView_ClearChildren(gApp.jni.jEnv, FjObject, _groupPosition);
 end;
 
 procedure jExpandableListView.ClearGroup(_groupPosition: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpandableListView_ClearGroup(FjEnv, FjObject, _groupPosition);
+     jExpandableListView_ClearGroup(gApp.jni.jEnv, FjObject, _groupPosition);
 end;
 
 

@@ -23,7 +23,7 @@ jShellCommand = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure ExecuteAsync(_shellCmd: string);
@@ -62,10 +62,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jShellCommand.Init(refApp: jApp);
+procedure jShellCommand.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -74,21 +74,21 @@ end;
 
 function jShellCommand.jCreate(): jObject;
 begin
-   Result:= jShellCommand_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jShellCommand_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jShellCommand.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShellCommand_jFree(FjEnv, FjObject);
+     jShellCommand_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jShellCommand.ExecuteAsync(_shellCmd: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jShellCommand_Execute(FjEnv, FjObject, _shellCmd);
+     jShellCommand_Execute(gApp.jni.jEnv, FjObject, _shellCmd);
 end;
 
 procedure jShellCommand.GenEvent_OnShellCommandExecuted(Obj: TObject; cmdResult: string);

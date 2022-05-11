@@ -61,13 +61,12 @@ jGdxForm = class(TAndroidForm)
     constructor CreateNew(AOwner: TComponent);
 
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
-    procedure ReInit(refApp: jApp);
+    procedure Init; override;
+    procedure ReInit;
     function jCreate( _active: boolean): jObject;
     procedure jFree();
 
     Procedure Close;
-    procedure UpdateJNI(refApp: jApp); override;
     procedure Finish();
     procedure Show();
 
@@ -198,17 +197,17 @@ begin
 
 end;
 
-procedure jGdxForm.Init(refApp: jApp);
+procedure jGdxForm.Init;
 var
   i: integer;
 begin
 
     if FInitialized  then Exit;
-    if refApp = nil then Exit;
+    if gApp = nil then Exit;
   
-    if not refApp.Initialized then Exit;
+    if not gApp.Initialized then Exit;
 
-    inherited Init(refApp);
+    inherited Init;
 
     FVisible := False;
 
@@ -222,15 +221,15 @@ begin
 
     FInitialized:= True;
 
-    FScreenStyle:= refApp.Orientation;
-    FScreenWH:= refApp.Screen.WH;   //sAved on start!
-    FPackageName:= refApp.AppName;
+    FScreenStyle:= gApp.Orientation;
+    FScreenWH:= gApp.Screen.WH;   //sAved on start!
+    FPackageName:= gApp.AppName;
 
     for i:= (Self.ComponentCount-1) downto 0 do
     begin
       if (Self.Components[i] is jControl) then
       begin
-         (Self.Components[i] as jControl).Init(refApp);
+         (Self.Components[i] as jControl).Init;
       end;
     end;
 
@@ -251,14 +250,14 @@ begin
 
 end;
 
-procedure jGdxForm.ReInit(refApp: jApp);
+procedure jGdxForm.ReInit;
 var
   i: integer;
 begin
 
   if not FInitialized then
   begin
-     Self.Init(refApp);
+     Self.Init;
      Exit;
   end;
 
@@ -271,12 +270,12 @@ begin
   end;
 
   self.Initialized:= False;
-  Self.Init(refApp);
+  Self.Init;
 end;
 
 function jGdxForm.jCreate( _active: boolean): jObject;
 begin
-   Result:= jGdxForm_jCreate(FjEnv, int64(Self) ,_active, FjThis);
+   Result:= jGdxForm_jCreate(gApp.jni.jEnv, int64(Self) ,_active, gApp.jni.jThis);
 end;
 
 destructor jGdxForm.Destroy;
@@ -288,7 +287,7 @@ begin
        if FInitialized and (not Finished) then
        begin
           jFree();
-          FjEnv^.DeleteGlobalRef(FjEnv,FjObject);
+          gApp.jni.jEnv^.DeleteGlobalRef(gApp.jni.jEnv,FjObject);
           FjObject:= nil;
        end;
      end;
@@ -301,7 +300,7 @@ procedure jGdxForm.jFree();
 begin
   //in designing component state: set value here...
   if (FInitialized) and (FjObject <> nil) then
-     jGdxForm_jFree(FjEnv, FjObject);
+     jGdxForm_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxForm.Finish();
@@ -357,7 +356,7 @@ begin
     FormBaseIndex:= gApp.TopIndex;
     gApp.TopIndex:= Self.FormIndex;
     FVisible:= True;
-    jGdxForm_Show(FjEnv, FjObject);
+    jGdxForm_Show(gApp.jni.jEnv, FjObject);
   end;
 
 end;
@@ -367,7 +366,7 @@ begin
   //in designing component state: result value here...
   Result:= FWidth;
   if FInitialized then
-   Result:= jGdxForm_GetWidth(FjEnv, FjObject);
+   Result:= jGdxForm_GetWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxForm.GetHeight(): integer;
@@ -375,7 +374,7 @@ begin
   //in designing component state: result value here...
   Result:= FHeight;
   if FInitialized then
-   Result:= jGdxForm_GetHeight(FjEnv, FjObject);
+   Result:= jGdxForm_GetHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxForm.SetWidth(const AValue: integer);
@@ -392,42 +391,42 @@ procedure jGdxForm.ClearColor(_red: single; _green: single; _blue: single; _alph
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxForm_ClearColor(FjEnv, FjObject, _red ,_green ,_blue ,_alpha);
+     jGdxForm_ClearColor(gApp.jni.jEnv, FjObject, _red ,_green ,_blue ,_alpha);
 end;
 
 function jGdxForm.GetGamePlayingSeconds(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxForm_GetGamePlayingSeconds(FjEnv, FjObject);
+   Result:= jGdxForm_GetGamePlayingSeconds(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxForm.GetGameRenderCount(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxForm_GetGameRenderCount(FjEnv, FjObject);
+   Result:= jGdxForm_GetGameRenderCount(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxForm.GetGameStartTimeMilliSeconds(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxForm_GetGameStartTimeMilliSeconds(FjEnv, FjObject);
+   Result:= jGdxForm_GetGameStartTimeMilliSeconds(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxForm.GetGameEndTimeMilliSeconds(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxForm_GetGameEndTimeMilliSeconds(FjEnv, FjObject);
+   Result:= jGdxForm_GetGameEndTimeMilliSeconds(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxForm.GetGameCurrentTimeMilliSeconds(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxForm_GetGameCurrentTimeMilliSeconds(FjEnv, FjObject);
+   Result:= jGdxForm_GetGameCurrentTimeMilliSeconds(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxForm.GenEvent_OnGDXFormShow(Sender:TObject);
@@ -489,21 +488,6 @@ end;
 procedure jGdxForm.GenEvent_OnGDXFormHide(Sender:TObject);
 begin
   if Assigned(FOnGDXFormHide) then FOnGDXFormHide(Sender);
-end;
-
-procedure jGdxForm.UpdateJNI(refApp: jApp);
-var
-  i, count: integer;
-begin
-  inherited UpdateJNI(refApp);
-  count:= Self.ComponentCount;
-  for i:= (count-1) downto 0 do
-  begin
-    if (Self.Components[i] is jControl) then
-    begin
-       (Self.Components[i] as jControl).UpdateJNI(refApp);
-    end;
-  end;
 end;
 
 {-------- jGdxForm_JNI_Bridge ----------}

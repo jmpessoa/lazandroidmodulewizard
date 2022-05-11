@@ -27,7 +27,7 @@ jContextMenu = class(jControl)
 
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function CheckItemCommute(_item: jObject): integer;
@@ -104,10 +104,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jContextMenu.Init(refApp: jApp);
+procedure jContextMenu.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -116,14 +116,14 @@ end;
 
 function jContextMenu.jCreate(): jObject;
 begin
-   Result:= jContextMenu_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jContextMenu_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jContextMenu.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContextMenu_jFree(FjEnv, FjObject);
+     jContextMenu_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jContextMenu.CheckItemCommute(_item: jObject): integer;
@@ -131,7 +131,7 @@ begin
   //in designing component state: set value here...
 
   if FInitialized then
-     Result:= jContextMenu_CheckItemCommute(FjEnv, FjObject, _item);
+     Result:= jContextMenu_CheckItemCommute(gApp.jni.jEnv, FjObject, _item);
 end;
 
 function jContextMenu.CheckItem(_item: jObject): integer;
@@ -139,7 +139,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     Result:= jContextMenu_CheckItem(FjEnv, FjObject, _item);
+     Result:= jContextMenu_CheckItem(gApp.jni.jEnv, FjObject, _item);
   end;
 end;
 
@@ -148,7 +148,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     Result:= jContextMenu_UnCheckItem(FjEnv, FjObject, _item);
+     Result:= jContextMenu_UnCheckItem(gApp.jni.jEnv, FjObject, _item);
   end;
 end;
 
@@ -156,48 +156,48 @@ function jContextMenu.Size(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContextMenu_Size(FjEnv, FjObject);
+   Result:= jContextMenu_Size(gApp.jni.jEnv, FjObject);
 end;
 
 function jContextMenu.FindMenuItemByID(_itemID: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContextMenu_FindMenuItemByID(FjEnv, FjObject, _itemID);
+   Result:= jContextMenu_FindMenuItemByID(gApp.jni.jEnv, FjObject, _itemID);
 end;
 
 function jContextMenu.GetMenuItemByIndex(_index: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContextMenu_GetMenuItemByIndex(FjEnv, FjObject, _index);
+   Result:= jContextMenu_GetMenuItemByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jContextMenu.UnCheckAllMenuItem();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContextMenu_UnCheckAllMenuItem(FjEnv, FjObject);
+     jContextMenu_UnCheckAllMenuItem(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jContextMenu.RegisterForContextMenu(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContextMenu_RegisterForContextMenu(FjEnv, FjObject, _view);
+     jContextMenu_RegisterForContextMenu(gApp.jni.jEnv, FjObject, _view);
 end;
 
 procedure jContextMenu.UnRegisterForContextMenu(_View: JObject); 
 begin 
 if(FInitialized) then 
-  JContextMenu_UnRegisterForContextMenu(FjEnv, FjObject, _View); 
+  JContextMenu_UnRegisterForContextMenu(gApp.jni.jEnv, FjObject, _View); 
 end; 
 
 //by Tomash
 procedure jContextMenu.OpenContextMenu(_View: JObject);
 begin
 if(FInitialized) then
-  JContextMenu_OpenContextMenu(FjEnv, FjObject, _View);
+  JContextMenu_OpenContextMenu(gApp.jni.jEnv, FjObject, _View);
 end;
 
 
@@ -205,7 +205,7 @@ function jContextMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string
 begin
   //in designing component state: set value here...
   if FInitialized then
-     Result:= jContextMenu_AddItem(FjEnv, FjObject, _menu ,_itemID ,_caption ,Ord(_itemType));
+     Result:= jContextMenu_AddItem(gApp.jni.jEnv, FjObject, _menu ,_itemID ,_caption ,Ord(_itemType));
 end;
 
 procedure jContextMenu.SetOptions(Value: TStrings);
@@ -217,21 +217,21 @@ procedure jContextMenu.SetHeader(_menu: jObject; _title: string; _headerIconIden
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContextMenu_SetHeader(FjEnv, FjObject, _menu ,_title ,_headerIconIdentifier);
+     jContextMenu_SetHeader(gApp.jni.jEnv, FjObject, _menu ,_title ,_headerIconIdentifier);
 end;
 
 procedure jContextMenu.SetHeaderTitle( _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContextMenu_SetHeaderTitle(FjEnv, FjObject ,_title);
+     jContextMenu_SetHeaderTitle(gApp.jni.jEnv, FjObject ,_title);
 end;
 
 procedure jContextMenu.SetHeaderIcon(_headerIconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContextMenu_SetHeaderIconByIdentifier(FjEnv, FjObject, _headerIconIdentifier);
+     jContextMenu_SetHeaderIconByIdentifier(gApp.jni.jEnv, FjObject, _headerIconIdentifier);
 end;
 
 function jContextMenu.IsItemChecked( _itemID: integer): boolean;
@@ -239,7 +239,7 @@ begin
   //in designing component state: set value here...
   Result:= False;
   if FInitialized then
-     Result:= jContextMenu_IsItemChecked(FjEnv, FjObject, _itemID);
+     Result:= jContextMenu_IsItemChecked(gApp.jni.jEnv, FjObject, _itemID);
 end;
 
 {-------- jContextMenu_JNI_Bridge ----------}

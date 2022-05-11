@@ -23,7 +23,7 @@ jSoundPool = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function  SoundLoad(_path: string; _filename: string): integer; overload;
     function  SoundLoad(_path: string): integer; overload;
     procedure SoundUnload(soundId: integer);
@@ -66,7 +66,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -74,12 +74,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jSoundPool.Init(refApp: jApp);
+procedure jSoundPool.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jSoundPool_jCreate(FjEnv, int64(Self), FMaxStreams, FjThis);
+  FjObject := jSoundPool_jCreate(gApp.jni.jEnv, int64(Self), FMaxStreams, gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
@@ -91,7 +91,7 @@ function jSoundPool.SoundLoad(_path: string; _filename: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tt_out_i(FjEnv, FjObject, 'SoundLoad', _path ,_filename);
+   Result:= jni_func_tt_out_i(gApp.jni.jEnv, FjObject, 'SoundLoad', _path ,_filename);
 end;
 
 function jSoundPool.SoundLoad(_path: string): integer;
@@ -99,14 +99,14 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_i(FjEnv, FjObject, 'SoundLoad', _path);
+   Result:= jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'SoundLoad', _path);
 end;
 
 procedure jSoundPool.SoundUnload(soundId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SoundUnload', soundId);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SoundUnload', soundId);
 end;
 
 (*
@@ -130,70 +130,70 @@ function jSoundPool.SoundPlay(soundId: integer; _leftVolume: single; _rightVolum
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSoundPool_SoundPlay(FjEnv, FjObject, soundId ,_leftVolume ,_rightVolume ,_priority ,_loop ,_rate);
+   Result:= jSoundPool_SoundPlay(gApp.jni.jEnv, FjObject, soundId ,_leftVolume ,_rightVolume ,_priority ,_loop ,_rate);
 end;
 
 procedure jSoundPool.StreamSetVolume(streamId: integer; _leftVolume: single; _rightVolume: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iff(FjEnv, FjObject, 'StreamSetVolume', streamId ,_leftVolume ,_rightVolume);
+     jni_proc_iff(gApp.jni.jEnv, FjObject, 'StreamSetVolume', streamId ,_leftVolume ,_rightVolume);
 end;
 
 procedure jSoundPool.StreamSetPriority(streamId: integer; _priority: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'StreamSetPriority', streamId ,_priority);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'StreamSetPriority', streamId ,_priority);
 end;
 
 procedure jSoundPool.StreamSetLoop(streamId: integer; _loop: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'StreamSetLoop', streamId ,_loop);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'StreamSetLoop', streamId ,_loop);
 end;
 
 procedure jSoundPool.StreamSetRate(streamId: integer; _rate: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_if(FjEnv, FjObject, 'StreamSetRate', streamId ,_rate);
+     jni_proc_if(gApp.jni.jEnv, FjObject, 'StreamSetRate', streamId ,_rate);
 end;
 
 procedure jSoundPool.StreamPause(streamId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'StreamPause', streamId);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'StreamPause', streamId);
 end;
 
 procedure jSoundPool.StreamResume(streamId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'StreamResume', streamId);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'StreamResume', streamId);
 end;
 
 procedure jSoundPool.StreamStop(streamId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'StreamStop', streamId);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'StreamStop', streamId);
 end;
 
 procedure jSoundPool.PauseAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'PauseAll');
+     jni_proc(gApp.jni.jEnv, FjObject, 'PauseAll');
 end;
 
 procedure jSoundPool.ResumeAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ResumeAll');
+     jni_proc(gApp.jni.jEnv, FjObject, 'ResumeAll');
 end;
 
 procedure jSoundPool.GenEvent_OnLoadComplete(Obj: jObject; soundId: integer; status: integer);

@@ -38,7 +38,7 @@ jGdxShapeRenderer = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -104,11 +104,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxShapeRenderer.Init(refApp: jApp);
+procedure jGdxShapeRenderer.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -117,49 +117,49 @@ end;
 
 function jGdxShapeRenderer.jCreate(): jObject;
 begin
-   Result:= jGdxShapeRenderer_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxShapeRenderer_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxShapeRenderer.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_jFree(FjEnv, FjObject);
+     jGdxShapeRenderer_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxShapeRenderer.SetProjectionMatrix(_matrix4: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_SetProjectionMatrix(FjEnv, FjObject, _matrix4);
+     jGdxShapeRenderer_SetProjectionMatrix(gApp.jni.jEnv, FjObject, _matrix4);
 end;
 
 procedure jGdxShapeRenderer.BeginDraw(_shapeType: TGDXShapeType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_BeginDraw(FjEnv, FjObject, Ord(_shapeType));
+     jGdxShapeRenderer_BeginDraw(gApp.jni.jEnv, FjObject, Ord(_shapeType));
 end;
 
 procedure jGdxShapeRenderer.EndDraw();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_EndDraw(FjEnv, FjObject);
+     jGdxShapeRenderer_EndDraw(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxShapeRenderer.SetColor(_red: integer; _green: integer; _blue: integer; _alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_SetColor(FjEnv, FjObject, _red ,_green ,_blue ,_alpha);
+     jGdxShapeRenderer_SetColor(gApp.jni.jEnv, FjObject, _red ,_green ,_blue ,_alpha);
 end;
 
 procedure jGdxShapeRenderer.Rect(_x: single; _y: single; _width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_Rect(FjEnv, FjObject, _x ,_y ,_width ,_height);
+     jGdxShapeRenderer_Rect(gApp.jni.jEnv, FjObject, _x ,_y ,_width ,_height);
 end;
 
 procedure jGdxShapeRenderer.Rect2(_x1: single; _y1: single; _x2: single; _y2: single);
@@ -172,7 +172,7 @@ begin
   h:= Abs(Trunc(_y2 - _y1));
 
   if FInitialized then
-     jGdxShapeRenderer_Rect(FjEnv, FjObject, _x1,_y1, w, h);
+     jGdxShapeRenderer_Rect(gApp.jni.jEnv, FjObject, _x1,_y1, w, h);
 
 end;
 
@@ -180,7 +180,7 @@ procedure jGdxShapeRenderer.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxShapeRenderer_Dispose(FjEnv, FjObject);
+     jGdxShapeRenderer_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxShapeRenderer.SetViewportScaleXY(minX: single; maxX: single; minY: single; maxY: single);

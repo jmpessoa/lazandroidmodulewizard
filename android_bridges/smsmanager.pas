@@ -20,7 +20,7 @@ jSMSManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function Send(_phoneNumber: string; _smsMessage: string; _multipartMessage: boolean): boolean; overload;
@@ -75,72 +75,72 @@ begin
   inherited Destroy;
 end;
 
-procedure jSMSManager.Init(refApp: jApp);
+procedure jSMSManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
 
   if FHeaderBodyDelimiter <> '|' then
-     jSMSManager_SetHeaderBodyDelimiter(FjEnv, FjObject, FHeaderBodyDelimiter);
+     jSMSManager_SetHeaderBodyDelimiter(gApp.jni.jEnv, FjObject, FHeaderBodyDelimiter);
 
 end;
 
 
 function jSMSManager.jCreate(): jObject;
 begin
-   Result:= jSMSManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSMSManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jSMSManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSMSManager_jFree(FjEnv, FjObject);
+     jSMSManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jSMSManager.Send(_phoneNumber: string; _smsMessage: string; _multipartMessage: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSMSManager_Send(FjEnv, FjObject, _phoneNumber ,_smsMessage ,_multipartMessage);
+   Result:= jSMSManager_Send(gApp.jni.jEnv, FjObject, _phoneNumber ,_smsMessage ,_multipartMessage);
 end;
 
 function jSMSManager.Send(_phoneNumber: string; _smsMessage: string; _packageDeliveredAction: string; _multipartMessage: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSMSManager_Send(FjEnv, FjObject, _phoneNumber ,_smsMessage ,_packageDeliveredAction ,_multipartMessage);
+   Result:= jSMSManager_Send(gApp.jni.jEnv, FjObject, _phoneNumber ,_smsMessage ,_packageDeliveredAction ,_multipartMessage);
 end;
 
 function jSMSManager.Read(intent: jObject; _headerBodyDelimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSMSManager_Read(FjEnv, FjObject, intent ,_headerBodyDelimiter);
+   Result:= jSMSManager_Read(gApp.jni.jEnv, FjObject, intent ,_headerBodyDelimiter);
 end;
 
 function jSMSManager.GetInboxCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSMSManager_GetInboxCount(FjEnv, FjObject);
+   Result:= jSMSManager_GetInboxCount(gApp.jni.jEnv, FjObject);
 end;
 
 function jSMSManager.ReadInbox(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSMSManager_ReadInbox(FjEnv, FjObject, _index);
+   Result:= jSMSManager_ReadInbox(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jSMSManager.Read(_intent: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSMSManager_Read(FjEnv, FjObject, _intent);
+   Result:= jSMSManager_Read(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 procedure jSMSManager.SetHeaderBodyDelimiter(_delimiter: string);
@@ -148,7 +148,7 @@ begin
   //in designing component state: set value here...
   FHeaderBodyDelimiter:= _delimiter;
   if FInitialized then
-     jSMSManager_SetHeaderBodyDelimiter(FjEnv, FjObject, _delimiter);
+     jSMSManager_SetHeaderBodyDelimiter(gApp.jni.jEnv, FjObject, _delimiter);
 end;
 
 {-------- jSMSManager_JNI_Bridge ----------}

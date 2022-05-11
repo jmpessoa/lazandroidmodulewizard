@@ -24,7 +24,7 @@ jMaps = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetUri(_uriString: string);
@@ -98,10 +98,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jMaps.Init(refApp: jApp);
+procedure jMaps.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -109,147 +109,147 @@ end;
 
 function jMaps.jCreate(): jObject;
 begin
-   Result:= jMaps_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jMaps_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jMaps.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_jFree(FjEnv, FjObject);
+     jMaps_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMaps.SetUri(_uriString: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_SetUri(FjEnv, FjObject, _uriString);
+     jMaps_SetUri(gApp.jni.jEnv, FjObject, _uriString);
 end;
 
 procedure jMaps.Show(_uriString: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Show(FjEnv, FjObject, _uriString);
+     jMaps_Show(gApp.jni.jEnv, FjObject, _uriString);
 end;
 
 procedure jMaps.Show(_latitude: string; _longitude: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Show(FjEnv, FjObject, _latitude ,_longitude);
+     jMaps_Show(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 procedure jMaps.Show(_latitude: string; _longitude: string; _zoom: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Show(FjEnv, FjObject, _latitude ,_longitude ,_zoom);
+     jMaps_Show(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_zoom);
 end;
 
 procedure jMaps.Search(_latitude: string; _longitude: string; _address: string; _label: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Search(FjEnv, FjObject, _latitude ,_longitude ,_address ,_label);
+     jMaps_Search(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_address ,_label);
 end;
 
 procedure jMaps.Search(_latitude: string; _longitude: string; _label: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Search(FjEnv, FjObject, _latitude ,_longitude ,_label);
+     jMaps_Search(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_label);
 end;
 
 procedure jMaps.Search(_address: string; _label: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Search(FjEnv, FjObject, _address ,_label);
+     jMaps_Search(gApp.jni.jEnv, FjObject, _address ,_label);
 end;
 
 procedure jMaps.Navigation(_address: string; _mode: TNavigationMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Navigation(FjEnv, FjObject, _address ,Ord(_mode));
+     jMaps_Navigation(gApp.jni.jEnv, FjObject, _address ,Ord(_mode));
 end;
 
 procedure jMaps.Navigation(_address: string; _avoid: TNavigationAvoid);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_NavigationTryAvoid(FjEnv, FjObject, _address ,Ord(_avoid));
+     jMaps_NavigationTryAvoid(gApp.jni.jEnv, FjObject, _address ,Ord(_avoid));
 end;
 
 procedure jMaps.StreetView(_latitude: string; _longitude: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_StreetView(FjEnv, FjObject, _latitude ,_longitude);
+     jMaps_StreetView(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 procedure jMaps.StreetView(_latitude: string; _longitude: string; _cameraBearingTowards: integer; _zoom: integer; _cameraTiltAngle: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_StreetView(FjEnv, FjObject, _latitude ,_longitude ,_cameraBearingTowards ,_zoom ,_cameraTiltAngle);
+     jMaps_StreetView(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_cameraBearingTowards ,_zoom ,_cameraTiltAngle);
 end;
 
 procedure jMaps.SearchCategory(_category: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_SearchCategory(FjEnv, FjObject, _category);
+     jMaps_SearchCategory(gApp.jni.jEnv, FjObject, _category);
 end;
 
 procedure jMaps.SearchCategory(_latitude: string; _longitude: string; _category: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_SearchCategory(FjEnv, FjObject, _latitude ,_longitude ,_category);
+     jMaps_SearchCategory(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_category);
 end;
 
 procedure jMaps.SearchCategory(_latitude: string; _longitude: string; _zoom: integer; _category: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_SearchCategory(FjEnv, FjObject, _latitude ,_longitude ,_zoom ,_category);
+     jMaps_SearchCategory(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_zoom ,_category);
 end;
 
 procedure jMaps.Show(_latitude: string; _longitude: string; _zoom: integer; _label: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Show(FjEnv, FjObject, _latitude ,_longitude ,_zoom ,_label);
+     jMaps_Show(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_zoom ,_label);
 end;
 
 procedure jMaps.Show(_latitude: string; _longitude: string; _label: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Show(FjEnv, FjObject, _latitude ,_longitude ,_label);
+     jMaps_Show(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_label);
 end;
 
 procedure jMaps.Navigation(_latitude: string; _longitude: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_Navigation(FjEnv, FjObject, _latitude ,_longitude);
+     jMaps_Navigation(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 function jMaps.IsAppMapsInstalled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMaps_IsAppMapsInstalled(FjEnv, FjObject);
+   Result:= jMaps_IsAppMapsInstalled(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMaps.TryDownloadAppMaps();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMaps_TryDownloadAppMaps(FjEnv, FjObject);
+     jMaps_TryDownloadAppMaps(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jMaps_JNI_Bridge ----------}

@@ -20,7 +20,7 @@ jTextToSpeech = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure jFree();
     procedure SpeakOn(_text: string);
     procedure SpeakAdd(_text: string);
@@ -62,12 +62,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jTextToSpeech.Init(refApp: jApp);
+procedure jTextToSpeech.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jTextToSpeech_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jTextToSpeech_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
@@ -81,21 +81,21 @@ procedure jTextToSpeech.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
 end;
 
 procedure jTextToSpeech.SpeakOn(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'Speak', _text);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'Speak', _text);
 end;
 
 procedure jTextToSpeech.SpeakAdd(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SpeakAdd', _text);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SpeakAdd', _text);
 end;
 
 procedure jTextToSpeech.SetLanguage(_language: TSpeechLanguage);
@@ -104,14 +104,14 @@ begin
   FSpeechLanguage:= _language;
 
   if FjObject <> nil then
-     jni_proc_i(FjEnv, FjObject, 'SetLanguage', Ord(_language));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetLanguage', Ord(_language));
 end;
 
 procedure jTextToSpeech.SpeakOnline(_text: string; _language: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SpeakOnline', _text ,_language);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SpeakOnline', _text ,_language);
 end;
 
 // by ADiV
@@ -119,7 +119,7 @@ procedure jTextToSpeech.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Stop');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Stop');
 end;
 
 // by ADiV
@@ -128,7 +128,7 @@ begin
  //in designing component state: set value here...
   Result:= False;
   if FInitialized then
-     Result:= jni_func_out_z(FjEnv, FjObject, 'IsSpeaking');
+     Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsSpeaking');
 end;
 
 // by ADiV
@@ -137,7 +137,7 @@ begin
  //in designing component state: set value here...
   Result:= False;
   if FInitialized then
-     Result:= jni_func_out_z(FjEnv, FjObject, 'IsLoaded');
+     Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsLoaded');
 end;
 
 {-------- jTextToSpeech_JNI_Bridge ----------}

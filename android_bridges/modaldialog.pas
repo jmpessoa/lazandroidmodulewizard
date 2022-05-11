@@ -27,7 +27,7 @@ jModalDialog = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -107,47 +107,47 @@ begin
   inherited Destroy;
 end;
 
-procedure jModalDialog.Init(refApp: jApp);
+procedure jModalDialog.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
 
   if FTheme <> thHoloLightDialog then
-     jModalDialog_SetTheme(FjEnv, FjObject, Ord(FTheme));
+     jModalDialog_SetTheme(gApp.jni.jEnv, FjObject, Ord(FTheme));
 
   if FCaptionOK <>  'OK' then
-    jModalDialog_SetCaptionButtonOK(FjEnv, FjObject, FCaptionOK);
+    jModalDialog_SetCaptionButtonOK(gApp.jni.jEnv, FjObject, FCaptionOK);
 
   if FCaptionCancel <> 'Cancel' then
-    jModalDialog_SetCaptionButtonCancel(FjEnv, FjObject, FCaptionCancel);
+    jModalDialog_SetCaptionButtonCancel(gApp.jni.jEnv, FjObject, FCaptionCancel);
 
   if FTitleFontSize <> 0 then
-     jModalDialog_SetTitleFontSize(FjEnv, FjObject, FTitleFontSize);
+     jModalDialog_SetTitleFontSize(gApp.jni.jEnv, FjObject, FTitleFontSize);
 
-  jModalDialog_SetDialogTitle(FjEnv, FjObject, FTitle);
+  jModalDialog_SetDialogTitle(gApp.jni.jEnv, FjObject, FTitle);
 
   FInitialized:= True;
 end;
 
 function jModalDialog.jCreate(): jObject;
 begin
-   Result:= jModalDialog_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jModalDialog_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jModalDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_jFree(FjEnv, FjObject);
+     jModalDialog_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jModalDialog.SetRequestCode(_requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_SetRequestCode(FjEnv, FjObject, _requestCode);
+     jModalDialog_SetRequestCode(gApp.jni.jEnv, FjObject, _requestCode);
 end;
 
 procedure jModalDialog.SetDialogTitle(_dialogTitle: string);
@@ -155,42 +155,42 @@ begin
   //in designing component state: set value here...
   FTitle:= _dialogTitle;
   if FInitialized then
-     jModalDialog_SetDialogTitle(FjEnv, FjObject, _dialogTitle);
+     jModalDialog_SetDialogTitle(gApp.jni.jEnv, FjObject, _dialogTitle);
 end;
 
 procedure jModalDialog.ShowMessage(_packageName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_ShowMessage(FjEnv, FjObject, _packageName);
+     jModalDialog_ShowMessage(gApp.jni.jEnv, FjObject, _packageName);
 end;
 
 procedure jModalDialog.QuestionForActivityResult(_packageName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_QuestionForActivityResult(FjEnv, FjObject, _packageName);
+     jModalDialog_QuestionForActivityResult(gApp.jni.jEnv, FjObject, _packageName);
 end;
 
 procedure jModalDialog.InputForActivityResult(_packageName: string; var _requestInfo: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_InputForActivityResult(FjEnv, FjObject, _packageName ,_requestInfo);
+     jModalDialog_InputForActivityResult(gApp.jni.jEnv, FjObject, _packageName ,_requestInfo);
 end;
 
 function jModalDialog.GetStringValue(_intentData: jObject; _fieldName: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jModalDialog_GetStringValue(FjEnv, FjObject, _intentData ,_fieldName);
+   Result:= jModalDialog_GetStringValue(gApp.jni.jEnv, FjObject, _intentData ,_fieldName);
 end;
 
 function jModalDialog.GetIntValue(_intentData: jObject; _fieldName: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jModalDialog_GetIntValue(FjEnv, FjObject, _intentData ,_fieldName);
+   Result:= jModalDialog_GetIntValue(gApp.jni.jEnv, FjObject, _intentData ,_fieldName);
 end;
 
 procedure jModalDialog.SetTheme(_dialogTheme: TDialogTheme);
@@ -198,14 +198,14 @@ begin
   //in designing component state: set value here...
   FTheme:= _dialogTheme;
   if FInitialized then
-     jModalDialog_SetTheme(FjEnv, FjObject, Ord(_dialogTheme));
+     jModalDialog_SetTheme(gApp.jni.jEnv, FjObject, Ord(_dialogTheme));
 end;
 
 procedure jModalDialog.SetHasWindowTitle(_hasWindowTitle: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_SetHasWindowTitle(FjEnv, FjObject, _hasWindowTitle);
+     jModalDialog_SetHasWindowTitle(gApp.jni.jEnv, FjObject, _hasWindowTitle);
 end;
 
 procedure jModalDialog.SetCaptionButtonOK(_captionBtnOk: string);
@@ -213,7 +213,7 @@ begin
   //in designing component state: set value here...
   FCaptionOK:= _captionBtnOk;
   if FInitialized then
-     jModalDialog_SetCaptionButtonOK(FjEnv, FjObject, _captionBtnOk);
+     jModalDialog_SetCaptionButtonOK(gApp.jni.jEnv, FjObject, _captionBtnOk);
 end;
 
 procedure jModalDialog.SetCaptionButtonCancel(_captionBtnCancel: string);
@@ -221,7 +221,7 @@ begin
   //in designing component state: set value here...
   FCaptionCancel:= _captionBtnCancel;
   if FInitialized then
-     jModalDialog_SetCaptionButtonCancel(FjEnv, FjObject, _captionBtnCancel);
+     jModalDialog_SetCaptionButtonCancel(gApp.jni.jEnv, FjObject, _captionBtnCancel);
 end;
 
 procedure jModalDialog.SetTitleFontSize(_fontSize: integer);
@@ -229,14 +229,14 @@ begin
   //in designing component state: set value here...
   FTitleFontSize:= _fontSize;
   if FInitialized then
-     jModalDialog_SetTitleFontSize(FjEnv, FjObject, _fontSize);
+     jModalDialog_SetTitleFontSize(gApp.jni.jEnv, FjObject, _fontSize);
 end;
 
 procedure jModalDialog.SetInputHint(_hint: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModalDialog_SetInputHint(FjEnv, FjObject, _hint);
+     jModalDialog_SetInputHint(gApp.jni.jEnv, FjObject, _hint);
 end;
 
 procedure jModalDialog.SetDialogMessage(_dialogMessage: string);
@@ -244,7 +244,7 @@ begin
   //in designing component state: set value here...
   FMessage:=_dialogMessage;
   if FInitialized then
-     jModalDialog_SetDialogMessage(FjEnv, FjObject, _dialogMessage);
+     jModalDialog_SetDialogMessage(gApp.jni.jEnv, FjObject, _dialogMessage);
 end;
 
 {-------- jModalDialog_JNI_Bridge ----------}

@@ -20,7 +20,7 @@ jDownloadManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetNotification(_title: string; _description: string);
@@ -97,10 +97,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jDownloadManager.Init(refApp: jApp);
+procedure jDownloadManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -109,133 +109,133 @@ end;
 
 function jDownloadManager.jCreate(): jObject;
 begin
-   Result:= jDownloadManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jDownloadManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jDownloadManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadManager_jFree(FjEnv, FjObject);
+     jDownloadManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDownloadManager.SetNotification(_title: string; _description: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadManager_SetNotification(FjEnv, FjObject, _title ,_description);
+     jDownloadManager_SetNotification(gApp.jni.jEnv, FjObject, _title ,_description);
 end;
 
 procedure jDownloadManager.SaveToFile(_pathEnv: TEnvDirectory; _filname: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadManager_SaveToFile(FjEnv, FjObject, Ord(_pathEnv) ,_filname);
+     jDownloadManager_SaveToFile(gApp.jni.jEnv, FjObject, Ord(_pathEnv) ,_filname);
 end;
 
 function jDownloadManager.Start(_urlString: string): TAndroidResult;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= TAndroidResult(jDownloadManager_Start(FjEnv, FjObject, _urlString));
+   Result:= TAndroidResult(jDownloadManager_Start(gApp.jni.jEnv, FjObject, _urlString));
 end;
 
 function jDownloadManager.GetActionDownloadComplete(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetActionDownloadComplete(FjEnv, FjObject);
+   Result:= jDownloadManager_GetActionDownloadComplete(gApp.jni.jEnv, FjObject);
 end;
 
 function jDownloadManager.GetExtras(_intent: jObject; _delimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetExtras(FjEnv, FjObject, _intent ,_delimiter);
+   Result:= jDownloadManager_GetExtras(gApp.jni.jEnv, FjObject, _intent ,_delimiter);
 end;
 
 function jDownloadManager.GetLocalUriAsString(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetLocalUriAsString(FjEnv, FjObject);
+   Result:= jDownloadManager_GetLocalUriAsString(gApp.jni.jEnv, FjObject);
 end;
 
 function jDownloadManager.GetLocalFileName(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetLocalFileName(FjEnv, FjObject);
+   Result:= jDownloadManager_GetLocalFileName(gApp.jni.jEnv, FjObject);
 end;
 
 function jDownloadManager.GetMediaType(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetMediaType(FjEnv, FjObject);
+   Result:= jDownloadManager_GetMediaType(gApp.jni.jEnv, FjObject);
 end;
 
 function jDownloadManager.GetFileSizeBytes(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetFileSizeBytes(FjEnv, FjObject);
+   Result:= jDownloadManager_GetFileSizeBytes(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDownloadManager.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadManager_SaveToFile(FjEnv, FjObject, _filename);
+     jDownloadManager_SaveToFile(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 function jDownloadManager.GetElapsedTimeInSeconds(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetElapsedTimeInSeconds(FjEnv, FjObject);
+   Result:= jDownloadManager_GetElapsedTimeInSeconds(gApp.jni.jEnv, FjObject);
 end;
 
 function jDownloadManager.GetFileUri(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetFileUri(FjEnv, FjObject);
+   Result:= jDownloadManager_GetFileUri(gApp.jni.jEnv, FjObject);
 end;
 
 function jDownloadManager.GetLocalUriAsString(_intent: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetLocalUriAsString(FjEnv, FjObject, _intent);
+   Result:= jDownloadManager_GetLocalUriAsString(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jDownloadManager.GetLocalFileName(_intent: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetLocalFileName(FjEnv, FjObject, _intent);
+   Result:= jDownloadManager_GetLocalFileName(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jDownloadManager.GetMediaType(_intent: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetMediaType(FjEnv, FjObject, _intent);
+   Result:= jDownloadManager_GetMediaType(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jDownloadManager.GetFileSizeBytes(_intent: jObject): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetFileSizeBytes(FjEnv, FjObject, _intent);
+   Result:= jDownloadManager_GetFileSizeBytes(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jDownloadManager.GetFileUri(_intent: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDownloadManager_GetFileUri(FjEnv, FjObject, _intent);
+   Result:= jDownloadManager_GetFileUri(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 function jDownloadManager_GetLocalUriAsString(env: PJNIEnv; _jdownloadmanager: JObject; _intent: jObject): string;

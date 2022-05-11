@@ -37,7 +37,7 @@ jCustomCamera = class(jVisualControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
 
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -159,27 +159,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jCustomCamera.Init(refApp: jApp);
+procedure jCustomCamera.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jCustomCamera_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jCustomCamera_SetId(FjEnv, FjObject, Self.Id);
+   jCustomCamera_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jCustomCamera_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jCustomCamera_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jCustomCamera_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -188,35 +188,35 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jCustomCamera_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jCustomCamera_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jCustomCamera_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jCustomCamera_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
-  jCustomCamera_SetAutoFocusOnShot(FjEnv, FjObject, FAutoFocusOnShot);
+  jCustomCamera_SetAutoFocusOnShot(gApp.jni.jEnv, FjObject, FAutoFocusOnShot);
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jCustomCamera_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jCustomCamera_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 
    if FFlashlightMode = fmON then
-      jCustomCamera_SetFlashlight(FjEnv, FjObject, True);
+      jCustomCamera_SetFlashlight(gApp.jni.jEnv, FjObject, True);
 
 
   end;
@@ -226,13 +226,13 @@ procedure jCustomCamera.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jCustomCamera.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jCustomCamera.UpdateLayout;
@@ -243,16 +243,16 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jCustomCamera.Refresh;
 begin
   if FInitialized then
   begin
-    jCustomCamera_surfaceUpdate( FjEnv, FjObject );
+    jCustomCamera_surfaceUpdate( gApp.jni.jEnv, FjObject );
 
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
   end;
 end;
 
@@ -275,112 +275,112 @@ end;
 
 function jCustomCamera.jCreate(): jObject;
 begin
-   Result:= jCustomCamera_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jCustomCamera_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jCustomCamera.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_jFree(FjEnv, FjObject);
+     jCustomCamera_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomCamera.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jCustomCamera_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jCustomCamera.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomCamera_GetParent(FjEnv, FjObject);
+   Result:= jCustomCamera_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomCamera.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_RemoveFromViewParent(FjEnv, FjObject);
+     jCustomCamera_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jCustomCamera.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomCamera_GetView(FjEnv, FjObject);
+   Result:= jCustomCamera_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomCamera.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetLParamWidth(FjEnv, FjObject, _w);
+     jCustomCamera_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jCustomCamera.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetLParamHeight(FjEnv, FjObject, _h);
+     jCustomCamera_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jCustomCamera.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomCamera_GetLParamWidth(FjEnv, FjObject);
+   Result:= jCustomCamera_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jCustomCamera.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomCamera_GetLParamHeight(FjEnv, FjObject);
+   Result:= jCustomCamera_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomCamera.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetLGravity(FjEnv, FjObject, _g);
+     jCustomCamera_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jCustomCamera.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetLWeight(FjEnv, FjObject, _w);
+     jCustomCamera_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jCustomCamera.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jCustomCamera_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jCustomCamera.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jCustomCamera_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jCustomCamera.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jCustomCamera_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jCustomCamera.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jCustomCamera_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jCustomCamera.ClearLayout();
@@ -391,15 +391,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jCustomCamera_clearLayoutAll(FjEnv, FjObject);
+     jCustomCamera_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jCustomCamera_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jCustomCamera_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jCustomCamera_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jCustomCamera_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -407,14 +407,14 @@ procedure jCustomCamera.TakePicture();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_TakePicture(FjEnv, FjObject);
+     jCustomCamera_TakePicture(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomCamera.TakePicture(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_TakePicture(FjEnv, FjObject, _filename);
+     jCustomCamera_TakePicture(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 // by tr3e
@@ -422,7 +422,7 @@ procedure jCustomCamera.AutoFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_AutoFocus(FjEnv, FjObject);
+     jCustomCamera_AutoFocus(gApp.jni.jEnv, FjObject);
 end;
 
 // by tr3e
@@ -432,49 +432,49 @@ begin
   FAutoFocusOnShot := _autoFocusOnShot;
 
   if FInitialized then
-     jCustomCamera_SetAutoFocusOnShot(FjEnv, FjObject, _autoFocusOnShot);
+     jCustomCamera_SetAutoFocusOnShot(gApp.jni.jEnv, FjObject, _autoFocusOnShot);
 end;
 
 procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetEnvironmentStorage(FjEnv, FjObject, Ord(_environmentDir) ,_folderName);
+     jCustomCamera_SetEnvironmentStorage(gApp.jni.jEnv, FjObject, Ord(_environmentDir) ,_folderName);
 end;
 
 procedure jCustomCamera.SetEnvironmentStorage(_environmentDir: TEnvDirectory; _folderName: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetEnvironmentStorage(FjEnv, FjObject, Ord(_environmentDir) ,_folderName ,_fileName);
+     jCustomCamera_SetEnvironmentStorage(gApp.jni.jEnv, FjObject, Ord(_environmentDir) ,_folderName ,_fileName);
 end;
 
 procedure jCustomCamera.SaveToMediaStore(_title: string; _description: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SaveToMediaStore(FjEnv, FjObject, _title ,_description);
+     jCustomCamera_SaveToMediaStore(gApp.jni.jEnv, FjObject, _title ,_description);
 end;
 
 function jCustomCamera.GetImage(_width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomCamera_GetImage(FjEnv, FjObject, _width ,_height);
+   Result:= jCustomCamera_GetImage(gApp.jni.jEnv, FjObject, _width ,_height);
 end;
 
 function jCustomCamera.GetImage(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCustomCamera_GetImage(FjEnv, FjObject);
+   Result:= jCustomCamera_GetImage(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomCamera.SetFlashlight(_flashlightMode: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomCamera_SetFlashlight(FjEnv, FjObject, _flashlightMode);
+     jCustomCamera_SetFlashlight(gApp.jni.jEnv, FjObject, _flashlightMode);
 end;
 
 procedure jCustomCamera.SetFlashlightMode(_flashlightMode: TFlashlightMode);
@@ -484,9 +484,9 @@ begin
   if FInitialized then
   begin
      if FFlashlightMode = fmON then
-       jCustomCamera_SetFlashlight(FjEnv, FjObject, True)
+       jCustomCamera_SetFlashlight(gApp.jni.jEnv, FjObject, True)
      else
-       jCustomCamera_SetFlashlight(FjEnv, FjObject, False);
+       jCustomCamera_SetFlashlight(gApp.jni.jEnv, FjObject, False);
   end;
 end;
 

@@ -24,7 +24,7 @@ jDumpJavaMethods = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate( _fullJavaClassName: string): jObject;
     procedure jFree();
     function GetMethodFullSignatureList(): string;
@@ -105,10 +105,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jDumpJavaMethods.Init(refApp: jApp);
+procedure jDumpJavaMethods.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   if FfullJavaClassName = '' then FfullJavaClassName:= 'android.media.MediaPlayer';
 
@@ -125,42 +125,42 @@ end;
 
 function jDumpJavaMethods.jCreate( _fullJavaClassName: string): jObject;
 begin
-   Result:= jDumpJavaMethods_jCreate(FjEnv, FjThis , int64(Self) ,_fullJavaClassName);
+   Result:= jDumpJavaMethods_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self) ,_fullJavaClassName);
 end;
 
 procedure jDumpJavaMethods.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_jFree(FjEnv, FjObject);
+     jDumpJavaMethods_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodFullSignatureList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodFullSignatureList(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetMethodFullSignatureList(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodImplementationList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodImplementationList(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetMethodImplementationList(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetStripFullTypeName(_stripFullTypeName: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_SetStripFullTypeName(FjEnv, FjObject, _stripFullTypeName);
+     jDumpJavaMethods_SetStripFullTypeName(gApp.jni.jEnv, FjObject, _stripFullTypeName);
 end;
 
 function jDumpJavaMethods.GetStripFullTypeName(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetStripFullTypeName(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetStripFullTypeName(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetFullJavaClassName(_fullJavaClassName: string);
@@ -168,7 +168,7 @@ begin
   //in designing component state: set value here...
   FfullJavaClassName:= _fullJavaClassName;
   if FInitialized then
-     jDumpJavaMethods_SetFullJavaClassName(FjEnv, FjObject, _fullJavaClassName);
+     jDumpJavaMethods_SetFullJavaClassName(gApp.jni.jEnv, FjObject, _fullJavaClassName);
 end;
 
 function jDumpJavaMethods.GetFullJavaClassName(): string;
@@ -176,7 +176,7 @@ begin
   //in designing component state: result value here...
   Result:= FfullJavaClassName;
   if FInitialized then
-   Result:= jDumpJavaMethods_GetFullJavaClassName(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetFullJavaClassName(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetObjReferenceName(_objReferenceName: string);
@@ -184,7 +184,7 @@ begin
   //in designing component state: set value here...
   FObjReferenceName:= _objReferenceName;
   if FInitialized then
-     jDumpJavaMethods_SetObjReferenceName(FjEnv, FjObject, _objReferenceName);
+     jDumpJavaMethods_SetObjReferenceName(gApp.jni.jEnv, FjObject, _objReferenceName);
 end;
 
 function jDumpJavaMethods.GetObjReferenceName(): string;
@@ -192,98 +192,98 @@ begin
   //in designing component state: result value here...
   Result:= FObjReferenceName;
   if FInitialized then
-   Result:= jDumpJavaMethods_GetObjReferenceName(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetObjReferenceName(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDumpJavaMethods.SetDelimiter(_delimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_SetDelimiter(FjEnv, FjObject, _delimiter);
+     jDumpJavaMethods_SetDelimiter(gApp.jni.jEnv, FjObject, _delimiter);
 end;
 
 function jDumpJavaMethods.GetDelimiter(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetDelimiter(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetDelimiter(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodHeaderList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodHeaderList(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetMethodHeaderList(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodHeaderListSize(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodHeaderListSize(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetMethodHeaderListSize(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetMethodHeaderByIndex(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetMethodHeaderByIndex(FjEnv, FjObject, _index);
+   Result:= jDumpJavaMethods_GetMethodHeaderByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jDumpJavaMethods.MaskMethodHeaderByIndex(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_MaskMethodHeaderByIndex(FjEnv, FjObject, _index);
+     jDumpJavaMethods_MaskMethodHeaderByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jDumpJavaMethods.UnMaskMethodHeaderByIndex(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDumpJavaMethods_UnMaskMethodHeaderByIndex(FjEnv, FjObject, _index);
+     jDumpJavaMethods_UnMaskMethodHeaderByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodHeaderList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodHeaderList(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodHeaderList(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.Extract(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_Extract(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_Extract(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.Extract(_fullJavaClassName: string; _delimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_Extract(FjEnv, FjObject, _fullJavaClassName ,_delimiter);
+   Result:= jDumpJavaMethods_Extract(gApp.jni.jEnv, FjObject, _fullJavaClassName ,_delimiter);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodImplementationByIndex(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(FjEnv, FjObject, _index);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodImplementationListSize(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationListSize(gApp.jni.jEnv, FjObject);
 end;
 
 function jDumpJavaMethods.GetNoMaskedMethodImplementationList(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationList(FjEnv, FjObject);
+   Result:= jDumpJavaMethods_GetNoMaskedMethodImplementationList(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jDumpJavaMethods_JNI_Bridge ----------}

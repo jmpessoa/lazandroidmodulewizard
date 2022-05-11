@@ -26,7 +26,7 @@ jChronometer = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -126,27 +126,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jChronometer.Init(refApp: jApp);
+procedure jChronometer.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jChronometer_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jChronometer_SetId(FjEnv, FjObject, Self.Id);
+   jChronometer_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jChronometer_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jChronometer_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jChronometer_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -155,29 +155,29 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jChronometer_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jChronometer_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jChronometer_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jChronometer_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jChronometer_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jChronometer_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -185,13 +185,13 @@ procedure jChronometer.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jChronometer.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jChronometer.UpdateLayout;
@@ -202,13 +202,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jChronometer.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -224,77 +224,77 @@ end;
 
 function jChronometer.jCreate(): jObject;
 begin
-  Result:= jChronometer_jCreate(FjEnv, int64(Self), FjThis);
+  Result:= jChronometer_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jChronometer.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_jFree(FjEnv, FjObject);
+     jChronometer_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jChronometer.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jChronometer_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jChronometer.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_RemoveFromViewParent(FjEnv, FjObject);
+     jChronometer_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jChronometer.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jChronometer_GetView(FjEnv, FjObject);
+   Result:= jChronometer_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jChronometer.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetLParamWidth(FjEnv, FjObject, _w);
+     jChronometer_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jChronometer.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetLParamHeight(FjEnv, FjObject, _h);
+     jChronometer_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jChronometer.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jChronometer_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jChronometer.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jChronometer_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jChronometer.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jChronometer_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jChronometer.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jChronometer_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jChronometer.ClearLayout();
@@ -305,15 +305,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jChronometer_clearLayoutAll(FjEnv, FjObject);
+     jChronometer_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jChronometer_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jChronometer_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jChronometer_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jChronometer_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -321,56 +321,56 @@ procedure jChronometer.SetBaseElapsedRealtime();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetBaseElapsedRealtime(FjEnv, FjObject);
+     jChronometer_SetBaseElapsedRealtime(gApp.jni.jEnv, FjObject);
 end;
 
 function jChronometer.GetElapsedTimeMillis(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jChronometer_GetElapsedTimeMillis(FjEnv, FjObject);
+   Result:= jChronometer_GetElapsedTimeMillis(gApp.jni.jEnv, FjObject);
 end;
 
 function jChronometer.Start(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jChronometer_Start(FjEnv, FjObject);
+   Result:= jChronometer_Start(gApp.jni.jEnv, FjObject);
 end;
 
 function jChronometer.Stop(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jChronometer_Stop(FjEnv, FjObject);
+   Result:= jChronometer_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 function jChronometer.Reset(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jChronometer_Reset(FjEnv, FjObject);
+   Result:= jChronometer_Reset(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jChronometer.SetThresholdTick(_thresholdTickMillis: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetThresholdTick(FjEnv, FjObject, _thresholdTickMillis);
+     jChronometer_SetThresholdTick(gApp.jni.jEnv, FjObject, _thresholdTickMillis);
 end;
 
 procedure jChronometer.SetBaseElapsedRealtime(_elapsedMillis: int64);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jChronometer_SetBaseElapsedRealtime(FjEnv, FjObject, _elapsedMillis);
+     jChronometer_SetBaseElapsedRealtime(gApp.jni.jEnv, FjObject, _elapsedMillis);
 end;
 
 function jChronometer.GetSystemElapsedRealtime(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jChronometer_GetSystemElapsedRealtime(FjEnv, FjObject);
+   Result:= jChronometer_GetSystemElapsedRealtime(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jChronometer_JNI_Bridge ----------}

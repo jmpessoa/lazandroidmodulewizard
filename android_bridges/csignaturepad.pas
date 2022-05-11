@@ -34,7 +34,7 @@ jcSignaturePad = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -159,7 +159,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jcSignaturePad.Init(refApp: jApp);
+procedure jcSignaturePad.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -167,19 +167,19 @@ begin
 
  if not FInitialized then
  begin
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
   FjPRLayoutHome:= FjPRLayout;
 
-  jcSignaturePad_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jcSignaturePad_SetId(FjEnv, FjObject, Self.Id);
+  jcSignaturePad_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+  jcSignaturePad_SetId(gApp.jni.jEnv, FjObject, Self.Id);
  end;
 
-  jcSignaturePad_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  jcSignaturePad_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                         sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -188,42 +188,42 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jcSignaturePad_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jcSignaturePad_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jcSignaturePad_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jcSignaturePad_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jcSignaturePad_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jcSignaturePad_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
  if not FInitialized then
  begin
   FInitialized := true;
 
   if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
   if FPenColor <> colbrBlack then
-     jcSignaturePad_SetPenColor(FjEnv, FjObject, GetARGB(FCustomColor, FPenColor));
+     jcSignaturePad_SetPenColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FPenColor));
 
   if FMinPenStrokeWidth <> 3 then;
-    jcSignaturePad_SetMinPenStrokeWidth(FjEnv, FjObject, FMinPenStrokeWidth);
+    jcSignaturePad_SetMinPenStrokeWidth(gApp.jni.jEnv, FjObject, FMinPenStrokeWidth);
 
   if FMaxPenStrokeWidth <> 7 then
-    jcSignaturePad_SetMaxPenStrokeWidth(FjEnv, FjObject, FMaxPenStrokeWidth);
+    jcSignaturePad_SetMaxPenStrokeWidth(gApp.jni.jEnv, FjObject, FMaxPenStrokeWidth);
 
   if FVelocityFilterWeight <>  0.9 then
-    jcSignaturePad_SetVelocityFilterWeight(FjEnv, FjObject, FVelocityFilterWeight);
+    jcSignaturePad_SetVelocityFilterWeight(gApp.jni.jEnv, FjObject, FVelocityFilterWeight);
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+  View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
  end;
 
 
@@ -233,13 +233,13 @@ procedure jcSignaturePad.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jcSignaturePad.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jcSignaturePad.UpdateLayout;
@@ -251,14 +251,14 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 
 end;
 
 procedure jcSignaturePad.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.ClearLayout;
@@ -269,15 +269,15 @@ begin
 
    if not FInitialized then Exit;
 
-  jcSignaturePad_ClearLayoutAll(FjEnv, FjObject );
+  jcSignaturePad_ClearLayoutAll(gApp.jni.jEnv, FjObject );
 
    for rToP := rpBottom to rpCenterVertical do
       if rToP in FPositionRelativeToParent then
-        jcSignaturePad_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+        jcSignaturePad_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
    for rToA := raAbove to raAlignRight do
      if rToA in FPositionRelativeToAnchor then
-       jcSignaturePad_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       jcSignaturePad_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 
 end;
 
@@ -289,140 +289,140 @@ end;
 
 function jcSignaturePad.jCreate(): jObject;
 begin
-   Result:= jcSignaturePad_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcSignaturePad_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcSignaturePad.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_jFree(FjEnv, FjObject);
+     jcSignaturePad_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jcSignaturePad_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jcSignaturePad.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetParent(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_RemoveFromViewParent(FjEnv, FjObject);
+     jcSignaturePad_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jcSignaturePad.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetView(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetLParamWidth(FjEnv, FjObject, _w);
+     jcSignaturePad_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jcSignaturePad.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetLParamHeight(FjEnv, FjObject, _h);
+     jcSignaturePad_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jcSignaturePad.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetLParamWidth(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jcSignaturePad.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetLParamHeight(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetLGravity(FjEnv, FjObject, _g);
+     jcSignaturePad_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jcSignaturePad.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetLWeight(FjEnv, FjObject, _w);
+     jcSignaturePad_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jcSignaturePad.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jcSignaturePad_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jcSignaturePad.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jcSignaturePad_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jcSignaturePad.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jcSignaturePad_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jcSignaturePad.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jcSignaturePad_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jcSignaturePad.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_ClearLayoutAll(FjEnv, FjObject);
+     jcSignaturePad_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.SaveToGalleryJPG(_fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SaveToGalleryJPG(FjEnv, FjObject, _fileName);
+     jcSignaturePad_SaveToGalleryJPG(gApp.jni.jEnv, FjObject, _fileName);
 end;
 
 procedure jcSignaturePad.SaveToGalleryJPG();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SaveToGalleryJPG(FjEnv, FjObject);
+     jcSignaturePad_SaveToGalleryJPG(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_Clear(FjEnv, FjObject);
+     jcSignaturePad_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.SetPenColor(_color: TARGBColorBridge);
@@ -430,7 +430,7 @@ begin
   //in designing component state: set value here...
   FPenColor:= _color;
   if FInitialized then
-     jcSignaturePad_SetPenColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jcSignaturePad_SetPenColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jcSignaturePad.SetMinPenStrokeWidth(_minWidth: single);
@@ -438,7 +438,7 @@ begin
   //in designing component state: set value here...
   FMinPenStrokeWidth:= _minWidth;
   if FInitialized then
-     jcSignaturePad_SetMinPenStrokeWidth(FjEnv, FjObject, _minWidth);
+     jcSignaturePad_SetMinPenStrokeWidth(gApp.jni.jEnv, FjObject, _minWidth);
 end;
 
 procedure jcSignaturePad.SetMaxPenStrokeWidth(_maxWidth: single);
@@ -446,7 +446,7 @@ begin
   //in designing component state: set value here...
   FMaxPenStrokeWidth:= _maxWidth;
   if FInitialized then
-     jcSignaturePad_SetMaxPenStrokeWidth(FjEnv, FjObject, _maxWidth);
+     jcSignaturePad_SetMaxPenStrokeWidth(gApp.jni.jEnv, FjObject, _maxWidth);
 end;
 
 procedure jcSignaturePad.SetVelocityFilterWeight(_velocityFilterWeight: single);
@@ -454,35 +454,35 @@ begin
   //in designing component state: set value here...
   FVelocityFilterWeight:= _velocityFilterWeight;
   if FInitialized then
-     jcSignaturePad_SetVelocityFilterWeight(FjEnv, FjObject, _velocityFilterWeight);
+     jcSignaturePad_SetVelocityFilterWeight(gApp.jni.jEnv, FjObject, _velocityFilterWeight);
 end;
 
 function jcSignaturePad.GetSignatureBitmap(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetSignatureBitmap(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetSignatureBitmap(gApp.jni.jEnv, FjObject);
 end;
 
 function jcSignaturePad.GetTransparentSignatureBitmap(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetTransparentSignatureBitmap(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetTransparentSignatureBitmap(gApp.jni.jEnv, FjObject);
 end;
 
 function jcSignaturePad.GetSignatureSVG(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcSignaturePad_GetSignatureSVG(FjEnv, FjObject);
+   Result:= jcSignaturePad_GetSignatureSVG(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcSignaturePad.SaveToFileJPG(_path: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcSignaturePad_SaveToFileJPG(FjEnv, FjObject, _path ,_fileName);
+     jcSignaturePad_SaveToFileJPG(gApp.jni.jEnv, FjObject, _path ,_fileName);
 end;
 
 procedure jcSignaturePad.GenEvent_OnSignaturePadStartSigning(Sender:TObject);

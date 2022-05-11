@@ -20,7 +20,7 @@ jGdxSprite = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -93,11 +93,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxSprite.Init(refApp: jApp);
+procedure jGdxSprite.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -106,133 +106,133 @@ end;
 
 function jGdxSprite.jCreate(): jObject;
 begin
-   Result:= jGdxSprite_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxSprite_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxSprite.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized and (FjObject <> nil) then
-     jGdxSprite_jFree(FjEnv, FjObject);
+     jGdxSprite_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxSprite.SetPosition(_x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetPosition(FjEnv, FjObject, _x ,_y);
+     jGdxSprite_SetPosition(gApp.jni.jEnv, FjObject, _x ,_y);
 end;
 
 procedure jGdxSprite.SetRotation(_degrees: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetRotation(FjEnv, FjObject, _degrees);
+     jGdxSprite_SetRotation(gApp.jni.jEnv, FjObject, _degrees);
 end;
 
 procedure jGdxSprite.SetSprite(_sprite: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetSprite(FjEnv, FjObject, _sprite);
+     jGdxSprite_SetSprite(gApp.jni.jEnv, FjObject, _sprite);
 end;
 
 procedure jGdxSprite.Translate(_offsetX: single; _offsetY: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Translate(FjEnv, FjObject, _offsetX ,_offsetY);
+     jGdxSprite_Translate(gApp.jni.jEnv, FjObject, _offsetX ,_offsetY);
 end;
 
 procedure jGdxSprite.Rotate90(_clockwise: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Rotate90(FjEnv, FjObject, _clockwise);
+     jGdxSprite_Rotate90(gApp.jni.jEnv, FjObject, _clockwise);
 end;
 
 procedure jGdxSprite.Rotate(_degrees: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Rotate(FjEnv, FjObject, _degrees);
+     jGdxSprite_Rotate(gApp.jni.jEnv, FjObject, _degrees);
 end;
 
 procedure jGdxSprite.SetSprite(_sprite: jObject; _scale: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetSprite(FjEnv, FjObject, _sprite ,_scale);
+     jGdxSprite_SetSprite(gApp.jni.jEnv, FjObject, _sprite ,_scale);
 end;
 
 procedure jGdxSprite.SetSprites(_textureAtlas: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetSprites(FjEnv, FjObject, _textureAtlas);
+     jGdxSprite_SetSprites(gApp.jni.jEnv, FjObject, _textureAtlas);
 end;
 
 procedure jGdxSprite.SetSprites(_textureAtlas: jObject; _scale: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetSprites(FjEnv, FjObject, _textureAtlas ,_scale);
+     jGdxSprite_SetSprites(gApp.jni.jEnv, FjObject, _textureAtlas ,_scale);
 end;
 
 procedure jGdxSprite.Draw(_batch: jObject; _x: single; _y: single); overload;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Draw(FjEnv, FjObject, _batch,_x ,_y);
+     jGdxSprite_Draw(gApp.jni.jEnv, FjObject, _batch,_x ,_y);
 end;
 
 procedure jGdxSprite.Draw(_batch: jObject; _sprite: string; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Draw(FjEnv, FjObject, _batch ,_sprite ,_x ,_y);
+     jGdxSprite_Draw(gApp.jni.jEnv, FjObject, _batch ,_sprite ,_x ,_y);
 end;
 
 procedure jGdxSprite.SetPosition(_sprite: string; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetPosition(FjEnv, FjObject, _sprite ,_x ,_y);
+     jGdxSprite_SetPosition(gApp.jni.jEnv, FjObject, _sprite ,_x ,_y);
 end;
 
 procedure jGdxSprite.SetRotation(_sprite: string; _degrees: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_SetRotation(FjEnv, FjObject, _sprite ,_degrees);
+     jGdxSprite_SetRotation(gApp.jni.jEnv, FjObject, _sprite ,_degrees);
 end;
 
 procedure jGdxSprite.Translate(_sprite: string; _offsetX: single; _offsetY: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Translate(FjEnv, FjObject, _sprite ,_offsetX ,_offsetY);
+     jGdxSprite_Translate(gApp.jni.jEnv, FjObject, _sprite ,_offsetX ,_offsetY);
 end;
 
 procedure jGdxSprite.Rotate90(_sprite: string; _clockwise: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Rotate90(FjEnv, FjObject, _sprite ,_clockwise);
+     jGdxSprite_Rotate90(gApp.jni.jEnv, FjObject, _sprite ,_clockwise);
 end;
 
 procedure jGdxSprite.Rotate(_sprite: string; _degrees: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Rotate(FjEnv, FjObject, _sprite ,_degrees);
+     jGdxSprite_Rotate(gApp.jni.jEnv, FjObject, _sprite ,_degrees);
 end;
 
 procedure jGdxSprite.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSprite_Dispose(FjEnv, FjObject);
+     jGdxSprite_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGdxSprite_JNI_Bridge ----------}

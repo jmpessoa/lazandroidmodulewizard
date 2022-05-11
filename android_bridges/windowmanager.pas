@@ -20,7 +20,7 @@ jWindowManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure AddView(_floatingView: jObject);
@@ -88,10 +88,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jWindowManager.Init(refApp: jApp);
+procedure jWindowManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -100,63 +100,63 @@ end;
 
 function jWindowManager.jCreate(): jObject;
 begin
-   Result:= jWindowManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jWindowManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jWindowManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_jFree(FjEnv, FjObject);
+     jWindowManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jWindowManager.AddView(_floatingView: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_AddView(FjEnv, FjObject, _floatingView);
+     jWindowManager_AddView(gApp.jni.jEnv, FjObject, _floatingView);
 end;
 
 procedure jWindowManager.RemoveView();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_RemoveView(FjEnv, FjObject);
+     jWindowManager_RemoveView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jWindowManager.SetViewPosition(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_SetViewPosition(FjEnv, FjObject, _x ,_y);
+     jWindowManager_SetViewPosition(gApp.jni.jEnv, FjObject, _x ,_y);
 end;
 
 function jWindowManager.GetViewPositionX(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_GetViewPositionX(FjEnv, FjObject);
+   Result:= jWindowManager_GetViewPositionX(gApp.jni.jEnv, FjObject);
 end;
 
 function jWindowManager.GetViewPositionY(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_GetViewPositionY(FjEnv, FjObject);
+   Result:= jWindowManager_GetViewPositionY(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jWindowManager.SetViewRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_SetViewRoundCorner(FjEnv, FjObject);
+     jWindowManager_SetViewRoundCorner(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jWindowManager.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+     jWindowManager_SetRadiusRoundCorner(gApp.jni.jEnv, FjObject, _radius);
 end;
 
 //Segator
@@ -164,56 +164,56 @@ procedure jWindowManager.SetViewFocusable(_value:boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_SetViewFocusable(FjEnv, FjObject, _value);
+     jWindowManager_SetViewFocusable(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jWindowManager.RequestDrawOverlayRuntimePermission(_packageName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_RequestDrawOverlayRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
+     jWindowManager_RequestDrawOverlayRuntimePermission(gApp.jni.jEnv, FjObject, _packageName ,_requestCode);
 end;
 
 procedure jWindowManager.RequestIgnoreBackgrundDataRestrictionRuntimePermission(_packageName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_RequestIgnoreBackgrundDataRestrictionRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
+     jWindowManager_RequestIgnoreBackgrundDataRestrictionRuntimePermission(gApp.jni.jEnv, FjObject, _packageName ,_requestCode);
 end;
 
 procedure jWindowManager.RequestIgnoreBatteryOptimizationRuntimePermission(_packageName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWindowManager_RequestIgnoreBatteryOptimizationRuntimePermission(FjEnv, FjObject, _packageName ,_requestCode);
+     jWindowManager_RequestIgnoreBatteryOptimizationRuntimePermission(gApp.jni.jEnv, FjObject, _packageName ,_requestCode);
 end;
 
 function jWindowManager.IsDrawOverlaysRuntimePermissionNeed(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_IsDrawOverlaysRuntimePermissionNeed(FjEnv, FjObject);
+   Result:= jWindowManager_IsDrawOverlaysRuntimePermissionNeed(gApp.jni.jEnv, FjObject);
 end;
 
 function jWindowManager.CanDrawOverlays(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_CanDrawOverlays(FjEnv, FjObject);
+   Result:= jWindowManager_CanDrawOverlays(gApp.jni.jEnv, FjObject);
 end;
 
 function jWindowManager.IgnoringBatteryOptimizations(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_IgnoringBatteryOptimizations(FjEnv, FjObject);
+   Result:= jWindowManager_IgnoringBatteryOptimizations(gApp.jni.jEnv, FjObject);
 end;
 
 function jWindowManager.isAffectedByDataSaver(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jWindowManager_isAffectedByDataSaver(FjEnv, FjObject);
+   Result:= jWindowManager_isAffectedByDataSaver(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jWindowManager_JNI_Bridge ----------}

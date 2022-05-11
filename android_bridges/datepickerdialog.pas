@@ -23,7 +23,7 @@ jDatePickerDialog = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Show(); overload;
@@ -61,10 +61,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jDatePickerDialog.Init(refApp: jApp);
+procedure jDatePickerDialog.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -73,21 +73,21 @@ end;
 
 function jDatePickerDialog.jCreate(): jObject;
 begin
-   Result:= jDatePickerDialog_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jDatePickerDialog_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jDatePickerDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
 end;
 
 procedure jDatePickerDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Show');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Show');
 end;
 
 procedure jDatePickerDialog.GenEvent_OnDatePicker(Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
@@ -99,7 +99,7 @@ procedure jDatePickerDialog.Show(_year: integer; _monthOfYear: integer; _dayOfMo
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iii(FjEnv, FjObject, 'Show', _year ,_monthOfYear ,_dayOfMonth);
+     jni_proc_iii(gApp.jni.jEnv, FjObject, 'Show', _year ,_monthOfYear ,_dayOfMonth);
 end;
 
 {-------- jDatePickerDialog_JNI_Bridge ----------}

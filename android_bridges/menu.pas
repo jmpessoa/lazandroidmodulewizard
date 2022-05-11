@@ -25,7 +25,7 @@ jMenu = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Add(_menu: jObject; _itemID: integer; _caption: string);
@@ -112,10 +112,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jMenu.Init(refApp: jApp);
+procedure jMenu.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -124,35 +124,35 @@ end;
 
 function jMenu.jCreate(): jObject;
 begin
-   Result:= jMenu_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jMenu_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jMenu.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
 end;
 
 procedure jMenu.Add(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_it(FjEnv, FjObject, 'Add', _menu ,_itemID ,_caption);
+     jni_proc_men_it(gApp.jni.jEnv, FjObject, 'Add', _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.AddCheckable(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_it(FjEnv, FjObject, 'AddCheckable', _menu ,_itemID ,_caption);
+     jni_proc_men_it(gApp.jni.jEnv, FjObject, 'AddCheckable', _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.AddDrawable(_menu: jObject; _itemID: integer; _caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_it(FjEnv, FjObject, 'AddDrawable', _menu ,_itemID ,_caption);
+     jni_proc_men_it(gApp.jni.jEnv, FjObject, 'AddDrawable', _menu ,_itemID ,_caption);
 end;
 
 procedure jMenu.SetOptions(Value: TStrings);
@@ -169,35 +169,35 @@ procedure jMenu.CheckItemCommute(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_mei(FjEnv, FjObject, 'CheckItemCommute', _item);
+     jni_proc_mei(gApp.jni.jEnv, FjObject, 'CheckItemCommute', _item);
 end;
 
 procedure jMenu.CheckItem(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_mei(FjEnv, FjObject, 'CheckItem', _item);
+     jni_proc_mei(gApp.jni.jEnv, FjObject, 'CheckItem', _item);
 end;
 
 procedure jMenu.UnCheckItem(_item: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_mei(FjEnv, FjObject, 'UnCheckItem', _item);
+     jni_proc_mei(gApp.jni.jEnv, FjObject, 'UnCheckItem', _item);
 end;
 
 procedure jMenu.AddSubMenu(_menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_i_das(FjEnv, FjObject, 'AddSubMenu', _menu ,_startItemID ,_captions);
+     jni_proc_men_i_das(gApp.jni.jEnv, FjObject, 'AddSubMenu', _menu ,_startItemID ,_captions);
 end;
 
 procedure jMenu.AddCheckableSubMenu(_menu: jObject; _startItemID: integer; var _captions: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_i_das(FjEnv, FjObject, 'AddCheckableSubMenu', _menu ,_startItemID ,_captions);
+     jni_proc_men_i_das(gApp.jni.jEnv, FjObject, 'AddCheckableSubMenu', _menu ,_startItemID ,_captions);
 end;
 
 function jMenu.Size(): integer;
@@ -205,7 +205,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'Size');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'Size');
 end;
 
 function jMenu.FindMenuItemByID(_itemID: integer): jObject;
@@ -213,7 +213,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_mei(FjEnv, FjObject, 'FindMenuItemByID', _itemID);
+   Result:= jni_func_i_out_mei(gApp.jni.jEnv, FjObject, 'FindMenuItemByID', _itemID);
 end;
 
 function jMenu.GetMenuItemByIndex(_index: integer): jObject;
@@ -221,14 +221,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_mei(FjEnv, FjObject, 'GetMenuItemByIndex', _index);
+   Result:= jni_func_i_out_mei(gApp.jni.jEnv, FjObject, 'GetMenuItemByIndex', _index);
 end;
 
 procedure jMenu.UnCheckAllMenuItem();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'UnCheckAllMenuItem');
+     jni_proc(gApp.jni.jEnv, FjObject, 'UnCheckAllMenuItem');
 end;
 
 function jMenu.CountSubMenus(): integer;
@@ -236,125 +236,125 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'CountSubMenus');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'CountSubMenus');
 end;
 
 procedure jMenu.UnCheckAllSubMenuItemByIndex(_subMenuIndex: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'UnCheckAllSubMenuItemByIndex', _subMenuIndex);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'UnCheckAllSubMenuItemByIndex', _subMenuIndex);
 end;
 
 procedure jMenu.RegisterForContextMenu(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_viw(FjEnv, FjObject, 'RegisterForContextMenu', _view);
+     jni_proc_viw(gApp.jni.jEnv, FjObject, 'RegisterForContextMenu', _view);
 end;
 
 procedure jMenu.UnRegisterForContextMenu(_View: JObject); 
 begin 
   if(FInitialized) then 
-   jni_proc_viw(FjEnv, FjObject, 'UnRegisterForContextMenu', _View);
+   jni_proc_viw(gApp.jni.jEnv, FjObject, 'UnRegisterForContextMenu', _View);
 end; 
 
 procedure jMenu.AddItem(_menu: jObject; _itemID: integer; _caption: string; _iconIdentifier: string; _itemType: TMenuItemType; _showAsAction: TMenuItemShowAsAction);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddItem(FjEnv, FjObject, _menu ,_itemID ,_caption ,_iconIdentifier ,Ord(_itemType),Ord(_showAsAction));
+     jMenu_AddItem(gApp.jni.jEnv, FjObject, _menu ,_itemID ,_caption ,_iconIdentifier ,Ord(_itemType),Ord(_showAsAction));
 end;
 
 procedure jMenu.AddItem(_subMenu: jObject; _itemID: integer; _caption: string;  _itemType: TMenuItemType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddItem(FjEnv, FjObject, _subMenu ,_itemID ,_caption ,Ord(_itemType));
+     jMenu_AddItem(gApp.jni.jEnv, FjObject, _subMenu ,_itemID ,_caption ,Ord(_itemType));
 end;
 
 function jMenu.AddSubMenu(_menu: jObject; _title: string; _headerIconIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMenu_AddSubMenu(FjEnv, FjObject, _menu ,_title ,_headerIconIdentifier);
+   Result:= jMenu_AddSubMenu(gApp.jni.jEnv, FjObject, _menu ,_title ,_headerIconIdentifier);
 end;
 
 procedure jMenu.InvalidateOptionsMenu();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'InvalidateOptionsMenu');
+     jni_proc(gApp.jni.jEnv, FjObject, 'InvalidateOptionsMenu');
 end;
 
 procedure jMenu.SetItemVisible(_item: jObject; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemVisible(FjEnv, FjObject, _item ,_value);
+     jMenu_SetItemVisible(gApp.jni.jEnv, FjObject, _item ,_value);
 end;
 
 procedure jMenu.SetItemVisible(_menu: jObject; _index: integer; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemVisible(FjEnv, FjObject, _menu ,_index ,_value);
+     jMenu_SetItemVisible(gApp.jni.jEnv, FjObject, _menu ,_index ,_value);
 end;
 
 procedure jMenu.Clear(_menu: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_Clear(FjEnv, FjObject, _menu);
+     jMenu_Clear(gApp.jni.jEnv, FjObject, _menu);
 end;
 
 procedure jMenu.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Clear');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end;
 
 procedure jMenu.SetItemTitle(_item: jObject; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemTitle(FjEnv, FjObject, _item ,_title);
+     jMenu_SetItemTitle(gApp.jni.jEnv, FjObject, _item ,_title);
 end;
 
 procedure jMenu.SetItemTitle(_menu: jObject; _index: integer; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_it(FjEnv, FjObject, 'SetItemTitle', _menu ,_index ,_title);
+     jni_proc_men_it(gApp.jni.jEnv, FjObject, 'SetItemTitle', _menu ,_index ,_title);
 end;
 
 procedure jMenu.SetItemIcon(_item: jObject; _iconIdentifier: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemIcon(FjEnv, FjObject, _item ,_iconIdentifier);
+     jMenu_SetItemIcon(gApp.jni.jEnv, FjObject, _item ,_iconIdentifier);
 end;
 
 procedure jMenu.SetItemIcon(_menu: jObject; _index: integer; _iconIdentifier: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_SetItemIcon(FjEnv, FjObject, _menu ,_index ,_iconIdentifier);
+     jMenu_SetItemIcon(gApp.jni.jEnv, FjObject, _menu ,_index ,_iconIdentifier);
 end;
 
 procedure jMenu.SetItemChecked(_item: jObject; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_mei_z(FjEnv, FjObject, 'SetItemChecked', _item ,_value);
+     jni_proc_mei_z(gApp.jni.jEnv, FjObject, 'SetItemChecked', _item ,_value);
 end;
 
 procedure jMenu.SetItemCheckable(_item: jObject; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_mei_z(FjEnv, FjObject, 'SetItemCheckable', _item ,_value);
+     jni_proc_mei_z(gApp.jni.jEnv, FjObject, 'SetItemCheckable', _item ,_value);
 end;
 
 function jMenu.GetItemIdByIndex(_menu: jObject; _index: integer): integer;
@@ -362,7 +362,7 @@ begin
   Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_men_i_out_i(FjEnv, FjObject, 'GetItemIdByIndex', _menu ,_index);
+   Result:= jni_func_men_i_out_i(gApp.jni.jEnv, FjObject, 'GetItemIdByIndex', _menu ,_index);
 end;
 
 function jMenu.GetItemIndexById(_menu: jObject; _id: integer): integer;
@@ -370,28 +370,28 @@ begin
   Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_men_i_out_i(FjEnv, FjObject, 'GetItemIndexById', _menu ,_id);
+   Result:= jni_func_men_i_out_i(gApp.jni.jEnv, FjObject, 'GetItemIndexById', _menu ,_id);
 end;
 
 procedure jMenu.RemoveItemById(_menu: jObject; _id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_i(FjEnv, FjObject, 'RemoveItemById', _menu ,_id);
+     jni_proc_men_i(gApp.jni.jEnv, FjObject, 'RemoveItemById', _menu ,_id);
 end;
 
 procedure jMenu.RemoveItemByIndex(_menu: jObject; _index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_men_i(FjEnv, FjObject, 'RemoveItemByIndex', _menu ,_index);
+     jni_proc_men_i(gApp.jni.jEnv, FjObject, 'RemoveItemByIndex', _menu ,_index);
 end;
 
 procedure jMenu.AddDropDownItem(_menu: jObject; _view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMenu_AddDropDownItem(FjEnv, FjObject, _menu ,_view);
+     jMenu_AddDropDownItem(gApp.jni.jEnv, FjObject, _menu ,_view);
 end;
 
 {-------- jMenu_JNI_Bridge ----------}

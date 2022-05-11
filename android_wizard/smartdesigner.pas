@@ -3006,8 +3006,8 @@ begin
   Result:= method+'=Java_Event_'+method+signature+');';
   if method = 'pAppOnCreate' then
   begin
-    //Result := Result + FStartModuleVarName + '.Init(gApp);';
-    Result := Result + FStartModuleVarName + '.ReInit(gApp);' //by tr3e
+    //Result := Result + FStartModuleVarName + '.init;';
+    Result := Result + FStartModuleVarName + '.Reinit;' //by tr3e
   end;
 
   listParam.Free;

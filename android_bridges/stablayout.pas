@@ -30,7 +30,7 @@ jsTabLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -117,7 +117,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -125,55 +125,55 @@ begin
   inherited Destroy;
 end;
 
-procedure jsTabLayout.Init(refApp: jApp);
+procedure jsTabLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
     if rToA in FPositionRelativeToAnchor then
-      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
 
   for rToP := rpBottom to rpCenterVertical do
     if rToP in FPositionRelativeToParent then
-      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
      SetFitsSystemWindows(FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -181,13 +181,13 @@ procedure jsTabLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsTabLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsTabLayout.UpdateLayout;
@@ -198,13 +198,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsTabLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -221,14 +221,14 @@ end;
 
 function jsTabLayout.jCreate(): jObject;
 begin
-   Result:= jsTabLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsTabLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsTabLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsTabLayout.GetParent(): jObject;
@@ -236,35 +236,35 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTabLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsTabLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTabLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsTabLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsTabLayout.GetLParamWidth(): integer;
@@ -272,7 +272,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamWidth(FjEnv, FjObject);
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsTabLayout.GetLParamHeight(): integer;
@@ -280,49 +280,49 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamHeight(FjEnv, FjObject);
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTabLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, _g);
+     View_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jsTabLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLWeight(FjEnv, FjObject, _w);
+     View_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsTabLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsTabLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsTabLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsTabLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsTabLayout.ClearLayout();
@@ -333,15 +333,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -350,14 +350,14 @@ begin
   Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_i(FjEnv, FjObject, 'AddTab', _title);
+   Result:= jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'AddTab', _title);
 end;
 
 procedure jsTabLayout.SetupWithViewPager(_viewPage: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_viw(FjEnv, FjObject, 'SetupWithViewPager', _viewPage);
+     jni_proc_viw(gApp.jni.jEnv, FjObject, 'SetupWithViewPager', _viewPage);
 end;
 
 procedure jsTabLayout.SetFitsSystemWindows(_value: boolean);
@@ -366,7 +366,7 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
 
-  jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 function jsTabLayout.GetTabCount(): integer;
@@ -374,28 +374,28 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetTabCount');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetTabCount');
 end;
 
 procedure jsTabLayout.SetTabTextColors(_normalColor: TARGBColorBridge; _selectedColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetTabTextColors', GetARGB(FCustomColor, _normalColor), GetARGB(FCustomColor, _selectedColor));
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetTabTextColors', GetARGB(FCustomColor, _normalColor), GetARGB(FCustomColor, _selectedColor));
 end;
 
 procedure jsTabLayout.SetIcon(_position: integer; _iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'SetIcon', _position ,_iconIdentifier);
+     jni_proc_it(gApp.jni.jEnv, FjObject, 'SetIcon', _position ,_iconIdentifier);
 end;
 
 procedure jsTabLayout.SetPosition(_position: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetPosition', _position);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetPosition', _position);
 end;
 
 function jsTabLayout.GetPosition(): integer;
@@ -403,7 +403,7 @@ begin
   Result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetPosition');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetPosition');
 end;
 
 function jsTabLayout.IsSelected(_position: integer): boolean;
@@ -411,21 +411,21 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_z(FjEnv, FjObject, 'IsSelected', _position);
+   Result:= jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'IsSelected', _position);
 end;
 
 procedure jsTabLayout.SetCustomView(_position: integer; _view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTabLayout_SetCustomView(FjEnv, FjObject, _position ,_view);
+     jsTabLayout_SetCustomView(gApp.jni.jEnv, FjObject, _position ,_view);
 end;
 
 procedure jsTabLayout.SetTitle(_position: integer; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'SetTitle', _position ,_title);
+     jni_proc_it(gApp.jni.jEnv, FjObject, 'SetTitle', _position ,_title);
 end;
 
 function jsTabLayout.GetTitle(_position: integer): string;
@@ -433,70 +433,70 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetTitle', _position);
+   Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetTitle', _position);
 end;
 
 procedure jsTabLayout.SetTabMode(_tabMode: TTabMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetTabMode', Ord(_tabmode) );
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTabMode', Ord(_tabmode) );
 end;
 
 function jsTabLayout.GetTabAt(_position: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTabLayout_GetTabAt(FjEnv, FjObject, _position);
+   Result:= jsTabLayout_GetTabAt(gApp.jni.jEnv, FjObject, _position);
 end;
 
 procedure jsTabLayout.SetSelectedTabIndicatorColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSelectedTabIndicatorColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelectedTabIndicatorColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jsTabLayout.SetSelectedTabIndicatorHeight(_height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSelectedTabIndicatorHeight', _height);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelectedTabIndicatorHeight', _height);
 end;
 
 procedure jsTabLayout.SetTabGravity(_tabGravity: TTabGravity);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetTabGravity', Ord(_tabGravity) );
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTabGravity', Ord(_tabGravity) );
 end;
 
 procedure jsTabLayout.SetElevation(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetElevation', _value);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetElevation', _value);
 end;
 
 procedure jsTabLayout.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetBackgroundToPrimaryColor');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetBackgroundToPrimaryColor');
 end;
 
 procedure jsTabLayout.RemoveAllTabs();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveAllTabs');
+     jni_proc(gApp.jni.jEnv, FjObject, 'RemoveAllTabs');
 end;
 
 procedure jsTabLayout.RemoveTabAt(_position : integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'RemoveTabAt', _position);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'RemoveTabAt', _position);
 end;
 
 {-------- jsTabLayout_JNI_Bridge ----------}

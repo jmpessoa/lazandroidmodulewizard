@@ -35,7 +35,7 @@ jSearchView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -160,29 +160,29 @@ begin
   inherited Destroy;
 end;
 
-procedure jSearchView.Init(refApp: jApp);
+procedure jSearchView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject:= jCreate(FIconified); //jSelf !
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jSearchView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jSearchView_SetId(FjEnv, FjObject, Self.Id);
+   jSearchView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jSearchView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jSearchView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jSearchView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -191,32 +191,32 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jSearchView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jSearchView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jSearchView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jSearchView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jSearchView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jSearchView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FHint <> '' then
-     jSearchView_SetQueryHint(FjEnv, FjObject, FHint);
+     jSearchView_SetQueryHint(gApp.jni.jEnv, FjObject, FHint);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -224,13 +224,13 @@ procedure jSearchView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jSearchView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jSearchView.UpdateLayout;
@@ -241,13 +241,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jSearchView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -263,112 +263,112 @@ end;
 
 function jSearchView.jCreate( _iconified: boolean): jObject;
 begin
-   Result:= jSearchView_jCreate(FjEnv, int64(Self), _iconified, FjThis);
+   Result:= jSearchView_jCreate(gApp.jni.jEnv, int64(Self), _iconified, gApp.jni.jThis);
 end;
 
 procedure jSearchView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_jFree(FjEnv, FjObject);
+     jSearchView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jSearchView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jSearchView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetParent(FjEnv, FjObject);
+   Result:= jSearchView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_RemoveFromViewParent(FjEnv, FjObject);
+     jSearchView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jSearchView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetView(FjEnv, FjObject);
+   Result:= jSearchView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetLParamWidth(FjEnv, FjObject, _w);
+     jSearchView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jSearchView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetLParamHeight(FjEnv, FjObject, _h);
+     jSearchView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jSearchView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jSearchView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jSearchView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jSearchView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetLGravity(FjEnv, FjObject, _g);
+     jSearchView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jSearchView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetLWeight(FjEnv, FjObject, _w);
+     jSearchView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jSearchView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jSearchView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSearchView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jSearchView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jSearchView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jSearchView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jSearchView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jSearchView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jSearchView.ClearLayout();
@@ -379,15 +379,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jSearchView_clearLayoutAll(FjEnv, FjObject);
+     jSearchView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jSearchView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jSearchView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jSearchView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jSearchView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -395,28 +395,28 @@ function jSearchView.GetQuery(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetQuery(FjEnv, FjObject);
+   Result:= jSearchView_GetQuery(gApp.jni.jEnv, FjObject);
 end;
 
 function jSearchView.GetQueryHint(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetQueryHint(FjEnv, FjObject);
+   Result:= jSearchView_GetQueryHint(gApp.jni.jEnv, FjObject);
 end;
 
 function jSearchView.IsIconfiedByDefault(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_IsIconfiedByDefault(FjEnv, FjObject);
+   Result:= jSearchView_IsIconfiedByDefault(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.SetIconifiedByDefault(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetIconifiedByDefault(FjEnv, FjObject, _value);
+     jSearchView_SetIconifiedByDefault(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jSearchView.SetQueryHint(_hint: string);
@@ -424,35 +424,35 @@ begin
   //in designing component state: set value here...
   FHint:= _hint;
   if FInitialized then
-     jSearchView_SetQueryHint(FjEnv, FjObject, _hint);
+     jSearchView_SetQueryHint(gApp.jni.jEnv, FjObject, _hint);
 end;
 
 procedure jSearchView.SelectAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SelectAll(FjEnv, FjObject);
+     jSearchView_SelectAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.SelectAll(_highlightColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SelectAll(FjEnv, FjObject, GetARGB(FCustomColor, _highlightColor));
+     jSearchView_SelectAll(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _highlightColor));
 end;
 
 procedure jSearchView.SetFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetFocus(FjEnv, FjObject);
+     jSearchView_SetFocus(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.ClearFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_ClearFocus(FjEnv, FjObject);
+     jSearchView_ClearFocus(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.SetIconified(_value: boolean);
@@ -460,21 +460,21 @@ begin
   //in designing component state: set value here...
   FIconified:= _value;
   if FInitialized then
-     jSearchView_SetIconified(FjEnv, FjObject, _value);
+     jSearchView_SetIconified(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jSearchView.SetSoftInputShownOnFocus(_show: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSearchView_SetSoftInputShownOnFocus(FjEnv, FjObject, _show);
+     jSearchView_SetSoftInputShownOnFocus(gApp.jni.jEnv, FjObject, _show);
 end;
 
 function jSearchView.GetInnerEditView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSearchView_GetInnerEditView(FjEnv, FjObject);
+   Result:= jSearchView_GetInnerEditView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSearchView.GenEvent_OnSearchViewFocusChange(Sender: TObject; hasFocus: boolean);

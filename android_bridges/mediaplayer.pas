@@ -40,7 +40,7 @@ jMediaPlayer = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure DeselectTrack(_index: integer);
@@ -142,10 +142,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jMediaPlayer.Init(refApp: jApp);
+procedure jMediaPlayer.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -154,21 +154,21 @@ end;
 
 function jMediaPlayer.jCreate(): jObject;
 begin
-   Result:= jMediaPlayer_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jMediaPlayer_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jMediaPlayer.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_jFree(FjEnv, FjObject);
+     jMediaPlayer_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.DeselectTrack(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_DeselectTrack(FjEnv, FjObject, _index);
+     jMediaPlayer_DeselectTrack(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jMediaPlayer.Release();
@@ -176,7 +176,7 @@ begin
   //in designing component state: set value here...
   FPaused:= False;
   if FInitialized then
-     jMediaPlayer_Release(FjEnv, FjObject);
+     jMediaPlayer_Release(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Reset();
@@ -184,14 +184,14 @@ begin
   //in designing component state: set value here...
   FPaused:= False;
   if FInitialized then
-     jMediaPlayer_Reset(FjEnv, FjObject);
+     jMediaPlayer_Reset(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SetDataSource(_path: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetDataSource(FjEnv, FjObject, _path);
+     jMediaPlayer_SetDataSource(gApp.jni.jEnv, FjObject, _path);
 end;
 
 procedure jMediaPlayer.Start();
@@ -199,7 +199,7 @@ begin
   //in designing component state: set value here...
   FPaused:= False;
   if FInitialized then
-     jMediaPlayer_Start(FjEnv, FjObject);
+     jMediaPlayer_Start(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Stop();
@@ -207,7 +207,7 @@ begin
   //in designing component state: set value here...
   FPaused:= False;
   if FInitialized then
-     jMediaPlayer_Stop(FjEnv, FjObject);
+     jMediaPlayer_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.Pause();
@@ -215,14 +215,14 @@ begin
   //in designing component state: set value here...
   FPaused:= True;
   if FInitialized then
-     jMediaPlayer_Pause(FjEnv, FjObject);
+     jMediaPlayer_Pause(gApp.jni.jEnv, FjObject);
 end;
 
 function jMediaPlayer.IsPlaying(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-     Result:= jMediaPlayer_IsPlaying(FjEnv, FjObject);
+     Result:= jMediaPlayer_IsPlaying(gApp.jni.jEnv, FjObject);
 end;
 
 function jMediaPlayer.IsPaused(): boolean;
@@ -234,14 +234,14 @@ procedure jMediaPlayer.SeekTo(_millis: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SeekTo(FjEnv, FjObject, _millis);
+     jMediaPlayer_SeekTo(gApp.jni.jEnv, FjObject, _millis);
 end;
 
 procedure jMediaPlayer.SetLooping(_looping: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetLooping(FjEnv, FjObject, _looping);
+     jMediaPlayer_SetLooping(gApp.jni.jEnv, FjObject, _looping);
 end;
 
 // by tr3e
@@ -249,112 +249,112 @@ procedure jMediaPlayer.SetPrepareAsync(_isPrepareAsync: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetPrepareAsync(FjEnv, FjObject, _isPrepareAsync);
+     jMediaPlayer_SetPrepareAsync(gApp.jni.jEnv, FjObject, _isPrepareAsync);
 end;
 
 function jMediaPlayer.IsLooping(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_IsLooping(FjEnv, FjObject);
+   Result:= jMediaPlayer_IsLooping(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SelectTrack(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SelectTrack(FjEnv, FjObject, _index);
+     jMediaPlayer_SelectTrack(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jMediaPlayer.GetCurrentPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_GetCurrentPosition(FjEnv, FjObject);
+   Result:= jMediaPlayer_GetCurrentPosition(gApp.jni.jEnv, FjObject);
 end;
 
 function jMediaPlayer.GetDuration(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_GetDuration(FjEnv, FjObject);
+   Result:= jMediaPlayer_GetDuration(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SetVolume(_leftVolume: single; _rightVolume: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetVolume(FjEnv, FjObject, _leftVolume ,_rightVolume);
+     jMediaPlayer_SetVolume(gApp.jni.jEnv, FjObject, _leftVolume ,_rightVolume);
 end;
 
 procedure jMediaPlayer.SetDisplay(_surfaceHolder: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetDisplay(FjEnv, FjObject, _surfaceHolder);
+     jMediaPlayer_SetDisplay(gApp.jni.jEnv, FjObject, _surfaceHolder);
 end;
 
 function jMediaPlayer.GetVideoWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_GetVideoWidth(FjEnv, FjObject);
+   Result:= jMediaPlayer_GetVideoWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jMediaPlayer.GetVideoHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaPlayer_GetVideoHeight(FjEnv, FjObject);
+   Result:= jMediaPlayer_GetVideoHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaPlayer.SetScreenOnWhilePlaying(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetScreenOnWhilePlaying(FjEnv, FjObject, _value);
+     jMediaPlayer_SetScreenOnWhilePlaying(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jMediaPlayer.SetAudioStreamType(_audioStreamType: TAudioStreamType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetAudioStreamType(FjEnv, FjObject, Ord(_audioStreamType));
+     jMediaPlayer_SetAudioStreamType(gApp.jni.jEnv, FjObject, Ord(_audioStreamType));
 end;
 
 procedure jMediaPlayer.SetDataSource(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetDataSource(FjEnv, FjObject, _path ,_filename);
+     jMediaPlayer_SetDataSource(gApp.jni.jEnv, FjObject, _path ,_filename);
 end;
 
 procedure jMediaPlayer.SetSurfaceTexture(_surfaceTexture: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_SetSurfaceTexture(FjEnv, FjObject, _surfaceTexture);
+     jMediaPlayer_SetSurfaceTexture(gApp.jni.jEnv, FjObject, _surfaceTexture);
 end;
 
 procedure jMediaPlayer.LoadFromAssets(_fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_LoadFromAssets(FjEnv, FjObject, _fileName);
+     jMediaPlayer_LoadFromAssets(gApp.jni.jEnv, FjObject, _fileName);
 end;
 
 procedure jMediaPlayer.LoadFromURL(_url: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_LoadFromURL(FjEnv, FjObject, _url);
+     jMediaPlayer_LoadFromURL(gApp.jni.jEnv, FjObject, _url);
 end;
 
 procedure jMediaPlayer.LoadFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaPlayer_LoadFromFile(FjEnv, FjObject, _path ,_filename);
+     jMediaPlayer_LoadFromFile(gApp.jni.jEnv, FjObject, _path ,_filename);
 end;
 
 procedure jMediaPlayer.GenEvent_OnPrepared(Obj: TObject; videoWidth: integer; videoHeigh: integer);

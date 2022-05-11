@@ -8,7 +8,7 @@
 //
 //   Developer
 //   ---------------------------------------------------------------------------
-//                   Simon,Choi / Choi,Won-sik , ÃÖ¿ø½Ä¿Ë
+//                   Simon,Choi / Choi,Won-sik , ï¿½Ö¿ï¿½ï¿½Ä¿ï¿½
 //                           simonsayz@naver.com   
 //                           http://blog.naver.com/simonsayz
 //
@@ -37,7 +37,7 @@
 //   ---------------------------------------------------------------------------
 //    Quick Ref    : http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf
 //    Basic        : https://wiki.engr.illinois.edu/download/attachments/98402319/2.pdf?version=2&modificationDate=1296076618000
-//                   http://www.gisdeveloper.co.kr/category/ÇÁ·Î±×·¡¹Ö/OpenGL
+//                   http://www.gisdeveloper.co.kr/category/ï¿½ï¿½ï¿½Î±×·ï¿½ï¿½ï¿½/OpenGL
 //    Alpha        : http://stackoverflow.com/questions/1572175/how-to-programmatically-alpha-fade-a-textured-object-in-opengl-es-1-1-iphone
 //    Matrix       : http://www.songho.ca/opengl/gl_matrix.html
 //                   http://developer.android.com/reference/android/opengl/Matrix.html
@@ -182,7 +182,7 @@ jCanvasES1 = class(jGLViewEvent)
   //
   Constructor Create(AOwner: TComponent); override;
   Destructor  Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 
   procedure ClearLayout();
   Procedure UpdateLayout; override;
@@ -756,7 +756,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-          jni_free(FjEnv, FjObject );
+          jni_free(gApp.jni.jEnv, FjObject );
           FjObject := nil;
         end;
   end;
@@ -766,31 +766,31 @@ end;
 
 procedure jCanvasES1.Pause;
 begin
- jni_proc(FjEnv, FjObject, 'SetOnPause');
+ jni_proc(gApp.jni.jEnv, FjObject, 'SetOnPause');
 end;
 
 procedure jCanvasES1.Resume;
 begin
- jni_proc(FjEnv, FjObject, 'SetOnResume');
+ jni_proc(gApp.jni.jEnv, FjObject, 'SetOnResume');
 end;
 
-Procedure jCanvasES1.Init(refApp: jApp);
+Procedure jCanvasES1.Init;
 var
    rToP: TPositionRelativeToParent;
    rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
-   FjObject  := jGLSurfaceView_Create1(FjEnv, FjThis, Self, cjOpenGLESv1);
+   inherited Init;
+   FjObject  := jGLSurfaceView_Create1(gApp.jni.jEnv, gApp.jni.jThis, Self, cjOpenGLESv1);
 
    if FjObject = nil then exit;
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
@@ -799,28 +799,28 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    SetAutoRefresh(FAutoRefresh);
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 end;
 
@@ -828,7 +828,7 @@ Procedure jCanvasES1.SetVisible  (Value : Boolean);
  begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject , FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject , FVisible);
  end;
 
 function jCanvasES1.GetVisible: Boolean;
@@ -839,7 +839,7 @@ end;
 procedure jCanvasES1.Refresh;
 begin
    if FInitialized then
-      jni_proc(FjEnv, FjObject, 'Refresh' );
+      jni_proc(gApp.jni.jEnv, FjObject, 'Refresh' );
 end;
 
 Procedure jCanvasES1.SetAutoRefresh(Value: boolean);
@@ -847,7 +847,7 @@ begin
   FAutoRefresh := Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetAutoRefresh', FAutoRefresh);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAutoRefresh', FAutoRefresh);
 end;
 
 //
@@ -1036,7 +1036,7 @@ begin
   case lang of
      tJava : begin
                 //Texture.Active :=        _glTexture_Load_wJava(gApp.Jni.jEnv, gApp.Jni.jThis, gApp.Path.Dat+'/'+filename, Texture.ID);
-                  Texture.Active :=        _glTexture_Load_wJava(FjEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID);
+                  Texture.Active :=        _glTexture_Load_wJava(gApp.jni.jEnv, FjObject, gApp.Path.Dat+'/'+filename, Texture.ID);
              end;
      (**tPascal : Texture.Active := _glTexture_Load_wPas(filename, Texture.ID);**) //And_lib_Image_droped
   end;
@@ -1051,7 +1051,7 @@ begin
 
   if FImageList = nil then exit;
 
-  FImageList.Init(gApp);  //***
+  FImageList.Init;  //***
 
   for i:= 0 to FImageList.Images.Count - 1 do
   begin
@@ -1109,7 +1109,7 @@ end;
 Procedure jCanvasES1.Request_GLThread;
 begin
  if FInitialized then
-    jni_proc(FjEnv, FjObject, 'glThread');
+    jni_proc(gApp.jni.jEnv, FjObject, 'glThread');
 end;
 
 //
@@ -1153,7 +1153,7 @@ begin
    if sysIsWidthExactToParent(Self) then
     Result := sysGetWidthOfParent(FParent)
    else
-    Result:= View_GetLParamWidth(FjEnv, FjObject );
+    Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jCanvasES1.GetHeight: integer;
@@ -1164,7 +1164,7 @@ begin
    if sysIsHeightExactToParent(Self) then
     Result := sysGetHeightOfParent(FParent)
    else
-    Result:= View_GetLParamHeight(FjEnv, FjObject);
+    Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCanvasES1.ClearLayout();
@@ -1175,15 +1175,15 @@ begin
   //in designing component state: set value here...
   if not FInitialized then exit;
 
-  View_ClearLayoutAll(FjEnv, FjObject);
+  View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
   for rToP := rpBottom to rpCenterVertical do
     if rToP in FPositionRelativeToParent then
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
   for rToA := raAbove to raAlignRight do
     if rToA in FPositionRelativeToAnchor then
-       View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 end;
 
 procedure jCanvasES1.UpdateLayout;
@@ -1194,7 +1194,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 end.

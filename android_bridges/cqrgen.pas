@@ -20,7 +20,7 @@ jcQRGen = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -81,11 +81,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcQRGen.Init(refApp: jApp);
+procedure jcQRGen.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -97,84 +97,84 @@ end;
 
 function jcQRGen.jCreate(): jObject;
 begin
-   Result:= jcQRGen_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcQRGen_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcQRGen.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcQRGen_jFree(FjEnv, FjObject);
+     jcQRGen_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jcQRGen.GetURLQRCode(_url: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetURLQRCode(FjEnv, FjObject, _url);
+   Result:= jcQRGen_GetURLQRCode(gApp.jni.jEnv, FjObject, _url);
 end;
 
 function jcQRGen.GetTextQRCode(_txt: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetTextQRCode(FjEnv, FjObject, _txt);
+   Result:= jcQRGen_GetTextQRCode(gApp.jni.jEnv, FjObject, _txt);
 end;
 
 function jcQRGen.GetEMailQRCode(_email: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetEMailQRCode(FjEnv, FjObject, _email);
+   Result:= jcQRGen_GetEMailQRCode(gApp.jni.jEnv, FjObject, _email);
 end;
 
 function jcQRGen.GetMeCardQRCode(_name: string; _email: string; _address: string; _phone: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetMeCardQRCode(FjEnv, FjObject, _name ,_email ,_address ,_phone);
+   Result:= jcQRGen_GetMeCardQRCode(gApp.jni.jEnv, FjObject, _name ,_email ,_address ,_phone);
 end;
 
 function jcQRGen.GetVCardQRCode(_name: string; _email: string; _address: string; _phone: string; _title: string; _company: string; _website: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetVCardQRCode(FjEnv, FjObject, _name ,_email ,_address ,_phone ,_title ,_company ,_website);
+   Result:= jcQRGen_GetVCardQRCode(gApp.jni.jEnv, FjObject, _name ,_email ,_address ,_phone ,_title ,_company ,_website);
 end;
 
 function jcQRGen.GetURLQRCode(_url: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetURLQRCode(FjEnv, FjObject, _url ,_width ,_height);
+   Result:= jcQRGen_GetURLQRCode(gApp.jni.jEnv, FjObject, _url ,_width ,_height);
 end;
 
 function jcQRGen.GetTextQRCode(_txt: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetTextQRCode(FjEnv, FjObject, _txt ,_width ,_height);
+   Result:= jcQRGen_GetTextQRCode(gApp.jni.jEnv, FjObject, _txt ,_width ,_height);
 end;
 
 function jcQRGen.GetEMailQRCode(_email: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetEMailQRCode(FjEnv, FjObject, _email ,_width ,_height);
+   Result:= jcQRGen_GetEMailQRCode(gApp.jni.jEnv, FjObject, _email ,_width ,_height);
 end;
 
 function jcQRGen.GetMeCardQRCode(_name: string; _email: string; _address: string; _phone: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetMeCardQRCode(FjEnv, FjObject, _name ,_email ,_address ,_phone ,_width ,_height);
+   Result:= jcQRGen_GetMeCardQRCode(gApp.jni.jEnv, FjObject, _name ,_email ,_address ,_phone ,_width ,_height);
 end;
 
 function jcQRGen.GetVCardQRCode(_name: string; _email: string; _address: string; _phone: string; _title: string; _company: string; _website: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcQRGen_GetVCardQRCode(FjEnv, FjObject, _name ,_email ,_address ,_phone ,_title ,_company ,_website ,_width ,_height);
+   Result:= jcQRGen_GetVCardQRCode(gApp.jni.jEnv, FjObject, _name ,_email ,_address ,_phone ,_title ,_company ,_website ,_width ,_height);
 end;
 
 {-------- jcQRGen_JNI_Bridge ----------}

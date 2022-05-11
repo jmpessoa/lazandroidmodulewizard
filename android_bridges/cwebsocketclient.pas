@@ -38,7 +38,7 @@ jcWebSocketClient = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     function jCreate( _strUri: string): jObject; overload;
     procedure jFree();
@@ -116,11 +116,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcWebSocketClient.Init(refApp: jApp);
+procedure jcWebSocketClient.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
 
   if FUri <> '' then
@@ -136,14 +136,14 @@ end;
 
 function jcWebSocketClient.jCreate( _strUri: string): jObject;
 begin
-   Result:= jcWebSocketClient_jCreate(FjEnv, int64(Self) ,_strUri, FjThis);
+   Result:= jcWebSocketClient_jCreate(gApp.jni.jEnv, int64(Self) ,_strUri, gApp.jni.jThis);
 end;
 
 procedure jcWebSocketClient.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebsocketClient_jFree(FjEnv, FjObject);
+     jcWebsocketClient_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcWebSocketClient.SetUri(_strUri: string);
@@ -151,70 +151,70 @@ begin
   //in designing component state: set value here...
   FUri:= _strUri;
   if FInitialized then
-     jcWebSocketClient_SetUri(FjEnv, FjObject, _strUri);
+     jcWebSocketClient_SetUri(gApp.jni.jEnv, FjObject, _strUri);
 end;
 
 procedure jcWebSocketClient.SetConnectTimeout(_millisecTimeout: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_SetConnectTimeout(FjEnv, FjObject, _millisecTimeout);
+     jcWebSocketClient_SetConnectTimeout(gApp.jni.jEnv, FjObject, _millisecTimeout);
 end;
 
 procedure jcWebSocketClient.SetReadTimeout(_millisecTimeout: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_SetReadTimeout(FjEnv, FjObject, _millisecTimeout);
+     jcWebSocketClient_SetReadTimeout(gApp.jni.jEnv, FjObject, _millisecTimeout);
 end;
 
 procedure jcWebSocketClient.EnableAutomaticReconnection(_millisecWaitTime: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_EnableAutomaticReconnection(FjEnv, FjObject, _millisecWaitTime);
+     jcWebSocketClient_EnableAutomaticReconnection(gApp.jni.jEnv, FjObject, _millisecWaitTime);
 end;
 
 procedure jcWebSocketClient.AddHeader(_name: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_AddHeader(FjEnv, FjObject, _name ,_value);
+     jcWebSocketClient_AddHeader(gApp.jni.jEnv, FjObject, _name ,_value);
 end;
 
 procedure jcWebSocketClient.Connect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_Connect(FjEnv, FjObject);
+     jcWebSocketClient_Connect(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcWebSocketClient.Close();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_Close(FjEnv, FjObject);
+     jcWebSocketClient_Close(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcWebsocketClient.Send(_message: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebsocketClient_Send(FjEnv, FjObject, _message);
+     jcWebsocketClient_Send(gApp.jni.jEnv, FjObject, _message);
 end;
 
 procedure jcWebSocketClient.SendPing(var _data: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_SendPing(FjEnv, FjObject, _data);
+     jcWebSocketClient_SendPing(gApp.jni.jEnv, FjObject, _data);
 end;
 
 procedure jcWebSocketClient.SendPong(var _data: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcWebSocketClient_SendPong(FjEnv, FjObject, _data);
+     jcWebSocketClient_SendPong(gApp.jni.jEnv, FjObject, _data);
 end;
 
 procedure jcWebSocketClient.GenEvent_WebSocketClientOnOpen(Sender:TObject);

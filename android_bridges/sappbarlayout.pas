@@ -23,7 +23,7 @@ jsAppBarLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -114,27 +114,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jsAppBarLayout.Init(refApp: jApp);
+procedure jsAppBarLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jsAppBarLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsAppBarLayout_SetId(FjEnv, FjObject, Self.Id);
+   jsAppBarLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsAppBarLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsAppBarLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsAppBarLayout_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -143,33 +143,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsAppBarLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsAppBarLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsAppBarLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsAppBarLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsAppBarLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsAppBarLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsAppBarLayout_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsAppBarLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -177,13 +177,13 @@ procedure jsAppBarLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsAppBarLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsAppBarLayout.UpdateLayout;
@@ -194,13 +194,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsAppBarLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -213,56 +213,56 @@ end;
 
 function jsAppBarLayout.jCreate(): jObject;
 begin
-   Result:= jsAppBarLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsAppBarLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsAppBarLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_jFree(FjEnv, FjObject);
+     jsAppBarLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAppBarLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsAppBarLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsAppBarLayout.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAppBarLayout_GetParent(FjEnv, FjObject);
+   Result:= jsAppBarLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAppBarLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jsAppBarLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsAppBarLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsAppBarLayout_GetView(FjEnv, FjObject);
+   Result:= jsAppBarLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAppBarLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jsAppBarLayout_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsAppBarLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jsAppBarLayout_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsAppBarLayout.GetWidth(): integer;
@@ -273,7 +273,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jsAppBarLayout_getLParamWidth(FjEnv, FjObject );
+   Result:= jsAppBarLayout_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jsAppBarLayout.GetHeight(): integer;
@@ -284,49 +284,49 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jsAppBarLayout_getLParamHeight(FjEnv, FjObject );
+   Result:= jsAppBarLayout_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jsAppBarLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetLGravity(FjEnv, FjObject, _g);
+     jsAppBarLayout_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jsAppBarLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetLWeight(FjEnv, FjObject, _w);
+     jsAppBarLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsAppBarLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsAppBarLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsAppBarLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsAppBarLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsAppBarLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsAppBarLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsAppBarLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsAppBarLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsAppBarLayout.ClearLayout();
@@ -337,15 +337,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsAppBarLayout_clearLayoutAll(FjEnv, FjObject);
+     jsAppBarLayout_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsAppBarLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsAppBarLayout_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsAppBarLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsAppBarLayout_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -354,21 +354,21 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsAppBarLayout_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsAppBarLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsAppBarLayout.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetBackgroundToPrimaryColor(FjEnv, FjObject);
+     jsAppBarLayout_SetBackgroundToPrimaryColor(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAppBarLayout.SetExpanded(expanded: boolean; animation: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsAppBarLayout_SetExpanded(FjEnv, FjObject, expanded ,animation);
+     jsAppBarLayout_SetExpanded(gApp.jni.jEnv, FjObject, expanded ,animation);
 end;
 {-------- jsAppBarLayout_JNI_Bridge ----------}
 

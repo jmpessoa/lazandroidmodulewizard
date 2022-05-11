@@ -25,7 +25,7 @@ jOpenDialog = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -80,10 +80,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jOpenDialog.Init(refApp: jApp);
+procedure jOpenDialog.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
 
@@ -92,41 +92,41 @@ begin
   if FFileExtension <> '' then
      SetFileExtension(FFileExtension);
 
-  jOpenDialog_SetInitialDirectory(FjEnv, FjObject, Ord(FInitialDirectory));
+  jOpenDialog_SetInitialDirectory(gApp.jni.jEnv, FjObject, Ord(FInitialDirectory));
 
 end;
 
 function jOpenDialog.jCreate(): jObject;
 begin
-  Result:= jOpenDialog_jCreate(FjEnv, int64(Self), FjThis);
+  Result:= jOpenDialog_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jOpenDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOpenDialog_jFree(FjEnv, FjObject);
+     jOpenDialog_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jOpenDialog.Show(_fileExtension: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOpenDialog_Show(FjEnv, FjObject, _fileExtension);
+     jOpenDialog_Show(gApp.jni.jEnv, FjObject, _fileExtension);
 end;
 
 procedure jOpenDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOpenDialog_Show(FjEnv, FjObject);
+     jOpenDialog_Show(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jOpenDialog.Show(_initialEnvDirectory: TEnvDirectory; _fileExtension: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOpenDialog_Show(FjEnv, FjObject, Ord(_initialEnvDirectory) ,_fileExtension);
+     jOpenDialog_Show(gApp.jni.jEnv, FjObject, Ord(_initialEnvDirectory) ,_fileExtension);
 end;
 
 procedure jOpenDialog.SetInitialEnvDirectory(_initialEnvDirectory: TEnvDirectory);
@@ -134,7 +134,7 @@ begin
   //in designing component state: set value here...
   FInitialDirectory:= _initialEnvDirectory;
   if FInitialized then
-     jOpenDialog_SetInitialDirectory(FjEnv, FjObject, Ord(_initialEnvDirectory));
+     jOpenDialog_SetInitialDirectory(gApp.jni.jEnv, FjObject, Ord(_initialEnvDirectory));
 end;
 
 procedure jOpenDialog.SetFileExtension(_fileExtension: string);
@@ -153,7 +153,7 @@ begin
        aux:= Copy(aux, p+1, Length(aux));
      end;
      if Pos('*', aux) > 0 then  aux:= '';
-     jOpenDialog_SetFileExtension(FjEnv, FjObject, aux);
+     jOpenDialog_SetFileExtension(gApp.jni.jEnv, FjObject, aux);
   end;
 end;
 

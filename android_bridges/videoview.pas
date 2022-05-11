@@ -22,7 +22,7 @@ jVideoView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -123,27 +123,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jVideoView.Init(refApp: jApp);
+procedure jVideoView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jVideoView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jVideoView_SetId(FjEnv, FjObject, Self.Id);
+   jVideoView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jVideoView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jVideoView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jVideoView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -152,30 +152,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jVideoView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jVideoView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jVideoView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jVideoView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jVideoView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jVideoView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -183,13 +183,13 @@ procedure jVideoView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jVideoView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jVideoView.UpdateLayout;
@@ -200,13 +200,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jVideoView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -217,112 +217,112 @@ end;
 
 function jVideoView.jCreate(): jObject;
 begin
-   Result:= jVideoView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jVideoView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jVideoView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_jFree(FjEnv, FjObject);
+     jVideoView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jVideoView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jVideoView.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jVideoView_GetParent(FjEnv, FjObject);
+   Result:= jVideoView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_RemoveFromViewParent(FjEnv, FjObject);
+     jVideoView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jVideoView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jVideoView_GetView(FjEnv, FjObject);
+   Result:= jVideoView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetLParamWidth(FjEnv, FjObject, _w);
+     jVideoView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jVideoView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetLParamHeight(FjEnv, FjObject, _h);
+     jVideoView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jVideoView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jVideoView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jVideoView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jVideoView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jVideoView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jVideoView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetLGravity(FjEnv, FjObject, _g);
+     jVideoView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jVideoView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetLWeight(FjEnv, FjObject, _w);
+     jVideoView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jVideoView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jVideoView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jVideoView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jVideoView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jVideoView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jVideoView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jVideoView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jVideoView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jVideoView.ClearLayout();
@@ -333,15 +333,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jVideoView_clearLayoutAll(FjEnv, FjObject);
+     jVideoView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jVideoView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jVideoView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jVideoView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jVideoView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -349,56 +349,56 @@ procedure jVideoView.Pause();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_Pause(FjEnv, FjObject);
+     jVideoView_Pause(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.Resume();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_Resume(FjEnv, FjObject);
+     jVideoView_Resume(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.SeekTo(_position: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SeekTo(FjEnv, FjObject, _position);
+     jVideoView_SeekTo(gApp.jni.jEnv, FjObject, _position);
 end;
 
 function jVideoView.GetCurrentPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jVideoView_GetCurrentPosition(FjEnv, FjObject);
+   Result:= jVideoView_GetCurrentPosition(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jVideoView.SetProgressDialog(_title: string; _waitingMessage: string; _cancelable: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_SetProgressDialog(FjEnv, FjObject, _title ,_waitingMessage ,_cancelable);
+     jVideoView_SetProgressDialog(gApp.jni.jEnv, FjObject, _title ,_waitingMessage ,_cancelable);
 end;
 
 procedure jVideoView.PlayFromURL(_url: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_PlayFromUrl(FjEnv, FjObject, _url);
+     jVideoView_PlayFromUrl(gApp.jni.jEnv, FjObject, _url);
 end;
 
 procedure jVideoView.PlayFromRawResource(_fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_PlayFromRawResource(FjEnv, FjObject, _fileName);
+     jVideoView_PlayFromRawResource(gApp.jni.jEnv, FjObject, _fileName);
 end;
 
 procedure jVideoView.PlayFromSdcard(_fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jVideoView_PlayFromSdcard(FjEnv, FjObject, _fileName);
+     jVideoView_PlayFromSdcard(gApp.jni.jEnv, FjObject, _fileName);
 end;
 
 {-------- jVideoView_JNI_Bridge ----------}

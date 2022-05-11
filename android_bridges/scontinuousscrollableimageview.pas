@@ -31,7 +31,7 @@ jsContinuousScrollableImageView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -140,7 +140,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jsContinuousScrollableImageView.Init(refApp: jApp);
+procedure jsContinuousScrollableImageView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -148,26 +148,26 @@ begin
 
  if not FInitialized then
  begin
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
 
   if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
   FjPRLayoutHome:= FjPRLayout;
 
   if FLayoutWeight <> 1 then
-    jsContinuousScrollableImageView_SetLWeight(FjEnv, FjObject, FLayoutWeight);
+    jsContinuousScrollableImageView_SetLWeight(gApp.jni.jEnv, FjObject, FLayoutWeight);
 
   if FGravityInParent <> lgNone then
-    jsContinuousScrollableImageView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    jsContinuousScrollableImageView_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-  jsContinuousScrollableImageView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jsContinuousScrollableImageView_SetId(FjEnv, FjObject, Self.Id);
+  jsContinuousScrollableImageView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+  jsContinuousScrollableImageView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
  end;
 
-  jsContinuousScrollableImageView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  jsContinuousScrollableImageView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                         sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -176,35 +176,35 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsContinuousScrollableImageView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsContinuousScrollableImageView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsContinuousScrollableImageView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsContinuousScrollableImageView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsContinuousScrollableImageView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsContinuousScrollableImageView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
-  jsContinuousScrollableImageView_SetImageIdentifier(FjEnv, FjObject, FImageIdentifier);
-  jsContinuousScrollableImageView_SetDirection(FjEnv, FjObject, Ord(FDirection));
-  jsContinuousScrollableImageView_SetDuration(FjEnv, FjObject, FDuration);
-  jsContinuousScrollableImageView_SetScaleType(FjEnv, FjObject, Ord(FScaleType));
+  jsContinuousScrollableImageView_SetImageIdentifier(gApp.jni.jEnv, FjObject, FImageIdentifier);
+  jsContinuousScrollableImageView_SetDirection(gApp.jni.jEnv, FjObject, Ord(FDirection));
+  jsContinuousScrollableImageView_SetDuration(gApp.jni.jEnv, FjObject, FDuration);
+  jsContinuousScrollableImageView_SetScaleType(gApp.jni.jEnv, FjObject, Ord(FScaleType));
 
  if not FInitialized then
  begin
   FInitialized := true;
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+  View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
  end;
 end;
 
@@ -212,13 +212,13 @@ procedure jsContinuousScrollableImageView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsContinuousScrollableImageView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsContinuousScrollableImageView.UpdateLayout;
@@ -230,14 +230,14 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 
 end;
 
 procedure jsContinuousScrollableImageView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsContinuousScrollableImageView.ClearLayout;
@@ -248,15 +248,15 @@ begin
 
    if not FInitialized then Exit;
 
-  jsContinuousScrollableImageView_ClearLayoutAll(FjEnv, FjObject );
+  jsContinuousScrollableImageView_ClearLayoutAll(gApp.jni.jEnv, FjObject );
 
    for rToP := rpBottom to rpCenterVertical do
       if rToP in FPositionRelativeToParent then
-        jsContinuousScrollableImageView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+        jsContinuousScrollableImageView_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
    for rToA := raAbove to raAlignRight do
      if rToA in FPositionRelativeToAnchor then
-       jsContinuousScrollableImageView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       jsContinuousScrollableImageView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 
 end;
 
@@ -268,70 +268,70 @@ end;
 
 function jsContinuousScrollableImageView.jCreate(): jObject;
 begin
-   Result:= jsContinuousScrollableImageView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsContinuousScrollableImageView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsContinuousScrollableImageView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_jFree(FjEnv, FjObject);
+     jsContinuousScrollableImageView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsContinuousScrollableImageView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsContinuousScrollableImageView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsContinuousScrollableImageView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsContinuousScrollableImageView_GetParent(FjEnv, FjObject);
+   Result:= jsContinuousScrollableImageView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsContinuousScrollableImageView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_RemoveFromViewParent(FjEnv, FjObject);
+     jsContinuousScrollableImageView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsContinuousScrollableImageView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsContinuousScrollableImageView_GetView(FjEnv, FjObject);
+   Result:= jsContinuousScrollableImageView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsContinuousScrollableImageView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_SetLParamWidth(FjEnv, FjObject, _w);
+     jsContinuousScrollableImageView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsContinuousScrollableImageView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_SetLParamHeight(FjEnv, FjObject, _h);
+     jsContinuousScrollableImageView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsContinuousScrollableImageView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsContinuousScrollableImageView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jsContinuousScrollableImageView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsContinuousScrollableImageView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsContinuousScrollableImageView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jsContinuousScrollableImageView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsContinuousScrollableImageView.SetLGravity(_layoutgravity: TLayoutGravity);
@@ -339,7 +339,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _layoutgravity;
   if FInitialized then
-     jsContinuousScrollableImageView_SetLGravity(FjEnv, FjObject, Ord(_layoutgravity));
+     jsContinuousScrollableImageView_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_layoutgravity));
 end;
 
 procedure jsContinuousScrollableImageView.SetLWeight(_layoutweight: single);
@@ -347,42 +347,42 @@ begin
   //in designing component state: set value here...
   FLayoutWeight:=  _layoutweight;
   if FInitialized then
-     jsContinuousScrollableImageView_SetLWeight(FjEnv, FjObject, _layoutweight);
+     jsContinuousScrollableImageView_SetLWeight(gApp.jni.jEnv, FjObject, _layoutweight);
 end;
 
 procedure jsContinuousScrollableImageView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsContinuousScrollableImageView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsContinuousScrollableImageView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsContinuousScrollableImageView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsContinuousScrollableImageView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsContinuousScrollableImageView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsContinuousScrollableImageView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsContinuousScrollableImageView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsContinuousScrollableImageView.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsContinuousScrollableImageView_ClearLayoutAll(FjEnv, FjObject);
+     jsContinuousScrollableImageView_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsContinuousScrollableImageView.SetImageIdentifier(_imageIdentifier: string);
@@ -390,7 +390,7 @@ begin
   //in designing component state: set value here...
   FImageIdentifier:= _imageIdentifier;
   if FInitialized then
-     jsContinuousScrollableImageView_SetImageIdentifier(FjEnv, FjObject, _imageIdentifier);
+     jsContinuousScrollableImageView_SetImageIdentifier(gApp.jni.jEnv, FjObject, _imageIdentifier);
 end;
 
 procedure jsContinuousScrollableImageView.SetDirection(_direction: TScrollDirection);
@@ -398,7 +398,7 @@ begin
   //in designing component state: set value here...
   FDirection:= _direction;
   if FInitialized then
-     jsContinuousScrollableImageView_SetDirection(FjEnv, FjObject, Ord(_direction));
+     jsContinuousScrollableImageView_SetDirection(gApp.jni.jEnv, FjObject, Ord(_direction));
 end;
 
 procedure jsContinuousScrollableImageView.SetDuration(_duration: integer);
@@ -406,7 +406,7 @@ begin
   //in designing component state: set value here...
   FDuration:= _duration;
   if FInitialized then
-     jsContinuousScrollableImageView_SetDuration(FjEnv, FjObject, _duration);
+     jsContinuousScrollableImageView_SetDuration(gApp.jni.jEnv, FjObject, _duration);
 end;
 
 procedure jsContinuousScrollableImageView.SetScaleType(_scaleType: TImageScaleType);
@@ -414,7 +414,7 @@ begin
   //in designing component state: set value here...
   FScaleType:= _scaleType;
   if FInitialized then
-     jsContinuousScrollableImageView_SetScaleType(FjEnv, FjObject, Ord(_scaleType));
+     jsContinuousScrollableImageView_SetScaleType(gApp.jni.jEnv, FjObject, Ord(_scaleType));
 end;
 
 {-------- jsContinuousScrollableImageView_JNI_Bridge ----------}

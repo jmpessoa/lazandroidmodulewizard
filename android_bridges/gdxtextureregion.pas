@@ -20,7 +20,7 @@ jGdxTextureRegion = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -62,11 +62,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxTextureRegion.Init(refApp: jApp);
+procedure jGdxTextureRegion.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -74,35 +74,35 @@ end;
 
 function jGdxTextureRegion.jCreate(): jObject;
 begin
-   Result:= jGdxTextureRegion_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxTextureRegion_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxTextureRegion.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized and (FjObject <> nil) then
-     jGdxTextureRegion_jFree(FjEnv, FjObject);
+     jGdxTextureRegion_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxTextureRegion.SetTextures(_textureAtlas: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxTextureRegion_SetTextures(FjEnv, FjObject, _textureAtlas);
+     jGdxTextureRegion_SetTextures(gApp.jni.jEnv, FjObject, _textureAtlas);
 end;
 
 function jGdxTextureRegion.GetRegion(_region: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTextureRegion_GetRegion(FjEnv, FjObject, _region);
+   Result:= jGdxTextureRegion_GetRegion(gApp.jni.jEnv, FjObject, _region);
 end;
 
 procedure jGdxTextureRegion.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxTextureRegion_Dispose(FjEnv, FjObject);
+     jGdxTextureRegion_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGdxTextureRegion_JNI_Bridge ----------}

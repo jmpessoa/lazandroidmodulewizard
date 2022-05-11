@@ -20,7 +20,7 @@ jExpression = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetFormula(_expression: string; var _variables: TDynArrayOfString); overload;
@@ -71,11 +71,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jExpression.Init(refApp: jApp);
+procedure jExpression.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -84,62 +84,62 @@ end;
 
 function jExpression.jCreate(): jObject;
 begin
-   Result:= jExpression_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jExpression_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jExpression.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpression_jFree(FjEnv, FjObject);
+     jExpression_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jExpression.SetFormula(_expression: string; var _variables: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpression_SetFormula(FjEnv, FjObject, _expression ,_variables);
+     jExpression_SetFormula(gApp.jni.jEnv, FjObject, _expression ,_variables);
 end;
 
 procedure jExpression.SetFormula(_expression: string; _variables: array of string);
 begin
   if FInitialized then
-     jExpression_SetFormula(FjEnv, FjObject, _expression ,_variables);
+     jExpression_SetFormula(gApp.jni.jEnv, FjObject, _expression ,_variables);
 end;
 
 procedure jExpression.SetValue(_variable: string; _value: double);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jExpression_SetValue(FjEnv, FjObject, _variable ,_value);
+     jExpression_SetValue(gApp.jni.jEnv, FjObject, _variable ,_value);
 end;
 
 function jExpression.Evaluate(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpression_Evaluate(FjEnv, FjObject);
+   Result:= jExpression_Evaluate(gApp.jni.jEnv, FjObject);
 end;
 
 function jExpression.IsExpressionValid(_checkVariablesSet: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpression_IsExpressionValid(FjEnv, FjObject, _checkVariablesSet);
+   Result:= jExpression_IsExpressionValid(gApp.jni.jEnv, FjObject, _checkVariablesSet);
 end;
 
 function jExpression.CanEvaluate(_checkVariableSet: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpression_CanEvaluate(FjEnv, FjObject, _checkVariableSet);
+   Result:= jExpression_CanEvaluate(gApp.jni.jEnv, FjObject, _checkVariableSet);
 end;
 
 function jExpression.GetValue(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jExpression_GetValue(FjEnv, FjObject);
+   Result:= jExpression_GetValue(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jExpression_JNI_Bridge ----------}

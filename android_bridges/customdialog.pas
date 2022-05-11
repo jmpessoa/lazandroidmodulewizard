@@ -34,7 +34,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -112,7 +112,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-        jni_free(FjEnv, FjObject);
+        jni_free(gApp.jni.jEnv, FjObject);
         FjObject:= nil;
      end;
   end;
@@ -120,28 +120,28 @@ begin
   inherited Destroy;
 end;
 
-procedure jCustomDialog.Init(refApp: jApp);
+procedure jCustomDialog.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
 
-   FjObject := jCustomDialog_jCreate(FjEnv, FjThis , int64(Self), FShowTitle);
+   FjObject := jCustomDialog_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self), FShowTitle);
 
    if FjObject = nil then exit;   //jSelf/View
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_Setid(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_Setid(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -166,20 +166,20 @@ begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{wiew!}, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject{FjRLayout}{wiew!}, GetARGB(FCustomColor, FColor));
 
    {
    if not FCloseOnBackKeyPressed then
-    jCustomDialog_SetCloseOnBackKeyPressed(FjEnv, FjObject, FCloseOnBackKeyPressed);
+    jCustomDialog_SetCloseOnBackKeyPressed(gApp.jni.jEnv, FjObject, FCloseOnBackKeyPressed);
 
    if not CanceledOnTouchOutside then
-     jCustomDialog_SetCanceledOnTouchOutside(FjEnv, FjObject, FCanceledOnTouchOutside);
+     jCustomDialog_SetCanceledOnTouchOutside(gApp.jni.jEnv, FjObject, FCanceledOnTouchOutside);
    }
 
    if not FCancelable then
       SetCancelable(FCancelable);
 
-   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject, FVisible);
   end;
 end;
 
@@ -209,7 +209,7 @@ procedure jCustomDialog.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject {FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); // @@
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject {FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); // @@
 end;
 
 procedure jCustomDialog.UpdateLayout;
@@ -222,27 +222,27 @@ begin
 
   if getDialogWidth()  > 0 then FWidth := getDialogWidth();
 
-  //init(gApp);
+  //init;
 end;
 
 procedure jCustomDialog.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 function jCustomDialog.GetDialogWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetDialogWidth');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetDialogWidth');
 end;
 
 function jCustomDialog.GetDialogHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetDialogHeight');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetDialogHeight');
 end;
 
 //Event : Java -> Pascal
@@ -257,35 +257,35 @@ begin
   //inherited SetViewParent(_viewgroup);
   FjPRLayout:= _viewgroup;
   if FjObject <> nil then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jCustomDialog.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomDialog.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jCustomDialog.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jCustomDialog.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jCustomDialog.ClearLayout();
@@ -296,7 +296,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
@@ -313,11 +313,11 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
+     //jCustomDialog_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
      if FText <> '' then
-       jni_proc_t(FjEnv, FjObject, 'Show', FText)
+       jni_proc_t(gApp.jni.jEnv, FjObject, 'Show', FText)
      else
-       jni_proc(FjEnv, FjObject, 'Show');
+       jni_proc(gApp.jni.jEnv, FjObject, 'Show');
   end;
 end;
 
@@ -328,11 +328,11 @@ begin
   FText:= _title;
   if FInitialized then
   begin
-     //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
+     //jCustomDialog_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
      if FIconIdentifier <> '' then
-        jni_proc_tt(FjEnv, FjObject, 'Show', _title, FIconIdentifier)
+        jni_proc_tt(gApp.jni.jEnv, FjObject, 'Show', _title, FIconIdentifier)
      else
-        jni_proc_t(FjEnv, FjObject, 'Show', _title)
+        jni_proc_t(gApp.jni.jEnv, FjObject, 'Show', _title)
   end;
 end;
 
@@ -343,8 +343,8 @@ begin
   FIconIdentifier:= _iconIdentifier;
   if FInitialized then
   begin
-     //jCustomDialog_RemoveFromViewParent(FjEnv, FjObject);
-     jni_proc_tt(FjEnv, FjObject, 'Show', _title, _iconIdentifier);
+     //jCustomDialog_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'Show', _title, _iconIdentifier);
   end;
 end;
 
@@ -353,21 +353,21 @@ begin
   //in designing component state: set value here...
   inherited SetText(_title);
   if FInitialized then
-    jni_proc_t(FjEnv, FjObject, 'SetTitle', _title);
+    jni_proc_t(gApp.jni.jEnv, FjObject, 'SetTitle', _title);
 end;
 
 procedure jCustomDialog.SetIconIdentifier(_iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_t(FjEnv, FjObject, 'SetIconIdentifier', _iconIdentifier);
+    jni_proc_t(gApp.jni.jEnv, FjObject, 'SetIconIdentifier', _iconIdentifier);
 end;
 
 procedure jCustomDialog.Close();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'Close');
+    jni_proc(gApp.jni.jEnv, FjObject, 'Close');
 end;
 
 {
@@ -376,7 +376,7 @@ begin
   //in designing component state: set value here...
   FCloseOnBackKeyPressed:= _value;
   if FInitialized then
-     jCustomDialog_SetCloseOnBackKeyPressed(FjEnv, FjObject, FCloseOnBackKeyPressed);
+     jCustomDialog_SetCloseOnBackKeyPressed(gApp.jni.jEnv, FjObject, FCloseOnBackKeyPressed);
 end;
 
 procedure jCustomDialog.SetCanceledOnTouchOutside(_value: boolean);
@@ -384,7 +384,7 @@ begin
   //in designing component state: set value here...
   FCanceledOnTouchOutside:= _value;
   if FInitialized then
-     jCustomDialog_SetCanceledOnTouchOutside(FjEnv, FjObject, FCanceledOnTouchOutside);
+     jCustomDialog_SetCanceledOnTouchOutside(gApp.jni.jEnv, FjObject, FCanceledOnTouchOutside);
 end;
 }
 
@@ -394,7 +394,7 @@ begin
   FCancelable:= _value;
 
   if FjObject <> nil then
-     jni_proc_z(FjEnv, FjObject, 'SetCancelable', FCancelable);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetCancelable', FCancelable);
 end;
 
 procedure jCustomDialog.GenEvent_OnCustomDialogShow(Obj: TObject; dialog: jObject; title: string);

@@ -45,7 +45,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
 
     procedure ClearLayout();
@@ -172,7 +172,7 @@ begin
   begin
       if FjObject  <> nil then
       begin
-         jni_free(FjEnv, FjObject);
+         jni_free(gApp.jni.jEnv, FjObject);
          FjObject := nil;
       end;
   end;
@@ -181,7 +181,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jSpinner.Init(refApp: jApp);
+procedure jSpinner.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -189,25 +189,25 @@ var
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);      //  <<--  FjPRLayout:= jForm.view [default]!
+   inherited Init;      //  <<--  FjPRLayout:= jForm.view [default]!
    //your code here: set/initialize create params....
-   FjObject := jSpinner_jCreate(FjEnv, FjThis , int64(Self));
+   FjObject := jSpinner_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                   FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                   sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                   sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
@@ -216,28 +216,28 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+      View_AddlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_setLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_setLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
    if FSelectedFontColor <> colbrDefault then
      Self.SetSelectedTextColor(GetARGB(FCustomColor, FSelectedFontColor));
@@ -260,7 +260,7 @@ begin
    if FItems <> nil then
    begin
     for i:= 0 to FItems.Count-1 do
-     jni_proc_ttz( FjEnv, FjObject, 'Add', FItems.Strings[i], '0', false);
+     jni_proc_ttz( gApp.jni.jEnv, FjObject, 'Add', FItems.Strings[i], '0', false);
 
     if FItems.Count > 0 then
     begin
@@ -283,7 +283,7 @@ begin
 
    SetSelectedIndex(FSelectedIndex);
 
-   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject, FVisible);
   end;
 end;
 
@@ -291,7 +291,7 @@ procedure jSpinner.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 procedure jSpinner.ClearLayout();
@@ -302,15 +302,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_clearLayoutAll(FjEnv, FjObject);
+     View_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -322,13 +322,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jSpinner.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject );
+    View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jSpinner.SetViewParent(_viewgroup: jObject);
@@ -336,14 +336,14 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject , _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject , _viewgroup);
 end;
 
 function jSpinner.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -351,56 +351,56 @@ procedure jSpinner.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamWidth(FjEnv, FjObject , _w);
+     View_SetLParamWidth(gApp.jni.jEnv, FjObject , _w);
 end;
 
 procedure jSpinner.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamHeight(FjEnv, FjObject , _h);
+     View_SetLParamHeight(gApp.jni.jEnv, FjObject , _h);
 end;
 
 procedure jSpinner.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jSpinner.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsAnchorRule(FjEnv, FjObject , _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , _rule);
 end;
 
 procedure jSpinner.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsParentRule(FjEnv, FjObject , _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , _rule);
 end;
 
 procedure jSpinner.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLayoutAll(FjEnv, FjObject , _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject , _idAnchor);
 end;
 
 function jSpinner.GetSelectedItemPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetSelectedItemPosition' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetSelectedItemPosition' );
 end;
 
 function jSpinner.GetSelectedItem(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetSelectedItem' );
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetSelectedItem' );
 end;
 
 procedure jSpinner.Add(_item: string);
@@ -410,7 +410,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc_ttz( FjEnv, FjObject, 'Add', _item, '0', true);
+     jni_proc_ttz( gApp.jni.jEnv, FjObject, 'Add', _item, '0', true);
      FItems.Add(_item);
   end;
 end;
@@ -419,14 +419,14 @@ procedure jSpinner.Clear;
 begin
   if FItems = nil then exit;
   FItems.Clear;
-  jni_proc(FjEnv, FjObject, 'Clear');
+  jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end; 
 
 procedure jSpinner.SetSelectedTextColor(_color: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSelectedTextColor', _color);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelectedTextColor', _color);
 end;
 
 procedure jSpinner.SetDropListTextColor(_color: TARGBColorBridge{integer});
@@ -434,7 +434,7 @@ begin
   //in designing component state: set value here...
   FDropListTextColor:= _color;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetDropListTextColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetDropListTextColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jSpinner.SetDropListBackgroundColor(_color: TARGBColorBridge{integer});
@@ -442,7 +442,7 @@ begin
   //in designing component state: set value here...
   FDropListBackgroundColor:= _color;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetDropListBackgroundColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetDropListBackgroundColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jSpinner.SetLastItemAsPrompt(_hasPrompt: boolean);
@@ -451,7 +451,7 @@ begin
   FLastItemAsPrompt:= _hasPrompt;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetLastItemAsPrompt', _hasPrompt);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetLastItemAsPrompt', _hasPrompt);
 end;
 
 function jSpinner.GetSize(): integer;
@@ -462,7 +462,7 @@ begin
   //in designing component state: result value here...
   Result:= FItems.Count;
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetSize' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetSize' );
 end;
 
 procedure jSpinner.Delete(_index: integer);
@@ -475,7 +475,7 @@ begin
    FItems.Delete(_index);
 
    if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Delete', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'Delete', _index);
   end;
 end;
 
@@ -483,7 +483,7 @@ procedure jSpinner.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelection', _index);
 end;
 
 procedure jSpinner.SetItem(_index: integer; _item: string);
@@ -496,7 +496,7 @@ begin
    FItems.Strings[_index]:= _item;
 
    if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'SetItem', _index ,_item);
+     jni_proc_it(gApp.jni.jEnv, FjObject, 'SetItem', _index ,_item);
   end;
 end;
 
@@ -540,7 +540,7 @@ begin
   FFontSize:= _txtFontSize;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextFontSize', _txtFontSize);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextFontSize', _txtFontSize);
 end;
 
 procedure jSpinner.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -549,7 +549,7 @@ begin
   FFontSizeUnit:= _unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jSpinner.SetTextAlignment(_alignment: TTextAlignment);
@@ -558,7 +558,7 @@ begin
   FTextAlignment:= _alignment;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextAlignment', Ord(_alignment));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextAlignment', Ord(_alignment));
 end;
 
 procedure jSpinner.SetFontFace(AValue: TFontFace);
@@ -566,7 +566,7 @@ begin
  FFontFace:= AValue;
  if FjObject = nil then exit;
 
- jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+ jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 procedure jSpinner.SetTextTypeFace(Value: TTextTypeFace);
@@ -574,14 +574,14 @@ begin
   FTextTypeFace:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+  jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 function jSpinner.GetText(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    FText:= jni_func_out_t(FjEnv, FjObject, 'GetText');
+    FText:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetText');
 
   Result := FText;
 end;
@@ -591,7 +591,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc_i(FjEnv, FjObject, 'SetText', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetText', _index);
      FText:= GetText();
   end;
 end;
@@ -602,7 +602,7 @@ begin
   FSelectedIndex:= _index;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetSelectedIndex', _index);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelectedIndex', _index);
 end;
 
 function jSpinner.GetSelectedIndex(): integer;
@@ -610,7 +610,7 @@ begin
   //in designing component state: result value here...
   if FInitialized then
   begin
-    FSelectedIndex:= jni_func_out_i(FjEnv, FjObject, 'GetSelectedIndex');
+    FSelectedIndex:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetSelectedIndex');
   end;
   Result:= FSelectedIndex;
 end;
@@ -622,7 +622,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
    if (_index >= 0) and (_index < FItems.Count) then
-     jSpinner_SetItem(FjEnv, FjObject, _index ,_item ,_strTag);
+     jSpinner_SetItem(gApp.jni.jEnv, FjObject, _index ,_item ,_strTag);
 end;
 
 procedure jSpinner.Add(_item: string; _strTag: string);
@@ -632,7 +632,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc_ttz( FjEnv, FjObject, 'Add', _item, _strTag, true);
+     jni_proc_ttz( gApp.jni.jEnv, FjObject, 'Add', _item, _strTag, true);
      FItems.Add(_item);
   end;
 end;
@@ -644,7 +644,7 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    if (_index >= 0) and (_index < FItems.Count) then
-    Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetItemTagString', _index);
+    Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetItemTagString', _index);
 end;
 
 procedure jSpinner.SetItemTagString(_index: integer; _strTag: string);
@@ -654,7 +654,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
    if (_index >= 0) and (_index < FItems.Count) then
-     jni_proc_it(FjEnv, FjObject, 'SetItemTagString', _index ,_strTag);
+     jni_proc_it(gApp.jni.jEnv, FjObject, 'SetItemTagString', _index ,_strTag);
 end;
 
 procedure jSpinner.SetSelectedPaddingTop(_paddingTop: integer);
@@ -663,7 +663,7 @@ begin
   FSelectedPaddingTop:= _paddingTop;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetSelectedPaddingTop', _paddingTop);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelectedPaddingTop', _paddingTop);
 end;
 
 procedure jSpinner.SetSelectedPaddingBottom(_paddingBottom: integer);
@@ -672,7 +672,7 @@ begin
   FSelectedPaddingBottom:= _paddingBottom;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetSelectedPaddingBottom', _paddingBottom);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelectedPaddingBottom', _paddingBottom);
 end;
 
 procedure jSpinner.SetLGravity(_value: TLayoutGravity);
@@ -680,14 +680,14 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-   View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+   View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jSpinner.SetColorFilter(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetColorFilter', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorFilter', GetARGB(FCustomColor, _color));
 end;
 
 //TODO
@@ -698,10 +698,10 @@ var
 begin
   {if FInitialized then
   begin
-    jSpinner_Clear(FjEnv, FjObject );
+    jSpinner_Clear(gApp.jni.jEnv, FjObject );
     for i:= 0 to FItems.Count - 1 do
     begin
-       jSpinner_Add(FjEnv, FjObject , FItems.Strings[i]);
+       jSpinner_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i]);
     end;
   end;}
 end;

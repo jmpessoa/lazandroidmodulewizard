@@ -22,7 +22,7 @@ jsCardView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -94,46 +94,46 @@ begin
   inherited Destroy;
 end;
 
-procedure jsCardView.Init(refApp: jApp);
+procedure jsCardView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
 
   for rToA := raAbove to raAlignRight do
     if rToA in FPositionRelativeToAnchor then
-      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
 
   for rToP := rpBottom to rpCenterVertical do
     if rToP in FPositionRelativeToParent then
-      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -142,7 +142,7 @@ begin
    if FColor <> colbrDefault then
     SetColor(FColor);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -150,14 +150,14 @@ procedure jsCardView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-       jni_proc_i(FjEnv, FjObject, 'SetCardBackgroundColor', GetARGB(FCustomColor, FColor));
+       jni_proc_i(gApp.jni.jEnv, FjObject, 'SetCardBackgroundColor', GetARGB(FCustomColor, FColor));
 end;
 
 procedure jsCardView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsCardView.UpdateLayout;
@@ -168,13 +168,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsCardView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -187,21 +187,21 @@ end;
 
 function jsCardView.jCreate(): jObject;
 begin
-   Result:= jsCardView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsCardView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsCardView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
 end;
 
 procedure jsCardView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsCardView.GetParent(): jObject;
@@ -209,14 +209,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCardView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsCardView.GetView(): jObject;
@@ -224,21 +224,21 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCardView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsCardView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsCardView.GetWidth(): integer;
@@ -249,7 +249,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_getLParamWidth(FjEnv, FjObject );
+   Result:= View_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jsCardView.GetHeight(): integer;
@@ -260,7 +260,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_getLParamHeight(FjEnv, FjObject );
+   Result:= View_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jsCardView.SetLGravity(_gravity: TLayoutGravity);
@@ -268,42 +268,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(_gravity));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jsCardView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLWeight(FjEnv, FjObject, _w);
+     View_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsCardView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsCardView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsCardView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsCardView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsCardView.ClearLayout();
@@ -314,15 +314,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -330,7 +330,7 @@ procedure jsCardView.SetCardElevation(_elevation: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_f(FjEnv, FjObject, 'SetCardElevation', _elevation);
+     jni_proc_f(gApp.jni.jEnv, FjObject, 'SetCardElevation', _elevation);
 end;
 
 
@@ -338,21 +338,21 @@ procedure jsCardView.SetContentPadding(_left: integer; _top: integer; _right: in
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iiii(FjEnv, FjObject, 'SetContentPadding', _left ,_top ,_right ,_bottom);
+     jni_proc_iiii(gApp.jni.jEnv, FjObject, 'SetContentPadding', _left ,_top ,_right ,_bottom);
 end;
 
 procedure jsCardView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jsCardView.SetRadius(_radius: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_f(FjEnv, FjObject, 'SetRadius', _radius);
+     jni_proc_f(gApp.jni.jEnv, FjObject, 'SetRadius', _radius);
 end;
 
 {-------- jsCardView_JNI_Bridge ----------}

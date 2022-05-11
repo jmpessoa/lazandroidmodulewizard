@@ -37,7 +37,7 @@ jBluetoothServerSocket = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetUUID(_strUUID: string);
@@ -151,38 +151,38 @@ begin
   inherited Destroy;
 end;
 
-procedure jBluetoothServerSocket.Init(refApp: jApp);
+procedure jBluetoothServerSocket.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
 
   if FTimeout > 0 then
-     jBluetoothServerSocket_SetTimeout(FjEnv, FjObject, FTimeout);
+     jBluetoothServerSocket_SetTimeout(gApp.jni.jEnv, FjObject, FTimeout);
 
   if FUUID <> '00001101-0000-1000-8000-00805F9B34FB' then
-     jBluetoothServerSocket_SetUUID(FjEnv, FjObject, FUUID);
+     jBluetoothServerSocket_SetUUID(gApp.jni.jEnv, FjObject, FUUID);
 
   if FDataHeaderReceiveEnabled = True then
-     jBluetoothServerSocket_SetDataHeaderReceiveEnabled(FjEnv, FjObject, FDataHeaderReceiveEnabled);
+     jBluetoothServerSocket_SetDataHeaderReceiveEnabled(gApp.jni.jEnv, FjObject, FDataHeaderReceiveEnabled);
 
   if FReceiverBufferLength <> 1024 then
-     jBluetoothServerSocket_SetReceiverBufferLength(FjEnv, FjObject, FReceiverBufferLength);
+     jBluetoothServerSocket_SetReceiverBufferLength(gApp.jni.jEnv, FjObject, FReceiverBufferLength);
 end;
 
 
 function jBluetoothServerSocket.jCreate(): jObject;
 begin
-   Result:= jBluetoothServerSocket_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jBluetoothServerSocket_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jBluetoothServerSocket.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_jFree(FjEnv, FjObject);
+     jBluetoothServerSocket_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothServerSocket.SetUUID(_strUUID: string);
@@ -190,35 +190,35 @@ begin
   //in designing component state: set value here...
   FUUID:=  _strUUID;
   if FInitialized then
-     jBluetoothServerSocket_SetUUID(FjEnv, FjObject, _strUUID);
+     jBluetoothServerSocket_SetUUID(gApp.jni.jEnv, FjObject, _strUUID);
 end;
 
 procedure jBluetoothServerSocket.Listen();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_Listen(FjEnv, FjObject);
+     jBluetoothServerSocket_Listen(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothServerSocket.CancelListening();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_CancelListening(FjEnv, FjObject);
+     jBluetoothServerSocket_CancelListening(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothServerSocket.DisconnectClient();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_Disconnect(FjEnv, FjObject);
+     jBluetoothServerSocket_Disconnect(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetoothServerSocket.IsClientConnected(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothServerSocket_IsConnected(FjEnv, FjObject);
+   Result:= jBluetoothServerSocket_IsConnected(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothServerSocket.SetTimeout(_milliseconds: integer);
@@ -226,7 +226,7 @@ begin
   //in designing component state: set value here...
   FTimeout:= _milliseconds;
   if FInitialized then
-     jBluetoothServerSocket_SetTimeout(FjEnv, FjObject, _milliseconds);
+     jBluetoothServerSocket_SetTimeout(gApp.jni.jEnv, FjObject, _milliseconds);
 end;
 
 
@@ -255,28 +255,28 @@ function jBluetoothServerSocket.JByteArrayToString(var _byteArray: TDynArrayOfJB
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothServerSocket_ByteArrayToString(FjEnv, FjObject, _byteArray);
+   Result:= jBluetoothServerSocket_ByteArrayToString(gApp.jni.jEnv, FjObject, _byteArray);
 end;
 
 function jBluetoothServerSocket.JByteArrayToBitmap(var _byteArray: TDynArrayOfJByte): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothServerSocket_ByteArrayToBitmap(FjEnv, FjObject, _byteArray);
+   Result:= jBluetoothServerSocket_ByteArrayToBitmap(gApp.jni.jEnv, FjObject, _byteArray);
 end;
 
 procedure jBluetoothServerSocket.WriteMessage(_message: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_WriteMessage(FjEnv, FjObject, _message);
+     jBluetoothServerSocket_WriteMessage(gApp.jni.jEnv, FjObject, _message);
 end;
 
 procedure jBluetoothServerSocket.Write(var _dataContent: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_Write(FjEnv, FjObject, _dataContent);
+     jBluetoothServerSocket_Write(gApp.jni.jEnv, FjObject, _dataContent);
 end;
 
 procedure jBluetoothServerSocket.SetReceiverBufferLength(_value: integer);
@@ -284,7 +284,7 @@ begin
   //in designing component state: set value here...
   FReceiverBufferLength:= _value;
   if FInitialized then
-     jBluetoothServerSocket_SetReceiverBufferLength(FjEnv, FjObject, _value);
+     jBluetoothServerSocket_SetReceiverBufferLength(gApp.jni.jEnv, FjObject, _value);
 end;
 
 function jBluetoothServerSocket.GetReceiverBufferLength(): integer;
@@ -292,7 +292,7 @@ begin
   //in designing component state: result value here...
   Result:= FReceiverBufferLength;
   //if FInitialized then
-    //Result:= jBluetoothServerSocket_GetReceiverBufferLength(FjEnv, FjObject);
+    //Result:= jBluetoothServerSocket_GetReceiverBufferLength(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetoothServerSocket.GetDataHeaderReceiveEnabled(): boolean;
@@ -302,7 +302,7 @@ begin
 
   //commented for better performace!
   //if FInitialized then
-    //Result:= jBluetoothServerSocket_GetDataHeaderReceiveEnabled(FjEnv, FjObject);
+    //Result:= jBluetoothServerSocket_GetDataHeaderReceiveEnabled(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothServerSocket.SetDataHeaderReceiveEnabled(_value: boolean);
@@ -310,63 +310,63 @@ begin
   //in designing component state: set value here...
   FDataHeaderReceiveEnabled:= _value;
   if FInitialized then
-     jBluetoothServerSocket_SetDataHeaderReceiveEnabled(FjEnv, FjObject, _value);
+     jBluetoothServerSocket_SetDataHeaderReceiveEnabled(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jBluetoothServerSocket.SaveJByteArrayToFile(var _byteArray: TDynArrayOfJByte; _filePath: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_SaveByteArrayToFile(FjEnv, FjObject, _byteArray ,_filePath ,_fileName);
+     jBluetoothServerSocket_SaveByteArrayToFile(gApp.jni.jEnv, FjObject, _byteArray ,_filePath ,_fileName);
 end;
 
 procedure jBluetoothServerSocket.WriteMessage(_message: string; var _dataHeader: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_WriteMessage(FjEnv, FjObject, _message ,_dataHeader);
+     jBluetoothServerSocket_WriteMessage(gApp.jni.jEnv, FjObject, _message ,_dataHeader);
 end;
 
 procedure jBluetoothServerSocket.Write(var _dataContent: TDynArrayOfJByte; var _dataHeader: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_Write(FjEnv, FjObject, _dataContent ,_dataHeader);
+     jBluetoothServerSocket_Write(gApp.jni.jEnv, FjObject, _dataContent ,_dataHeader);
 end;
 
 procedure jBluetoothServerSocket.SendFile(_filePath: string; _fileName: string; var _dataHeader: TDynArrayOfJByte);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_SendFile(FjEnv, FjObject, _filePath ,_fileName ,_dataHeader);
+     jBluetoothServerSocket_SendFile(gApp.jni.jEnv, FjObject, _filePath ,_fileName ,_dataHeader);
 end;
 
 procedure jBluetoothServerSocket.SendFile(_filePath: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_SendFile(FjEnv, FjObject, _filePath ,_fileName);
+     jBluetoothServerSocket_SendFile(gApp.jni.jEnv, FjObject, _filePath ,_fileName);
 end;
 
 procedure jBluetoothServerSocket.WriteMessage(_message: string; _dataHeader: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_WriteMessage(FjEnv, FjObject, _message ,_dataHeader);
+     jBluetoothServerSocket_WriteMessage(gApp.jni.jEnv, FjObject, _message ,_dataHeader);
 end;
 
 procedure jBluetoothServerSocket.Write(var _dataContent: TDynArrayOfJByte; _dataHeader: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_Write(FjEnv, FjObject, _dataContent ,_dataHeader);
+     jBluetoothServerSocket_Write(gApp.jni.jEnv, FjObject, _dataContent ,_dataHeader);
 end;
 
 procedure jBluetoothServerSocket.SendFile(_filePath: string; _fileName: string; _dataHeader: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothServerSocket_SendFile(FjEnv, FjObject, _filePath ,_fileName ,_dataHeader);
+     jBluetoothServerSocket_SendFile(gApp.jni.jEnv, FjObject, _filePath ,_fileName ,_dataHeader);
 end;
 
 {-------- jBluetoothServerSocket_JNI_Bridge ----------}

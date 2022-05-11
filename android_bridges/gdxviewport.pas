@@ -20,7 +20,7 @@ jGdxViewport = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function FitViewport(_width: integer; _height: integer; _camera: jObject): jObject;
@@ -61,11 +61,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxViewport.Init(refApp: jApp);
+procedure jGdxViewport.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -74,35 +74,35 @@ end;
 
 function jGdxViewport.jCreate(): jObject;
 begin
-   Result:= jGdxViewport_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxViewport_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxViewport.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxViewport_jFree(FjEnv, FjObject);
+     jGdxViewport_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxViewport.FitViewport(_width: integer; _height: integer; _camera: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxViewport_FitViewport(FjEnv, FjObject, _width ,_height ,_camera);
+   Result:= jGdxViewport_FitViewport(gApp.jni.jEnv, FjObject, _width ,_height ,_camera);
 end;
 
 procedure jGdxViewport.Apply();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxViewport_Apply(FjEnv, FjObject);
+     jGdxViewport_Apply(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxViewport.Update(_width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxViewport_Update(FjEnv, FjObject, _width ,_height);
+     jGdxViewport_Update(gApp.jni.jEnv, FjObject, _width ,_height);
 end;
 
 {-------- jGdxViewport_JNI_Bridge ----------}

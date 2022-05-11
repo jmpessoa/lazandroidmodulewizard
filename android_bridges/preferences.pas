@@ -23,7 +23,7 @@ jPreferences = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     procedure Clear();
     procedure Remove(_key: string);
@@ -65,7 +65,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-           jni_free(FjEnv, FjObject);
+           jni_free(gApp.jni.jEnv, FjObject);
            FjObject := nil;
         end;
   end;
@@ -73,12 +73,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jPreferences.Init(refApp: jApp);
+procedure jPreferences.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
-  FjObject := jPreferences_jCreate(FjEnv, FjThis , int64(Self), FIsShared);
+  FjObject := jPreferences_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self), FIsShared);
 
   if FjObject = nil then exit;
   
@@ -89,84 +89,84 @@ function jPreferences.GetIntData(_key: string; _defaultValue: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ti_out_i(FjEnv, FjObject, 'GetIntData', _key ,_defaultValue);
+   Result:= jni_func_ti_out_i(gApp.jni.jEnv, FjObject, 'GetIntData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetIntData(_key: string; _value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetIntData', _key ,_value);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetIntData', _key ,_value);
 end;
 
 function jPreferences.GetStringData(_key: string; _defaultValue: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result := jni_func_tt_out_t(FjEnv, FjObject, 'GetStringData', _key ,_defaultValue);
+   Result := jni_func_tt_out_t(gApp.jni.jEnv, FjObject, 'GetStringData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetStringData(_key: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-   jni_proc_tt(FjEnv, FjObject, 'SetStringData', _key ,_value);
+   jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetStringData', _key ,_value);
 end;
 
 function jPreferences.GetBoolData(_key: string; _defaultValue: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tz_out_z(FjEnv, FjObject, 'GetBoolData', _key ,_defaultValue);
+   Result:= jni_func_tz_out_z(gApp.jni.jEnv, FjObject, 'GetBoolData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetBoolData(_key: string; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-   jni_proc_tz(FjEnv, FjObject, 'SetBoolData', _key ,_value);
+   jni_proc_tz(gApp.jni.jEnv, FjObject, 'SetBoolData', _key ,_value);
 end;
 
 function jPreferences.GetLongData(_key: string; _defaultValue: int64): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tj_out_j(FjEnv, FjObject, 'GetLongData', _key ,_defaultValue);
+   Result:= jni_func_tj_out_j(gApp.jni.jEnv, FjObject, 'GetLongData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetLongData(_key: string; _value: int64);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tj(FjEnv, FjObject, 'SetLongData', _key ,_value);
+     jni_proc_tj(gApp.jni.jEnv, FjObject, 'SetLongData', _key ,_value);
 end;
 
 function jPreferences.GetFloatData(_key: string; _defaultValue: single): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tf_out_f(FjEnv, FjObject, 'GetFloatData', _key ,_defaultValue);
+   Result:= jni_func_tf_out_f(gApp.jni.jEnv, FjObject, 'GetFloatData', _key ,_defaultValue);
 end;
 
 procedure jPreferences.SetFloatData(_key: string; _value: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tf(FjEnv, FjObject, 'SetFloatData', _key ,_value);
+     jni_proc_tf(gApp.jni.jEnv, FjObject, 'SetFloatData', _key ,_value);
 end;
 
 procedure jPreferences.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Clear');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end;
 
 procedure jPreferences.Remove(_key: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'Remove', _key);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'Remove', _key);
 end;
 
 {-------- jPreferences_JNI_Bridge ----------}

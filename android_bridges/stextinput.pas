@@ -30,7 +30,7 @@ jsTextInput = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -132,30 +132,30 @@ begin
   inherited Destroy;
 end;
 
-procedure jsTextInput.Init(refApp: jApp);
+procedure jsTextInput.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jsTextInput_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    jsTextInput_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   jsTextInput_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsTextInput_SetId(FjEnv, FjObject, Self.Id);
+   jsTextInput_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsTextInput_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsTextInput_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsTextInput_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -164,45 +164,45 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsTextInput_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsTextInput_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsTextInput_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsTextInput_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsTextInput_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsTextInput_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FHint <> '' then
-     jsTextInput_SetHint(FjEnv, FjObject, FHint);
+     jsTextInput_SetHint(gApp.jni.jEnv, FjObject, FHint);
 
    if FHintTextColor <> colbrDefault then
-     jsTextInput_SetHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+     jsTextInput_SetHintTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 
    if FFontColor <> colbrDefault then
-     jsTextInput_SetTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jsTextInput_SetTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
    if FFontSize > 0 then
-     jsTextInput_SetTextSize(FjEnv, FjObject, FFontSize);
+     jsTextInput_SetTextSize(gApp.jni.jEnv, FjObject, FFontSize);
 
    if FText <> '' then
-     jsTextInput_SetText(FjEnv, FjObject, FText);
+     jsTextInput_SetText(gApp.jni.jEnv, FjObject, FText);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -210,13 +210,13 @@ procedure jsTextInput.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsTextInput.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsTextInput.UpdateLayout;
@@ -227,13 +227,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsTextInput.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -244,70 +244,70 @@ end;
 
 function jsTextInput.jCreate(): jObject;
 begin
-   Result:= jsTextInput_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsTextInput_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsTextInput.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_jFree(FjEnv, FjObject);
+     jsTextInput_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTextInput.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsTextInput_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsTextInput.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTextInput_GetParent(FjEnv, FjObject);
+   Result:= jsTextInput_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTextInput.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_RemoveFromViewParent(FjEnv, FjObject);
+     jsTextInput_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsTextInput.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTextInput_GetView(FjEnv, FjObject);
+   Result:= jsTextInput_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTextInput.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetLParamWidth(FjEnv, FjObject, _w);
+     jsTextInput_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsTextInput.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetLParamHeight(FjEnv, FjObject, _h);
+     jsTextInput_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsTextInput.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTextInput_GetLParamWidth(FjEnv, FjObject);
+   Result:= jsTextInput_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsTextInput.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsTextInput_GetLParamHeight(FjEnv, FjObject);
+   Result:= jsTextInput_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTextInput.SetLGravity(_gravity: TLayoutGravity);
@@ -315,42 +315,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jsTextInput_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     jsTextInput_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jsTextInput.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetLWeight(FjEnv, FjObject, _w);
+     jsTextInput_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsTextInput.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsTextInput_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsTextInput.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsTextInput_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsTextInput.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsTextInput_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsTextInput.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsTextInput_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsTextInput.ClearLayout();
@@ -361,15 +361,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsTextInput_clearLayoutAll(FjEnv, FjObject);
+     jsTextInput_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsTextInput_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsTextInput_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsTextInput_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsTextInput_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -377,14 +377,14 @@ procedure jsTextInput.SetFontColor(_color: TARGBColorBridge);
 begin
   FFontColor:= _color;
   if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jsTextInput_SetTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jsTextInput_SetTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jsTextInput.SetFontSize(_size: DWord);
 begin
   FFontSize:= _size;
   if FInitialized and  (FFontSize > 0) then
-     jsTextInput_SetTextSize(FjEnv, FjObject, FFontSize);
+     jsTextInput_SetTextSize(gApp.jni.jEnv, FjObject, FFontSize);
 end;
 
 procedure jsTextInput.SetHint(_hint: string);
@@ -392,7 +392,7 @@ begin
   //in designing component state: set value here...
   FHint:= _hint;
   if FInitialized then
-     jsTextInput_SetHint(FjEnv, FjObject, _hint);
+     jsTextInput_SetHint(gApp.jni.jEnv, FjObject, _hint);
 end;
 
 procedure jsTextInput.SetHintTextColor(_color: TARGBColorBridge);
@@ -400,35 +400,35 @@ begin
   //in designing component state: set value here...
   FHintTextColor:=  _color;
   if FInitialized then
-     jsTextInput_SetHintTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
+     jsTextInput_SetHintTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 end;
 
 procedure jsTextInput.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_CopyToClipboard(FjEnv, FjObject);
+     jsTextInput_CopyToClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTextInput.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_PasteFromClipboard(FjEnv, FjObject);
+     jsTextInput_PasteFromClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 function jsTextInput.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-      Result:= jsTextInput_GetText(FjEnv, FjObject);
+      Result:= jsTextInput_GetText(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsTextInput.SetText(_text: string);
 begin
   inherited SetText(_text);
   if FInitialized then
-    jsTextInput_SetText(FjEnv, FjObject, _text);
+    jsTextInput_SetText(gApp.jni.jEnv, FjObject, _text);
 end;
 
 {-------- jsTextInput_JNI_Bridge ----------}

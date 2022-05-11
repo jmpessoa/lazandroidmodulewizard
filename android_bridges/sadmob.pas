@@ -58,7 +58,7 @@ jsAdMob = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -171,7 +171,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -179,21 +179,21 @@ begin
   inherited Destroy;
 end;
 
-procedure jsAdMob.Init(refApp: jApp);
+procedure jsAdMob.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject := jsAdMob_jCreate(FjEnv, int64(Self), FjThis);
+   FjObject := jsAdMob_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
@@ -201,10 +201,10 @@ begin
 
    AdMobBannerSetSize( FAdMobBannerSize );
    
-   View_SetId(FjEnv, FjObject, FId);
+   View_SetId(gApp.jni.jEnv, FjObject, FId);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                     FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                     sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, FMarginLeft + FMarginRight ),
                     sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, FMarginTop + FMarginBottom ));
@@ -227,9 +227,9 @@ begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -237,13 +237,13 @@ procedure jsAdMob.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsAdMob.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsAdMob.UpdateLayout;
@@ -254,13 +254,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsAdMob.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -313,49 +313,49 @@ procedure jsAdMob.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsAdMob.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAdMob.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAdMob.AdMobBannerSetSize(_whBannerSize: TAdMobBannerSize);
 begin
   FAdMobBannerSize:= _whBannerSize;
   if FjObject <> nil then
-   jni_proc_i(FjEnv, FjObject, 'AdMobBannerSetSize', Ord(_whBannerSize));
+   jni_proc_i(gApp.jni.jEnv, FjObject, 'AdMobBannerSetSize', Ord(_whBannerSize));
 end;
 
 function jsAdMob.AdMobBannerGetSize: TAdMobBannerSize;
 begin
   Result := FAdMobBannerSize;
   if FInitialized then
-    Result := TAdMobBannerSize(jni_func_out_i(FjEnv, FjObject, 'AdMobBannerGetSize'))
+    Result := TAdMobBannerSize(jni_func_out_i(gApp.jni.jEnv, FjObject, 'AdMobBannerGetSize'))
 end;
 
 procedure jsAdMob.AdMobBannerSetId(_admobid: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AdMobBannerSetId', _admobid);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AdMobBannerSetId', _admobid);
 end;
 
 procedure jsAdMob.AdMobBannerSetAdativeWidth( _aWidth : integer );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'AdMobBannerSetAdativeWidth', _aWidth);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'AdMobBannerSetAdativeWidth', _aWidth);
 end;
 
 function jsAdMob.AdMobBannerIsLoading(): boolean;
@@ -364,7 +364,7 @@ begin
 
  //in designing component state: result value here...
  if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'AdMobBannerIsLoading');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'AdMobBannerIsLoading');
 end;
 
 function jsAdMob.AdMobBannerGetHeight(): integer;
@@ -373,98 +373,98 @@ begin
 
  //in designing component state: result value here...
  if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'AdMobBannerGetHeight');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'AdMobBannerGetHeight');
 end;
 
 procedure jsAdMob.AdMobInit();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobInit');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInit');
 end;
 
 procedure jsAdMob.AdMobFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobFree');
 end;
 
 procedure jsAdMob.AdMobBannerStop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobBannerStop');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobBannerStop');
 end;
 
 procedure jsAdMob.AdMobBannerPause();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobBannerPause');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobBannerPause');
 end;
 
 procedure jsAdMob.AdMobBannerResume();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobBannerResume');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobBannerResume');
 end;
 
 procedure jsAdMob.AdMobBannerRun();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobBannerRun');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobBannerRun');
 end;
 
 procedure jsAdMob.AdMobBannerUpdate();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AdMobBannerUpdate');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AdMobBannerUpdate');
 end;
 
 function jsAdMob.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAdMob.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsAdMob.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsAdMob.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsAdMob.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsAdMob.BringToFront;
 begin
   //in designing component state: set value here...
   if FjObject <> nil then
-     View_BringToFront(FjEnv, FjObject);
+     View_BringToFront(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsAdMob.ClearLayout();
@@ -475,7 +475,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
@@ -491,28 +491,28 @@ procedure jsAdMob.AdMobInterCreateAndLoad();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(FjEnv, FjObject, 'AdMobInterCreateAndLoad');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInterCreateAndLoad');
 end;
 
 procedure jsAdMob.AdMobInterLoad();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(FjEnv, FjObject, 'AdMobInterLoad');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInterLoad');
 end;
 
 procedure jsAdMob.AdMobInterSetAutoLoadOnClose( _autoLoadOnClose : boolean );
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc_z(FjEnv, FjObject, 'AdMobInterSetAutoLoadOnClose', _autoLoadOnClose);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'AdMobInterSetAutoLoadOnClose', _autoLoadOnClose);
 end;
 
 procedure jsAdMob.AdMobInterSetId( _admobid : string );
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc_t(FjEnv, FjObject, 'AdMobInterSetId', _admobid);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'AdMobInterSetId', _admobid);
 end;
 
 function  jsAdMob.AdMobInterIsLoading() : boolean;
@@ -520,7 +520,7 @@ begin
  result := false;
  //in designing component state: set value here...
  if FjObject <> nil then
-  result := jni_func_out_z(FjEnv, FjObject, 'AdMobInterIsLoading');
+  result := jni_func_out_z(gApp.jni.jEnv, FjObject, 'AdMobInterIsLoading');
 end;
 
 function jsAdMob.AdMobInterIsLoaded( ) : boolean;
@@ -528,35 +528,35 @@ begin
  result := false;
  //in designing component state: set value here...
  if FjObject <> nil then
-  result := jni_func_out_z(FjEnv, FjObject, 'AdMobInterIsLoaded');
+  result := jni_func_out_z(gApp.jni.jEnv, FjObject, 'AdMobInterIsLoaded');
 end;
 
 procedure jsAdMob.AdMobInterShow( );
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(FjEnv, FjObject, 'AdMobInterShow');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInterShow');
 end;
 
 procedure jsAdMob.AdMobRewardedSetId( _admobid : string );
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc_t(FjEnv, FjObject, 'AdMobRewardedSetId', _admobid);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'AdMobRewardedSetId', _admobid);
 end;
 
 procedure jsAdMob.AdMobRewardedCreateAndLoad();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(FjEnv, FjObject, 'AdMobRewardedLoad');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobRewardedLoad');
 end;
 
 procedure jsAdMob.AdMobRewardedLoad();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(FjEnv, FjObject, 'AdMobRewardedLoad');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobRewardedLoad');
 end;
 
 function  jsAdMob.AdMobRewardedIsLoaded() : boolean;
@@ -564,7 +564,7 @@ begin
  result := false;
  //in designing component state: set value here...
  if FjObject <> nil then
-  result := jni_func_out_z(FjEnv, FjObject, 'AdMobRewardedIsLoaded');
+  result := jni_func_out_z(gApp.jni.jEnv, FjObject, 'AdMobRewardedIsLoaded');
 end;
 
 function  jsAdMob.AdMobRewardedIsLoading() : boolean;
@@ -572,7 +572,7 @@ begin
  result := false;
  //in designing component state: set value here...
  if FjObject <> nil then
-  result := jni_func_out_z(FjEnv, FjObject, 'AdMobRewardedIsLoading');
+  result := jni_func_out_z(gApp.jni.jEnv, FjObject, 'AdMobRewardedIsLoading');
 end;
 
 function  jsAdMob.AdMobRewardedGetAmount() : integer;
@@ -580,7 +580,7 @@ begin
  result := -1;
  //in designing component state: set value here...
  if FjObject <> nil then
-  result := jni_func_out_i(FjEnv, FjObject, 'AdMobRewardedGetAmount');
+  result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'AdMobRewardedGetAmount');
 end;
 
 
@@ -589,14 +589,14 @@ begin
  result := '';
  //in designing component state: set value here...
  if FjObject <> nil then
-  result := jni_func_out_t(FjEnv, FjObject, 'AdMobRewardedGetType');
+  result := jni_func_out_t(gApp.jni.jEnv, FjObject, 'AdMobRewardedGetType');
 end;
 
 procedure jsAdMob.AdMobRewardedShow();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(FjEnv, FjObject, 'AdMobRewardedShow');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobRewardedShow');
 end;
 
 {-------- jsAdMob_JNI_Bridge ----------}

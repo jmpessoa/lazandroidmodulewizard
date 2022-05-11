@@ -29,7 +29,7 @@ jActionBarTab = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function GetActionBar(): jObject;
@@ -101,10 +101,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jActionBarTab.Init(refApp: jApp);
+procedure jActionBarTab.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -112,56 +112,56 @@ end;
 
 function jActionBarTab.jCreate(): jObject;
 begin
-   Result:= jActionBarTab_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jActionBarTab_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jActionBarTab.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_jFree(FjEnv, FjObject);
+     jActionBarTab_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jActionBarTab.GetActionBar(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jActionBarTab_GetActionBar(FjEnv, FjObject);
+   Result:= jActionBarTab_GetActionBar(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jActionBarTab.Add(_title: string; _panel: jObject; _iconIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_Add(FjEnv, FjObject, _title ,_panel ,_iconIdentifier);
+     jActionBarTab_Add(gApp.jni.jEnv, FjObject, _title ,_panel ,_iconIdentifier);
 end;
 
 procedure jActionBarTab.Add(_title: string; _panel: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_Add(FjEnv, FjObject, _title ,_panel);
+     jActionBarTab_Add(gApp.jni.jEnv, FjObject, _title ,_panel);
 end;
 
 procedure jActionBarTab.Add(_title: string; _panel: jObject; _customTabView: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_Add(FjEnv, FjObject, _title ,_panel ,_customTabView);
+     jActionBarTab_Add(gApp.jni.jEnv, FjObject, _title ,_panel ,_customTabView);
 end;
 
 procedure jActionBarTab.SetTabNavigationMode();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_SetTabNavigationMode(FjEnv, FjObject);
+     jActionBarTab_SetTabNavigationMode(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jActionBarTab.RemoveAllTabs();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_RemoveAllTabs(FjEnv, FjObject);
+     jActionBarTab_RemoveAllTabs(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jActionBarTab.SetTitles(Value: TStrings);
@@ -179,28 +179,28 @@ function jActionBarTab.GetSelectedTab(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jActionBarTab_GetSelectedTab(FjEnv, FjObject);
+   Result:= jActionBarTab_GetSelectedTab(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jActionBarTab.SelectTab(tab: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_SelectTab(FjEnv, FjObject, tab);
+     jActionBarTab_SelectTab(gApp.jni.jEnv, FjObject, tab);
 end;
 
 function jActionBarTab.GetTabAtIndex(_index: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jActionBarTab_GetTabAtIndex(FjEnv, FjObject, _index);
+   Result:= jActionBarTab_GetTabAtIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jActionBarTab.SelectTabByIndex(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActionBarTab_SelectTabByIndex(FjEnv, FjObject, _index);
+     jActionBarTab_SelectTabByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 

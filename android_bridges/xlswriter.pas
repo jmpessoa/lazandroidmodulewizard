@@ -20,7 +20,7 @@ jXLSWriter = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function CreateWorkbook(_sheet: string; _path: string; _fileName: string): boolean; overload;
@@ -60,10 +60,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jXLSWriter.Init(refApp: jApp);
+procedure jXLSWriter.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -72,35 +72,35 @@ end;
 
 function jXLSWriter.jCreate(): jObject;
 begin
-   Result:= jXLSWriter_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jXLSWriter_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jXLSWriter.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jXLSWriter_jFree(FjEnv, FjObject);
+     jXLSWriter_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jXLSWriter.CreateWorkbook(_sheet: string; _path: string; _fileName: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jXLSWriter_CreateWorkbook(FjEnv, FjObject, _sheet ,_path ,_fileName);
+   Result:= jXLSWriter_CreateWorkbook(gApp.jni.jEnv, FjObject, _sheet ,_path ,_fileName);
 end;
 
 function jXLSWriter.CreateWorkbook(var _sheets: TDynArrayOfString; _path: string; _fileName: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jXLSWriter_CreateWorkbook(FjEnv, FjObject, _sheets ,_path ,_fileName);
+   Result:= jXLSWriter_CreateWorkbook(gApp.jni.jEnv, FjObject, _sheets ,_path ,_fileName);
 end;
 
 function jXLSWriter.AddCell(_sheetIndex: integer; _column: integer; _row: integer; _content: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jXLSWriter_AddCell(FjEnv, FjObject, _sheetIndex ,_column ,_row ,_content);
+   Result:= jXLSWriter_AddCell(gApp.jni.jEnv, FjObject, _sheetIndex ,_column ,_row ,_content);
 end;
 
 {-------- jXLSWriter_JNI_Bridge ----------}

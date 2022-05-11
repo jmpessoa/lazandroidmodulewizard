@@ -28,7 +28,7 @@ jsToolbar = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -173,32 +173,32 @@ begin
   inherited Destroy;
 end;
 
-procedure jsToolbar.Init(refApp: jApp);
+procedure jsToolbar.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject:= jCreate(FAsActionBar); //jSelf !
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jsToolbar_SetGravityInParent(FjEnv, FjObject, Ord(FGravityInParent) );
+    jsToolbar_SetGravityInParent(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   jsToolbar_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsToolbar_SetId(FjEnv, FjObject, Self.Id);
+   jsToolbar_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsToolbar_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsToolbar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsToolbar_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -207,45 +207,45 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsToolbar_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsToolbar_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsToolbar_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsToolbar_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsToolbar_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsToolbar_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FNavigationIconIdentifier <> '' then
-     jsToolbar_SetNavigationIcon(FjEnv, FjObject, FNavigationIconIdentifier);
+     jsToolbar_SetNavigationIcon(gApp.jni.jEnv, FjObject, FNavigationIconIdentifier);
 
    if  FText <> '' then
-    jsToolbar_SetTitle(FjEnv, FjObject, FText);
+    jsToolbar_SetTitle(gApp.jni.jEnv, FjObject, FText);
 
    if FLogoIcon <> '' then
-    jsToolbar_SetLogo(FjEnv, FjObject, FLogoIcon);
+    jsToolbar_SetLogo(gApp.jni.jEnv, FjObject, FLogoIcon);
 
    if FFontColor <> colbrDefault then
-       jsToolbar_SetTitleTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+       jsToolbar_SetTitleTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
    if FFitsSystemWindows  then
-     jsToolbar_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsToolbar_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -253,13 +253,13 @@ procedure jsToolbar.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsToolbar.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsToolbar.UpdateLayout;
@@ -270,13 +270,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsToolbar.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -287,56 +287,56 @@ end;
 
 function jsToolbar.jCreate(_asActionBar: boolean): jObject;
 begin
-   Result:= jsToolbar_jCreate(FjEnv,int64(Self),_asActionBar,FjThis);
+   Result:= jsToolbar_jCreate(gApp.jni.jEnv,int64(Self),_asActionBar,gApp.jni.jThis);
 end;
 
 procedure jsToolbar.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_jFree(FjEnv, FjObject);
+     jsToolbar_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsToolbar.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsToolbar_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsToolbar.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsToolbar_GetParent(FjEnv, FjObject);
+   Result:= jsToolbar_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsToolbar.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_RemoveFromViewParent(FjEnv, FjObject);
+     jsToolbar_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsToolbar.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsToolbar_GetView(FjEnv, FjObject);
+   Result:= jsToolbar_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsToolbar.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetLParamWidth(FjEnv, FjObject, _w);
+     jsToolbar_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsToolbar.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetLParamHeight(FjEnv, FjObject, _h);
+     jsToolbar_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsToolbar.GetWidth(): integer;
@@ -347,7 +347,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jsToolbar_getLParamWidth(FjEnv, FjObject );
+   Result:= jsToolbar_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jsToolbar.GetHeight(): integer;
@@ -358,42 +358,42 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jsToolbar_getLParamHeight(FjEnv, FjObject );
+   Result:= jsToolbar_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jsToolbar.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetLWeight(FjEnv, FjObject, _w);
+     jsToolbar_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsToolbar.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsToolbar_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsToolbar.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsToolbar_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsToolbar.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsToolbar_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsToolbar.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsToolbar_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsToolbar.ClearLayout();
@@ -404,15 +404,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsToolbar_clearLayoutAll(FjEnv, FjObject);
+     jsToolbar_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsToolbar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsToolbar_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsToolbar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsToolbar_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -421,7 +421,7 @@ begin
   //in designing component state: set value here...
   FText:= _title;
   if FInitialized then
-     jsToolbar_SetTitle(FjEnv, FjObject, _title);
+     jsToolbar_SetTitle(gApp.jni.jEnv, FjObject, _title);
 end;
 
 procedure jsToolbar.SetNavigationIcon(_imageIdentifier: string);
@@ -429,7 +429,7 @@ begin
   //in designing component state: set value here...
   FNavigationIconIdentifier:= _imageIdentifier;
   if FInitialized then
-     jsToolbar_SetNavigationIcon(FjEnv, FjObject, _imageIdentifier);
+     jsToolbar_SetNavigationIcon(gApp.jni.jEnv, FjObject, _imageIdentifier);
 end;
 
 procedure jsToolbar.SetLogoIcon(_imageIdentifier: string);
@@ -437,7 +437,7 @@ begin
   //in designing component state: set value here...
   FLogoIcon:= _imageIdentifier;
   if FInitialized then
-     jsToolbar_SetLogo(FjEnv, FjObject, _imageIdentifier);
+     jsToolbar_SetLogo(gApp.jni.jEnv, FjObject, _imageIdentifier);
 end;
 
 {
@@ -445,7 +445,7 @@ procedure jsToolbar.SetAsActionBar(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetAsActionBar(FjEnv, FjObject, _value);
+     jsToolbar_SetAsActionBar(gApp.jni.jEnv, FjObject, _value);
 end;
 }
 
@@ -453,28 +453,28 @@ procedure jsToolbar.SetSubtitle(_subtitle: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetSubtitle(FjEnv, FjObject, _subtitle);
+     jsToolbar_SetSubtitle(gApp.jni.jEnv, FjObject, _subtitle);
 end;
 
 procedure jsToolbar.SetHomeButtonEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetHomeButtonEnabled(FjEnv, FjObject, _value);
+     jsToolbar_SetHomeButtonEnabled(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsToolbar.SetDisplayHomeAsUpEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetDisplayHomeAsUpEnabled(FjEnv, FjObject, _value);
+     jsToolbar_SetDisplayHomeAsUpEnabled(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsToolbar.SetDisplayUseLogoEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetDisplayUseLogoEnabled(FjEnv, FjObject, _value);
+     jsToolbar_SetDisplayUseLogoEnabled(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsToolbar.SetLGravity(_value: TLayoutGravity);
@@ -482,28 +482,28 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jsToolbar_SetGravityInParent(FjEnv, FjObject, Ord(_value));
+     jsToolbar_SetGravityInParent(gApp.jni.jEnv, FjObject, Ord(_value));
 end;
 
 procedure jsToolbar.SetTitleTextColor(_color: TARGBColorBridge);
 begin
    FFontColor:= _color;
    if FInitialized then
-       jsToolbar_SetTitleTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+       jsToolbar_SetTitleTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsToolbar.SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetScrollFlag(FjEnv, FjObject, Ord(_collapsingScrollFlag));
+     jsToolbar_SetScrollFlag(gApp.jni.jEnv, FjObject, Ord(_collapsingScrollFlag));
 end;
 
 procedure jsToolbar.SetCollapseMode(_collapseMode: TCollapsingMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetCollapseMode(FjEnv, FjObject, Ord(_collapseMode) );
+     jsToolbar_SetCollapseMode(gApp.jni.jEnv, FjObject, Ord(_collapseMode) );
 end;
 
 {
@@ -511,7 +511,7 @@ procedure jsToolbar.SetHeightDP(_heightDP: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetHeightDP(FjEnv, FjObject, _heightDP);
+     jsToolbar_SetHeightDP(gApp.jni.jEnv, FjObject, _heightDP);
 end;
 }
 
@@ -520,28 +520,28 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsToolbar_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsToolbar_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsToolbar.SetTheme(_theme: TAppTheme);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetTheme(FjEnv, FjObject, Ord(_theme));
+     jsToolbar_SetTheme(gApp.jni.jEnv, FjObject, Ord(_theme));
 end;
 
 procedure jsToolbar.SetSubtitleTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetSubtitleTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsToolbar_SetSubtitleTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsToolbar.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetBackgroundToPrimaryColor(FjEnv, FjObject);
+     jsToolbar_SetBackgroundToPrimaryColor(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -549,35 +549,35 @@ function jsToolbar.GetPrimaryColor(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsToolbar_GetPrimaryColor(FjEnv, FjObject);
+   Result:= jsToolbar_GetPrimaryColor(gApp.jni.jEnv, FjObject);
 end;
 
 function jsToolbar.GetSuggestedMinimumHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsToolbar_GetSuggestedMinimumHeight(FjEnv, FjObject);
+   Result:= jsToolbar_GetSuggestedMinimumHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsToolbar.SetSuggestedMinimumHeight();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetSuggestedMinimumHeight(FjEnv, FjObject);
+     jsToolbar_SetSuggestedMinimumHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsToolbar.SetMinimumHeight(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetMinimumHeight(FjEnv, FjObject, _value);
+     jsToolbar_SetMinimumHeight(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsToolbar.SetHeightByDisplayMetricsDensity(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsToolbar_SetHeightByDisplayMetricsDensity(FjEnv, FjObject, _value);
+     jsToolbar_SetHeightByDisplayMetricsDensity(gApp.jni.jEnv, FjObject, _value);
 end;
 
 {-------- jsToolbar_JNI_Bridge ----------}

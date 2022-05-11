@@ -42,7 +42,7 @@ jBluetooth = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Enabled();
@@ -133,10 +133,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jBluetooth.Init(refApp: jApp);
+procedure jBluetooth.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -145,91 +145,91 @@ end;
 
 function jBluetooth.jCreate(): jObject;
 begin
-   Result:= jBluetooth_jCreate(FjEnv, FjThis, int64(Self));
+   Result:= jBluetooth_jCreate(gApp.jni.jEnv, gApp.jni.jThis, int64(Self));
 end;
 
 procedure jBluetooth.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_jFree(FjEnv, FjObject);
+     jBluetooth_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetooth.Enabled();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_Enabled(FjEnv, FjObject);
+     jBluetooth_Enabled(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetooth.Discovery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_Discovery(FjEnv, FjObject);
+     jBluetooth_Discovery(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetooth.CancelDiscovery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_CancelDiscovery(FjEnv, FjObject);
+     jBluetooth_CancelDiscovery(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetooth.GetPairedDevices(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetPairedDevices(FjEnv, FjObject);
+   Result:= jBluetooth_GetPairedDevices(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetooth.GetFoundedDevices(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetFoundedDevices(FjEnv, FjObject);
+   Result:= jBluetooth_GetFoundedDevices(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetooth.GetReachablePairedDevices(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetReachablePairedDevices(FjEnv, FjObject);
+   Result:= jBluetooth_GetReachablePairedDevices(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetooth.Disable();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_Disable(FjEnv, FjObject);
+     jBluetooth_Disable(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetooth.IsEnable(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_IsEnable(FjEnv, FjObject);
+   Result:= jBluetooth_IsEnable(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetooth.GetState(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetState(FjEnv, FjObject);
+   Result:= jBluetooth_GetState(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetooth.GetReachablePairedDeviceByName(_deviceName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jBluetooth_GetReachablePairedDeviceByName(FjEnv, FjObject, _deviceName);
+    Result:= jBluetooth_GetReachablePairedDeviceByName(gApp.jni.jEnv, FjObject, _deviceName);
 end;
 
 function jBluetooth.GetReachablePairedDeviceByAddress(_deviceAddress: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetReachablePairedDeviceByAddress(FjEnv, FjObject, _deviceAddress);
+   Result:= jBluetooth_GetReachablePairedDeviceByAddress(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 
@@ -237,14 +237,14 @@ function jBluetooth.IsReachablePairedDevice(_deviceAddress: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_IsReachablePairedDevice(FjEnv, FjObject, _deviceAddress);
+   Result:= jBluetooth_IsReachablePairedDevice(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 function jBluetooth.GetRemoteDevice(_deviceAddress: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetRemoteDevice(FjEnv, FjObject, _deviceAddress);
+   Result:= jBluetooth_GetRemoteDevice(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 procedure jBluetooth.GenEvent_OnBluetoothEnabled(Obj: TObject);
@@ -291,7 +291,7 @@ procedure jBluetooth.SendFile(_filePath: string; _fileName: string; _mimeType: s
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_SendFile(FjEnv, FjObject, _filePath ,_fileName ,LowerCase(_mimeType));
+     jBluetooth_SendFile(gApp.jni.jEnv, FjObject, _filePath ,_fileName ,LowerCase(_mimeType));
 end;
 
 
@@ -299,21 +299,21 @@ procedure jBluetooth.UnpairDeviceByAddress(_deviceAddress: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_UnpairDeviceByAddress(FjEnv, FjObject, _deviceAddress);
+     jBluetooth_UnpairDeviceByAddress(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 function jBluetooth.GetFoundedDeviceByAddress(_deviceAddress: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetooth_GetFoundedDeviceByAddress(FjEnv, FjObject, _deviceAddress);
+   Result:= jBluetooth_GetFoundedDeviceByAddress(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 procedure jBluetooth.PairDeviceByAddress(_deviceAddress: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetooth_PairDeviceByAddress(FjEnv, FjObject, _deviceAddress);
+     jBluetooth_PairDeviceByAddress(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 {-------- jBluetooth_JNI_Bridge ----------}

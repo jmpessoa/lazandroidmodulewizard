@@ -211,6 +211,9 @@ uses
 
    Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        codedata: JString; codetype: integer);
+   Procedure Java_Event_pOnZBarcodeScannerViewPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                       picture: JObject; fullPath: JString);
+   Procedure Java_Event_pOnZBarcodeScannerViewPictureMake(env: PJNIEnv; this: jobject; Obj: TObject);
 
    procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
    procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
@@ -457,12 +460,10 @@ end;
 procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetooth then
   begin
-    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
     jBluetooth(Obj).GenEvent_OnBluetoothEnabled(Obj);
   end;
 end;
@@ -470,12 +471,10 @@ end;
 procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetooth then
   begin
-    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
     jBluetooth(Obj).GenEvent_OnBluetoothDisabled(Obj);
   end;
 end;
@@ -486,12 +485,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetooth then
   begin
-    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
     pasStrName := '';
     if deviceName <> nil then
     begin
@@ -512,12 +509,10 @@ end;
 procedure Java_Event_pOnBluetoothDiscoveryStarted(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetooth then
   begin
-    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
     jBluetooth(Obj).GenEvent_OnBluetoothDiscoveryStarted(Obj);
   end;
 end;
@@ -525,12 +520,10 @@ end;
 procedure Java_Event_pOnBluetoothDiscoveryFinished(env: PJNIEnv; this: jobject; Obj: TObject; countFoundedDevices: integer; countPairedDevices: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetooth then
   begin
-    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
     jBluetooth(Obj).GenEvent_OnBluetoothDiscoveryFinished(Obj, countFoundedDevices, countPairedDevices);
   end;
 end;
@@ -541,12 +534,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetooth then
   begin
-    jForm(jBluetooth(Obj).Owner).UpdateJNI(gApp);
     pasStrName := '';
     if deviceName <> nil then
     begin
@@ -573,7 +564,6 @@ var
 
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   arrayResult := nil;
@@ -595,7 +585,6 @@ begin
 
   if Obj is jBluetoothClientSocket then
   begin
-    jForm(jBluetoothClientSocket(Obj).Owner).UpdateJNI(gApp);
     jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketIncomingData(Obj, arrayResult, arrayResultHeader);
   end;
 
@@ -607,12 +596,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetoothClientSocket then
   begin
-    jForm(jBluetoothClientSocket(Obj).Owner).UpdateJNI(gApp);
     pasStrName := '';
     if deviceName <> nil then
     begin
@@ -632,12 +619,10 @@ end;
 procedure Java_Event_pOnBluetoothClientSocketDisconnected(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetoothClientSocket then
   begin
-    jForm(jBluetoothClientSocket(Obj).Owner).UpdateJNI(gApp);
     jBluetoothClientSocket(Obj).GenEvent_OnBluetoothClientSocketDisconnected(Obj);
   end;
 end;
@@ -650,12 +635,10 @@ var
 begin
   keepConnected := true;
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetoothServerSocket then
   begin
-    jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
     pasStrName := '';
     if deviceName <> nil then
     begin
@@ -684,7 +667,6 @@ var
   keepConnected: boolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   keepConnected := true;
@@ -708,7 +690,6 @@ begin
 
   if Obj is jBluetoothServerSocket then
   begin
-    jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
     jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketIncomingData(Obj, arrayResult, arrayResultHeader, keepConnected);
   end;
   Result:= JBool(keepConnected);
@@ -722,12 +703,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetoothServerSocket then
   begin
-    jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
     pasStrName := '';
     if serverName <> nil then
     begin
@@ -747,12 +726,10 @@ end;
 procedure Java_Event_pOnBluetoothServerSocketAcceptTimeout(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBluetoothServerSocket then
   begin
-    jForm(jBluetoothServerSocket(Obj).Owner).UpdateJNI(gApp);
     jBluetoothServerSocket(Obj).GenEvent_OnBluetoothServerSocketAcceptTimeout(Obj);
   end;
 end;
@@ -760,13 +737,11 @@ end;
 procedure Java_Event_pOnAdMobLoaded(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobLoaded(Obj, admobType);
   end;
 end;
@@ -774,13 +749,11 @@ end;
 procedure Java_Event_pOnAdMobInitializationComplete(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobInitializationComplete(Obj);
   end;
 end;
@@ -788,13 +761,11 @@ end;
 procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobClicked(Obj, admobType);
   end;
 end;
@@ -802,13 +773,11 @@ end;
 procedure Java_Event_pOnAdMobFailedToLoad(env: PJNIEnv; this: jobject; Obj: TObject; admobType, errorCode: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobFailedToLoad(Obj, admobType, errorCode);
   end;
 end;
@@ -816,13 +785,11 @@ end;
 procedure Java_Event_pOnAdMobOpened(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobOpened(Obj, admobType);
   end;
 end;
@@ -830,13 +797,11 @@ end;
 procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject; admobType: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobClosed(Obj, admobType);
   end;
 end;
@@ -844,13 +809,11 @@ end;
 procedure Java_Event_pOnAdMobRewardedUserEarned(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobRewardedUserEarned(Obj);
   end;
 end;
@@ -858,13 +821,11 @@ end;
 procedure Java_Event_pOnAdMobRewardedFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jForm(jsAdMob(Obj).Owner).UpdateJNI(gApp);
      jsAdMob(Obj).GenEvent_OnAdMobRewardedFailedToShow(Obj, errorCode);
   end;
 end;
@@ -875,12 +836,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSpinner then
   begin
-    jForm(jSpinner(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -897,12 +856,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jLocation then
   begin
-    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     pasaddress:='';
 
     if address <> nil then
@@ -921,12 +878,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jLocation then
   begin
-    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     pasmsgStatus:= '';
     pasprovider:= '';
     if provider <> nil then
@@ -951,12 +906,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jLocation then
   begin
-    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     pasprovider := '';
     if provider <> nil then
     begin
@@ -973,12 +926,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jLocation then
   begin
-    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     pasprovider := '';
     if provider <> nil then
     begin
@@ -992,12 +943,10 @@ end;
 procedure Java_Event_pOnGpsStatusChanged(env: PJNIEnv; this: jobject; Obj: TObject; countSatellites: integer; gpsStatusEvent: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jLocation then
   begin
-    jForm(jLocation(Obj).Owner).UpdateJNI(gApp);
     jLocation(Obj).GenEvent_OnGpsStatusChanged(Obj, countSatellites, gpsStatusEvent);
   end;
 end;
@@ -1009,12 +958,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jActionBarTab then
   begin
-    jForm(jActionBarTab(Obj).Owner).UpdateJNI(gApp);
     pastitle:= '';
     if title <> nil then
     begin
@@ -1031,12 +978,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jActionBarTab then
   begin
-    jForm(jActionBarTab(Obj).Owner).UpdateJNI(gApp);
     pastitle:= '';
     if title <> nil then
     begin
@@ -1053,12 +998,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jCustomDialog then
   begin
-    jForm(jCustomDialog(Obj).Owner).UpdateJNI(gApp);
     pastitle:= '';
     if title <> nil then
     begin
@@ -1075,12 +1018,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jCustomDialog then
   begin
-    jForm(jCustomDialog(Obj).Owner).UpdateJNI(gApp);
     pastitle:= '';
     if title <> nil then
     begin
@@ -1099,12 +1040,10 @@ end;
 Procedure Java_Event_pOnClickToggleButton(env: PJNIEnv; this: jobject; Obj: TObject; state: jboolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jToggleButton then
   begin
-    jForm(jToggleButton(Obj).Owner).UpdateJNI(gApp);
     jToggleButton(Obj).GenEvent_OnClickToggleButton(Obj, Boolean(state));
   end;
 end;
@@ -1112,12 +1051,10 @@ end;
 procedure Java_Event_pOnLongClickToggleButton(env:PJNIEnv;this:JObject;Sender:TObject;state:jBoolean);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jToggleButton then
   begin
-    jForm(jToggleButton(Sender).Owner).UpdateJNI(gApp);
     jToggleButton(Sender).GenEvent_OnLongClickToggleButton(Sender,boolean(state));
   end;
 end;
@@ -1130,12 +1067,10 @@ end;
 Procedure Java_Event_pOnChangeSwitchButton(env: PJNIEnv; this: jobject; Obj: TObject; state: jboolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSwitchButton then
   begin
-    jForm(jSwitchButton(Obj).Owner).UpdateJNI(gApp);
     jSwitchButton(Obj).GenEvent_OnChangeSwitchButton(Obj, Boolean(state));
   end;
 end;
@@ -1146,12 +1081,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jGridView then
   begin
-    jForm(jGridView(Obj).Owner).UpdateJNI(gApp);
     pasCaption:= '';
     if caption <> nil then
     begin
@@ -1168,12 +1101,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jGridView then
   begin
-    jForm(jGridView(Obj).Owner).UpdateJNI(gApp);
     pasCaption:= '';
     if caption <> nil then
     begin
@@ -1190,7 +1121,6 @@ var
   arrayResult: array of single;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   arrayResult := nil;
@@ -1204,7 +1134,6 @@ begin
 
   if Obj is jSensorManager then
   begin
-    jForm(jSensorManager(Obj).Owner).UpdateJNI(gApp);
     jSensorManager(Obj).GenEvent_OnChangedSensor(Obj, sensor, sensorType, arrayResult, timestamp{sizeArray});
   end;
 
@@ -1213,12 +1142,10 @@ end;
 Procedure Java_Event_pOnListeningSensor(env: PJNIEnv; this: jobject; Obj: TObject; sensor: jObject; sensorType: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSensorManager then
   begin
-    jForm(jSensorManager(Obj).Owner).UpdateJNI(gApp);
     jSensorManager(Obj).GenEvent_OnListeningSensor(Obj, sensor, sensorType);
   end;
 end;
@@ -1229,12 +1156,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSensorManager then
   begin
-    jForm(jSensorManager(Obj).Owner).UpdateJNI(gApp);
     pasSensorName:= '';
     if sensorName <> nil then
     begin
@@ -1248,12 +1173,10 @@ end;
 Procedure Java_Event_pOnBroadcastReceiver(env: PJNIEnv; this: jobject; Obj: TObject; intent:jObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jBroadcastReceiver then
   begin
-    jForm(jBroadcastReceiver(Obj).Owner).UpdateJNI(gApp);
     jBroadcastReceiver(Obj).GenEvent_OnBroadcastReceiver(Obj,  intent);
   end;
 end;
@@ -1262,12 +1185,10 @@ end;
 Procedure Java_Event_pOnTimePicker(env: PJNIEnv; this: jobject; Obj: TObject; hourOfDay: integer; minute: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTimePickerDialog then
   begin
-    jForm(jTimePickerDialog(Obj).Owner).UpdateJNI(gApp);
     jTimePickerDialog(Obj).GenEvent_OnTimePicker(Obj, hourOfDay, minute);
   end;
 end;
@@ -1275,12 +1196,10 @@ end;
 Procedure Java_Event_pOnDatePicker(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jDatePickerDialog then
   begin
-    jForm(jDatePickerDialog(Obj).Owner).UpdateJNI(gApp);
     jDatePickerDialog(Obj).GenEvent_OnDatePicker(Obj,  year, monthOfYear, dayOfMonth);
   end;
 end;
@@ -1288,12 +1207,10 @@ end;
 Procedure Java_Event_pOnCalendarSelectedDayChange(env: PJNIEnv; this: jobject; Obj: TObject; year: integer; monthOfYear: integer; dayOfMonth: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jCalendarView then
   begin
-    jForm(jCalendarView(Obj).Owner).UpdateJNI(gApp);
     jCalendarView(Obj).GenEvent_OnSelectedDayChange(Obj,  year, monthOfYear, dayOfMonth);
   end;
 end;
@@ -1304,12 +1221,10 @@ var
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jShellCommand then
   begin
-    jForm(jShellCommand(Obj).Owner).UpdateJNI(gApp);
     pascmdResult := '';
     if cmdResult <> nil then
     begin
@@ -1327,12 +1242,10 @@ var
 begin
 
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
 
     pasMessageReceived := '';
 
@@ -1352,7 +1265,6 @@ var
   arrayResult: TDynArrayOfJByte; //array of jByte;  //shortint
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   arrayResult := nil;
@@ -1366,7 +1278,6 @@ begin
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientBytesReceived(Obj, arrayResult);
   end;
 
@@ -1375,12 +1286,10 @@ end;
 Procedure Java_Event_pOnTCPSocketClientConnected(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     jTCPSocketClient(Obj).GenEvent_OnTCPSocketClientConnected(Obj);
   end;
 end;
@@ -1391,12 +1300,10 @@ var
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     pasfilename := '';
     if filename <> nil then
     begin
@@ -1413,12 +1320,10 @@ var
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     pasfilename := '';
     if filename <> nil then
     begin
@@ -1435,12 +1340,10 @@ var
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     pasfilename := '';
     if filename <> nil then
     begin
@@ -1457,12 +1360,10 @@ var
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Obj).Owner).UpdateJNI(gApp);
     pasfilename := '';
     if filename <> nil then
     begin
@@ -1476,12 +1377,10 @@ end;
 procedure Java_Event_pOnTCPSocketClientDisConnected(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jTCPSocketClient then
   begin
-    jForm(jTCPSocketClient(Sender).Owner).UpdateJNI(gApp);
     jTCPSocketClient(Sender).GenEvent_OnTCPSocketClientDisConnected(Sender);
   end;
 end;
@@ -1490,13 +1389,10 @@ Procedure Java_Event_pOnSurfaceViewCreated(env: PJNIEnv; this: jobject; Obj: TOb
                                surfaceHolder: jObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSurfaceView then
   begin
-    jSurfaceView(Obj).UpdateJNI(gApp);
-    jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
     jSurfaceView(Obj).GenEvent_OnSurfaceViewCreated(Obj,surfaceHolder);
   end;
 end;
@@ -1504,13 +1400,10 @@ end;
 Procedure Java_Event_pOnSurfaceViewDraw (env: PJNIEnv; this: jobject; Obj: TObject; canvas: jObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSurfaceView then
   begin
-    jSurfaceView(Obj).UpdateJNI(gApp);
-    jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
     jSurfaceView(Obj).GenEvent_OnSurfaceViewDraw(Obj, canvas);
   end;
 end;
@@ -1518,12 +1411,10 @@ end;
 Procedure Java_Event_pOnMediaPlayerPrepared(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeigh: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jMediaPlayer then
   begin
-    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
     jMediaPlayer(Obj).GenEvent_OnPrepared(Obj, videoWidth, videoHeigh);
   end;
 end;
@@ -1531,12 +1422,10 @@ end;
 Procedure Java_Event_pOnMediaPlayerVideoSizeChanged(env: PJNIEnv; this: jobject; Obj: TObject; videoWidth: integer; videoHeight: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jMediaPlayer then
   begin
-    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
     jMediaPlayer(Obj).GenEvent_OnVideoSizeChanged(Obj, videoWidth, videoHeight);
   end;
 end;
@@ -1544,12 +1433,10 @@ end;
 Procedure Java_Event_pOnMediaPlayerCompletion(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jMediaPlayer then
   begin
-    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
     jMediaPlayer(Obj).GenEvent_OnCompletion(Obj);
   end;
 end;
@@ -1560,12 +1447,10 @@ var
    jBoo: jBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jMediaPlayer then
   begin
-    jForm(jMediaPlayer(Obj).Owner).UpdateJNI(gApp);
     pastimedText := '';
     if timedText <> nil then
     begin
@@ -1579,12 +1464,10 @@ end;
 Procedure Java_Event_pOnSoundPoolLoadComplete(env: PJNIEnv; this: jobject; Obj: TObject; soundId : integer; status: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSoundPool then
   begin
-    jForm(jSoundPool(Obj).Owner).UpdateJNI(gApp);
     jSoundPool(Obj).GenEvent_OnLoadComplete(Obj, soundId, status);
   end;
 end;
@@ -1594,14 +1477,11 @@ procedure Java_Event_pOnSurfaceViewTouch(env: PJNIEnv; this: jobject;
                               act,cnt: integer; x1,y1,x2,y2 : single);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jSurfaceView then
   begin
-      jSurfaceView(Obj).UpdateJNI(gApp);
-      jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
       jSurfaceView(Obj).GenEvent_OnSurfaceViewTouch(Obj,act,cnt,x1,y1,x2,y2);
   end;
 end;
@@ -1611,13 +1491,10 @@ Procedure Java_Event_pOnSurfaceViewChanged(env: PJNIEnv; this: jobject;
                               Obj: TObject; width: integer; height: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSurfaceView then
   begin
-    jSurfaceView(Obj).UpdateJNI(gApp);
-    jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
     jSurfaceView(Obj).GenEvent_OnSurfaceViewChanged(Obj, width, height);
   end;
 end;
@@ -1628,14 +1505,11 @@ var
 begin
   running:= True;
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jSurfaceView then
   begin
-      //jSurfaceView(Obj).UpdateJNI(gApp);
-      jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
       jSurfaceView(Obj).GenEvent_OnSurfaceViewDrawingInBackground(Obj,progress,running);
   end;
   Result:= JBool(running);
@@ -1644,13 +1518,11 @@ end;
 procedure Java_Event_pOnSurfaceViewDrawingPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; progress: single);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jSurfaceView then
   begin
-      jForm(jSurfaceView(Obj).Owner).UpdateJNI(gApp);
       jSurfaceView(Obj).GenEvent_OnSurfaceViewDrawingPostExecute(Obj,progress);
   end;
 end;
@@ -1663,7 +1535,6 @@ var
   arrayResultY: array of single;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   arrayResultX := nil;
@@ -1687,8 +1558,6 @@ begin
         SetLength(arrayResultY, sizeArray);
         env^.GetFloatArrayRegion(env, arrayY, 0, sizeArray, @arrayResultY[0] {target});
       end;
-      jDrawingView(Obj).UpdateJNI(gApp);
-      jForm(jDrawingView(Obj).Owner).UpdateJNI(gApp);
 
       jDrawingView(Obj).GenEvent_OnDrawingViewTouch(Obj,action,countPoints,
                                                     arrayResultX,arrayResultY,
@@ -1704,7 +1573,6 @@ var
   arrayResultY: array of single;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   arrayResultX := nil;
@@ -1728,8 +1596,6 @@ begin
         SetLength(arrayResultY, sizeArray);
         env^.GetFloatArrayRegion(env, arrayY, 0, sizeArray, @arrayResultY[0] {target});
       end;
-      jDrawingView(Obj).UpdateJNI(gApp);
-      jForm(jDrawingView(Obj).Owner).UpdateJNI(gApp);
 
       jDrawingView(Obj).GenEvent_OnDrawingViewDraw(Obj,action,countPoints,
                                                     arrayResultX,arrayResultY,
@@ -1741,13 +1607,11 @@ procedure Java_Event_pOnDrawingViewSizeChanged(env: PJNIEnv; this: jobject; Obj:
                                    width: integer; height: integer; oldWidth: integer; oldHeight: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jDrawingView then
   begin
-      jForm(jDrawingView(Obj).Owner).UpdateJNI(gApp);
       jDrawingView(Obj).GenEvent_OnDrawingViewSizeChanged(Obj,width, height, oldWidth, oldHeight);
   end;
 end;
@@ -1755,13 +1619,11 @@ end;
 procedure Java_Event_pOnRatingBarChanged(env: PJNIEnv; this: jobject; Obj: TObject; rating: single);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jRatingBar then
   begin
-      jForm(jRatingBar(Obj).Owner).UpdateJNI(gApp);
       jRatingBar(Obj).GenEvent_OnRatingBarChanged(Obj,rating);
   end;
 end;
@@ -1769,13 +1631,11 @@ end;
 Procedure Java_Event_pOnContactManagerContactsExecuted(env: PJNIEnv; this: jobject; Obj: TObject; count: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jContactManager then
   begin
-      jForm(jContactManager(Obj).Owner).UpdateJNI(gApp);
       jContactManager(Obj).GenEvent_OnContactManagerContactsExecuted(Obj, count);
   end;
 end;
@@ -1791,14 +1651,12 @@ var
    continueListing: boolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   continueListing:= True;
 
   if Obj is jContactManager then
   begin
-    jForm(jContactManager(Obj).Owner).UpdateJNI(gApp);
     pascontact := '';
 
     if contactInfo <> nil then
@@ -1833,13 +1691,11 @@ var
   outColor: dword;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outColor:= 0;
   if Obj is jGridVIew then
   begin
-    jForm(jGridVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -1857,12 +1713,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jRadioGroup then
   begin
-    jForm(jRadioGroup(Obj).Owner).UpdateJNI(gApp);
     pascheckedCaption := '';
     if checkedCaption <> nil then
     begin
@@ -1880,13 +1734,11 @@ var
   outBitmap: jObject;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outBitmap:= nil;
   if Obj is jGridVIew then
   begin
-    jForm(jGridVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -1906,13 +1758,11 @@ end;
 procedure Java_Event_pOnSeekBarProgressChanged(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer; fromUser: jboolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jSeekBar then
   begin
-     jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
      jSeekBar(Obj).GenEvent_OnSeekBarProgressChanged(Obj, progress, Boolean(fromUser));
   end;
 end;
@@ -1920,13 +1770,11 @@ end;
 procedure Java_Event_pOnSeekBarStartTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jSeekBar then
   begin
-    jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
     jSeekBar(Obj).GenEvent_OnSeekBarStartTrackingTouch(Obj, progress);
   end;
 end;
@@ -1934,13 +1782,11 @@ end;
 procedure Java_Event_pOnSeekBarStopTrackingTouch(env: PJNIEnv; this: jobject; Obj: TObject; progress: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jSeekBar then
   begin
-     jForm(jSeekBar(Obj).Owner).UpdateJNI(gApp);
      jSeekBar(Obj).GenEvent_OnSeekBarStopTrackingTouch(Obj, progress);
   end;
 end;
@@ -1951,12 +1797,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -1973,12 +1817,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jComboEditText then
   begin
-    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -1993,74 +1835,63 @@ Procedure Java_Event_pOnClickGeneric(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
   //------------------------------------------------------
   if not (Assigned(Obj)) then Exit;
   if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     jAutoTextView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jChronometer then
   begin
-    jForm(jChronometer(Obj).Owner).UpdateJNI(gApp);
     jChronometer(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jComboEditText then
   begin
-    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
     jComboEditText(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jToolbar then
   begin
-    jForm(jToolbar(Obj).Owner).UpdateJNI(gApp);
     jToolbar(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jsToolbar then   //android support library...
   begin
-    jForm(jsToolbar(Obj).Owner).UpdateJNI(gApp);
     jsToolbar(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jsFloatingButton then   //android support library...
   begin
-    jForm(jsFloatingButton(Obj).Owner).UpdateJNI(gApp);
     jsFloatingButton(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jFrameLayout then
   begin
-    jForm(jFrameLayout(Obj).Owner).UpdateJNI(gApp);
     jFrameLayout(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jSearchView then
   begin
-    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
     jSearchView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jZBarcodeScannerView then
   begin
-    jForm(jZBarcodeScannerView(Obj).Owner).UpdateJNI(gApp);
     jZBarcodeScannerView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
   if Obj is jsContinuousScrollableImageView then
   begin
-    jForm(jsContinuousScrollableImageView(Obj).Owner).UpdateJNI(gApp);
     jsContinuousScrollableImageView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
@@ -2070,12 +1901,10 @@ end;
 procedure Java_Event_pOnChronometerTick(env: PJNIEnv; this: jobject; Obj: TObject; elapsedTimeMillis: JLong);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jChronometer then
   begin
-    jForm(jChronometer(Obj).Owner).UpdateJNI(gApp);
     jChronometer(Obj).GenEvent_OnChronometerTick(Obj, int64(elapsedTimeMillis));
   end;
 end;
@@ -2083,12 +1912,10 @@ end;
 Procedure Java_Event_pOnNumberPicker(env: PJNIEnv; this: jobject; Obj: TObject; oldValue: integer; newValue: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jNumberPickerDialog then
   begin
-    jForm(jNumberPickerDialog(Obj).Owner).UpdateJNI(gApp);
     jNumberPickerDialog(Obj).GenEvent_OnNumberPicker(Obj, oldValue, newValue);
   end;
 end;
@@ -2101,13 +1928,11 @@ var
    outListening: boolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outListening:= True;  //continue listening
   if Obj is jUDPSocket then
   begin
-    jForm(jUDPSocket(Obj).Owner).UpdateJNI(gApp);
     pascontent := '';
     if content <> nil then
     begin
@@ -2132,12 +1957,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jOpenDialog then
   begin
-    jForm(jOpenDialog(Obj).Owner).UpdateJNI(gApp);
     pasFileName := '';
     if fileName <> nil then
     begin
@@ -2163,12 +1986,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jcMikrotikRouterOS then
   begin
-    jForm(jOpenDialog(Obj).Owner).UpdateJNI(gApp);
     pasdelimitedContent:= '';
     if delimitedContent <> nil then
     begin
@@ -2195,12 +2016,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jExpandableListView then
   begin
-    jForm(jExpandableListView(Obj).Owner).UpdateJNI(gApp);
     pasgroupHeader := '';
     if groupHeader <> nil then
     begin
@@ -2218,12 +2037,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsNavigationView then
   begin
-    jForm(jsNavigationView(Obj).Owner).UpdateJNI(gApp);
     pasitemCaption := '';
     if itemCaption <> nil then
     begin
@@ -2240,12 +2057,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsBottomNavigationView then
   begin
-    jForm(jsBottomNavigationView(Obj).Owner).UpdateJNI(gApp);
     pasitemCaption := '';
     if itemCaption <> nil then
     begin
@@ -2262,12 +2077,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTreeListView then
   begin
-    jForm(jTreeListView(Obj).Owner).UpdateJNI(gApp);
     pasitemCaption := '';
     if itemCaption <> nil then
     begin
@@ -2285,12 +2098,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTreeListView then
   begin
-    jForm(jTreeListView(Obj).Owner).UpdateJNI(gApp);
     pasitemCaption := '';
     if itemCaption <> nil then
     begin
@@ -2309,12 +2120,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jExpandableListView then
   begin
-    jForm(jExpandableListView(Obj).Owner).UpdateJNI(gApp);
     pasgroupHeader := '';
     if groupHeader <> nil then
     begin
@@ -2336,12 +2145,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jExpandableListView then
   begin
-    jForm(jExpandableListView(Obj).Owner).UpdateJNI(gApp);
     pasgroupHeader := '';
     if groupHeader <> nil then
     begin
@@ -2364,12 +2171,10 @@ end;
 Procedure Java_Event_pOnGL2SurfaceCreate(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jGL2SurfaceView then
   begin
-    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
     jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceCreate(Obj);
   end;
 end;
@@ -2377,12 +2182,10 @@ end;
 Procedure Java_Event_pOnGL2SurfaceDestroyed(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jGL2SurfaceView then
   begin
-    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
     jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceDestroyed(Obj);
   end;
 end;
@@ -2390,12 +2193,10 @@ end;
 Procedure Java_Event_pOnGL2SurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jGL2SurfaceView then
   begin
-    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
     jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceChanged(Obj, width, height);
   end;
 end;
@@ -2403,12 +2204,10 @@ end;
 Procedure Java_Event_pOnGL2SurfaceDrawFrame(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jGL2SurfaceView then
   begin
-    jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
     jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceDrawFrame(Obj);
   end;
 end;
@@ -2425,7 +2224,6 @@ var
   arrayResultY: array of single;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   arrayResultX := nil;
@@ -2449,8 +2247,6 @@ begin
         SetLength(arrayResultY, sizeArray);
         env^.GetFloatArrayRegion(env, arrayY, 0, sizeArray, @arrayResultY[0] {target});
       end;
-      jGL2SurfaceView(Obj).UpdateJNI(gApp);
-      jForm(jGL2SurfaceView(Obj).Owner).UpdateJNI(gApp);
 
       jGL2SurfaceView(Obj).GenEvent_OnGL2SurfaceTouch(Obj,action,countPoints,
                                                     arrayResultX,arrayResultY,
@@ -2462,12 +2258,10 @@ end;
 Procedure Java_Event_pOnRecyclerViewItemClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemClick(Obj, itemIndex);
   end;
 end;
@@ -2476,12 +2270,10 @@ end;
 Procedure Java_Event_pOnRecyclerViewItemLongClick(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemLongClick(Obj, itemIndex);
   end;
 end;
@@ -2490,12 +2282,10 @@ end;
 Procedure Java_Event_pOnRecyclerViewItemTouchUp(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemTouchUp(Obj, itemIndex);
   end;
 end;
@@ -2504,12 +2294,10 @@ end;
 Procedure Java_Event_pOnRecyclerViewItemTouchDown(env: PJNIEnv; this: jobject; Obj: TObject; itemIndex: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemTouchDown(Obj, itemIndex);
   end;
 end;
@@ -2520,12 +2308,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsTabLayout then
   begin
-    jForm(jsTabLayout(Obj).Owner).UpdateJNI(gApp);
     pastitle := '';
     if title <> nil then
     begin
@@ -2539,12 +2325,10 @@ end;
 procedure Java_Event_pOnCustomCameraSurfaceChanged(env: PJNIEnv; this: jobject; Obj: TObject; width: integer; height: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jCustomCamera then
   begin
-    jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
     jCustomCamera(Obj).GenEvent_OnCustomCameraSurfaceChanged(Obj, width, height);
   end;
 end;
@@ -2555,7 +2339,6 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jCustomCamera then
@@ -2566,7 +2349,6 @@ begin
       _jBoolean:= JNI_False;
       pasfullPath:= string( env^.GetStringUTFChars(env,fullPath,@_jBoolean) );
     end;
-    jForm(jCustomCamera(Obj).Owner).UpdateJNI(gApp);
     jCustomCamera(Obj).GenEvent_OnCustomCameraPictureTaken(Obj, picture, pasfullPath);
   end;
 end;
@@ -2574,12 +2356,10 @@ end;
 Procedure Java_Event_pOnSearchViewFocusChange(env: PJNIEnv; this: jobject; Obj: TObject; hasFocus: jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSearchView then
   begin
-    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
     jSearchView(Obj).GenEvent_OnSearchViewFocusChange(Obj, Boolean(hasFocus));
   end;
 end;
@@ -2591,12 +2371,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSearchView then
   begin
-    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
     pasquery := '';
     if query <> nil then
     begin
@@ -2613,12 +2391,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jSearchView then
   begin
-    jForm(jSearchView(Obj).Owner).UpdateJNI(gApp);
     pasnewText := '';
     if newText <> nil then
     begin
@@ -2632,12 +2408,10 @@ end;
 procedure Java_Event_pOnClickX(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSearchView then
   begin
-    jForm(jSearchView(Sender).Owner).UpdateJNI(gApp);
     jSearchView(Sender).GenEvent_OnClickX(Sender);
   end;
 end;
@@ -2648,12 +2422,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTelephonyManager then
   begin
-    jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
     pasPhoneNumber := '';
     if phoneNumber <> nil then
     begin
@@ -2667,12 +2439,10 @@ end;
 Procedure Java_Event_pOnGetUidTotalMobileBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: JLong; uid: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTelephonyManager then
   begin
-    jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
     jTelephonyManager(Obj).GenEvent_OnGetUidTotalMobileBytesFinished(Obj, int64(bytesResult), uid);
   end;
 end;
@@ -2680,12 +2450,10 @@ end;
 Procedure Java_Event_pOnGetUidTotalWifiBytesFinished(env: PJNIEnv; this: jobject; Obj: TObject; bytesResult: JLong; uid: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTelephonyManager then
   begin
-    jForm(jTelephonyManager(Obj).Owner).UpdateJNI(gApp);
     jTelephonyManager(Obj).GenEvent_OnGetUidTotalWifiBytesFinished(Obj, int64(bytesResult), uid);
   end;
 end;
@@ -2697,12 +2465,10 @@ Procedure Java_Event_pOnRecyclerViewItemWidgetClick(env: PJNIEnv; this: jobject;
                                                     widgetId: integer; status: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetClick(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId, TItemWidgetStatus(status));
   end;
 end;
@@ -2713,12 +2479,10 @@ Procedure Java_Event_pOnRecyclerViewItemWidgetLongClick(env: PJNIEnv; this: jobj
                                                       widgetId: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetLongClick(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId);
   end;
 end;
@@ -2729,12 +2493,10 @@ Procedure Java_Event_pOnRecyclerViewItemWidgetTouchUp(env: PJNIEnv; this: jobjec
                                                       widgetId: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetTouchUp(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId);
   end;
 end;
@@ -2745,12 +2507,10 @@ Procedure Java_Event_pOnRecyclerViewItemWidgetTouchDown(env: PJNIEnv; this: jobj
                                                       widgetId: integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jsRecyclerView then
   begin
-    jForm(jsRecyclerView(Obj).Owner).UpdateJNI(gApp);
     jsRecyclerView(Obj).GenEvent_OnRecyclerViewItemWidgetTouchDown(Obj,itemIndex, TItemContentFormat(widgetClass),widgetId);
   end;
 end;
@@ -2763,12 +2523,10 @@ var
   pascodedata: string;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jZBarcodeScannerView then
   begin
-    jForm(jZBarcodeScannerView(Obj).Owner).UpdateJNI(gApp);
     pascodedata := '';
     if codedata <> nil then
     begin
@@ -2779,15 +2537,44 @@ begin
   end;
 end;
 
+procedure Java_Event_pOnZBarcodeScannerViewPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject; picture: JObject; fullPath: JString);
+var
+  pasfullPath: string;
+  _jBoolean: JBoolean;
+begin
+  gApp.Jni.jEnv := env;
+  if this <> nil then gApp.Jni.jThis := this;
+
+  if Obj is jZBarcodeScannerView then
+  begin
+    pasfullPath := '';
+    if fullPath <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pasfullPath:= string( env^.GetStringUTFChars(env,fullPath,@_jBoolean) );
+    end;
+    jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewPictureTaken(Obj, picture, pasfullPath);
+  end;
+end;
+
+procedure Java_Event_pOnZBarcodeScannerViewPictureMake(env: PJNIEnv; this: jobject; Obj: TObject);
+begin
+  gApp.Jni.jEnv := env;
+  if this <> nil then gApp.Jni.jThis := this;
+
+  if Obj is jZBarcodeScannerView then
+  begin
+    jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewPictureMake(Obj);
+  end;
+end;
+
 procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jMidiManager then
   begin
-    jForm(jMidiManager(Sender).Owner).UpdateJNI(gApp);
     jMidiManager(Sender).GenEvent_OnMidiManagerDeviceAdded(Sender,deviceId,GetString(env,deviceName),GetString(env,productId),GetString(env,manufacture));
   end;
 end;
@@ -2795,12 +2582,10 @@ end;
 procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jMidiManager then
   begin
-    jForm(jMidiManager(Sender).Owner).UpdateJNI(gApp);
     jMidiManager(Sender).GenEvent_OnMidiManagerDeviceRemoved(Sender,deviceId,GetString(env,deviceName),GetString(env,productId),GetString(env,manufacture));
   end;
 end;
@@ -2812,13 +2597,11 @@ var
   outReturnWidth: integer;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outReturn:=nil;
   if Sender is jcOpenMapView then
   begin
-    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
     jcOpenMapView(Sender).GenEvent_OnOpenMapViewRoadDraw(Sender,roadCode,roadStatus,roadDuration,roadDistance,outReturnColor,outReturnWidth);
   end;
   SetLength(outReturn, 2);
@@ -2831,12 +2614,10 @@ end;
 procedure Java_Event_pOnOpenMapViewClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcOpenMapView then
   begin
-    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
     jcOpenMapView(Sender).GenEvent_OnOpenMapViewClick(Sender,latitude,longitude);
   end;
 end;
@@ -2844,12 +2625,10 @@ end;
 procedure Java_Event_pOnOpenMapViewLongClick(env:PJNIEnv;this:JObject;Sender:TObject;latitude:double;longitude:double);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcOpenMapView then
   begin
-    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
     jcOpenMapView(Sender).GenEvent_OnOpenMapViewLongClick(Sender,latitude,longitude);
   end;
 end;
@@ -2857,12 +2636,10 @@ end;
 procedure Java_Event_pOnOpenMapViewMarkerClick(env:PJNIEnv;this:JObject;Sender:TObject;title:jString;latitude:double;longitude:double);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcOpenMapView then
   begin
-    jForm(jcOpenMapView(Sender).Owner).UpdateJNI(gApp);
     jcOpenMapView(Sender).GenEvent_OnOpenMapViewMarkerClick(Sender,GetString(env,title),latitude,longitude);
   end;
 end;
@@ -2870,12 +2647,10 @@ end;
 procedure Java_Event_pOnSignaturePadStartSigning(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcSignaturePad then
   begin
-    jForm(jcSignaturePad(Sender).Owner).UpdateJNI(gApp);
     jcSignaturePad(Sender).GenEvent_OnSignaturePadStartSigning(Sender);
   end;
 end;
@@ -2883,12 +2658,10 @@ end;
 procedure Java_Event_pOnSignaturePadSigned(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcSignaturePad then
   begin
-    jForm(jcSignaturePad(Sender).Owner).UpdateJNI(gApp);
     jcSignaturePad(Sender).GenEvent_OnSignaturePadSigned(Sender);
   end;
 end;
@@ -2896,12 +2669,10 @@ end;
 procedure Java_Event_pOnSignaturePadClear(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcSignaturePad then
   begin
-    jForm(jcSignaturePad(Sender).Owner).UpdateJNI(gApp);
     jcSignaturePad(Sender).GenEvent_OnSignaturePadClear(Sender);
   end;
 end;
@@ -2909,12 +2680,10 @@ end;
 procedure Java_Event_pOnGDXFormRender(env:PJNIEnv;this:JObject;Sender:TObject;deltaTime:single);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormRender(Sender,deltaTime);
   end;
 end;
@@ -2922,12 +2691,10 @@ end;
 procedure Java_Event_pOnGDXFormShow(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormShow(Sender);
   end;
 end;
@@ -2935,12 +2702,10 @@ end;
 procedure Java_Event_pOnGDXFormResize(env:PJNIEnv;this:JObject;Sender:TObject;width:integer;height:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormResize(Sender,width,height);
   end;
 end;
@@ -2948,12 +2713,10 @@ end;
 procedure Java_Event_pOnGDXFormClose(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormClose(Sender);
   end;
 end;
@@ -2961,12 +2724,10 @@ end;
 procedure Java_Event_pOnGDXFormTouchDown(env:PJNIEnv;this:JObject;Sender:TObject;screenX:integer;screenY:integer;pointer:integer;button:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormTouchDown(Sender,screenX,screenY,pointer,button);
   end;
 end;
@@ -2974,12 +2735,10 @@ end;
 procedure Java_Event_pOnGDXFormTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;screenX:integer;screenY:integer;pointer:integer;button:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormTouchUp(Sender,screenX,screenY,pointer,button);
   end;
 end;
@@ -2989,13 +2748,11 @@ var
   outReturn: integer;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outReturn:=0;
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormKeyPressed(Sender,keyCode{,outReturn});
   end;
   Result:=outReturn;
@@ -3004,12 +2761,10 @@ end;
 procedure Java_Event_pOnGDXFormResume(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormResume(Sender);
   end;
 end;
@@ -3017,12 +2772,10 @@ end;
 procedure Java_Event_pOnGDXFormPause(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormPause(Sender);
   end;
 end;
@@ -3030,12 +2783,10 @@ end;
 procedure Java_Event_pOnGDXFormHide(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jGdxForm then
   begin
-    jGdxForm(Sender).UpdateJNI(gApp);
     jGdxForm(Sender).GenEvent_OnGDXFormHide(Sender);
   end;
 end;
@@ -3044,12 +2795,10 @@ end;
 procedure Java_Event_pOnMailMessageRead(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Header:jString;Date:jString;Subject:jString;ContentType:jString;ContentText:jString;Attachments:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcMail then
   begin
-    jForm(jcMail(Sender).Owner).UpdateJNI(gApp);
     jcMail(Sender).GenEvent_OnMailMessageRead(Sender,position,GetString(env,Header),GetString(env,Date),GetString(env,Subject),GetString(env,ContentType),GetString(env,ContentText),GetString(env,Attachments));
   end;
 end;
@@ -3057,12 +2806,10 @@ end;
 procedure Java_Event_pOnMailMessagesCount(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcMail then
   begin
-    jForm(jcMail(Sender).Owner).UpdateJNI(gApp);
     jcMail(Sender).GenEvent_OnMailMessagesCount(Sender,count);
   end;
 end;
@@ -3070,12 +2817,10 @@ end;
 procedure Java_Event_pOnSFTPClientTryConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSFTPClient then
   begin
-    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
     jSFTPClient(Sender).GenEvent_OnSFTPClientTryConnect(Sender,boolean(success));
   end;
 end;
@@ -3083,12 +2828,10 @@ end;
 procedure Java_Event_pOnSFTPClientDownloadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSFTPClient then
   begin
-    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
     jSFTPClient(Sender).GenEvent_OnSFTPClientDownloadFinished(Sender,GetString(env,destination),boolean(success));
   end;
 end;
@@ -3096,12 +2839,10 @@ end;
 procedure Java_Event_pOnSFTPClientUploadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSFTPClient then
   begin
-    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
     jSFTPClient(Sender).GenEvent_OnSFTPClientUploadFinished(Sender,GetString(env,destination),boolean(success));
   end;
 end;
@@ -3109,12 +2850,10 @@ end;
 procedure Java_Event_pOnSFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSFTPClient then
   begin
-    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
     jSFTPClient(Sender).GenEvent_OnSFTPClientListing(Sender,GetString(env,remotePath),GetString(env,fileName),fileSize);
   end;
 end;
@@ -3122,12 +2861,10 @@ end;
 procedure Java_Event_pOnSFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSFTPClient then
   begin
-    jForm(jSFTPClient(Sender).Owner).UpdateJNI(gApp);
     jSFTPClient(Sender).GenEvent_OnSFTPClientListed(Sender,count);
   end;
 end;
@@ -3135,12 +2872,10 @@ end;
 procedure Java_Event_pOnFTPClientTryConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jFTPClient then
   begin
-    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
     jFTPClient(Sender).GenEvent_OnFTPClientTryConnect(Sender,boolean(success));
   end;
 end;
@@ -3148,12 +2883,10 @@ end;
 procedure Java_Event_pOnFTPClientDownloadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jFTPClient then
   begin
-    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
     jFTPClient(Sender).GenEvent_OnFTPClientDownloadFinished(Sender,GetString(env,destination),boolean(success));
   end;
 end;
@@ -3161,12 +2894,10 @@ end;
 procedure Java_Event_pOnFTPClientUploadFinished(env:PJNIEnv;this:JObject;Sender:TObject;destination:jString;success:jBoolean);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jFTPClient then
   begin
-    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
     jFTPClient(Sender).GenEvent_OnFTPClientUploadFinished(Sender,GetString(env,destination),boolean(success));
   end;
 end;
@@ -3174,12 +2905,10 @@ end;
 procedure Java_Event_pOnFTPClientListing(env:PJNIEnv;this:JObject;Sender:TObject;remotePath:jString;fileName:jString;fileSize:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jFTPClient then
   begin
-    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
     jFTPClient(Sender).GenEvent_OnFTPClientListing(Sender,GetString(env,remotePath),GetString(env,fileName),fileSize);
   end;
 end;
@@ -3187,12 +2916,10 @@ end;
 procedure Java_Event_pOnFTPClientListed(env:PJNIEnv;this:JObject;Sender:TObject;count:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jFTPClient then
   begin
-    jForm(jFTPClient(Sender).Owner).UpdateJNI(gApp);
     jFTPClient(Sender).GenEvent_OnFTPClientListed(Sender,count);
   end;
 end;
@@ -3200,12 +2927,10 @@ end;
 procedure Java_Event_pOnBluetoothSPPDataReceived(env:PJNIEnv;this:JObject;Sender:TObject;jbyteArrayData:jbyteArray;messageData:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDataReceived(Sender,GetDynArrayOfJByte(env,jbyteArrayData),GetString(env,messageData));
   end;
 end;
@@ -3213,12 +2938,10 @@ end;
 procedure Java_Event_pOnBluetoothSPPDeviceConnected(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDeviceConnected(Sender,GetString(env,deviceName),GetString(env,deviceAddress));
   end;
 end;
@@ -3226,12 +2949,10 @@ end;
 procedure Java_Event_pOnBluetoothSPPDeviceDisconnected(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDeviceDisconnected(Sender);
   end;
 end;
@@ -3239,12 +2960,10 @@ end;
 procedure Java_Event_pOnBluetoothSPPDeviceConnectionFailed(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPDeviceConnectionFailed(Sender);
   end;
 end;
@@ -3252,12 +2971,10 @@ end;
 procedure Java_Event_pOnBluetoothSPPServiceStateChanged(env:PJNIEnv;this:JObject;Sender:TObject;serviceState:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPServiceStateChanged(Sender, serviceState);
   end;
 end;
@@ -3265,12 +2982,10 @@ end;
 procedure Java_Event_pOnBluetoothSPPListeningNewAutoConnection(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
     jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPListeningNewAutoConnection(Sender,GetString(env,deviceName),GetString(env,deviceAddress));
   end;
 end;
@@ -3278,25 +2993,21 @@ end;
 procedure Java_Event_pOnBluetoothSPPAutoConnectionStarted(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcBluetoothSPP then
   begin
-    jForm(jcBluetoothSPP(Sender).Owner).UpdateJNI(gApp);
-    jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPAutoConnectionStarted(Sender);
+   jcBluetoothSPP(Sender).GenEvent_OnBluetoothSPPAutoConnectionStarted(Sender);
   end;
 end;
 
 procedure Java_Event_pOnDirectorySelected(env:PJNIEnv;this:JObject;Sender:TObject;path:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSelectDirectoryDialog then
   begin
-    jForm(jSelectDirectoryDialog(Sender).Owner).UpdateJNI(gApp);
     jSelectDirectoryDialog(Sender).GenEvent_OnDirectorySelected(Sender,GetString(env,path));
   end;
 end;
@@ -3304,12 +3015,10 @@ end;
 procedure Java_Event_pOnMsSqlJDBCConnectionExecuteQueryAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jMsSqlJDBCConnection then
   begin
-    jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
     jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionExecuteQueryAsync(Sender,GetString(env,messageStatus));
   end;
 end;
@@ -3317,12 +3026,10 @@ end;
 procedure Java_Event_pOnMsSqlJDBCConnectionOpenAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jMsSqlJDBCConnection then
   begin
-    jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
     jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionOpenAsync(Sender,GetString(env,messageStatus));
   end;
 end;
@@ -3330,12 +3037,10 @@ end;
 procedure Java_Event_pOnMsSqlJDBCConnectionExecuteUpdateAsync(env:PJNIEnv;this:JObject;Sender:TObject;messageStatus:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jMsSqlJDBCConnection then
   begin
-    jForm(jMsSqlJDBCConnection(Sender).Owner).UpdateJNI(gApp);
     jMsSqlJDBCConnection(Sender).GenEvent_OnMsSqlJDBCConnectionExecuteUpdateAsync(Sender,GetString(env,messageStatus));
   end;
 end;
@@ -3344,48 +3049,40 @@ end;
 procedure Java_Event_pOnBeginOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jCustomSpeechToText then
   begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
     jCustomSpeechToText(Sender).GenEvent_OnBeginOfSpeech(Sender);
   end;
 end;
 procedure Java_Event_pOnSpeechBufferReceived(env:PJNIEnv;this:JObject;Sender:TObject;txtBytes:jbyteArray);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jCustomSpeechToText then
   begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
-    jCustomSpeechToText(Sender).GenEvent_OnSpeechBufferReceived(Sender,GetDynArrayOfJByte(env,txtBytes));
+   jCustomSpeechToText(Sender).GenEvent_OnSpeechBufferReceived(Sender,GetDynArrayOfJByte(env,txtBytes));
   end;
 end;
 procedure Java_Event_pOnEndOfSpeech(env:PJNIEnv;this:JObject;Sender:TObject);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jCustomSpeechToText then
   begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
     jCustomSpeechToText(Sender).GenEvent_OnEndOfSpeech(Sender);
   end;
 end;
 procedure Java_Event_pOnSpeechResults(env:PJNIEnv;this:JObject;Sender:TObject;txt:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jCustomSpeechToText then
   begin
-    jForm(jCustomSpeechToText(Sender).Owner).UpdateJNI(gApp);
     jCustomSpeechToText(Sender).GenEvent_OnSpeechResults(Sender,GetString(env,txt));
   end;
 end;
@@ -3396,7 +3093,6 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   pasStr := '';
@@ -3405,7 +3101,6 @@ begin
     pasStr    := String( env^.GetStringUTFChars(Env,xml,@_jBoolean) );
   end;
 
-  jForm(jcBillingClient(Obj).Owner).UpdateJNI(gApp);
   jcBillingClient(Obj).GenEvent_OnBillingClientEvent(pasStr);
 end;
 
@@ -3413,12 +3108,10 @@ end;
 procedure Java_Event_pOnToyTimerServicePullElapsedTime(env:PJNIEnv;this:JObject;Sender:TObject;elapsedTime:int64);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jcToyTimerService then
   begin
-    jForm(jcToyTimerService(Sender).Owner).UpdateJNI(gApp);
     jcToyTimerService(Sender).GenEvent_OnToyTimerServicePullElapsedTime(Sender,elapsedTime);
   end;
 end;
@@ -3427,60 +3120,50 @@ end;
 procedure Java_Event_pOnBluetoothLEConnected(env:PJNIEnv;this:JObject;Sender:TObject;deviceName:jString;deviceAddress:jString;bondState:integer);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jBluetoothLowEnergy then
   begin
-    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
     jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEConnected(Sender,GetString(env,deviceName),GetString(env,deviceAddress),bondState);
   end;
 end;
 procedure Java_Event_pOnBluetoothLEScanCompleted(env:PJNIEnv;this:JObject;Sender:TObject;deviceNameArray:jstringArray;deviceAddressArray:jstringArray);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jBluetoothLowEnergy then
   begin
-    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
-    jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEScanCompleted(Sender,GetDynArrayOfString(env,deviceNameArray),GetDynArrayOfString(env,deviceAddressArray));
+     jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEScanCompleted(Sender,GetDynArrayOfString(env,deviceNameArray),GetDynArrayOfString(env,deviceAddressArray));
   end;
 end;
 procedure Java_Event_pOnBluetoothLEServiceDiscovered(env:PJNIEnv;this:JObject;Sender:TObject;serviceIndex:integer;serviceUUID:jString;characteristicUUIDArray:jstringArray);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jBluetoothLowEnergy then
   begin
-    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
     jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLEServiceDiscovered(Sender,serviceIndex,GetString(env,serviceUUID),GetDynArrayOfString(env,characteristicUUIDArray));
   end;
 end;
 procedure Java_Event_pOnBluetoothLECharacteristicChanged(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jBluetoothLowEnergy then
   begin
-    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
     jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLECharacteristicChanged(Sender,GetString(env,strValue),GetString(env,strCharacteristic));
   end;
 end;
 procedure Java_Event_pOnBluetoothLECharacteristicRead(env:PJNIEnv;this:JObject;Sender:TObject;strValue:jString;strCharacteristic:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jBluetoothLowEnergy then
   begin
-    jForm(jBluetoothLowEnergy(Sender).Owner).UpdateJNI(gApp);
     jBluetoothLowEnergy(Sender).GenEvent_OnBluetoothLECharacteristicRead(Sender,GetString(env,strValue),GetString(env,strCharacteristic));
   end;
 end;
@@ -3489,12 +3172,10 @@ end;
 procedure Java_Event_pOnGetTokenComplete(env:PJNIEnv;this:JObject;Sender:TObject;token:jString;isSuccessful:jBoolean;statusMessage:jString);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jsFirebasePushNotificationListener then
   begin
-    jForm(jsFirebasePushNotificationListener(Sender).Owner).UpdateJNI(gApp);
     jsFirebasePushNotificationListener(Sender).GenEvent_OnGetTokenComplete(Sender,GetString(env,token),boolean(isSuccessful),GetString(env,statusMessage));
   end;
 end;
@@ -3503,60 +3184,50 @@ end;
 procedure Java_Event_pOnBatteryCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer;pluggedBy:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jBatteryManager then
   begin
-    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
     jBatteryManager(Sender).GenEvent_OnBatteryCharging(Sender,batteryAtPercentLevel,pluggedBy);
   end;
 end;
 procedure Java_Event_pOnBatteryDisCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jBatteryManager then
   begin
-    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
     jBatteryManager(Sender).GenEvent_OnBatteryDisCharging(Sender,batteryAtPercentLevel);
   end;
 end;
 procedure Java_Event_pOnBatteryFull(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jBatteryManager then
   begin
-    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
     jBatteryManager(Sender).GenEvent_OnBatteryFull(Sender,batteryAtPercentLevel);
   end;
 end;
 procedure Java_Event_pOnBatteryUnknown(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jBatteryManager then
   begin
-    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
     jBatteryManager(Sender).GenEvent_OnBatteryUnknown(Sender,batteryAtPercentLevel);
   end;
 end;
 procedure Java_Event_pOnBatteryNotCharging(env:PJNIEnv;this:JObject;Sender:TObject;batteryAtPercentLevel:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis:= this;
 
   if Sender is jBatteryManager then
   begin
-    jForm(jBatteryManager(Sender).Owner).UpdateJNI(gApp);
     jBatteryManager(Sender).GenEvent_OnBatteryNotCharging(Sender,batteryAtPercentLevel);
   end;
 end;
@@ -3564,12 +3235,11 @@ end;
 procedure Java_Event_pOnModbusConnect(env:PJNIEnv;this:JObject;Sender:TObject;success:jBoolean;msg:jString);
 begin
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
-   if this <> nil then gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jModbus then
   begin
-    jForm(jModbus(Sender).Owner).UpdateJNI(gApp);
-    jModbus(Sender).GenEvent_OnModbusConnect(Sender,boolean(success),GetString(env,msg));
+   jModbus(Sender).GenEvent_OnModbusConnect(Sender,boolean(success),GetString(env,msg));
   end;
 end;
 
@@ -3577,9 +3247,9 @@ procedure Java_Event_pWebSocketClientOnOpen(env:PJNIEnv;this:JObject;Sender:TObj
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnOpen(Sender);
   end;
 end;
@@ -3588,9 +3258,9 @@ procedure Java_Event_pWebSocketClientOnTextReceived(env:PJNIEnv;this:JObject;Sen
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnTextReceived(Sender,GetString(env,msgContent));
   end;
 end;
@@ -3599,9 +3269,9 @@ procedure Java_Event_pWebSocketClientOnBinaryReceived(env:PJNIEnv;this:JObject;S
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnBinaryReceived(Sender,GetDynArrayOfJByte(env,data));
   end;
 end;
@@ -3610,9 +3280,9 @@ procedure Java_Event_pWebSocketClientOnPingReceived(env:PJNIEnv;this:JObject;Sen
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnPingReceived(Sender,GetDynArrayOfJByte(env,data));
   end;
 end;
@@ -3621,9 +3291,9 @@ procedure Java_Event_pWebSocketClientOnPongReceived(env:PJNIEnv;this:JObject;Sen
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnPongReceived(Sender,GetDynArrayOfJByte(env,data));
   end;
 end;
@@ -3632,9 +3302,9 @@ procedure Java_Event_pWebSocketClientOnException(env:PJNIEnv;this:JObject;Sender
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnException(Sender,GetString(env,exceptionMessage));
   end;
 end;
@@ -3643,9 +3313,9 @@ procedure Java_Event_pWebSocketClientOnCloseReceived(env:PJNIEnv;this:JObject;Se
 begin
   gApp.Jni.jEnv:= env;
   if this <> nil then gApp.Jni.jThis:= this;
+
   if Sender is jcWebSocketClient then
   begin
-    jForm(jcWebSocketClient(Sender).Owner).UpdateJNI(gApp);
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnCloseReceived(Sender);
   end;
 end;

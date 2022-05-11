@@ -24,7 +24,7 @@ jLinearLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
 
     procedure ClearLayout();
@@ -116,33 +116,33 @@ begin
   inherited Destroy;
 end;
 
-procedure jLinearLayout.Init(refApp: jApp);
+procedure jLinearLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FOrientation <> loHorizontal then
-       jLinearLayout_SetOrientation(FjEnv, FjObject, Ord(FOrientation));
+       jLinearLayout_SetOrientation(gApp.jni.jEnv, FjObject, Ord(FOrientation));
 
    if FGravityInParent <> lgNone then
-     jLinearLayout_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     jLinearLayout_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   jLinearLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jLinearLayout_SetId(FjEnv, FjObject, Self.Id);
+   jLinearLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jLinearLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jLinearLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jLinearLayout_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -151,30 +151,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jLinearLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jLinearLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jLinearLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jLinearLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jLinearLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jLinearLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -182,13 +182,13 @@ procedure jLinearLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jLinearLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jLinearLayout.UpdateLayout;
@@ -199,13 +199,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jLinearLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 (*
@@ -218,56 +218,56 @@ end;
 
 function jLinearLayout.jCreate(): jObject;
 begin
-   Result:= jLinearLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jLinearLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jLinearLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_jFree(FjEnv, FjObject);
+     jLinearLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jLinearLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jLinearLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jLinearLayout.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLinearLayout_GetParent(FjEnv, FjObject);
+   Result:= jLinearLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jLinearLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jLinearLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jLinearLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLinearLayout_GetView(FjEnv, FjObject);
+   Result:= jLinearLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jLinearLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jLinearLayout_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jLinearLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jLinearLayout_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jLinearLayout.GetWidth(): integer;
@@ -278,7 +278,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jLinearLayout_getLParamWidth(FjEnv, FjObject );
+   Result:= jLinearLayout_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jLinearLayout.GetHeight(): integer;
@@ -289,7 +289,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jLinearLayout_getLParamHeight(FjEnv, FjObject );
+   Result:= jLinearLayout_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jLinearLayout.SetLGravity(_gravity: TLayoutGravity);
@@ -297,42 +297,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jLinearLayout_SetLGravity(FjEnv, FjObject, Ord(_gravity) );
+     jLinearLayout_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity) );
 end;
 
 procedure jLinearLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_SetLWeight(FjEnv, FjObject, _w);
+     jLinearLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jLinearLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jLinearLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jLinearLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jLinearLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jLinearLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jLinearLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jLinearLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLinearLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jLinearLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jLinearLayout.ClearLayout();
@@ -343,15 +343,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jLinearLayout_clearLayoutAll(FjEnv, FjObject);
+     jLinearLayout_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jLinearLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jLinearLayout_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jLinearLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jLinearLayout_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -360,7 +360,7 @@ begin
   //in designing component state: set value here...
   FOrientation:= _orientation;
   if FInitialized then
-     jLinearLayout_SetOrientation(FjEnv, FjObject, Ord(FOrientation));
+     jLinearLayout_SetOrientation(gApp.jni.jEnv, FjObject, Ord(FOrientation));
 end;
 
 {-------- jLinearLayout_JNI_Bridge ----------}

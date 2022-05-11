@@ -82,7 +82,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Loaded; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure GenEvent_OnClickGridItem(Obj: TObject; position: integer; Caption: string);
@@ -188,7 +188,7 @@ begin
   begin
     if FjObject <> nil then
     begin
-      jni_proc(FjEnv, FjObject, 'jFree');
+      jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
       FjObject := nil;
     end;
   end;
@@ -206,28 +206,28 @@ begin
     FRowCount := DEFAULT_ROWCOUNT;
 end;
 
-procedure jGridView.Init(refApp: jApp);
+procedure jGridView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-   FjObject := jGridView_jCreate(FjEnv, int64(Self), FjThis); //jSelf !
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
+   FjObject := jGridView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis); //jSelf !
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -236,14 +236,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
   if Self.Anchor <> nil then
@@ -251,14 +251,14 @@ begin
   else
     Self.AnchorId := -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFontColor <> colbrDefault then
     SetFontColor(FFontColor);
@@ -275,7 +275,7 @@ begin
    if FColCount <> -1 then
     SetNumColumns(FColCount);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -283,7 +283,7 @@ procedure jGridView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 //==== Added by tintinux
@@ -356,13 +356,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jGridView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -385,35 +385,35 @@ begin
   inherited SetViewParent(_viewgroup);
   //in designing component state: set value here...
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject, _viewgroup);
+    View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jGridView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_RemoveFromViewParent(FjEnv, FjObject);
+    View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jGridView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := View_GetView(FjEnv, FjObject);
+    Result := View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGridView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLParamWidth(FjEnv, FjObject, _w);
+    View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jGridView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLParamHeight(FjEnv, FjObject, _h);
+    View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jGridView.SetLeftTopRightBottomWidthHeight(_left: integer;
@@ -421,7 +421,7 @@ procedure jGridView.SetLeftTopRightBottomWidthHeight(_left: integer;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+    View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
       _left, _top, _right, _bottom, _w, _h);
 end;
 
@@ -429,21 +429,21 @@ procedure jGridView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+    View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jGridView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+    View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jGridView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+    View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jGridView.ClearLayout();
@@ -454,15 +454,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-          View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+          View_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -473,7 +473,7 @@ begin
     // workaround because adding empty _item does nothing
     if (_item = '') and (_imgIdentifier = '') then
       _item := ' ';
-    jni_proc_tt(FjEnv, FjObject, 'Add', _item, _imgIdentifier);
+    jni_proc_tt(gApp.jni.jEnv, FjObject, 'Add', _item, _imgIdentifier);
     inc(FItemCount);
   end;
 end;
@@ -484,21 +484,21 @@ begin
   FColCount := _value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetNumColumns', _value);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetNumColumns', _value);
 end;
 
 procedure jGridView.SetColumnWidth(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetColumnWidth', _value);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColumnWidth', _value);
 end;
 
 procedure jGridView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'Clear');
+    jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end;
 
 procedure jGridView.Delete(_index: integer);
@@ -506,7 +506,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
     begin
-    jni_proc_i(FjEnv, FjObject, 'Delete', _index);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'Delete', _index);
     Dec(FItemCount);
     end;
 end;
@@ -517,35 +517,35 @@ begin
   FItemsLayout := _value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetItemsLayout', Ord(_value));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetItemsLayout', Ord(_value));
 end;
 
 function jGridView.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
+    Result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemIndex');
 end;
 
 function jGridView.GetItemCaption(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result := jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
+    Result := jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetItemCaption');
 end;
 
 procedure jGridView.DispatchOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemTextColor', _value);
+    jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemTextColor', _value);
 end;
 
 procedure jGridView.DispatchOnDrawItemBitmap(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemBitmap', _value);
+    jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemBitmap', _value);
 end;
 
 procedure jGridView.SetFontSize(_size: Dword);
@@ -553,7 +553,7 @@ begin
   //in designing component state: set value here...
   FFontSize := _size;
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetFontSize', _size);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSize', _size);
 end;
 
 procedure jGridView.SetFontColor(_color: TARGBColorBridge);
@@ -562,7 +562,7 @@ begin
   FFontColor := _color;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontColor', GetARGB(FCustomColor, _color));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jGridView.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -571,7 +571,7 @@ begin
   FFontSizeUnit := _unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jGridView.GenEvent_OnDrawItemCaptionColor(Obj: TObject;
@@ -604,35 +604,35 @@ procedure jGridView.UpdateItemTitle(_index: integer; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_it(FjEnv, FjObject, 'UpdateItemTitle', _index, _title);
+    jni_proc_it(gApp.jni.jEnv, FjObject, 'UpdateItemTitle', _index, _title);
 end;
 
 procedure jGridView.SetHorizontalSpacing(_horizontalSpacingPixels: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetHorizontalSpacing', _horizontalSpacingPixels);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetHorizontalSpacing', _horizontalSpacingPixels);
 end;
 
 procedure jGridView.SetVerticalSpacing(_verticalSpacingPixels: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetVerticalSpacing', _verticalSpacingPixels);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetVerticalSpacing', _verticalSpacingPixels);
 end;
 
 procedure jGridView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelection', _index);
 end;
 
 procedure jGridView.SetStretchMode(_stretchMode: TGridStretchMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetStretchMode', Ord(_stretchMode));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetStretchMode', Ord(_stretchMode));
 end;
 
 ///----  Added by tintinux

@@ -29,7 +29,7 @@ jTelephonyManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Call(_phoneNumber: string);
     procedure SetSpeakerphoneOn(_value: boolean);
     function GetIMEI(): string;
@@ -91,7 +91,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -99,12 +99,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jTelephonyManager.Init(refApp: jApp);
+procedure jTelephonyManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jTelephonyManager_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jTelephonyManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
   FInitialized:= True;
@@ -114,21 +114,21 @@ procedure jTelephonyManager.Call(_phoneNumber: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'Call', _phoneNumber);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'Call', _phoneNumber);
 end;
 
 procedure jTelephonyManager.SetSpeakerphoneOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetSpeakerphoneOn', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetSpeakerphoneOn', _value);
 end;
 
 function jTelephonyManager.GetIMEI(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetIMEI');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetIMEI');
 end;
 
 
@@ -136,161 +136,161 @@ function jTelephonyManager.GetNetworkCountryIso(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetNetworkCountryIso');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetNetworkCountryIso');
 end;
 
 function jTelephonyManager.GetSimCountryIso(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetSimCountryIso');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetSimCountryIso');
 end;
 
 function jTelephonyManager.GetDeviceSoftwareVersion(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceSoftwareVersion');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetDeviceSoftwareVersion');
 end;
 
 function jTelephonyManager.GetVoiceMailNumber(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetVoiceMailNumber');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetVoiceMailNumber');
 end;
 
 function jTelephonyManager.GetPhoneType(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetPhoneType');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetPhoneType');
 end;
 
 function jTelephonyManager.GetNetworkType(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetNetworkType');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetNetworkType');
 end;
 
 function jTelephonyManager.GetTotalRxBytes(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_j(FjEnv, FjObject, 'GetTotalRxBytes');
+   Result:= jni_func_out_j(gApp.jni.jEnv, FjObject, 'GetTotalRxBytes');
 end;
 
 function jTelephonyManager.GetTotalTxBytes(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_j(FjEnv, FjObject, 'GetTotalTxBytes');
+   Result:= jni_func_out_j(gApp.jni.jEnv, FjObject, 'GetTotalTxBytes');
 end;
 
 function jTelephonyManager.GetMobileRxBytes(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_j(FjEnv, FjObject, 'GetMobileRxBytes');
+   Result:= jni_func_out_j(gApp.jni.jEnv, FjObject, 'GetMobileRxBytes');
 end;
 
 function jTelephonyManager.GetMobileTxBytes(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_j(FjEnv, FjObject, 'GetMobileTxBytes');
+   Result:= jni_func_out_j(gApp.jni.jEnv, FjObject, 'GetMobileTxBytes');
 end;
 
 function jTelephonyManager.GetUidTxBytes(_startTime, _endTime:int64; _uid: integer): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTxBytes', _startTime, _endTime, _uid);
+   Result:= jni_func_jji_out_j(gApp.jni.jEnv, FjObject, 'GetUidTxBytes', _startTime, _endTime, _uid);
 end;
 
 function jTelephonyManager.GetUidRxBytes(_startTime, _endTime:int64; _uid: integer): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidRxBytes', _startTime, _endTime, _uid);
+   Result:= jni_func_jji_out_j(gApp.jni.jEnv, FjObject, 'GetUidRxBytes', _startTime, _endTime, _uid);
 end;
 
 function jTelephonyManager.GetUidTotalBytes(_startTime, _endTime:int64; _uid:integer): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalBytes', _startTime, _endTime, _uid);
+   Result:= jni_func_jji_out_j(gApp.jni.jEnv, FjObject, 'GetUidTotalBytes', _startTime, _endTime, _uid);
 end;
 
 function jTelephonyManager.GetUidTotalMobileBytes(_startTime, _endTime:int64; _uid: integer): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalMobileBytes', _startTime, _endTime, _uid);
+   Result:= jni_func_jji_out_j(gApp.jni.jEnv, FjObject, 'GetUidTotalMobileBytes', _startTime, _endTime, _uid);
 end;
 
 procedure jTelephonyManager.GetUidTotalMobileBytesAsync(_startTime, _endTime:int64; _uid: integer);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jTelephonyManager_GetUidTotalMobileBytesAsync(FjEnv, FjObject, _startTime, _endTime,  _uid);
+    jTelephonyManager_GetUidTotalMobileBytesAsync(gApp.jni.jEnv, FjObject, _startTime, _endTime,  _uid);
 end;
 
 procedure jTelephonyManager.GetUidTotalWifiBytesAsync(_startTime, _endTime:int64; _uid: integer);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jTelephonyManager_GetUidTotalWifiBytesAsync(FjEnv, FjObject, _startTime, _endTime,  _uid);
+    jTelephonyManager_GetUidTotalWifiBytesAsync(gApp.jni.jEnv, FjObject, _startTime, _endTime,  _uid);
 end;
 
 function jTelephonyManager.GetUidTotalWifiBytes(_startTime, _endTime:int64; _uid: integer): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_jji_out_j(FjEnv, FjObject, 'GetUidTotalWifiBytes', _startTime, _endTime, _uid);
+   Result:= jni_func_jji_out_j(gApp.jni.jEnv, FjObject, 'GetUidTotalWifiBytes', _startTime, _endTime, _uid);
 end;
 
 function jTelephonyManager.GetUidFromPackage(_package: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetUidFromPackage', _package);
+   Result:= jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'GetUidFromPackage', _package);
 end;
 
 function jTelephonyManager.IsNetworkRoaming(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsNetworkRoaming');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsNetworkRoaming');
 end;
 
 function jTelephonyManager.GetLine1Number(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetLine1Number');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetLine1Number');
 end;
 
 function jTelephonyManager.GetSubscriberId(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetSubscriberId');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetSubscriberId');
 end;
 
 function jTelephonyManager.GetNetworkOperatorName(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetNetworkOperatorName');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetNetworkOperatorName');
 end;
 
 function jTelephonyManager.IsWifiEnabled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsWifiEnabled');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsWifiEnabled');
 end;
 
 procedure jTelephonyManager.GenEvent_OnTelephonyCallStateChanged(Sender: TObject; state: TTelephonyCallState; phoneNumber: string);
@@ -313,7 +313,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLocationAreaCode');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetLocationAreaCode');
 end;
 
 function jTelephonyManager.GetBaseStationId(): integer;
@@ -321,7 +321,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBaseStationId');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetBaseStationId');
 end;
 
 function jTelephonyManager.GetMobileNetworkCode(): integer;
@@ -329,7 +329,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetMobileNetworkCode');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetMobileNetworkCode');
 end;
 
 function jTelephonyManager.GetMobileCountryCode(): integer;
@@ -337,7 +337,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetMobileCountryCode');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetMobileCountryCode');
 end;
 
 {-------- jTelephonyManager_JNI_Bridge ----------}

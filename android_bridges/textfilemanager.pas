@@ -23,7 +23,7 @@ jTextFileManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SaveToFile(_txtContent: string; _filename: string); overload;
@@ -92,10 +92,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jTextFileManager.Init(refApp: jApp);
+procedure jTextFileManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -105,28 +105,28 @@ end;
 
 function jTextFileManager.jCreate(): jObject;
 begin
-   Result:= jTextFileManager_jCreate(FjEnv, FjThis , int64(Self));
+   Result:= jTextFileManager_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jTextFileManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextFileManager_jFree(FjEnv, FjObject);
+     jTextFileManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTextFileManager.SaveToFile(_txtContent: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextFileManager_SaveToFile(FjEnv, FjObject, _txtContent ,_filename);
+     jTextFileManager_SaveToFile(gApp.jni.jEnv, FjObject, _txtContent ,_filename);
 end;
 
 procedure jTextFileManager.SaveToFile(_txtContent: string; _path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextFileManager_SaveToFile(FjEnv, FjObject, _txtContent ,_path, _filename);
+     jTextFileManager_SaveToFile(gApp.jni.jEnv, FjObject, _txtContent ,_path, _filename);
 end;
 
 procedure jTextFileManager.SaveToFile(_txtContent: string; _envDir: TEnvDirectory; _filename: string);
@@ -139,14 +139,14 @@ function jTextFileManager.LoadFromFile(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTextFileManager_LoadFromFile(FjEnv, FjObject, _filename);
+   Result:= jTextFileManager_LoadFromFile(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 function jTextFileManager.LoadFromFile(_path: string; _filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTextFileManager_LoadFromFile(FjEnv, FjObject,_path, _filename);
+   Result:= jTextFileManager_LoadFromFile(gApp.jni.jEnv, FjObject,_path, _filename);
 end;
 
 function jTextFileManager.LoadFromFile(_envDir: TEnvDirectory; _filename: string): string; overload;
@@ -158,7 +158,7 @@ procedure jTextFileManager.SaveToSdCard(_txtContent: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextFileManager_SaveToSdCard(FjEnv, FjObject, _txtContent ,_filename);
+     jTextFileManager_SaveToSdCard(gApp.jni.jEnv, FjObject, _txtContent ,_filename);
 end;
 
 function jTextFileManager.LoadFromSdCard(_filename: string): string;
@@ -166,42 +166,42 @@ begin
   //in designing component state: result value here...
   Result:= '';
   if FInitialized then
-   Result:= jTextFileManager_LoadFromSdCard(FjEnv, FjObject, _filename);
+   Result:= jTextFileManager_LoadFromSdCard(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 function jTextFileManager.LoadFromAssets(_filename: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-     Result:= jTextFileManager_LoadFromAssets(FjEnv, FjObject, _filename);
+     Result:= jTextFileManager_LoadFromAssets(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 procedure jTextFileManager.CopyToClipboard(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextFileManager_CopyToClipboard(FjEnv, FjObject, _text);
+     jTextFileManager_CopyToClipboard(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jTextFileManager.PasteFromClipboard(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTextFileManager_PasteFromClipboard(FjEnv, FjObject);
+   Result:= jTextFileManager_PasteFromClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTextFileManager.CopyContentToClipboard(_filename: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-     jTextFileManager_CopyContentToClipboard(FjEnv, FjObject, _filename);
+     jTextFileManager_CopyContentToClipboard(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 procedure jTextFileManager.PasteContentFromClipboard(_filename: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-     jTextFileManager_PasteContentFromClipboard(FjEnv, FjObject, _filename);
+     jTextFileManager_PasteContentFromClipboard(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 //LMB
@@ -209,7 +209,7 @@ function jTextFileManager.LoadFromAssetsAsJByteArray(_filePath: string): TDynArr
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTextFileManager_LoadFromAssetsAsJByteArray(FjEnv, FjObject, _filePath);
+   Result:= jTextFileManager_LoadFromAssetsAsJByteArray(gApp.jni.jEnv, FjObject, _filePath);
 end;
 
 //LMB

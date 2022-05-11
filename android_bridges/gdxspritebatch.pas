@@ -20,7 +20,7 @@ jGdxSpriteBatch = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -72,11 +72,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxSpriteBatch.Init(refApp: jApp);
+procedure jGdxSpriteBatch.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -85,63 +85,63 @@ end;
 
 function jGdxSpriteBatch.jCreate(): jObject;
 begin
-   Result:= jGdxSpriteBatch_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxSpriteBatch_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxSpriteBatch.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized and (FjObject <> nil) then
-     jGdxSpriteBatch_jFree(FjEnv, FjObject);
+     jGdxSpriteBatch_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxSpriteBatch.BeginBatch();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSpriteBatch_BeginBatch(FjEnv, FjObject);
+     jGdxSpriteBatch_BeginBatch(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxSpriteBatch.DrawTexture(_texture: jObject; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSpriteBatch_DrawTexture(FjEnv, FjObject, _texture ,_x ,_y);
+     jGdxSpriteBatch_DrawTexture(gApp.jni.jEnv, FjObject, _texture ,_x ,_y);
 end;
 
 procedure jGdxSpriteBatch.EndBatch();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSpriteBatch_EndBatch(FjEnv, FjObject);
+     jGdxSpriteBatch_EndBatch(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxSpriteBatch.SetProjectionMatrix(_matrix4: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSpriteBatch_SetProjectionMatrix(FjEnv, FjObject, _matrix4);
+     jGdxSpriteBatch_SetProjectionMatrix(gApp.jni.jEnv, FjObject, _matrix4);
 end;
 
 function jGdxSpriteBatch.GetJInstance(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxSpriteBatch_GetJInstance(FjEnv, FjObject);
+   Result:= jGdxSpriteBatch_GetJInstance(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxSpriteBatch.DrawTextureRegion(_textureRegion: jObject; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSpriteBatch_DrawTextureRegion(FjEnv, FjObject, _textureRegion ,_x ,_y);
+     jGdxSpriteBatch_DrawTextureRegion(gApp.jni.jEnv, FjObject, _textureRegion ,_x ,_y);
 end;
 
 procedure jGdxSpriteBatch.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxSpriteBatch_Dispose(FjEnv, FjObject);
+     jGdxSpriteBatch_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGdxSpriteBatch_JNI_Bridge ----------}

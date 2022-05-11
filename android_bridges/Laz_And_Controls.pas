@@ -182,7 +182,7 @@ type
      Destructor  Destroy; override;
      Procedure Refresh;
      Procedure UpdateLayout; override;
-     procedure Init(refApp: jApp);  override;
+     procedure Init;  override;
 
      function GetTop: integer;    // By ADiV
      function GetLeft: integer;   // By ADiV
@@ -261,7 +261,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure Init(refApp: jApp) override;
+    procedure Init; override;
 
     function GetImageByIndex(index: integer): string;
     function GetImageExByIndex(index: integer): string;
@@ -311,7 +311,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     procedure GetAsync(_stringUrl: string); overload;
     procedure GetAsync; overload;
@@ -425,7 +425,7 @@ type
   public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(refApp: jApp) override;
+   procedure Init; override;
    procedure Send; overload;
    procedure Send(mTo: string; subject: string; msg: string); overload;
 
@@ -456,7 +456,7 @@ type
   public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(refApp: jApp) override;
+   procedure Init; override;
    function Send(multipartMessage: Boolean = False): integer; overload;
 
    function Send(toNumber: string;  msg: string; multipartMessage: Boolean = False): integer; overload;
@@ -484,7 +484,7 @@ type
    FullPathToBitmapFile: string;
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
-   procedure Init(refApp: jApp) override;
+   procedure Init; override;
 
    procedure TakePhoto; overload;
    procedure TakePhoto(_filename: string ; _requestCode: integer); overload;
@@ -511,7 +511,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(refApp: jApp) override;
+    procedure Init; override;
     //Property
     property jParent   : jForm     read FjParent   write FjParent;
   published
@@ -552,7 +552,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp) override;
+    procedure Init; override;
 
     procedure LoadFromBuffer(buffer: Pointer; size: Integer); overload;// by Kordal
     function LoadFromBuffer(var buffer: TDynArrayOfJByte): jObject;  overload;
@@ -649,7 +649,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(refApp: jApp)  override;
+    procedure Init; override;
 
     Procedure Show;   overload;
 
@@ -693,7 +693,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(refApp: jApp) override;
+    procedure Init; override;
     procedure Start;
     procedure Stop;
     procedure Close;
@@ -730,7 +730,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp) override;
+    procedure Init; override;
     procedure Done;    //by jmpessoa
     Procedure Execute;
     property Running: boolean read FRunning  write FRunning;
@@ -757,7 +757,7 @@ type
    public
      constructor Create(AOwner: TComponent); override;
      destructor  Destroy; override;
-     procedure Init(refApp: jApp) override;
+     procedure Init; override;
 
      procedure MoveToFirst;
      procedure MoveToNext;
@@ -819,7 +819,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp) override;
+    procedure Init; override;
     function ExecSQL(execQuery: string) : boolean;
     function CheckDataBaseExists(dataBaseName: string): boolean;
     procedure OpenOrCreate(dataBaseName: string);
@@ -933,7 +933,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     
     procedure ClearLayout();
@@ -1009,7 +1009,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout; override;
     procedure Append(_txt: string);
@@ -1152,7 +1152,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
 
     function GetWidth: integer;  override;
@@ -1301,7 +1301,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout(); override;
 
@@ -1365,7 +1365,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
     Procedure UpdateLayout(); override;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -1406,7 +1406,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     Procedure UpdateLayout(); override;
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -1455,7 +1455,7 @@ type
     procedure ClearLayout;
     Procedure UpdateLayout(); override;
     
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Stop;
     procedure Start;
     procedure SetLGravity(_value: TLayoutGravity);
@@ -1529,7 +1529,7 @@ type
     procedure ClearLayout; //by ADiV
 
     Procedure UpdateLayout(); override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure SetImageByName(Value : string);
     Procedure SetImageByIndex(Value : integer);
 
@@ -1734,7 +1734,7 @@ type
 
     procedure ClearLayout;
     procedure UpdateLayout(); override;
-    procedure Init(refApp: jApp);  override;
+    procedure Init;  override;
 
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
@@ -1939,7 +1939,7 @@ type
 
     procedure ClearLayout;
     Procedure UpdateLayout(); override;
-    procedure Init(refApp: jApp);  override;
+    procedure Init;  override;
 
     procedure SetFillViewport(fillenabled: boolean);
     procedure ScrollTo(_x: integer; _y: integer);
@@ -2018,7 +2018,7 @@ type
     procedure ClearLayout();
     Procedure UpdateLayout(); override;
     
-    procedure Init(refApp: jApp);  override;
+    procedure Init;  override;
     procedure ScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollTo(_x: integer; _y: integer);
     procedure SmoothScrollBy(_x: integer; _y: integer);
@@ -2095,7 +2095,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure Refresh;
 
     procedure ClearLayout;
@@ -2200,7 +2200,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure InitPaintShader(refApp: jApp);
 
     Procedure DrawLine(x1, y1, x2, y2: single); overload;
@@ -2323,7 +2323,7 @@ type
 
     procedure ClearLayout();
     Procedure UpdateLayout(); override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     Procedure SaveToFile(fullFileName:String);
     function GetDrawingCache(): jObject;
     function GetImage(): jObject;
@@ -2395,7 +2395,7 @@ type
 
     procedure BringToFront; // By ADiV
     
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetViewParent(Value: jObject); override;
     procedure RemoveFromViewParent;  override;
@@ -2460,7 +2460,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     //
     Procedure GenEvent_OnTouch (Obj: TObject; Act,Cnt: integer; X1,Y1,X2,Y2: single);
     Procedure GenEvent_OnRender(Obj: TObject; EventType, w, h: integer);
@@ -2674,11 +2674,15 @@ end;
 // srcFile  'test.txt'
 // outFile  '/data/data/com/kredix/files/test.txt'
 Function  Asset_SaveToFile(srcFile, outFile : String) : Boolean;
- begin
+begin
+  Result := false;
+
+  if(gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
   Result := jni_func_tt_out_z(gApp.Jni.jEnv,gApp.Jni.jThis, 'assetSaveToFile', srcFile, outFile);
 
   Result := FileExists(outFile);
- end;
+end;
 
 // PkgName  '/data/app/com/kredix-1.apk'
 // srcFile  'assets/test.txt'
@@ -2717,7 +2721,7 @@ begin
   Result:= 1;
 
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   case gApp.Screen.Style of
     ssSensor    : Result := 0;
@@ -2731,12 +2735,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnNewIntent) then Form.OnNewIntent(Form, intent);
 end;
 
@@ -2744,7 +2748,7 @@ end;
 Procedure Java_Event_pAppOnDestroy(env: PJNIEnv; this: jobject);
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 end;
 
 {
@@ -2761,12 +2765,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnActivityPause) then Form.OnActivityPause(Form);
 end;
 
@@ -2774,7 +2778,7 @@ end;
 Procedure Java_Event_pAppOnRestart(env: PJNIEnv; this: jobject);
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 end;
 
 {
@@ -2786,12 +2790,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnActivityResume) then Form.OnActivityResume(Form);
 end;
 
@@ -2801,12 +2805,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnActivityStart) then Form.OnActivityStart(Form);
 end;
 
@@ -2823,12 +2827,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnActivityStop) then Form.OnActivityStop(Form);
 end;
 
@@ -2839,15 +2843,13 @@ var
   CanClose: boolean;
 begin
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
-
-  Form.UpdateJNI(gApp);
 
   if Assigned(Form.OnBackButton) then
   begin
@@ -2874,13 +2876,11 @@ var
 begin
 
   gApp.Jni.jEnv := env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   Form := jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
-
-  Form.UpdateJNI(gApp);
 
   // Update width and height when rotating
   gApp.Screen.WH  := jSysInfo_ScreenWH(env, this);
@@ -2902,7 +2902,7 @@ var                   {rotate=1 --> device vertical/default position ; 2: device
 begin
 
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   Result := rotate;
 
@@ -2911,8 +2911,6 @@ begin
   Form := jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
-
-  Form.UpdateJNI(gApp);
 
   // Update width and height when rotating
   gApp.Screen.WH  := jSysInfo_ScreenWH(env, this);
@@ -2936,7 +2934,7 @@ end;
 Procedure Java_Event_pAppOnConfigurationChanged(env: PJNIEnv; this: jobject);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 end;
 
 Procedure Java_Event_pAppOnActivityResult(env: PJNIEnv; this: jobject;
@@ -2946,13 +2944,13 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnActivityResult) then Form.OnActivityResult(Form,requestCode,TAndroidResult(resultCode),intentData);
 end;
 
@@ -2962,13 +2960,13 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnViewClick) then Form.GenEvent_OnViewClick(jObjView, id);
 end;
 
@@ -2977,13 +2975,13 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnListItemClick) then Form.GenEvent_OnListItemClick(jObjAdapterView, jObjView, position, id);
 end;
 
@@ -2993,11 +2991,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnCreateOptionMenu) then Form.OnCreateOptionMenu(Form, jObjMenu);
 end;
 
@@ -3011,14 +3010,12 @@ begin
   prepareItems:= False;
 
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
-
-  Form.UpdateJNI(gApp);
 
   if Assigned(Form.OnPrepareOptionsMenu) then Form.OnPrepareOptionsMenu(Form, jObjMenu, menuSize, prepareItems);
 
@@ -3034,13 +3031,13 @@ begin
 
   prepareMoreItems:= True;
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnPrepareOptionsMenuItem) then Form.OnPrepareOptionsMenuItem(Form, jObjMenu, jObjMenuItem, itemIndex, prepareMoreItems);
   Result:= JBool(prepareMoreItems);
 end;
@@ -3056,14 +3053,13 @@ begin
 
   mute:= False;
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
 
   pasStr := '';
   if keyCodeString <> nil then
@@ -3093,15 +3089,13 @@ var
 begin
 
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if gApp.TopIndex < 0 then Exit;
 
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
 
   if not Assigned(Form) then Exit;
-
-  Form.UpdateJNI(gApp);
 
   pasStr := '';
   if itemCaption <> nil then
@@ -3121,11 +3115,12 @@ var
   Form: jForm;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
+
   if Assigned(Form.OnCreateContextMenu) then Form.OnCreateContextMenu(Form, jObjMenu);
 end;
 
@@ -3145,11 +3140,11 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
 
   pasStr := '';
   if itemCaption <> nil then
@@ -3169,11 +3164,11 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   if gApp.TopIndex < 0 then Exit;
   Form:= jForm(gApp.Forms.Stack[gApp.TopIndex].Form);
   if not Assigned(Form) then Exit;
-  Form.UpdateJNI(gApp);
 
   pasStr := '';
   if permission <> nil then
@@ -3195,14 +3190,11 @@ Procedure Java_Event_pOnDraw(env: PJNIEnv; this: jobject;
                              Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jView  then
   begin
-    jView(Obj).UpdateJNI(gApp);
-    jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnDraw(Obj);
   end;
 end;
@@ -3212,18 +3204,15 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jImageBtn then
   begin
-    jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
     jImageBtn(Obj).GenEvent_OnDown(Obj);
     exit;
   end else
   if Obj is jPanel then
   begin
-    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnDown(Obj);
     exit;
   end;
@@ -3235,19 +3224,16 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jImageBtn then
   begin
-    jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
     jImageBtn(Obj).GenEvent_OnUp(Obj);
     exit;
   end
   else
   if Obj is jPanel then
   begin
-    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnUp(Obj);
     exit;
   end;
@@ -3259,12 +3245,10 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jPanel then
   begin
-    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnDoubleClick(Obj);
     exit;
   end;
@@ -3276,44 +3260,37 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
   //------------------------------------------------------
 
   if not (Assigned(Obj)) then Exit;
   if Obj is jForm then
   begin
-    jForm(Obj).UpdateJNI(gApp);
     jForm(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jTextView then
   begin
-    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jEditText then
   begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jButton then
   begin
-    jForm(jButton(Obj).Owner).UpdateJNI(gApp);
     jButton(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jCheckBox then
   begin
-    jForm(jCheckBox(Obj).Owner).UpdateJNI(gApp);
     jCheckBox(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jRadioButton then
   begin
-    jForm(jRadioButton(Obj).Owner).UpdateJNI(gApp);
     jRadioButton(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
@@ -3324,19 +3301,16 @@ begin
   end;
   if Obj is jImageBtn then
   begin
-    jForm(jImageBtn(Obj).Owner).UpdateJNI(gApp);
     jImageBtn(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jImageView then
   begin
-    jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
     jImageView(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
   if Obj is jPanel then
   begin
-    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
@@ -3347,7 +3321,6 @@ begin
 
   //----update global "gApp": to whom it may concern------
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
   //------------------------------------------------------
 
@@ -3355,21 +3328,18 @@ begin
 
   if Obj is jWebView then  //need fix here ... handling long clicked!
   begin
-    jForm(jWebView(Obj).Owner).UpdateJNI(gApp);
     jWebView(Obj).GenEvent_OnLongClick(Obj);
     Exit;
   end;
 
   if Obj is jTextView then
   begin
-    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnLongClick(Obj);
     Exit;
   end;
 
   if Obj is jPanel then
   begin
-    jForm(jPanel(Obj).Owner).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnLongClick(Obj);
     Exit;
   end;
@@ -3379,12 +3349,10 @@ end;
 procedure Java_Event_pOnRunOnUiThread(env:PJNIEnv;this:JObject;Sender:TObject;tag:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jForm then
   begin
-    jForm(jForm(Sender).Owner).UpdateJNI(gApp);
     jForm(Sender).GenEvent_OnRunOnUiThread(Sender,tag);
   end;
 end;
@@ -3397,12 +3365,10 @@ end;
 Procedure Java_Event_pOnClickWidgetItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer; checked: jboolean);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListView then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnClickWidgetItem(Obj, index, Boolean(checked)); Exit;
   end;
 end;
@@ -3411,12 +3377,10 @@ end;
 procedure Java_Event_pOnClickImageItem(env: PJNIEnv; this: jobject; Obj: TObject;index: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListView then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnClickImageItem(Obj, index); Exit;
   end;
 end;
@@ -3424,36 +3388,30 @@ end;
 procedure Java_Event_pOnBeforeDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListView then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jTextView then
   begin
-    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jEditText then
   begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jButton then
   begin
-    jForm(jButton(Obj).Owner).UpdateJNI(gApp);
     jButton(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     jAutoTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
   end;
 end;
@@ -3461,36 +3419,30 @@ end;
 procedure Java_Event_pOnAfterDispatchDraw(env: PJNIEnv; this: jobject; Obj: TObject; canvas: JObject; tag: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListView then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jTextView then
   begin
-    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jEditText then
   begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jButton then
   begin
-    jForm(jButton(Obj).Owner).UpdateJNI(gApp);
     jButton(Obj).GenEvent_OnAfterDispatchDraw(Obj, canvas, tag);
     Exit;
   end;
   if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     jAutoTextView(Obj).GenEvent_OnBeforeDispatchDraw(Obj, canvas, tag);
   end;
 end;
@@ -3498,18 +3450,15 @@ end;
 procedure Java_Event_pOnLayouting(env: PJNIEnv; this: jobject; Obj: TObject; changed: JBoolean);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jTextView then
   begin
-    jForm(jTextView(Obj).Owner).UpdateJNI(gApp);
     jTextView(Obj).GenEvent_OnOnLayouting(Obj, Boolean(changed));
     Exit;
   end;
   if Obj is jEditText then
   begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnOnLayouting(Obj, Boolean(changed));
     Exit;
   end;
@@ -3521,12 +3470,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3544,12 +3491,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3567,12 +3512,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3590,12 +3533,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3613,12 +3554,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3638,13 +3577,11 @@ begin
   result := 0;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outColor:= 0;
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3663,11 +3600,11 @@ begin
   result := nil;
 
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   outReturnCustomFontname:= '';
   if Sender is jListView then
   begin
-    jForm(jListView(Sender).Owner).UpdateJNI(gApp);
     jListView(Sender).GenEvent_OnListViewDrawItemCustomFont(Sender,position,GetPascalString(env,caption),outReturnCustomFontname);
   end;
   Result:= Get_jString(outReturnCustomFontname);
@@ -3682,13 +3619,11 @@ begin
   result := 0;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outColor:= 0;
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3709,13 +3644,11 @@ begin
   result := nil;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outText:= '';
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3735,13 +3668,11 @@ begin
   result := 0;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outColor:= 0;
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnDrawItemBackgroundColor(Obj, index, outColor);
   end;
   Result:= outColor;
@@ -3756,13 +3687,11 @@ begin
   result := nil;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outBitmap:= nil;
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3783,13 +3712,11 @@ begin
   result := nil;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outBitmap:= nil;
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3804,12 +3731,10 @@ end;
 procedure Java_Event_pOnListViewScrollStateChanged(env: PJNIEnv; this: jobject; Obj: TObject; firstVisibleItem: integer; visibleItemCount: integer; totalItemCount: integer; lastItemReached: JBoolean);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     jListVIew(Obj).GenEvent_OnScrollStateChanged(Obj, firstVisibleItem, visibleItemCount, totalItemCount, Boolean(lastItemReached) );
   end;
 end;
@@ -3820,12 +3745,10 @@ var
  _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jListVIew then
   begin
-    jForm(jListVIew(Obj).Owner).UpdateJNI(gApp);
     pasCaption := '';
     if caption <> nil then
     begin
@@ -3842,7 +3765,6 @@ var
  _jBoolean: jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
@@ -3854,7 +3776,6 @@ begin
   end;
   if Obj is jEditText then
   begin
-     jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
      jEditText(Obj).GenEvent_OnChange(Obj, pasTxt, count);
   end;
 end;
@@ -3865,7 +3786,6 @@ var
   _jBoolean: jBoolean;
 begin
  gApp.Jni.jEnv:= env;
- //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
  if this <> nil then gApp.Jni.jThis := this;
 
  if not Assigned(Obj) then Exit;
@@ -3877,7 +3797,6 @@ begin
  end;
  if Obj is jEditText then
  begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnChanged(Obj, pasTxt, count);
  end;
 end;
@@ -3886,28 +3805,24 @@ end;
 Procedure Java_Event_pOnEnter(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
 
   if Obj is jEditText then
   begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnEnter(Obj);
     Exit;
   end;
 
   if Obj is jComboEditText then
   begin
-    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
     jComboEditText(Obj).GenEvent_OnEnter(Obj);
     Exit;
   end;
 
   if Obj is jAutoTextView then
   begin
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     jAutoTextView(Obj).GenEvent_OnEnter(Obj);
     Exit;
   end;
@@ -3918,14 +3833,12 @@ end;
 Procedure Java_Event_pOnBackPressed(env: PJNIEnv; this: jobject; Obj: TObject);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
 
   if Obj is jEditText then
   begin
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnBackPressed(Obj);
     Exit;
   end;
@@ -3933,26 +3846,9 @@ begin
   //by Tomash
   if Obj is jDialogProgress then
   begin
-    //jForm(jDialogProgress(Obj).Owner).UpdateJNI(gApp);
     with jDialogProgress(Obj) do if Assigned(FOnBackPressed) then FOnBackPressed(Obj);
     Exit;
   end;
-
-
-
-  (*if Obj is jComboEditText then
-  begin
-    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
-    jComboEditText(Obj).GenEvent_OnEnter(Obj);
-    Exit;
-  end;
-
-  if Obj is jAutoTextView then
-  begin
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
-    jAutoTextView(Obj).GenEvent_OnEnter(Obj);
-    Exit;
-  end; *)
 
 end;
 
@@ -3961,7 +3857,6 @@ Var
   Timer : jTimer;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if App_IsLock then Exit;
@@ -3972,8 +3867,6 @@ begin
   Timer := jTimer(Obj);
 
   if not (Timer.Enabled) then Exit;
-
-  Timer.jParent.UpdateJNI(gApp);
 
   if Timer.jParent.FormState = fsFormClose then Exit;
 
@@ -3986,25 +3879,21 @@ procedure Java_Event_pOnTouch(env: PJNIEnv; this: jobject;
                               act,cnt: integer; x1,y1,x2,y2 : single);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj)  then Exit;
   if Obj is jGLViewEvent  then
   begin
-    jForm(jGLViewEvent(Obj).Owner).UpdateJNI(gApp);
     jGLViewEvent(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
   if Obj is jView then
   begin
-    jForm(jView(Obj).Owner).UpdateJNI(gApp);
     jView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
   if Obj is jImageView then
   begin
-    jForm(jImageView(Obj).Owner).UpdateJNI(gApp);
     jImageView(Obj).GenEvent_OnTouch(Obj,act,cnt,x1,y1,x2,y2);
     Exit;
   end;
@@ -4013,13 +3902,11 @@ end;
 procedure Java_Event_pOnGLRenderer(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jGLViewEvent  then
   begin
-    jForm(jGLViewEvent(Obj).Owner).UpdateJNI(gApp);
     jGLViewEvent(Obj).GenEvent_OnRender(Obj, EventType, w, h);
   end;
 end;
@@ -4027,14 +3914,12 @@ end;
 procedure Java_Event_pOnGLRenderer1(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
 
   if not Assigned(Obj) then Exit;
   if Obj is jGLViewEvent  then
   begin
-    jForm(jGLViewEvent(Obj).Owner).UpdateJNI(gApp);
     jGLViewEvent(Obj).GenEvent_OnRender(Obj, EventType, w, h);
   end;
 end;
@@ -4042,13 +3927,11 @@ end;
 procedure Java_Event_pOnGLRenderer2(env: PJNIEnv; this: jobject; Obj: TObject; EventType, w, h: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jGLViewEvent  then
   begin
-    jForm(jGLViewEvent(Obj).Owner).UpdateJNI(gApp);
     jGLViewEvent(Obj).GenEvent_OnRender(Obj, EventType, w, h);
   end;
 end;
@@ -4066,7 +3949,6 @@ begin
   result := 0;
 
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   Result     := cjWebView_Act_Continue;
@@ -4094,7 +3976,6 @@ var
   pasWebView : jWebView;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   pasWebView := jWebView(webview);
@@ -4107,12 +3988,10 @@ end;
 procedure Java_Event_pOnWebViewEvaluateJavascriptResult(env:PJNIEnv;this:JObject;Sender:TObject;data:jString);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jWebView then
   begin
-    jForm(jWebView(Sender).Owner).UpdateJNI(gApp);
     jWebView(Sender).GenEvent_OnEvaluateJavascriptResult(Sender,GetPascalString(env,data));
   end;
 end;
@@ -4124,41 +4003,15 @@ begin
   result := 0;
 
   gApp.Jni.jEnv:= env;
-  //gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis := this;
 
   outReturn:=False;
   if Sender is jWebView then
   begin
-    jForm(jWebView(Sender).Owner).UpdateJNI(gApp);
     jWebView(Sender).GenEvent_OnWebViewReceivedSslError(Sender,GetPascalString(env,error),primaryError,outReturn);
   end;
   Result:=JBool(outReturn);
 end;
-
-
-{
-procedure Java_Event_pOnAsyncEvent(env: PJNIEnv; this: jobject;
-                                      Obj: TObject; EventType,Progress : integer);
-begin
-  gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
-
-  if not Assigned(Obj) then Exit;
-  if Obj is jAsyncTask then
-  begin
-     case EventType of
-       cjTask_Before: jAsyncTask(Obj).AsyncTaskState:= atsBefore;
-       cjTask_Progress: jAsyncTask(Obj).AsyncTaskState:= atsProgress;
-       cjTask_Post: jAsyncTask(Obj).AsyncTaskState:= atsPost ;
-       cjTask_BackGround: jAsyncTask(Obj).AsyncTaskState:= atsInBackground;
-     end;
-     jAsyncTask(Obj).UpdateJNI(gApp);
-     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
-     jAsyncTask(Obj).GenEvent_OnAsyncEvent(Obj,EventType,Progress);
-  end
-end;
- }
 
 function Java_Event_pOnAsyncEventDoInBackground(env: PJNIEnv; this: jobject; Obj : TObject; Progress : integer): JBoolean;
 var
@@ -4168,15 +4021,12 @@ begin
 
   doing:= True;  //doing!
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
      jAsyncTask(Obj).AsyncTaskState:= atsInBackground;
-     jAsyncTask(Obj).UpdateJNI(gApp);
-     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
      jAsyncTask(Obj).GenEvent_OnAsyncEventDoInBackground(Obj, Progress, doing);
      Result:=  JBool(doing);
   end
@@ -4190,15 +4040,12 @@ begin
 
   progressUpdate:= Progress + 1;
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
      jAsyncTask(Obj).AsyncTaskState:= atsProgress;
-     jAsyncTask(Obj).UpdateJNI(gApp);
-     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
      jAsyncTask(Obj).GenEvent_OnAsyncEventProgressUpdate(Obj, Progress, progressUpdate);
      Result:=  progressUpdate;
   end
@@ -4212,15 +4059,12 @@ begin
 
   startProgress:= 0;
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
      jAsyncTask(Obj).AsyncTaskState:= atsBefore;
-     jAsyncTask(Obj).UpdateJNI(gApp);
-     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
      jAsyncTask(Obj).GenEvent_OnAsyncEventPreExecute(Obj, startProgress);
      Result:= startProgress;
   end
@@ -4229,15 +4073,12 @@ end;
 procedure Java_Event_pOnAsyncEventPostExecute(env: PJNIEnv; this: jobject; Obj: TObject; Progress: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jAsyncTask then
   begin
      jAsyncTask(Obj).AsyncTaskState:= atsPost ;
-     jAsyncTask(Obj).UpdateJNI(gApp);
-     jForm(jAsyncTask(Obj).Owner).UpdateJNI(gApp);
      jAsyncTask(Obj).GenEvent_OnAsyncEventPostExecute(Obj, Progress);
   end
 end;
@@ -4250,7 +4091,6 @@ var
   i:integer;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
@@ -4268,7 +4108,6 @@ begin
       SetLength(pascontent,sizeArray);
       for i:=1 to sizeArray do pascontent[i]:=Chr(arrayResult[i-1]);
     end;
-    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
     jHttpClient(Obj).GenEvent_OnHttpClientContentResult(Obj, pascontent);
   end;
 
@@ -4277,13 +4116,11 @@ end;
 procedure Java_Event_pOnHttpClientUploadProgress(env: PJNIEnv; this: jobject; Obj: TObject; progress: int64);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jHttpClient then
   begin
-     jHttpClient(Obj).UpdateJNI(gApp);
      jHttpClient(Obj).GenEvent_OnHttpClientUploadProgress(Obj, progress);
   end
 end;
@@ -4296,7 +4133,6 @@ var
   _jBoolean  : jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
@@ -4315,7 +4151,6 @@ begin
       _jBoolean := JNI_False;
       pasResponse:= String(env^.GetStringUTFChars(Env,response,@_jBoolean) );
     end;
-    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
     jHttpClient(Obj).GenEvent_OnHttpClientUploadFinished(Obj, code, pasResponse, pasfullFileName);
   end;
 end;
@@ -4326,7 +4161,6 @@ var
   _jBoolean  : jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
@@ -4339,7 +4173,6 @@ begin
       _jBoolean := JNI_False;
       pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
     end;
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnOnFocus(Obj, pascontent);
   end;
 end;
@@ -4350,7 +4183,6 @@ var
   _jBoolean  : jBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
@@ -4363,7 +4195,6 @@ begin
       _jBoolean := JNI_False;
       pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
     end;
-    jForm(jEditText(Obj).Owner).UpdateJNI(gApp);
     jEditText(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
   end;
 
@@ -4375,7 +4206,6 @@ begin
       _jBoolean := JNI_False;
       pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
     end;
-    jForm(jComboEditText(Obj).Owner).UpdateJNI(gApp);
     jComboEditText(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
   end;
 
@@ -4387,7 +4217,6 @@ begin
       _jBoolean := JNI_False;
       pascontent    := String( env^.GetStringUTFChars(Env,content,@_jBoolean) );
     end;
-    jForm(jAutoTextView(Obj).Owner).UpdateJNI(gApp);
     jAutoTextView(Obj).GenEvent_OnOnLostFocus(Obj, pascontent);
   end;
 end;
@@ -4395,13 +4224,11 @@ end;
 procedure Java_Event_pOnHttpClientCodeResult(env: PJNIEnv; this: jobject; Obj: TObject; code: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Obj) then Exit;
   if Obj is jHttpClient then
   begin
-    jForm(jHttpClient(Obj).Owner).UpdateJNI(gApp);
     jHttpClient(Obj).GenEvent_OnHttpClientCodeResult(Obj, code);
   end;
 end;
@@ -4413,12 +4240,10 @@ procedure Java_Event_pOnScrollViewChanged(env: PJNIEnv; this: jobject; Obj: TObj
                                                                                       onPosition: integer;scrolldiff: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jScrollView then
   begin
-    jForm(jScrollView(Obj).Owner).UpdateJNI(gApp);
     jScrollView(Obj).GenEvent_OnChanged(Obj, currenthorizontal, currentVertical, previousHorizontal, previousVertical, onPosition, scrolldiff);
   end;
 end;
@@ -4430,12 +4255,10 @@ procedure Java_Event_pOnHorScrollViewChanged(env: PJNIEnv; this: jobject; Obj: T
                                                                                       onPosition: integer;scrolldiff: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jHorizontalScrollView then
   begin
-    jForm(jHorizontalScrollView(Obj).Owner).UpdateJNI(gApp);
     jHorizontalScrollView(Obj).GenEvent_OnChanged(Obj, currenthorizontal, currentVertical, previousHorizontal, previousVertical, onPosition, scrolldiff);
   end;
 end;
@@ -4443,12 +4266,10 @@ end;
 procedure Java_Event_pOnScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jScrollView then
   begin
-    jForm(jScrollView(Sender).Owner).UpdateJNI(gApp);
     jScrollView(Sender).GenEvent_OnScrollViewInnerItemClick(Sender,itemId);
   end;
 end;
@@ -4456,12 +4277,10 @@ end;
 procedure Java_Event_pOnScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jScrollView then
   begin
-    jForm(jScrollView(Sender).Owner).UpdateJNI(gApp);
     jScrollView(Sender).GenEvent_OnScrollViewInnerItemLongClick(Sender,index,itemId);
   end;
 end;
@@ -4469,12 +4288,10 @@ end;
 procedure Java_Event_pOnHorScrollViewInnerItemClick(env:PJNIEnv;this:JObject;Sender:TObject;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jHorizontalScrollView then
   begin
-    jForm(jHorizontalScrollView(Sender).Owner).UpdateJNI(gApp);
     jHorizontalScrollView(Sender).GenEvent_OnScrollViewInnerItemClick(Sender,itemId);
   end;
 end;
@@ -4482,12 +4299,10 @@ end;
 procedure Java_Event_pOnHorScrollViewInnerItemLongClick(env:PJNIEnv;this:JObject;Sender:TObject;index:integer;itemId:integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jHorizontalScrollView then
   begin
-    jForm(jHorizontalScrollView(Sender).Owner).UpdateJNI(gApp);
     jHorizontalScrollView(Sender).GenEvent_OnScrollViewInnerItemLongClick(Sender,index,itemId);
   end;
 end;
@@ -4495,12 +4310,10 @@ end;
 procedure Java_Event_pOnSqliteDataAccessAsyncPostExecute(env:PJNIEnv;this:JObject;Sender:TObject;count:integer;msgResult:jString);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jSqliteDataAccess then
   begin
-    jForm(jSqliteDataAccess(Sender).Owner).UpdateJNI(gApp);
     jSqliteDataAccess(Sender).GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender,count,GetPStringAndDeleteLocalRef(env,msgResult));
   end;
 end;
@@ -4539,14 +4352,14 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jTextView.Init(refApp: jApp);
+procedure jTextView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -4554,25 +4367,25 @@ begin
 
   if not FInitialized then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject := jTextView_Create(FjEnv, FjThis, Self);
+   FjObject := jTextView_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -4581,7 +4394,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -4589,14 +4402,14 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -4619,7 +4432,7 @@ begin
    SetTextAlignment(FTextAlignment);
 
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
    if FEnabled = False then
      SetEnabled(False);
@@ -4627,7 +4440,7 @@ begin
    SetFontFace(FFontFace);
    SetTextTypeFace(FTextTypeFace);
 
-   View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject, FVisible);
   end;
 
 end;
@@ -4636,41 +4449,41 @@ procedure jTextView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jTextView.RemoveFromViewParent;
 begin
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTextView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jTextView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 procedure jTextView.SetEnabled(Value: Boolean);
 begin
   FEnabled := Value;
   if FjObject = nil then exit;
-  jni_proc_z(FjEnv, FjObject, 'SetEnabled', FEnabled);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnabled', FEnabled);
 end;
 
 function jTextView.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jni_func_out_h(FjEnv, FjObject, 'getText' );
+     Result:= jni_func_out_h(gApp.jni.jEnv, FjObject, 'getText' );
 end;
 
 procedure jTextView.SetText(Value: string);
@@ -4678,7 +4491,7 @@ begin
   inherited SetText(Value);
   if FjObject = nil then exit;
 
-  jni_proc_h(FjEnv, FjObject, 'setText', Value);
+  jni_proc_h(gApp.jni.jEnv, FjObject, 'setText', Value);
 end;
 
 procedure jTextView.SetFontColor(Value: TARGBColorBridge);
@@ -4688,7 +4501,7 @@ begin
 
  if (FFontColor <> colbrDefault) then
  begin
-  jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
  end;
 end;
 
@@ -4698,7 +4511,7 @@ begin
   if FjObject = nil then exit;
 
   if(FFontSize > 0) then
-    jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
+    jni_proc_f(gApp.jni.jEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 procedure jTextView.SetFontFace(AValue: TFontFace); 
@@ -4706,7 +4519,7 @@ begin
  FFontFace:= AValue;
  if FjObject = nil then exit;
 
- jni_proc_i(FjEnv, FjObject, 'SetFontFace', Ord(FFontFace));
+ jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontFace', Ord(FFontFace));
 end;
 
 procedure jTextView.SetTextTypeFace(Value: TTextTypeFace);
@@ -4714,7 +4527,7 @@ begin
   FTextTypeFace:= Value ;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextTypeFace', Ord(FTextTypeFace));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextTypeFace', Ord(FTextTypeFace));
 end;
 
 procedure jTextView.UpdateLayout();
@@ -4725,7 +4538,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 // LORDMAN 2013-08-12
@@ -4734,13 +4547,13 @@ begin
   FTextAlignment:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextAlignment', Ord(FTextAlignment));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextAlignment', Ord(FTextAlignment));
 end;
 
 procedure jTextView.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 // Event : Java -> Pascal
@@ -4758,21 +4571,21 @@ procedure jTextView.Append(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-   jni_proc_t(FjEnv, FjObject, 'Append', _txt);
+   jni_proc_t(gApp.jni.jEnv, FjObject, 'Append', _txt);
 end;
 
 procedure jTextView.AppendLn(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AppendLn', _txt);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AppendLn', _txt);
 end;
 
 procedure jTextView.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'CopyToClipboard');
+     jni_proc(gApp.jni.jEnv, FjObject, 'CopyToClipboard');
 end;
 
 procedure jTextView.PasteFromClipboard();
@@ -4780,7 +4593,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc(FjEnv, FjObject, 'PasteFromClipboard');
+     jni_proc(gApp.jni.jEnv, FjObject, 'PasteFromClipboard');
   end;
 end;
 
@@ -4790,7 +4603,7 @@ begin
   FFontSizeUnit:=_unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 Procedure jTextView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
@@ -4816,7 +4629,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jTextView.GetHeight: integer;
@@ -4827,105 +4640,105 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jTextView.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jTextView.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jTextView.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jTextView.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jTextView.SetRotation(angle: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRotation', angle);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRotation', angle);
 end;
 
 procedure jTextView.SetShadowLayer(_radius: single; _dx: single; _dy: single; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTextView_SetShadowLayer(FjEnv, FjObject, _radius ,_dx ,_dy , GetARGB(FCustomColor, _color));
+     jTextView_SetShadowLayer(gApp.jni.jEnv, FjObject, _radius ,_dx ,_dy , GetARGB(FCustomColor, _color));
 end;
 
 procedure jTextView.SetShaderLinearGradient(_startColor: TARGBColorBridge; _endColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetShaderLinearGradient', GetARGB(FCustomColor, _startColor) ,GetARGB(FCustomColor, _endColor));
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetShaderLinearGradient', GetARGB(FCustomColor, _startColor) ,GetARGB(FCustomColor, _endColor));
 end;
 
 procedure jTextView.SetShaderRadialGradient(_centerColor: TARGBColorBridge; _edgeColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetShaderRadialGradient', GetARGB(FCustomColor, _centerColor) ,GetARGB(FCustomColor, _edgeColor));
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetShaderRadialGradient', GetARGB(FCustomColor, _centerColor) ,GetARGB(FCustomColor, _edgeColor));
 end;
 
 procedure jTextView.SetShaderSweepGradient(_color1: TARGBColorBridge; _color2: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetShaderSweepGradient', GetARGB(FCustomColor, _color1) ,GetARGB(FCustomColor, _color2));
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetShaderSweepGradient', GetARGB(FCustomColor, _color1) ,GetARGB(FCustomColor, _color2));
 end;
 
 procedure jTextView.SetTextDirection(_textDirection: TTextDirection);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetTextDirection', Ord(_textDirection));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextDirection', Ord(_textDirection));
 end;
 
 procedure jTextView.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jTextView.SetTextIsSelectable(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetTextIsSelectable', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetTextIsSelectable', _value);
 end;
 
 procedure jTextView.SetScrollingText();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetScrollingText');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetScrollingText');
 end;
 
 procedure jTextView.SetTextAsLink(_linkText: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetTextAsLink', _linkText);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetTextAsLink', _linkText);
 end;
 
 //use: SetTextAsLink('<a href=''http://www.google.com''>Go to Google</a>', colbrRed);
@@ -4933,28 +4746,28 @@ procedure jTextView.SetTextAsLink(_linkText: string; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetTextAsLink', _linkText , GetARGB(FCustomColor, _color));
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetTextAsLink', _linkText , GetARGB(FCustomColor, _color));
 end;
 
 procedure jTextView.SetBackgroundAlpha(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetBackgroundAlpha', _alpha);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetBackgroundAlpha', _alpha);
 end;
 
 procedure jTextView.MatchParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'MatchParent');
+     jni_proc(gApp.jni.jEnv, FjObject, 'MatchParent');
 end;
 
 procedure jTextView.WrapParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'WrapParent');
+     jni_proc(gApp.jni.jEnv, FjObject, 'WrapParent');
 end;
 
 procedure jTextView.ClearLayout();
@@ -4965,16 +4778,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -4984,7 +4797,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jTextView.SetAllCaps(_value: boolean);
@@ -4993,21 +4806,21 @@ begin
   FAllCaps:= _value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetAllCaps', _value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllCaps', _value);
 end;
 
 procedure jTextView.SetTextAsHtml(_htmlText: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetTextAsHtml', _htmlText);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetTextAsHtml', _htmlText);
 end;
 
 procedure jTextView.SetUnderline( _on : boolean );
 begin
  //in designing component state: set value here...
  if FInitialized then
-  jni_proc_z( FjEnv, FjObject, 'SetUnderline', _on);
+  jni_proc_z( gApp.jni.jEnv, FjObject, 'SetUnderline', _on);
 end;
 
 procedure jTextView.BringToFront;
@@ -5016,7 +4829,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -5024,7 +4837,7 @@ procedure jTextView.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 //------------------------------------------------------------------------------
@@ -5075,39 +4888,39 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jEditText.Init(refApp: jApp);
+procedure jEditText.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject := jEditText_Create(FjEnv, FjThis, Self);
+   FjObject := jEditText_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+    View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -5116,7 +4929,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -5124,14 +4937,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -5159,12 +4972,12 @@ begin
    if FMaxTextLength >= 0 then
     SetTextMaxLength(FMaxTextLength);
 
-   jni_proc(FjEnv, FjObject, 'setScrollerEx' );
+   jni_proc(gApp.jni.jEnv, FjObject, 'setScrollerEx' );
 
    SetHorizontalScrollBar(FHorizontalScrollBar);
    SetVerticalScrollBar(FVerticalScrollBar);
 
-   jni_proc_z(FjEnv, FjObject, 'setHorizontallyScrolling', FWrappingLine);
+   jni_proc_z(gApp.jni.jEnv, FjObject, 'setHorizontallyScrolling', FWrappingLine);
 
    if FCapSentence then
     SetCapSentence(FCapSentence);
@@ -5199,9 +5012,9 @@ begin
    end;
 
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv,  FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv,  gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
 
    DispatchOnChangeEvent(True);
    DispatchOnChangedEvent(True);
@@ -5212,52 +5025,52 @@ Procedure jEditText.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jEditText.RemoveFromViewParent;
 begin
 if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jEditText.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jEditText.setColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jEditText.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 function jEditText.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jni_func_out_t(FjEnv, FjObject, 'GetText');;
+     Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetText');;
 end;
 
 procedure jEditText.SetAllLowerCase( _lowercase : boolean );
 begin
  if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllLowerCase', _lowercase);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllLowerCase', _lowercase);
 end;
 
 procedure jEditText.SetAllUpperCase( _uppercase : boolean );
 begin
  if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllUpperCase', _uppercase);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllUpperCase', _uppercase);
 end;
 
 procedure jEditText.SetText(Value: string);
@@ -5266,7 +5079,7 @@ begin
   if not FInitialized then exit;
 
   if Value <> '' then
-   jni_proc_h(FjEnv, FjObject, 'setText', Value)
+   jni_proc_h(gApp.jni.jEnv, FjObject, 'setText', Value)
   else
    self.Clear;
 end;
@@ -5277,7 +5090,7 @@ begin
   if FjObject = nil then exit;
 
   if(FFontColor <> colbrDefault) then
-   jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+   jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jEditText.SetFontSize(Value: DWord);
@@ -5286,7 +5099,7 @@ begin
   if FjObject = nil then exit;
 
   if(FFontSize > 0) then
-   jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
+   jni_proc_f(gApp.jni.jEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 procedure jEditText.SetFontFace(AValue: TFontFace); 
@@ -5295,7 +5108,7 @@ begin
   FFontFace:= AValue;
   if FjObject = nil then exit;
 
-   jni_proc_ii( FjEnv, FjObject,'setFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+   jni_proc_ii( gApp.jni.jEnv, FjObject,'setFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end; 
 
 procedure jEditText.SetTextTypeFace(Value: TTextTypeFace); 
@@ -5304,7 +5117,7 @@ begin
  FTextTypeFace:= Value;
  if FjObject = nil then exit;
 
- jni_proc_ii( FjEnv, FjObject,'setFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+ jni_proc_ii( gApp.jni.jEnv, FjObject,'setFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end; 
 
 procedure jEditText.SetHintTextColor(Value: TARGBColorBridge);
@@ -5313,7 +5126,7 @@ begin
  FHintTextColor:= Value;
  if FjObject = nil then exit;
 
- jni_proc_i(FjEnv, FjObject, 'setHintTextColor', GetARGB(FCustomColor, FHintTextColor));
+ jni_proc_i(gApp.jni.jEnv, FjObject, 'setHintTextColor', GetARGB(FCustomColor, FHintTextColor));
 end;
 
 Procedure jEditText.SetHint(Value : String);
@@ -5321,14 +5134,14 @@ begin
   FHint:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_h(FjEnv, FjObject, 'setHint', FHint);
+  jni_proc_h(gApp.jni.jEnv, FjObject, 'setHint', FHint);
 end;
 
 // LORDMAN - 2013-07-26
 Procedure jEditText.SetFocus;
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetFocus' );
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetFocus' );
 end;
 
 {
@@ -5341,14 +5154,14 @@ mgr.hideSoftInputFromWindow(myView.getWindowToken(), 0);
 Procedure jEditText.ImmShow;
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'InputMethodShow' );
+     jni_proc(gApp.jni.jEnv, FjObject, 'InputMethodShow' );
 end;
 
 // LORDMAN - 2013-07-26
 Procedure jEditText.ImmHide;
 begin
   if FInitialized then
-      jni_proc(FjEnv, FjObject, 'InputMethodHide' );
+      jni_proc(gApp.jni.jEnv, FjObject, 'InputMethodHide' );
 end;
 
 Procedure jEditText.ShowSoftInput();
@@ -5368,7 +5181,7 @@ begin
   FInputTypeEx:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetInputTypeEx', InputTypeToStrEx(FInputTypeEx));
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetInputTypeEx', InputTypeToStrEx(FInputTypeEx));
 end;
 
 // LORDMAN - 2013-07-26
@@ -5378,7 +5191,7 @@ begin
   if FMaxTextLength < -1 then  FMaxTextLength:= -1; // reset/default: no limited !!
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'MaxLength', FMaxTextLength);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'MaxLength', FMaxTextLength);
 end;
 
 Procedure jEditText.SetMaxLines(Value: DWord);
@@ -5386,7 +5199,7 @@ begin
   FMaxLines:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'setMaxLines', Value);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setMaxLines', Value);
 
   if FMaxLines < 2 then
      SetSingleLine(True);
@@ -5397,8 +5210,8 @@ begin
   FSingleLine:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setSingleLine', Value);
-  jni_proc_i(FjEnv, FjObject, 'setMaxLines', 1);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setSingleLine', Value);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setMaxLines', 1);
 end;
 
 procedure jEditText.SetScrollBarStyle(Value: TScrollBarStyle);
@@ -5407,7 +5220,7 @@ begin
   if FjObject = nil then exit;
 
   if Value <> scrNone then
-   jni_proc_i(FjEnv, FjObject, 'setScrollBarStyle', GetScrollBarStyle(Value));
+   jni_proc_i(gApp.jni.jEnv, FjObject, 'setScrollBarStyle', GetScrollBarStyle(Value));
 
 end;
 
@@ -5416,7 +5229,7 @@ begin
   FHorizontalScrollBar:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setHorizontalScrollBarEnabled', Value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setHorizontalScrollBarEnabled', Value);
 end;
 
 procedure jEditText.SetVerticalScrollBar(Value: boolean);
@@ -5424,20 +5237,20 @@ begin
   FVerticalScrollBar:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setVerticalScrollBarEnabled', Value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setVerticalScrollBarEnabled', Value);
 end;
 
 procedure jEditText.SetScrollBarFadingEnabled(Value: boolean);
 begin
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setScrollbarFadingEnabled', Value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setScrollbarFadingEnabled', Value);
 end;
 
 procedure jEditText.SetMovementMethod;
 begin
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'SetMovementMethod' );
+    jni_proc(gApp.jni.jEnv, FjObject, 'SetMovementMethod' );
 end;
 
 // LORDMAN - 2013-07-26
@@ -5446,14 +5259,14 @@ begin
   Result.x := 0;
   Result.y := 0;
   if FInitialized then
-     jEditText_GetCursorPos(FjEnv, FjObject ,Result.x,Result.y);
+     jEditText_GetCursorPos(gApp.jni.jEnv, FjObject ,Result.x,Result.y);
 end;
 
 // LORDMAN - 2013-07-26
 Procedure jEditText.SetCursorPos(Value: TXY);
 begin
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'setCursorPos', Value.X,Value.Y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'setCursorPos', Value.X,Value.Y);
 end;
 
 // LORDMAN 2013-08-12
@@ -5462,7 +5275,7 @@ begin
   FTextAlignment:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextAlignment', Ord(FTextAlignment));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextAlignment', Ord(FTextAlignment));
 end;
 
 // Event : Java -> Pascal
@@ -5514,48 +5327,48 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jEditText.AllCaps;
 begin
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'AllCaps');
+    jni_proc(gApp.jni.jEnv, FjObject, 'AllCaps');
 end;
 
 procedure jEditText.DispatchOnChangeEvent(value: boolean);
 begin
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'DispatchOnChangeEvent', value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnChangeEvent', value);
 end;
 
 procedure jEditText.DispatchOnChangedEvent(value: boolean);
 begin
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'DispatchOnChangedEvent', value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnChangedEvent', value);
 end;
 
 procedure jEditText.Append(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'Append', _txt);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'Append', _txt);
 end;
 
 procedure jEditText.AppendLn(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AppendLn', _txt);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AppendLn', _txt);
 end;
 
 procedure jEditText.AppendTab();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'AppendTab');
+     jni_proc(gApp.jni.jEnv, FjObject, 'AppendTab');
 end;
 
 
@@ -5563,7 +5376,7 @@ procedure jEditText.SetImeOptions(_imeOption: TImeOptions);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetImeOptions', Ord(_imeOption));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetImeOptions', Ord(_imeOption));
 end;
 
 procedure jEditText.SetSoftInputOptions(_imeOption: TImeOptions);
@@ -5578,35 +5391,35 @@ begin
   FEditable:= enabled;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetEditable', enabled);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEditable', enabled);
 end;
 
 procedure jEditText.SetAcceptSuggestion(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAcceptSuggestion', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAcceptSuggestion', _value);
 end;
 
 procedure jEditText.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'CopyToClipboard');
+     jni_proc(gApp.jni.jEnv, FjObject, 'CopyToClipboard');
 end;
 
 procedure jEditText.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'PasteFromClipboard');
+     jni_proc(gApp.jni.jEnv, FjObject, 'PasteFromClipboard');
 end;
 
 procedure jEditText.Clear;
 begin
   if FjObject = nil then exit;
 
-  jni_proc(FjEnv, FjObject , 'Clear');
+  jni_proc(gApp.jni.jEnv, FjObject , 'Clear');
 end;
 
 procedure jEditText.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -5615,7 +5428,7 @@ begin
   FFontSizeUnit:= _unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 // by ADiV
@@ -5623,56 +5436,56 @@ procedure jEditText.SetSelection(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSelection', _value);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelection', _value);
 end;
 
 procedure jEditText.SetSelectAllOnFocus(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetSelectAllOnFocus', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetSelectAllOnFocus', _value);
 end;
 
 procedure jEditText.SelectAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SelectAll');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SelectAll');
 end;
 
 procedure jEditText.SetBackgroundByResIdentifier(_imgResIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
 end;
 
 procedure jEditText.SetBackgroundByImage(_image: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp(FjEnv, FjObject, 'SetBackgroundByImage', _image);
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'SetBackgroundByImage', _image);
 end;
 
 procedure jEditText.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image,Ord(_side));
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _image,Ord(_side));
 end;
 
 procedure jEditText.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jEditText.SetTextDirection(_textDirection: TTextDirection);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetTextDirection', Ord(_textDirection));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextDirection', Ord(_textDirection));
 end;
 
 Procedure jEditText.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);
@@ -5698,7 +5511,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jEditText.GetHeight: integer;
@@ -5709,21 +5522,21 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jEditText.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jEditText.RequestFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RequestFocus');
+     jni_proc(gApp.jni.jEnv, FjObject, 'RequestFocus');
 end;
 
 procedure jEditText.SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
@@ -5732,7 +5545,7 @@ begin
   FCloseSoftInputOnEnter:= _closeSoftInput;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetCloseSoftInputOnEnter', _closeSoftInput);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetCloseSoftInputOnEnter', _closeSoftInput);
 end;
 
 procedure jEditText.SetCapSentence(_capSentence: boolean);
@@ -5741,7 +5554,7 @@ begin
   FCapSentence:= _capSentence;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetCapSentence', _capSentence);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetCapSentence', _capSentence);
   // activate above setting
   SetInputTypeEx(FInputTypeEx);
 end;
@@ -5754,35 +5567,35 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetCaptureBackPressed', _capBackPressed);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetCaptureBackPressed', _capBackPressed);
 end;
 
 procedure jEditText.LoadFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'LoadFromFile', _path, _filename);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'LoadFromFile', _path, _filename);
 end;
 
 procedure jEditText.LoadFromFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'LoadFromFile', _filename);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'LoadFromFile', _filename);
 end;
 
 procedure jEditText.SaveToFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SaveToFile', _path ,_filename);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SaveToFile', _path ,_filename);
 end;
 
 procedure jEditText.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SaveToFile', _filename);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SaveToFile', _filename);
 end;
 
 procedure jEditText.ClearLayout();
@@ -5793,16 +5606,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -5812,49 +5625,49 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 procedure jEditText.SetSoftInputShownOnFocus(_show: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetSoftInputShownOnFocus', _show);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetSoftInputShownOnFocus', _show);
 end;
 
 procedure jEditText.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jEditText.SetRoundRadiusCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRoundRadiusCorner', _radius);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRoundRadiusCorner', _radius);
 end;
 
 procedure jEditText.SetRoundBorderColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRoundBorderColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRoundBorderColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jEditText.SetRoundBorderWidth(_strokeWidth: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRoundBorderWidth', _strokeWidth);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRoundBorderWidth', _strokeWidth);
 end;
 
 procedure jEditText.SetRoundBackgroundColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRoundBackgroundColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRoundBackgroundColor', GetARGB(FCustomColor, _color));
 end;
 
 
@@ -5864,21 +5677,21 @@ begin
   FActionIconIdentifier:=  _actionIconIdentifier;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetActionIconIdentifier', _actionIconIdentifier);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetActionIconIdentifier', _actionIconIdentifier);
 end;
 
 procedure jEditText.ShowActionIcon();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ShowActionIcon');
+     jni_proc(gApp.jni.jEnv, FjObject, 'ShowActionIcon');
 end;
 
 procedure jEditText.HideActionIcon();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'HideActionIcon');
+     jni_proc(gApp.jni.jEnv, FjObject, 'HideActionIcon');
 end;
 
 function jEditText.IsActionIconShowing(): boolean;
@@ -5886,7 +5699,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsActionIconShowing');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsActionIconShowing');
 end;
 
 function jEditText.GetTextLength(): int64;
@@ -5894,7 +5707,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_j(FjEnv, FjObject, 'GetTextLength');
+   Result:= jni_func_out_j(gApp.jni.jEnv, FjObject, 'GetTextLength');
 end;
 
 function jEditText.IsEmpty(): boolean;
@@ -5902,17 +5715,17 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsEmpty');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsEmpty');
 end;
 
 
 procedure Java_Event_pEditTextOnActionIconTouchUp(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   if Sender is jEditText then
   begin
-    jForm(jEditText(Sender).Owner).UpdateJNI(gApp);
     jEditText(Sender).GenEvent_EditTextOnActionIconTouchUp(Sender,GetPStringAndDeleteLocalRef(env,textContent));
   end;
 end;
@@ -5920,10 +5733,10 @@ end;
 procedure Java_Event_pEditTextOnActionIconTouchDown(env:PJNIEnv;this:JObject;Sender:TObject;textContent:jString);
 begin
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
+
   if Sender is jEditText then
   begin
-    jForm(jEditText(Sender).Owner).UpdateJNI(gApp);
     jEditText(Sender).GenEvent_EditTextOnActionIconTouchDown(Sender,GetPStringAndDeleteLocalRef(env,textContent));
   end;
 end;
@@ -5932,7 +5745,7 @@ procedure jEditText.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 procedure jEditText.GenEvent_EditTextOnActionIconTouchUp(Sender:TObject;textContent:string);
@@ -5972,40 +5785,40 @@ begin
    begin
      if FjObject  <> nil then
      begin
-       jni_free(FjEnv, FjObject );
+       jni_free(gApp.jni.jEnv, FjObject );
        FjObject := nil;
      end;
    end;
    inherited Destroy;
 end;
 
-procedure jButton.Init(refApp: jApp);
+procedure jButton.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); // set FjPRLayout:= jForm.View [default] ...
+   inherited Init; // set FjPRLayout:= jForm.View [default] ...
 
-   FjObject := jButton_Create(FjEnv,FjThis,Self);
+   FjObject := jButton_Create(gApp.jni.jEnv,gApp.jni.jThis,Self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6014,7 +5827,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-       View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -6022,14 +5835,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6050,9 +5863,9 @@ begin
    SetText(FText);
 
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
 
    if FEnabled = False then
      SetEnabled(False);
@@ -6063,20 +5876,20 @@ procedure jButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jButton.RemoveFromViewParent;
 begin
 if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jButton.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jButton.SetAllCaps(AValue: Boolean);
@@ -6084,28 +5897,28 @@ begin
   FAllCaps := AValue;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetAllCaps', FAllCaps);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllCaps', FAllCaps);
 end;
 
 procedure jButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 procedure jButton.Refresh;
 begin
   if not FInitialized then Exit;
 
-  View_Invalidate(FjEnv, FjObject );
+  View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 function jButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jni_func_out_h(FjEnv, FjObject, 'getText');
+     Result:= jni_func_out_h(gApp.jni.jEnv, FjObject, 'getText');
 end;
 
 procedure jButton.SetText(Value: string);
@@ -6113,7 +5926,7 @@ begin
   inherited SetText(Value); //by thierry
   if FjObject = nil then exit;
 
-  jni_proc_h(FjEnv, FjObject, 'setText', Value{FText}); //by thierry
+  jni_proc_h(gApp.jni.jEnv, FjObject, 'setText', Value{FText}); //by thierry
 end;
 
 procedure jButton.SetFontColor(Value: TARGBColorBridge);
@@ -6122,7 +5935,7 @@ begin
   if FjObject = nil then exit;
 
   if(FFontColor <> colbrDefault) then
-     jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jButton.SetFontSize(Value: DWord);
@@ -6131,7 +5944,7 @@ begin
   if FjObject = nil then exit;
 
   if(FFontSize > 0) then
-     jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
+     jni_proc_f(gApp.jni.jEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 procedure jButton.UpdateLayout();
@@ -6142,7 +5955,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jButton.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -6151,7 +5964,7 @@ begin
   FFontSizeUnit:=_unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 
@@ -6159,28 +5972,28 @@ procedure jButton.PerformClick();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'PerformClick');
+     jni_proc(gApp.jni.jEnv, FjObject, 'PerformClick');
 end;
 
 procedure jButton.PerformLongClick();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'PerformLongClick');
+     jni_proc(gApp.jni.jEnv, FjObject, 'PerformLongClick');
 end;
 
 procedure jButton.SetBackgroundByResIdentifier(_imgResIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
 end;
 
 procedure jButton.SetBackgroundByImage(_image: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp(FjEnv, FjObject, 'SetBackgroundByImage', _image);
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'SetBackgroundByImage', _image);
 end;
 
 // Event : Java -> Pascal
@@ -6209,7 +6022,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jButton.GetHeight: integer;
@@ -6220,42 +6033,42 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jButton.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jButton.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jButton.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jButton.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jButton.SetEnabled(Value: boolean);
@@ -6264,7 +6077,7 @@ begin
   FEnabled:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetEnabled', Value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnabled', Value);
 end;
 
 procedure jButton.ClearLayout();
@@ -6275,16 +6088,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -6294,21 +6107,21 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jButton.SetLWeight(_weight: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLWeight(FjEnv, FjObject, _weight);
+     View_SetLWeight(gApp.jni.jEnv, FjObject, _weight);
 end;
 
 procedure jButton.SetFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetFocus');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetFocus');
 end;
 
 procedure jButton.BringToFront;
@@ -6317,7 +6130,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -6325,7 +6138,7 @@ procedure jButton.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 //------------------------------------------------------------------------------
@@ -6356,39 +6169,39 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-Procedure jCheckBox.Init(refApp: jApp);
+Procedure jCheckBox.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject  := jCheckBox_Create(FjEnv, FjThis, self);
+   FjObject  := jCheckBox_Create(gApp.jni.jEnv, gApp.jni.jThis, self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6397,20 +6210,20 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= 0;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6431,9 +6244,9 @@ begin
    SetText(FText);
 
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
    SetChecked(FChecked);
   end;
 end;
@@ -6442,33 +6255,33 @@ Procedure jCheckBox.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jCheckBox.RemoveFromViewParent;
 begin
 if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 Procedure jCheckBox.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jCheckBox.Refresh;
 begin
   if not FInitialized then Exit;
-  View_Invalidate(FjEnv, FjObject );
+  View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 Function jCheckBox.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jni_func_out_h(FjEnv, FjObject, 'getText' );
+     Result:= jni_func_out_h(gApp.jni.jEnv, FjObject, 'getText' );
 end;
 
 Procedure jCheckBox.SetText(Value: string);
@@ -6476,7 +6289,7 @@ begin
   inherited SetText(Value);
   if FjObject = nil then exit;
 
-  jni_proc_h(FjEnv, FjObject, 'setText', Value);
+  jni_proc_h(gApp.jni.jEnv, FjObject, 'setText', Value);
 end;
 
 Procedure jCheckBox.SetFontColor(Value: TARGBColorBridge);
@@ -6485,7 +6298,7 @@ begin
   if FjObject = nil then exit;
 
   if(FFontColor <> colbrDefault) then
-     jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jCheckBox.SetFontSize(Value: DWord);
@@ -6494,14 +6307,14 @@ begin
   if FjObject = nil then exit;
 
   if(FFontSize > 0) then
-   jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
+   jni_proc_f(gApp.jni.jEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 Function jCheckBox.GetChecked: boolean;
 begin
   Result := FChecked;
   if FInitialized then
-     Result:= jni_func_out_z(FjEnv, FjObject, 'isChecked' );
+     Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'isChecked' );
 end;
 
 Procedure jCheckBox.SetChecked(Value: boolean);
@@ -6509,7 +6322,7 @@ begin
   FChecked:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setChecked', FChecked);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setChecked', FChecked);
 end;
 
 procedure jCheckBox.UpdateLayout();
@@ -6520,7 +6333,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jCheckBox.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -6529,7 +6342,7 @@ begin
   FFontSizeUnit:=_unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 // Event Java -> Pascal
@@ -6542,21 +6355,21 @@ procedure jCheckBox.SetCompoundDrawables(_image: jObject; _side: TCompoundDrawab
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jCheckBox.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jCheckBox.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jCheckBox.ClearLayout();
@@ -6567,16 +6380,16 @@ begin
     //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -6586,7 +6399,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 //------------------------------------------------------------------------------
@@ -6617,14 +6430,14 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jRadioButton.Init(refApp: jApp);
+procedure jRadioButton.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -6634,8 +6447,8 @@ begin
 
   if not FInitialized  then
   begin
-   inherited Init(refApp);
-   FjObject := jRadioButton_Create(FjEnv, FjThis, Self);
+   inherited Init;
+   FjObject := jRadioButton_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
    if FjObject = nil then exit;
 
@@ -6643,20 +6456,20 @@ begin
 
    if FParent <> nil then
    begin
-     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+     sysTryNewParent( FjPRLayout, FParent);
      if FParent is jRadioGroup then flag:= True;
    end;
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6665,14 +6478,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -6680,7 +6493,7 @@ begin
   else Self.AnchorId:= -1;
 
    if not flag then
-     View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6701,9 +6514,9 @@ begin
    SetChecked(FChecked);
 
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 end;
 
@@ -6711,34 +6524,34 @@ Procedure jRadioButton.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jRadioButton.RemoveFromViewParent;
 begin
 if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 Procedure jRadioButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jRadioButton.Refresh;
 begin
   if not FInitialized then Exit;
 
-  View_Invalidate(FjEnv, FjObject );
+  View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 Function jRadioButton.GetText: string;
 begin
   Result:= FText;
   if FInitialized then
-     Result:= jni_func_out_h(FjEnv, FjObject, 'getText' );
+     Result:= jni_func_out_h(gApp.jni.jEnv, FjObject, 'getText' );
 end;
 
 Procedure jRadioButton.SetText(Value: string);
@@ -6746,7 +6559,7 @@ begin
   inherited SetText(Value);
   if FjObject = nil then exit;
 
-  jni_proc_h(FjEnv, FjObject, 'setText', Value{ FText});
+  jni_proc_h(gApp.jni.jEnv, FjObject, 'setText', Value{ FText});
 end;
 
 Procedure jRadioButton.SetFontColor(Value: TARGBColorBridge);
@@ -6755,7 +6568,7 @@ begin
   if FjObject = nil then exit;
 
   if (FFontColor <> colbrDefault) then
-   jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+   jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jRadioButton.SetFontSize(Value: DWord);
@@ -6764,14 +6577,14 @@ begin
   if FjObject = nil then exit;
 
   if (FFontSize > 0) then
-   jni_proc_f(FjEnv, FjObject, 'SetTextSize', FFontSize);
+   jni_proc_f(gApp.jni.jEnv, FjObject, 'SetTextSize', FFontSize);
 end;
 
 Function jRadioButton.GetChecked: boolean;
 begin
   Result:= FChecked;
   if FInitialized then
-     Result:= jni_func_out_z(FjEnv, FjObject, 'isChecked' );
+     Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'isChecked' );
 end;
 
 Procedure jRadioButton.SetChecked(Value: boolean);
@@ -6779,7 +6592,7 @@ begin
   FChecked:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setChecked', FChecked);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setChecked', FChecked);
 end;
 
 procedure jRadioButton.UpdateLayout();
@@ -6790,7 +6603,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jRadioButton.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -6799,7 +6612,7 @@ begin
   FFontSizeUnit:=_unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 // Event Java -> Pascal
@@ -6812,21 +6625,21 @@ procedure jRadioButton.SetCompoundDrawables(_image: jObject; _side: TCompoundDra
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _image, Ord(_side));
 end;
 
 procedure jRadioButton.SetCompoundDrawables(_imageResIdentifier: string; _side: TCompoundDrawablesSide);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetCompoundDrawables', _imageResIdentifier, Ord(_side));
 end;
 
 procedure jRadioButton.SetFontFromAssets(_fontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetFontFromAssets', _fontName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetFontFromAssets', _fontName);
 end;
 
 procedure jRadioButton.ClearLayout();
@@ -6837,16 +6650,16 @@ begin
     //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -6856,13 +6669,13 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jRadioButton.SetRoundColor( _color: TARGBColorBridge );
 begin
   if FInitialized  then
-     jni_proc_i(FjEnv, FjObject, 'SetRoundColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRoundColor', GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------
@@ -6898,38 +6711,38 @@ begin
    begin
      if FjObject  <> nil then
      begin
-       jni_free(FjEnv, FjObject );
+       jni_free(gApp.jni.jEnv, FjObject );
        FjObject := nil;
      end;
    end;
    inherited Destroy;
 end;
 
-Procedure jProgressBar.Init(refApp: jApp);
+Procedure jProgressBar.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
-   FjObject := jProgressBar_Create(FjEnv, FjThis, Self, GetProgressBarStyle(FStyle));
+   inherited Init;
+   FjObject := jProgressBar_Create(gApp.jni.jEnv, gApp.jni.jThis, Self, GetProgressBarStyle(FStyle));
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -6938,21 +6751,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -6963,9 +6776,9 @@ begin
    SetMax(FMax);
 
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 end;
 
@@ -6973,13 +6786,13 @@ Procedure jProgressBar.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jProgressBar.RemoveFromViewParent;
 begin
 //if FInitialized then
-  // jProgressBar_RemoveFromViewParent(FjEnv, FjObject);
+  // jProgressBar_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jProgressBar.Stop;
@@ -7004,7 +6817,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -7012,7 +6825,7 @@ procedure jProgressBar.SetColors( _color, _colorBack : TARGBColorBridge );
 begin
  if not FInitialized then Exit;
 
- jni_proc_ii(FjEnv, FjObject, 'SetColors', GetARGB(FCustomColor, _color),
+ jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetColors', GetARGB(FCustomColor, _color),
                                            GetARGB(FCustomColor, _colorBack));
 end;
 
@@ -7020,21 +6833,21 @@ Procedure jProgressBar.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jProgressBar.Refresh;
 begin
   if not FInitialized then Exit;
 
-  View_Invalidate(FjEnv, FjObject );
+  View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 Function jProgressBar.GetProgress: integer;
 begin
   Result:= FProgress;
   if FInitialized then
-     Result:= jni_func_out_i(FjEnv, FjObject, 'getProgress' );
+     Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getProgress' );
 end;
 
 Procedure jProgressBar.SetProgress(Value: integer);
@@ -7046,7 +6859,7 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'setProgress', FProgress);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setProgress', FProgress);
 end;
 
 //by jmpessoa
@@ -7055,7 +6868,7 @@ begin
   if Value > FProgress  then FMax:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'setMax', FMax);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setMax', FMax);
 end;
 
 //by jmpessoa
@@ -7063,7 +6876,7 @@ Function jProgressBar.GetMax: integer;
 begin
   Result:= FMax;
   if FInitialized then
-     Result:= jni_func_out_i(FjEnv, FjObject, 'getMax' );
+     Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getMax' );
 end;
 
 procedure jProgressBar.ClearLayout();
@@ -7074,17 +6887,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -7097,7 +6910,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jProgressBar.SetLGravity(_value: TLayoutGravity);
@@ -7105,21 +6918,21 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jProgressBar.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 procedure jProgressBar.SetMarkerColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetMarkerColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMarkerColor', GetARGB(FCustomColor, _color));
 end;
 
 //------------------------------------------------------------------------------
@@ -7156,39 +6969,39 @@ begin
    begin
      if FjObject  <> nil then
      begin
-       jni_free(FjEnv, FjObject );
+       jni_free(gApp.jni.jEnv, FjObject );
        FjObject := nil;
      end;
    end;
    inherited Destroy;
 end;
 
-Procedure jImageView.Init(refApp: jApp);
+Procedure jImageView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject := jImageView_Create(FjEnv, FjThis, Self);
+   FjObject := jImageView_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv,FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv,FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -7197,14 +7010,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -7212,7 +7025,7 @@ begin
   else Self.AnchorId:= -1;
 
   if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
   if FRoundedShape <> False then
     SetRoundedShape(FRoundedShape);
@@ -7232,7 +7045,7 @@ begin
 
   if FImageList <> nil then
   begin
-    FImageList.Init(refApp);
+    FImageList.Init;
     if FImageList.Images.Count > 0 then
     begin
        if FImageIndex >=0 then SetImageByIndex(FImageIndex);
@@ -7242,12 +7055,12 @@ begin
   if  FImageScaleType <> scaleCenter  then
     SetScaleType(FImageScaleType);
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 
   if FAlpha <> 255 then
@@ -7259,40 +7072,40 @@ procedure jImageView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv,FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv,FjObject , FjPRLayout);
 end;
 
 procedure jImageView.RemoveFromViewParent;
 begin
 if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jImageView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 function jImageView.GetView(): jObject;
 begin
  result := nil;
  if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 Procedure jImageView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jImageView.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 Procedure jImageView.SetImageByName(Value: string);
@@ -7321,14 +7134,14 @@ Procedure jImageView.SetImage(_fullFilename: string);
 begin
    if FjObject = nil then exit;
 
-   jni_proc_t(FjEnv, FjObject , 'setImage', _fullFilename);
+   jni_proc_t(gApp.jni.jEnv, FjObject , 'setImage', _fullFilename);
 end;
 
 procedure jImageView.SetRotation(angle: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRotation', angle);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRotation', angle);
 end;
 
 function jImageView.SaveToJPG(filePath: string; cuality: integer; angle: integer): boolean;
@@ -7336,7 +7149,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tii_out_z(FjEnv, FjObject, 'SaveToJPG', filePath ,cuality ,angle);
+   Result:= jni_func_tii_out_z(gApp.jni.jEnv, FjObject, 'SaveToJPG', filePath ,cuality ,angle);
 end;
 
 function jImageView.SaveToPNG(filePath: string; cuality: integer; angle: integer): boolean;
@@ -7344,7 +7157,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tii_out_z(FjEnv, FjObject, 'SaveToPNG', filePath ,cuality ,angle);
+   Result:= jni_func_tii_out_z(gApp.jni.jEnv, FjObject, 'SaveToPNG', filePath ,cuality ,angle);
 end;
 
 Procedure jImageView.SetImageByIndex(Value: integer);
@@ -7405,7 +7218,7 @@ end;
 procedure jImageView.SetImage(bitmap: jObject);
 begin
   if FInitialized then
-     jni_proc_bmp(FjEnv, FjObject, 'SetBitmapImage', bitmap);
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'SetBitmapImage', bitmap);
 end;
 
 procedure jImageView.SetImageByResIdentifier(_imageResIdentifier: string);
@@ -7414,7 +7227,7 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
 end;
 
 procedure jImageView.SetParamHeight(Value: TLayoutParams);
@@ -7443,7 +7256,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jImageView.GetHeight: integer;
@@ -7454,7 +7267,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jImageView.ClearLayout();
@@ -7465,16 +7278,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -7487,7 +7300,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 // Event : Java -> Pascal
@@ -7525,21 +7338,21 @@ function jImageView.GetBitmapHeight: integer;
 begin
  Result:= 0;
  if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBitmapHeight' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetBitmapHeight' );
 end;
 
 function jImageView.GetBitmapWidth: integer;
 begin
  Result:= 0;
  if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBitmapWidth' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetBitmapWidth' );
 end;
 
 procedure jImageView.SetScale(_scaleX: single; _scaleY: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ff(FjEnv, FjObject, 'SetScale', _scaleX ,_scaleY);
+     jni_proc_ff(gApp.jni.jEnv, FjObject, 'SetScale', _scaleX ,_scaleY);
 end;
 
 // by ADiV
@@ -7549,7 +7362,7 @@ begin
 
  if not FInitialized then exit;
 
- jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
+ jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAlpha', FAlpha);
 end;
 
 // by ADiV
@@ -7557,7 +7370,7 @@ procedure jImageView.SetSaturation(Value: single);
 begin
   if not FInitialized then exit;
 
-  jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
+  jni_proc_f(gApp.jni.jEnv, FjObject, 'SetSaturation', Value);
 end;
 
 procedure jImageView.SetMatrixScaleCenter( _scaleX, _scaleY : single );
@@ -7567,7 +7380,7 @@ begin
   if ImageScaleType <> scaleMatrix then
    SetScaleType( scaleMatrix );
 
-  jni_proc_ff(FjEnv, FjObject, 'SetMatrixScaleCenter', _scaleX,_scaleY);
+  jni_proc_ff(gApp.jni.jEnv, FjObject, 'SetMatrixScaleCenter', _scaleX,_scaleY);
  end;
 end;
 
@@ -7579,7 +7392,7 @@ begin
    if ImageScaleType <> scaleMatrix then
     SetScaleType( scaleMatrix );
 
-   jni_proc_fffffff(FjEnv, FjObject, 'SetMatrix', _scaleX,_scaleY, _angle, _dx, _dy, _px, _py);
+   jni_proc_fffffff(gApp.jni.jEnv, FjObject, 'SetMatrix', _scaleX,_scaleY, _angle, _dx, _dy, _px, _py);
   end;
 end;
 
@@ -7590,7 +7403,7 @@ begin
   FImageScaleType:= _scaleType;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetScaleType', Ord(_scaleType));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetScaleType', Ord(_scaleType));
 end;
 
 function jImageView.GetBitmapImage(): jObject;
@@ -7599,7 +7412,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_bmp(FjEnv, FjObject, 'GetBitmapImage');
+   Result:= jni_func_out_bmp(gApp.jni.jEnv, FjObject, 'GetBitmapImage');
 end;
 
 function jImageView.GetImage(): jObject;
@@ -7613,7 +7426,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_iiii_out_bmp(FjEnv, FjObject, 'GetBitmapImage', _x, _y, _width, _height);
+   Result:= jni_func_iiii_out_bmp(gApp.jni.jEnv, FjObject, 'GetBitmapImage', _x, _y, _width, _height);
 end;
 
 function jImageView.GetLParamWidth(): integer;
@@ -7621,7 +7434,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamWidth(FjEnv, FjObject);
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jImageView.GetLParamHeight(): integer;
@@ -7629,35 +7442,35 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamHeight(FjEnv, FjObject);
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jImageView.SetImageFromURI(_uri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_uri(FjEnv, FjObject, 'SetImageFromURI', _uri);
+     jni_proc_uri(gApp.jni.jEnv, FjObject, 'SetImageFromURI', _uri);
 end;
 
 procedure jImageView.SetImageFromIntentResult(_intentData: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageFromIntentResult(FjEnv, FjObject, _intentData);
+     jImageView_SetImageFromIntentResult(gApp.jni.jEnv, FjObject, _intentData);
 end;
 
 procedure jImageView.SetImageThumbnailFromCamera(_intentData: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageThumbnailFromCamera(FjEnv, FjObject, _intentData);
+     jImageView_SetImageThumbnailFromCamera(gApp.jni.jEnv, FjObject, _intentData);
 end;
 
 
 procedure jImageView.SetImageFromJByteArray(var _image: TDynArrayOfJByte);
 begin
 if FInitialized then
-   jImageView_SetImageFromByteArray(FjEnv, FjObject, _image);
+   jImageView_SetImageFromByteArray(gApp.jni.jEnv, FjObject, _image);
 end;
 
 procedure jImageView.SetImageBitmap(_bitmap: jObject; _width: integer; _height: integer); //deprecated
@@ -7671,21 +7484,21 @@ procedure jImageView.SetImage(_bitmap: jObject; _width: integer; _height: intege
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_ii(FjEnv, FjObject, 'SetBitmapImage', _bitmap ,_width ,_height);
+     jni_proc_bmp_ii(gApp.jni.jEnv, FjObject, 'SetBitmapImage', _bitmap ,_width ,_height);
 end;
 
 procedure jImageView.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jImageView.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jImageView.SetLGravity(_value: TLayoutGravity);
@@ -7693,28 +7506,28 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jImageView.SetCollapseMode(_collapsemode: TCollapsingMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetCollapseMode', Ord(_collapsemode) );
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetCollapseMode', Ord(_collapsemode) );
 end;
 
 procedure jImageView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jImageView.SetScrollFlag(_collapsingScrollFlag: TCollapsingScrollflag);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetScrollFlag', Ord(_collapsingScrollFlag));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetScrollFlag', Ord(_collapsingScrollFlag));
 end;
 
 procedure jImageView.BringToFront;
@@ -7723,7 +7536,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -7731,7 +7544,7 @@ procedure jImageView.SetVisibilityGone();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetVisibilityGone');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetVisibilityGone');
 end;
 
 function jImageView.GetJByteBuffer(_width: integer; _height: integer): jObject;
@@ -7739,7 +7552,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_GetByteBuffer(FjEnv, FjObject, _width ,_height);
+   Result:= jImageView_GetByteBuffer(gApp.jni.jEnv, FjObject, _width ,_height);
 end;
 
 function jImageView.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
@@ -7747,14 +7560,14 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jImageView_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
+   Result:= jImageView_GetBitmapFromByteBuffer(gApp.jni.jEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
 function jImageView.GetDirectBufferAddress(byteBuffer: jObject): PJByte;
 begin
   result := nil;
   if FInitialized then
-   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,byteBuffer));
+   Result:= PJByte((gApp.jni.jEnv^).GetDirectBufferAddress(gApp.jni.jEnv,byteBuffer));
 end;
 
 procedure jImageView.SetRoundedShape(_value: boolean);
@@ -7763,42 +7576,42 @@ begin
   FRoundedShape:= _value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetRoundedShape', FRoundedShape);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetRoundedShape', FRoundedShape);
 end;
 
 procedure jImageView.SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
+     jImageView_SetImageFromByteBuffer(gApp.jni.jEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
 procedure jImageView.LoadFromURL(_url: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'LoadFromURL', _url);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'LoadFromURL', _url);
 end;
 
 procedure jImageView.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SaveToFile', _filename);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SaveToFile', _filename);
 end;
 
 procedure jImageView.ShowPopupMenu(var _items: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_ShowPopupMenu(FjEnv, FjObject, _items);
+     jImageView_ShowPopupMenu(gApp.jni.jEnv, FjObject, _items);
 end;
 
 procedure jImageView.ShowPopupMenu(_items: array of string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_ShowPopupMenu(FjEnv, FjObject, _items);
+     jImageView_ShowPopupMenu(gApp.jni.jEnv, FjObject, _items);
 end;
 
 procedure jImageView.SetAnimationDurationIn(_animationDurationIn: integer);
@@ -7807,7 +7620,7 @@ begin
   FAnimationDurationIn:= _animationDurationIn;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
 procedure jImageView.SetAnimationDurationOut(_animationDurationOut: integer);
@@ -7816,7 +7629,7 @@ begin
   FAnimationDurationOut:= _animationDurationOut;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
 end;
 
 procedure jImageView.SetAnimationMode(_animationMode: TAnimationMode);
@@ -7825,42 +7638,42 @@ begin
   FAnimationMode:= _animationMode;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode) );
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAnimationMode', Ord(_animationMode) );
 end;
 
 procedure jImageView.Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
+  jni_proc_zii(gApp.jni.jEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
 procedure jImageView.AnimateRotate( _angleFrom, _angleTo : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_ii(FjEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
+  jni_proc_ii(gApp.jni.jEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
 end;
 
 procedure jImageView.SetImageFromAssets(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetImageFromAssets', _filename);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetImageFromAssets', _filename);
 end;
 
 procedure jImageView.SetImageDrawable(_imageAnimation: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jImageView_SetImageDrawable(FjEnv, FjObject, _imageAnimation);
+     jImageView_SetImageDrawable(gApp.jni.jEnv, FjObject, _imageAnimation);
 end;
 
 procedure jImageView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Clear');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end;
 
 procedure jImageView.GenEvent_OnImageViewPopupItemSelected(Sender:TObject;caption:string);
@@ -7881,12 +7694,10 @@ end;
 procedure Java_Event_pOnImageViewPopupItemSelected(env:PJNIEnv;this:JObject;Sender:TObject;caption:jString);
 begin
   gApp.Jni.jEnv := env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis:= this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Sender is jImageView then
   begin
-    jForm(jImageView(Sender).Owner).UpdateJNI(gApp);
     jImageView(Sender).GenEvent_OnImageViewPopupItemSelected(Sender,GetPStringAndDeleteLocalRef(env,caption));
   end;
 end;
@@ -7895,14 +7706,14 @@ procedure jImageView.ApplyDrawableXML(_xmlIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
 procedure jImageView.SetClipToOutline(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetClipToOutline', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetClipToOutline', _value);
 end;
 
   { jImageList }
@@ -7922,7 +7733,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -7932,13 +7743,13 @@ begin
   inherited Destroy;
 end;
 
-procedure jImageList.Init(refApp: jApp);
+procedure jImageList.Init;
 var
   i: integer;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject:= jImageList_jCreate(FjEnv, int64(Self), FjThis);
+  inherited Init;
+  FjObject:= jImageList_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
@@ -8003,7 +7814,7 @@ begin
      if (imageIndex < FImages.Count) and (imageIndex >= 0) then
      begin
          path:= GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+Trim(FImages.Strings[imageIndex]);
-         Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromFile', path);
+         Result:= jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'LoadFromFile', path);
      end;
   end;
 end;
@@ -8037,7 +7848,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -8046,12 +7857,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jHttpClient.Init(refApp: jApp);
+procedure jHttpClient.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
-  FjObject:= jHttpClient_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject:= jHttpClient_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
@@ -8073,7 +7884,7 @@ procedure jHttpClient.SetAuthenticationUser(_userName: string; _password: string
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'SetAuthenticationUser', _userName ,_password);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'SetAuthenticationUser', _userName ,_password);
 end;
 
 procedure jHttpClient.SetAuthenticationMode(_authenticationMode: THttpClientAuthenticationMode);
@@ -8081,7 +7892,7 @@ begin
   //in designing component state: set value here...
   FAuthenticationMode:= _authenticationMode;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAuthenticationMode', Ord(_authenticationMode));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAuthenticationMode', Ord(_authenticationMode));
 end;
 
 
@@ -8089,7 +7900,7 @@ procedure jHttpClient.SetAuthenticationHost(_hostName: string; _port: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetAuthenticationHost', _hostName ,_port);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetAuthenticationHost', _hostName ,_port);
 end;
 
 procedure jHttpClient.SetUrls(Value: TStrings);
@@ -8135,7 +7946,7 @@ procedure jHttpClient.GetAsync(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-      jni_proc_t(FjEnv, FjObject, 'GetAsync', _stringUrl);
+      jni_proc_t(gApp.jni.jEnv, FjObject, 'GetAsync', _stringUrl);
 end;
 
 procedure jHttpClient.GetAsyncGooglePlayVersion(_stringUrl: string);
@@ -8143,7 +7954,7 @@ begin
 
  //in designing component state: result value here...
   if FInitialized then
-      jni_proc_t(FjEnv, FjObject, 'GetAsyncGooglePlayVersion', _stringUrl);
+      jni_proc_t(gApp.jni.jEnv, FjObject, 'GetAsyncGooglePlayVersion', _stringUrl);
 end;
 
 function jHttpClient.Get(_stringUrl: string): string;
@@ -8151,8 +7962,8 @@ begin
   Result := '';
   if not FInitialized then Exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetCharSet', FCharSet);
-  Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', _stringUrl);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetCharSet', FCharSet);
+  Result := jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'Get', _stringUrl);
 end;
 
 function jHttpClient.Get(): string;
@@ -8161,17 +7972,17 @@ begin
   if not FInitialized then Exit;
 
   if  FUrl <> '' then
-    Result := jni_func_t_out_t(FjEnv, FjObject, 'Get', FUrl)
+    Result := jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'Get', FUrl)
 end;
 
 procedure jHttpClient.ClearNameValueData;
 begin
-  if(FInitialized) then jni_proc(FjEnv, FjObject, 'ClearNameValueData');
+  if(FInitialized) then jni_proc(gApp.jni.jEnv, FjObject, 'ClearNameValueData');
 end;
 
 procedure jHttpClient.AddNameValueData(_name, _value: string);
 begin
-  if(FInitialized) then jni_proc_tt(FjEnv, FjObject, 'AddNameValueData', _name, _value);
+  if(FInitialized) then jni_proc_tt(gApp.jni.jEnv, FjObject, 'AddNameValueData', _name, _value);
 end;
 
 function jHttpClient.Post(_stringUrl: string): string;
@@ -8179,29 +7990,29 @@ begin
   Result := '';
   if not FInitialized then Exit;
 
-  jni_proc_t(FjEnv, FjObject, 'AddCreateTableQuery', FCharSet);
-  Result := jni_func_t_out_t(FjEnv, FjObject, 'Post', _stringUrl); //fixed! thanks to JKennes
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'AddCreateTableQuery', FCharSet);
+  Result := jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'Post', _stringUrl); //fixed! thanks to JKennes
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jni_proc_t(FjEnv, FjObject, 'PostNameValueDataAsync', _stringUrl);
+    jni_proc_t(gApp.jni.jEnv, FjObject, 'PostNameValueDataAsync', _stringUrl);
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _name: string; _value: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jni_proc_ttt(FjEnv, FjObject, 'PostNameValueDataAsync', _stringUrl ,_name ,_value);
+    jni_proc_ttt(gApp.jni.jEnv, FjObject, 'PostNameValueDataAsync', _stringUrl ,_name ,_value);
 end;
 
 procedure jHttpClient.PostNameValueDataAsync(_stringUrl: string; _listNameValue: string);
 begin
   //in designing component state: result value here...
   if FInitialized then
-    jni_proc_tt(FjEnv, FjObject, 'PostNameValueDataAsync', _stringUrl ,_listNameValue);
+    jni_proc_tt(gApp.jni.jEnv, FjObject, 'PostNameValueDataAsync', _stringUrl ,_listNameValue);
 end;
 
 function jHttpClient.GetCookiesCount(): integer;
@@ -8209,7 +8020,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetCookiesCount');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetCookiesCount');
 end;
 
 function jHttpClient.GetCookieByIndex(_index: integer): jObject;
@@ -8217,7 +8028,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookieByIndex(FjEnv, FjObject, _index);
+   Result:= jHttpClient_GetCookieByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jHttpClient.GetCookieAttributeValue(_cookie: jObject; _fieldName: string): string;
@@ -8225,21 +8036,21 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookieAttributeValue(FjEnv, FjObject, _cookie ,_fieldName);
+   Result:= jHttpClient_GetCookieAttributeValue(gApp.jni.jEnv, FjObject, _cookie ,_fieldName);
 end;
 
 procedure jHttpClient.ClearCookieStore();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ClearCookieStore');
+     jni_proc(gApp.jni.jEnv, FjObject, 'ClearCookieStore');
 end;
 
 procedure jHttpClient.trustAllCertificates();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'trustAllCertificates');
+     jni_proc(gApp.jni.jEnv, FjObject, 'trustAllCertificates');
 end;
 
 function jHttpClient.AddCookie(_name: string; _value: string): jObject;
@@ -8247,7 +8058,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_AddCookie(FjEnv, FjObject, _name ,_value);
+   Result:= jHttpClient_AddCookie(gApp.jni.jEnv, FjObject, _name ,_value);
 end;
 
 function jHttpClient.IsExpired(_cookie: jObject): boolean;
@@ -8255,7 +8066,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_IsExpired(FjEnv, FjObject, _cookie);
+   Result:= jHttpClient_IsExpired(gApp.jni.jEnv, FjObject, _cookie);
 end;
 
 function jHttpClient.GetStateful(_url: string): string;
@@ -8263,7 +8074,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStateful', _url);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetStateful', _url);
 end;
 
 function jHttpClient.PostStateful(_url: string): string;
@@ -8271,7 +8082,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'PostStateful', _url);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'PostStateful', _url);
 end;
 
 
@@ -8280,14 +8091,14 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_IsCookiePersistent(FjEnv, FjObject, _cookie);
+   Result:= jHttpClient_IsCookiePersistent(gApp.jni.jEnv, FjObject, _cookie);
 end;
 
 procedure jHttpClient.SetCookieValue(_cookie: jObject; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_SetCookieValue(FjEnv, FjObject, _cookie ,_value);
+     jHttpClient_SetCookieValue(gApp.jni.jEnv, FjObject, _cookie ,_value);
 end;
 
 function jHttpClient.GetCookieByName(_cookieName: string): jObject;
@@ -8295,14 +8106,14 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookieByName(FjEnv, FjObject, _cookieName);
+   Result:= jHttpClient_GetCookieByName(gApp.jni.jEnv, FjObject, _cookieName);
 end;
 
 procedure jHttpClient.SetCookieAttributeValue(_cookie: jObject; _attribute: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_SetCookieAttributeValue(FjEnv, FjObject, _cookie ,_attribute ,_value);
+     jHttpClient_SetCookieAttributeValue(gApp.jni.jEnv, FjObject, _cookie ,_attribute ,_value);
 end;
 
 function jHttpClient.GetCookieValue(_cookie: jObject): string;
@@ -8310,7 +8121,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookieValue(FjEnv, FjObject, _cookie);
+   Result:= jHttpClient_GetCookieValue(gApp.jni.jEnv, FjObject, _cookie);
 end;
 
 function jHttpClient.GetCookieName(_cookie: jObject): string;
@@ -8318,7 +8129,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookieName(FjEnv, FjObject, _cookie);
+   Result:= jHttpClient_GetCookieName(gApp.jni.jEnv, FjObject, _cookie);
 end;
 
 function jHttpClient.GetCookies(_nameValueSeparator: string): TDynArrayOfString;
@@ -8326,21 +8137,21 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookies(FjEnv, FjObject, _nameValueSeparator);
+   Result:= jHttpClient_GetCookies(gApp.jni.jEnv, FjObject, _nameValueSeparator);
 end;
 
 procedure jHttpClient.AddClientHeader(_name: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'AddClientHeader', _name ,_value);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'AddClientHeader', _name ,_value);
 end;
 
 procedure jHttpClient.ClearClientHeader(_name: string; _value: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'ClearClientHeader', _name ,_value);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'ClearClientHeader', _name ,_value);
 end;
 
 function jHttpClient.DeleteStateful(_url: string; _value:string): string;
@@ -8348,7 +8159,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tt_out_t(FjEnv, FjObject, 'DeleteStateful', _url, _value);
+   Result:= jni_func_tt_out_t(gApp.jni.jEnv, FjObject, 'DeleteStateful', _url, _value);
 end;
 
 procedure jHttpClient.GenEvent_OnHttpClientContentResult(Obj: TObject; content: RawByteString);
@@ -8376,7 +8187,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'UrlExist', _urlString);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'UrlExist', _urlString);
 end;
 
 function jHttpClient.GetCookies(_urlString: string; _nameValueSeparator: string): TDynArrayOfString;
@@ -8384,7 +8195,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetCookies(FjEnv, FjObject, _urlString ,_nameValueSeparator);
+   Result:= jHttpClient_GetCookies(gApp.jni.jEnv, FjObject, _urlString ,_nameValueSeparator);
 end;
 
 function jHttpClient.AddCookie(_urlString: string; _name: string; _value: string): jObject;
@@ -8392,7 +8203,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_AddCookie(FjEnv, FjObject, _urlString ,_name ,_value);
+   Result:= jHttpClient_AddCookie(gApp.jni.jEnv, FjObject, _urlString ,_name ,_value);
 end;
 
 
@@ -8403,7 +8214,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_OpenConnection(FjEnv, FjObject, _urlString);
+   Result:= jHttpClient_OpenConnection(gApp.jni.jEnv, FjObject, _urlString);
 end;
 
 function jHttpClient.SetRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
@@ -8411,7 +8222,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_SetRequestProperty(FjEnv, FjObject, _httpConnection ,_headerName, _headerValue);
+   Result:= jHttpClient_SetRequestProperty(gApp.jni.jEnv, FjObject, _httpConnection ,_headerName, _headerValue);
 end;
 
 (*
@@ -8419,7 +8230,7 @@ function jHttpClient.Connect(_httpConnection: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_Connect(FjEnv, FjObject, _httpConnection);
+   Result:= jHttpClient_Connect(gApp.jni.jEnv, FjObject, _httpConnection);
 end;
 *)
 
@@ -8428,7 +8239,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetHeaderField(FjEnv, FjObject, _httpConnection ,_headerName);
+   Result:= jHttpClient_GetHeaderField(gApp.jni.jEnv, FjObject, _httpConnection ,_headerName);
 end;
 
 function jHttpClient.GetHeaderFields(_httpConnection: jObject): TDynArrayOfString;
@@ -8436,7 +8247,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetHeaderFields(FjEnv, FjObject, _httpConnection);
+   Result:= jHttpClient_GetHeaderFields(gApp.jni.jEnv, FjObject, _httpConnection);
 end;
 
 
@@ -8444,7 +8255,7 @@ procedure jHttpClient.Disconnect(_httpConnection: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHttpClient_Disconnect(FjEnv, FjObject, _httpConnection);
+     jHttpClient_Disconnect(gApp.jni.jEnv, FjObject, _httpConnection);
 end;
 
 function jHttpClient.Get(_httpConnection: jObject): string;
@@ -8452,7 +8263,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_Get(FjEnv, FjObject, _httpConnection);
+   Result:= jHttpClient_Get(gApp.jni.jEnv, FjObject, _httpConnection);
 end;
 
 function jHttpClient.AddRequestProperty(_httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
@@ -8460,7 +8271,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_AddRequestProperty(FjEnv, FjObject, _httpConnection ,_headerName ,_headerValue);
+   Result:= jHttpClient_AddRequestProperty(gApp.jni.jEnv, FjObject, _httpConnection ,_headerName ,_headerValue);
 end;
 
 function jHttpClient.Post(_httpConnection: jObject): string;
@@ -8468,7 +8279,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_Post(FjEnv, FjObject, _httpConnection);
+   Result:= jHttpClient_Post(gApp.jni.jEnv, FjObject, _httpConnection);
 end;
 
 
@@ -8477,7 +8288,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetResponseCode');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetResponseCode');
 end;
 
 function jHttpClient.GetDefaultConnection(): jObject;
@@ -8485,7 +8296,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_GetDefaultConnection(FjEnv, FjObject);
+   Result:= jHttpClient_GetDefaultConnection(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jHttpClient.SetResponseTimeout(_timeoutMilliseconds: integer);
@@ -8494,7 +8305,7 @@ begin
   FResponseTimeout:= _timeoutMilliseconds;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetResponseTimeout', _timeoutMilliseconds);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetResponseTimeout', _timeoutMilliseconds);
 end;
 
 procedure jHttpClient.SetConnectionTimeout(_timeoutMilliseconds: integer);
@@ -8503,7 +8314,7 @@ begin
   FConnectionTimeout:= _timeoutMilliseconds;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetConnectionTimeout', _timeoutMilliseconds);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetConnectionTimeout', _timeoutMilliseconds);
 end;
 
 function jHttpClient.GetResponseTimeout(): integer;
@@ -8512,7 +8323,7 @@ begin
   //in designing component state: result value here...
   Result:= FResponseTimeout;
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetResponseTimeout');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetResponseTimeout');
 end;
 
 function jHttpClient.GetConnectionTimeout(): integer;
@@ -8521,7 +8332,7 @@ begin
   //in designing component state: result value here...
   Result:= FConnectionTimeout;
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetConnectionTimeout');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetConnectionTimeout');
 end;
 
 
@@ -8529,14 +8340,14 @@ procedure jHttpClient.UploadFile(_url: string; _fullFileName: string; _uploadFor
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ttt(FjEnv, FjObject, 'UploadFile', _url ,_fullFileName ,_uploadFormName);
+     jni_proc_ttt(gApp.jni.jEnv, FjObject, 'UploadFile', _url ,_fullFileName ,_uploadFormName);
 end;
 
 procedure jHttpClient.UploadFile(_url: string; _fullFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'UploadFile', _url ,_fullFileName);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'UploadFile', _url ,_fullFileName);
 end;
 
 procedure jHttpClient.SetUploadFormName(_uploadFormName: string);
@@ -8545,28 +8356,28 @@ begin
   FUploadFormName:=_uploadFormName;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetUploadFormName', _uploadFormName);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetUploadFormName', _uploadFormName);
 end;
 
 procedure jHttpClient.SetUnvaluedNameData(_unvaluedName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetUnvaluedNameData', _unvaluedName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetUnvaluedNameData', _unvaluedName);
 end;
 
 procedure jHttpClient.SetEncodeValueData(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetEncodeValueData', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEncodeValueData', _value);
 end;
 
 procedure jHttpClient.PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'PostSOAPDataAsync', _SOAPData ,_stringUrl);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'PostSOAPDataAsync', _SOAPData ,_stringUrl);
 end;
 
 { jSMTPClient }
@@ -8598,10 +8409,10 @@ begin
  inherited Destroy;
 end;
 
-procedure jSMTPClient.Init(refApp: jApp);
+procedure jSMTPClient.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(refApp);
+ inherited Init;
 (*  TODO
  for i:= 0 to FMails.Count - 1 do
  begin
@@ -8629,6 +8440,8 @@ end;
 
 procedure jSMTPClient.Send;
 begin
+ if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
  if FInitialized then
     jSend_Email(gApp.Jni.jEnv, gApp.Jni.jThis,
                 FMailTo,              //to
@@ -8681,6 +8494,8 @@ end;
 
 procedure jSMTPClient.Send(mTo: string; subject: string; msg: string);
 begin
+  if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
   if FInitialized then
      jSend_Email(gApp.Jni.jEnv, gApp.Jni.jThis,
                  mTo,     //to
@@ -8721,10 +8536,10 @@ begin
  inherited Destroy;
 end;
 
-procedure jSMS.Init(refApp: jApp);
+procedure jSMS.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(refApp);
+ inherited Init;
 
  FInitialized:= True;
 
@@ -8736,6 +8551,8 @@ begin
  Result := '';
 
  if FContactList = nil then exit;
+
+ if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
 
  if not FInitialized then exit;
 
@@ -8756,6 +8573,8 @@ function jSMS.Send(multipartMessage: Boolean): integer;
 begin
   result := 0;
 
+  if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
   if FSMSMessage = nil then exit;
 
   if FInitialized then
@@ -8773,6 +8592,8 @@ end;
 function jSMS.Send(toName: string; multipartMessage: Boolean): integer;
 begin
   result := 0;
+
+  if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
 
   if FSMSMessage = nil then exit;
 
@@ -8792,6 +8613,8 @@ function jSMS.Send(toNumber: string;  msg: string; multipartMessage: Boolean): i
 begin
  result := 0;
 
+ if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
  if FInitialized then
  begin
     if toNumber <> '' then
@@ -8805,6 +8628,8 @@ end;
 function jSMS.Send(toNumber: string;  msg: string; packageDeliveredAction: string; multipartMessage: Boolean): integer;
 begin
  result := 0;
+
+ if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
 
  if FInitialized then
  begin
@@ -8820,6 +8645,9 @@ end;
 function jSMS.Read(intentReceiver: jObject; addressBodyDelimiter: string): string;
 begin
 result := '';
+
+ if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
 if FInitialized then
    Result:= jRead_SMS(gApp.Jni.jEnv, gApp.Jni.jThis,intentReceiver, addressBodyDelimiter);  //message
 end;
@@ -8844,10 +8672,10 @@ begin
  inherited Destroy;
 end;
 
-procedure jCamera.Init(refApp: jApp);
+procedure jCamera.Init;
 begin
  if FInitialized  then Exit;
- inherited Init(refApp);
+ inherited Init;
  FInitialized:= True;
 end;
 
@@ -8867,8 +8695,8 @@ begin
        FFileName:= SplitStr(strExt, '.');
        FFileName:= FFileName + '.jpg';
      end;
-     Self.UpdateJNI(gApp);
-     Self.FullPathToBitmapFile:= jCamera_takePhoto(FjEnv, FjThis,
+
+     Self.FullPathToBitmapFile:= jCamera_takePhoto(gApp.jni.jEnv, gApp.jni.jThis,
                                                    GetFilePath(FFilePath), FFileName, FRequestCode, FAddToGallery);
   end;
 end;
@@ -8889,8 +8717,8 @@ begin
        _filename:= SplitStr(strExt, '.');
        _filename:= _filename + '.jpg';
      end;
-     Self.UpdateJNI(gApp);
-     Self.FullPathToBitmapFile:= jCamera_takePhoto(FjEnv, FjThis,
+
+     Self.FullPathToBitmapFile:= jCamera_takePhoto(gApp.jni.jEnv, gApp.jni.jThis,
                                                    GetFilePath(FFilePath), _filename, _requestCode, FAddToGallery);
   end;
 end;
@@ -8948,7 +8776,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -8958,7 +8786,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jListView.Init(refApp: jApp);
+procedure jListView.Init;
 var
   i: integer;
   rToP: TPositionRelativeToParent;
@@ -8966,12 +8794,12 @@ var
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
    if FImageItem <> nil then
    begin
-    FImageItem.Init(refApp);
+    FImageItem.Init;
 
-    FjObject := jListView_Create2(FjEnv, FjThis, Self,
+    FjObject := jListView_Create2(gApp.jni.jEnv, gApp.jni.jThis, Self,
                                Ord(FWidgetItem), FWidgetText, FImageItem.GetImage,
                                Ord(FTextDecorated), Ord(FItemLayout), Ord(FTextSizeDecorated),
                                Ord(FTextAlign), Ord(FTextPosition));
@@ -8982,19 +8810,19 @@ begin
         SetWidgetTextColor(FWidgetTextColor);
 
     if FFontColor <> colbrDefault then
-       jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+       jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
         SetFontSizeUnit(FFontSizeUnit);
 
     if FFontSize > 0 then
-       jni_proc_i(FjEnv, FjObject, 'setTextSize', FFontSize);
+       jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextSize', FFontSize);
 
     if FFontFace <> ffNormal then
        SetFontFace(FFontFace);
 
     if FColor <> colbrDefault then
-       View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+       View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
     if FItemPaddingTop <> 10 then
       SetItemPaddingTop(FItemPaddingTop);
@@ -9020,12 +8848,12 @@ begin
     if FItems <> nil then
      for i:= 0 to FItems.Count-1 do
       if FItems.Strings[i] <> '' then
-        jListView_add22(FjEnv, FjObject , FItems.Strings[i], FDelimiter, FImageItem.GetImage);
+        jListView_add22(gApp.jni.jEnv, FjObject , FItems.Strings[i], FDelimiter, FImageItem.GetImage);
 
    end
    else
    begin
-    FjObject := jListView_Create3(FjEnv, FjThis, Self,
+    FjObject := jListView_Create3(gApp.jni.jEnv, gApp.jni.jThis, Self,
                                Ord(FWidgetItem), FWidgetText,
                                Ord(FTextDecorated),Ord(FItemLayout), Ord(FTextSizeDecorated),
                                Ord(FTextAlign), Ord(FTextPosition));
@@ -9036,19 +8864,19 @@ begin
       SetWidgetTextColor(FWidgetTextColor);
 
     if FFontColor <> colbrDefault then
-      jni_proc_i(FjEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
+      jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextColor', GetARGB(FCustomColor, FFontColor));
 
     if FFontSizeUnit <> unitDefault then
       SetFontSizeUnit(FFontSizeUnit);
 
     if FFontSize > 0 then
-      jni_proc_i(FjEnv, FjObject, 'setTextSize', FFontSize);
+      jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextSize', FFontSize);
 
     if FFontFace <> ffNormal then
       SetFontFace(FFontFace);
 
     if FColor <> colbrDefault then
-      View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+      View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
     if FImageItemIdentifier <> '' then    //ic_launcher
         SetImageByResIdentifier(FImageItemIdentifier);
@@ -9077,7 +8905,7 @@ begin
     if FItems <> nil then
      for i:= 0 to FItems.Count-1 do
        if FItems.Strings[i] <> '' then
-         jListView_add2(FjEnv, FjObject , FItems.Strings[i], FDelimiter);
+         jListView_add2(gApp.jni.jEnv, FjObject , FItems.Strings[i], FDelimiter);
 
    end;
 
@@ -9088,15 +8916,15 @@ begin
    SetEnableOnClickTextRight(FEnableOnClickTextRight);
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_setId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+   View_setId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -9105,7 +8933,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -9113,19 +8941,19 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
 
    if FHighLightSelectedItemColor <> colbrDefault then
    begin
@@ -9144,76 +8972,76 @@ procedure jListView.SetWidget(Value: TWidgetItem);
 begin
   FWidgetItem:= Value;
   //if FInitialized then
-  //jListView_setHasWidgetItem(FjEnv, FjObject , Ord(FHasWidgetItem));
+  //jListView_setHasWidgetItem(gApp.jni.jEnv, FjObject , Ord(FHasWidgetItem));
 end;
 
 procedure jListView.SetWidgetByIndex(Value: TWidgetItem; index: integer);
 begin
     if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'setWidgetItem', ord(Value), index);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'setWidgetItem', ord(Value), index);
 end;
 
 procedure jListView.SetWidgetByIndex(Value: TWidgetItem; txt: string; index: integer);
 begin
     if FInitialized then
-     jListView_setWidgetItem3(FjEnv, FjObject , ord(Value), txt, index);
+     jListView_setWidgetItem3(gApp.jni.jEnv, FjObject , ord(Value), txt, index);
 end;
 
 procedure jListView.SetWidgetTextByIndex(txt: string; index: integer);
 begin
    if FInitialized then
-      jni_proc_ti(FjEnv,FjObject, 'setWidgetText', txt,index);
+      jni_proc_ti(gApp.jni.jEnv,FjObject, 'setWidgetText', txt,index);
 end;
 
 procedure jListView.SetTextDecoratedByIndex(Value: TTextDecorated; index: integer);
 begin
   if FInitialized then
-   jni_proc_ii(FjEnv, FjObject, 'setTextDecorated', ord(Value), index);
+   jni_proc_ii(gApp.jni.jEnv, FjObject, 'setTextDecorated', ord(Value), index);
 end;
 
 procedure jListView.SetTextSizeDecoratedByIndex(value: TTextSizeDecorated; index: integer);
 begin
   if FInitialized then
-   jni_proc_ii(FjEnv, FjObject, 'setTextSizeDecorated', Ord(value), index);
+   jni_proc_ii(gApp.jni.jEnv, FjObject, 'setTextSizeDecorated', Ord(value), index);
 end;
 
 procedure jListView.SetLayoutByIndex(Value: TItemLayout; index: integer);
 begin
   if FInitialized then
-   jni_proc_ii(FjEnv, FjObject, 'setItemLayout', ord(Value), index);
+   jni_proc_ii(gApp.jni.jEnv, FjObject, 'setItemLayout', ord(Value), index);
 end;
 
 procedure jListView.SetImageByIndex(Value: jObject; index: integer);
 begin
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'setImageItem', Value, index);
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'setImageItem', Value, index);
 end;
 
 procedure jListView.SetImageByIndex(imgResIdentifier: string; index: integer);  overload;
 begin
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'setImageItem', imgResIdentifier, index);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'setImageItem', imgResIdentifier, index);
 end;
 
 
 procedure jListView.SetTextAlignByIndex(Value: TTextAlign; index: integer);
 begin
   if FInitialized then
-    jni_proc_ii(FjEnv, FjObject, 'setTextAlign', ord(Value), index);
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'setTextAlign', ord(Value), index);
 end;
 
 // by ADiV
 procedure jListView.SetTextPositionByIndex(Value: TTextPosition; index: integer);
 begin
   if FInitialized then
-    jni_proc_ii(FjEnv, FjObject, 'setTextPosition', ord(Value), index);
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'setTextPosition', ord(Value), index);
 end;
 
 // by ADiV
 procedure jListView.ClearChecked;
 begin
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'ClearChecked' );
+    jni_proc(gApp.jni.jEnv, FjObject, 'ClearChecked' );
 end;
 
 // by ADiV
@@ -9222,76 +9050,76 @@ begin
   Result:= 0;
 
   if FInitialized then
-    result := jni_func_out_i(FjEnv, FjObject, 'GetItemsChecked');
+    result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemsChecked');
 end;
 
 function jListView.IsItemChecked(index: integer): boolean;
 begin
   result := false;
   if FInitialized then
-    Result:= jni_func_i_out_z(FjEnv, FjObject, 'isItemChecked', index);
+    Result:= jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'isItemChecked', index);
 end;
 
 procedure jListView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jListView.RemoveFromViewParent;
 begin
  if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jListView.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 Procedure jListView.SetColor (Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jListView.Refresh;
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Refresh' ); // by ADiV
+     jni_proc(gApp.jni.jEnv, FjObject, 'Refresh' ); // by ADiV
 end;
 
 Procedure jListView.SetFontColor(Value: TARGBColorBridge);
 begin
   FFontColor:= Value;
   //if (FInitialized = True) and (FFontColor <> colbrDefault ) then
-    // jListView_setTextColor2(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor), index);
-    //jListView_setTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    // jListView_setTextColor2(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FFontColor), index);
+    //jListView_setTextColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 end;
 
 Procedure jListView.SetFontColorByIndex(Value: TARGBColorBridge; index: integer);
 begin
   //FFontColor:= Value;
   if FInitialized  and (Value <> colbrDefault) then
-   jni_proc_ii(FjEnv, FjObject, 'setTextColor2', GetARGB(FCustomColor, Value), index);
+   jni_proc_ii(gApp.jni.jEnv, FjObject, 'setTextColor2', GetARGB(FCustomColor, Value), index);
 end;
 
 Procedure jListView.SetFontSize(Value: DWord);
 begin
   FFontSize:= Value;
   if FInitialized and (FFontSize > 0) then
-    jni_proc_i(FjEnv, FjObject, 'setTextSizeAll', FFontSize);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'setTextSizeAll', FFontSize);
 end;
 
 Procedure jListView.SetFontSizeByIndex(Value: DWord; index: integer);
 begin
   //FFontSize:= Value;
   if FInitialized and (Value > 0) then
-     jni_proc_ii(FjEnv, FjObject, 'setTextSize2', Value, index);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'setTextSize2', Value, index);
 end;
 
 // by ADiV
@@ -9299,7 +9127,7 @@ function jListView.GetFontSizeByIndex(index: Integer): integer;
 begin
   result := 0;
   if FInitialized then
-    Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetFontSizeByIndex', index);
+    Result:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetFontSizeByIndex', index);
 end;
 
 // by ADiV
@@ -9307,14 +9135,14 @@ procedure jListView.SetDrawAlphaBackground(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetDrawAlphaBackground', _alpha);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetDrawAlphaBackground', _alpha);
 end;
 
 // LORDMAN 2013-08-07
 Procedure jListView.SetItemPosition(Value: TXY);
 begin
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'setItemPosition', Value.X, Value.Y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'setItemPosition', Value.X, Value.Y);
 end;
 
 Procedure jListView.Add(item: string; delim: string);
@@ -9325,7 +9153,7 @@ begin
   begin
     FItems.Add(item);
     if FInitialized then
-      jListView_add2(FjEnv, FjObject, item, delim);
+      jListView_add2(gApp.jni.jEnv, FjObject, item, delim);
   end;
 end;
 
@@ -9337,7 +9165,7 @@ begin
   begin
     FItems.Add(item);
     if FInitialized then
-       jListView_add2(FjEnv, FjObject , item, FDelimiter);
+       jListView_add2(gApp.jni.jEnv, FjObject , item, FDelimiter);
   end;
 end;
 
@@ -9350,7 +9178,7 @@ begin
   begin
      FItems.Add(item);
      if FInitialized then
-       jListView_add3(FjEnv, FjObject , item,
+       jListView_add3(gApp.jni.jEnv, FjObject , item,
           delim, GetARGB(FCustomColor, fontColor), fontSize, Ord(hasWidget), widgetText, image);
   end;
 end;
@@ -9359,7 +9187,7 @@ function jListView.GetItemText(index: Integer): string;
 begin
   result := '';
   if FInitialized then
-    Result:= jni_func_i_out_t(FjEnv, FjObject, 'getItemText', index);
+    Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'getItemText', index);
 end;
 
 function jListView.GetCount: integer;
@@ -9371,7 +9199,7 @@ begin
   Result:= FItems.Count;
 
   if FInitialized then
-    Result:= jni_func_out_i(FjEnv, FjObject, 'GetSize' );
+    Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetSize' );
 end;
 
 Procedure jListView.Delete(index: Integer);
@@ -9382,7 +9210,7 @@ begin
   begin
      FItems.Delete(index);
      if FInitialized then
-       jni_proc_i(FjEnv, FjObject, 'delete', index);
+       jni_proc_i(gApp.jni.jEnv, FjObject, 'delete', index);
   end;
 end;
 
@@ -9392,7 +9220,7 @@ begin
   if FItems = nil then exit;
 
   FItems.Clear;
-  jni_proc(FjEnv, FjObject, 'clear' );
+  jni_proc(gApp.jni.jEnv, FjObject, 'clear' );
 end;
 
 procedure jListView.SetItems(Value: TStrings);
@@ -9409,7 +9237,7 @@ begin
     for i:= 0 to FItems.Count - 1 do
     begin
        if FItems.Strings[i] <> '' then
-         jListView_add2(FjEnv, FjObject , FItems.Strings[i], FDelimiter);
+         jListView_add2(gApp.jni.jEnv, FjObject , FItems.Strings[i], FDelimiter);
     end;
   end;
 
@@ -9422,10 +9250,10 @@ procedure jListView.ListViewChange(Sender: TObject);
 begin
 {  if FInitialized then
   begin
-    jListView_clear(FjEnv, FjObject );
+    jListView_clear(gApp.jni.jEnv, FjObject );
     for i:= 0 to FItems.Count - 1 do
     begin
-       jListView_add2(FjEnv, FjObject , FItems.Strings[i],
+       jListView_add2(gApp.jni.jEnv, FjObject , FItems.Strings[i],
                                     FDelimiter, GetARGB(FCustomColor, FFontColor), FFontSize, FWidgetText, Ord(FWidgetItem));
     end;
   end; }
@@ -9439,17 +9267,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;  
@@ -9462,7 +9290,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jListView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -9499,7 +9327,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -9507,7 +9335,7 @@ procedure jListView.SetVisibilityGone();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetVisibilityGone');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetVisibilityGone');
 end;
 
 // Event : Java -> Pascal
@@ -9648,7 +9476,7 @@ begin
   //in designing component state: set value here...
   FTextColorInfo:= _color;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetTextColorInfo', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextColorInfo', GetARGB(FCustomColor, _color));
 end;
 
 // by ADiV
@@ -9656,7 +9484,7 @@ procedure jListView.SetTextColorInfoByIndex(Value: TARGBColorBridge; index: inte
 begin
   //FFontColor:= Value;
   if FInitialized  and (Value <> colbrDefault) then
-     jni_proc_ii(FjEnv, FjObject, 'SetTextColorInfoByIndex', GetARGB(FCustomColor, Value), index);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetTextColorInfoByIndex', GetARGB(FCustomColor, Value), index);
 end;
 
 procedure jListView.SetHighLightSelectedItemColor(_color: TARGBColorBridge);
@@ -9664,7 +9492,7 @@ begin
   //in designing component state: set value here...
   FHighLightSelectedItemColor:= _color;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetHighLightSelectedItemColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetHighLightSelectedItemColor', GetARGB(FCustomColor, _color));
 end;
 
 function jListView.GetItemIndex(): integer;
@@ -9672,7 +9500,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemIndex');
 end;
 
 function jListView.GetItemCaption(): string;
@@ -9680,21 +9508,21 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetItemCaption');
 end;
 
 procedure jListView.DispatchOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemTextColor', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemTextColor', _value);
 end;
 
 procedure jListView.DispatchOnDrawItemBitmap(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemBitmap', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemBitmap', _value);
 end;
 
 procedure jListView.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -9703,7 +9531,7 @@ begin
   FFontSizeUnit:=_unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jListView.SetFontFace(AValue: TFontFace);
@@ -9711,7 +9539,7 @@ begin
  FFontFace:= AValue;
  if FjObject = nil then exit;
 
- jni_proc_i(FjEnv, FjObject, 'SetFontFace', Ord(FFontFace));
+ jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontFace', Ord(FFontFace));
 end;
 
 procedure jListView.SetItemLayout( _itemLayout : TItemLayout);
@@ -9719,7 +9547,7 @@ begin
  FItemLayout := _itemLayout;
 
  if FInitialized then
-  jni_proc_i( FjEnv, FjObject, 'SetItemLayout', Ord(FItemLayout));
+  jni_proc_i( gApp.jni.jEnv, FjObject, 'SetItemLayout', Ord(FItemLayout));
 end;
 
 procedure jListView.SetTextAlign( _textAlign : TTextAlign);
@@ -9727,7 +9555,7 @@ begin
  FTextAlign := _textAlign;
 
  if FInitialized then
-  jni_proc_i( FjEnv, FjObject, 'SetTextAlign', Ord(FTextAlign));
+  jni_proc_i( gApp.jni.jEnv, FjObject, 'SetTextAlign', Ord(FTextAlign));
 end;
 
 function jListView.GetWidgetText(_index: integer): string;
@@ -9735,14 +9563,14 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetWidgetText', _index);
+   Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetWidgetText', _index);
 end;
 
 procedure jListView.SetWidgetCheck(_value: boolean; _index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_setWidgetCheck(FjEnv, FjObject, _value ,_index);
+     jListView_setWidgetCheck(gApp.jni.jEnv, FjObject, _value ,_index);
 end;
 
 function jListView.GetWidgetCheck(_index: integer) : boolean;
@@ -9751,14 +9579,14 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   result := jni_func_i_out_z(FjEnv, FjObject, 'getWidgetCheck', _index);
+   result := jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'getWidgetCheck', _index);
 end;
 
 procedure jListView.SetItemTagString(_tagString: string; _index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'setItemTagString', _tagString ,_index);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'setItemTagString', _tagString ,_index);
 end;
 
 
@@ -9767,7 +9595,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_t(FjEnv, FjObject, 'getItemTagString', _index);
+   Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'getItemTagString', _index);
 end;
 
 function jListView.GetWidth: integer;
@@ -9778,7 +9606,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jListView.GetHeight: integer;
@@ -9789,7 +9617,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 function jListView.GetTotalHeight: integer;
@@ -9797,7 +9625,7 @@ begin
   Result:= FHeight;
   if FInitialized then
   begin
-    result:=jni_func_out_i(FjEnv, FjObject, 'getTotalHeight');
+    result:=jni_func_out_i(gApp.jni.jEnv, FjObject, 'getTotalHeight');
   end;
 end;
 
@@ -9806,7 +9634,7 @@ begin
   result:=0;
   if FInitialized then
   begin
-    result:=jni_func_i_out_i(FjEnv, FjObject, 'getItemHeight', aItemIndex);
+    result:=jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'getItemHeight', aItemIndex);
   end;
 end;
 
@@ -9816,21 +9644,21 @@ begin
   FImageItemIdentifier:= _imageResIdentifier;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetImageByResIdentifier', _imageResIdentifier);
 end;
 
 procedure jListView.SetLeftDelimiter(_leftDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetLeftDelimiter', _leftDelimiter);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetLeftDelimiter', _leftDelimiter);
 end;
 
 procedure jListView.SetRightDelimiter(_rightDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetRightDelimiter', _rightDelimiter);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetRightDelimiter', _rightDelimiter);
 end;
 
 function jListView.GetCenterItemCaption(_fullItemCaption: string): string;
@@ -9838,7 +9666,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetCenterItemCaption', _fullItemCaption);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetCenterItemCaption', _fullItemCaption);
 end;
 
 function jListView.GetLeftItemCaption(_fullItemCaption: string): string;
@@ -9846,7 +9674,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetLeftItemCaption', _fullItemCaption);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetLeftItemCaption', _fullItemCaption);
 end;
 
 function jListView.GetRightItemCaption(_fullItemCaption: string): string;
@@ -9854,7 +9682,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetRightItemCaption', _fullItemCaption);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetRightItemCaption', _fullItemCaption);
 end;
 
 function jListView.GetLongPressSelectedItem(): integer;
@@ -9862,14 +9690,14 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLongPressSelectedItem');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetLongPressSelectedItem');
 end;
 
 procedure jListView.SetAllPartsOnDrawItemTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllPartsOnDrawItemTextColor', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllPartsOnDrawItemTextColor', _value);
 end;
 
 procedure jListView.SetItemPaddingTop(_ItemPaddingTop: integer);
@@ -9878,7 +9706,7 @@ begin
   FItemPaddingTop:= _ItemPaddingTop;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingTop', _ItemPaddingTop);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetItemPaddingTop', _ItemPaddingTop);
 end;
 
 procedure jListView.SetItemPaddingBottom(_itemPaddingBottom: integer);
@@ -9887,7 +9715,7 @@ begin
   FItemPaddingBottom:= _itemPaddingBottom;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingBottom', _itemPaddingBottom);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetItemPaddingBottom', _itemPaddingBottom);
 end;
 
 // by ADiV
@@ -9897,7 +9725,7 @@ begin
   FItemPaddingLeft := _itemPaddingLeft;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingLeft', _itemPaddingLeft);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetItemPaddingLeft', _itemPaddingLeft);
 end;
 
 procedure jListView.SetItemPaddingRight(_itemPaddingRight: integer);
@@ -9906,7 +9734,7 @@ begin
   FItemPaddingRight := _itemPaddingRight;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetItemPaddingRight', _itemPaddingRight);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetItemPaddingRight', _itemPaddingRight);
 end;
 
 procedure jListView.SetTextMarginLeft(_left: integer);
@@ -9915,7 +9743,7 @@ begin
   FTextMarginLeft := _left;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextMarginLeft', _left);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextMarginLeft', _left);
 end;
 
 procedure jListView.SetTextMarginRight(_right: integer);
@@ -9924,7 +9752,7 @@ begin
   FTextMarginRight := _right;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextMarginRight', _right);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextMarginRight', _right);
 end;
 
 procedure jListView.SetTextMarginInner(_inner: integer);
@@ -9933,14 +9761,14 @@ begin
   FTextMarginInner := _inner;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetTextMarginInner', _inner);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextMarginInner', _inner);
 end;
 
 procedure jListView.SetWidgetImageSide(_side: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetWidgetImageSide', _side);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetWidgetImageSide', _side);
 end;
 
 procedure jListView.SetTextWordWrap(_value: boolean);
@@ -9949,7 +9777,7 @@ begin
   FTextWordWrap := _value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetItemCenterWordWrap', _value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetItemCenterWordWrap', _value);
 end;
 
 // by ADiV
@@ -9959,7 +9787,7 @@ begin
   FEnableOnClickTextLeft := _value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetEnableOnClickTextLeft', _value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnableOnClickTextLeft', _value);
 end;
 
 // by ADiV
@@ -9969,7 +9797,7 @@ begin
   FEnableOnClickTextCenter := _value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetEnableOnClickTextCenter', _value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnableOnClickTextCenter', _value);
 end;
 
 // by ADiV
@@ -9979,14 +9807,14 @@ begin
   FEnableOnClickTextRight := _value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetEnableOnClickTextRight', _value);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnableOnClickTextRight', _value);
 end;
 
 // by ADiV
 procedure jListView.SetItemText(txt: string; index: integer);
 begin
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'setItemTextByIndex', txt, index);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'setItemTextByIndex', txt, index);
 end;
 
 // by ADiV
@@ -9994,7 +9822,7 @@ procedure jListView.SetWidgetOnTouch( _ontouch : boolean );
 begin
  //in designing component state: result value here...
  if FInitialized then
-  jni_proc_z(FjEnv, FjObject, 'SetWidgetOnTouch', _ontouch);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetWidgetOnTouch', _ontouch);
 end;
 
 procedure jListView.SetWidgetTextColor(_textcolor: TARGBColorBridge);
@@ -10003,56 +9831,56 @@ begin
   FWidgetTextColor:= _textcolor;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetWidgetTextColor', GetARGB(FCustomColor, _textcolor));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetWidgetTextColor', GetARGB(FCustomColor, _textcolor));
 end;
 
 procedure jListView.SetDispatchOnDrawItemWidgetTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetDispatchOnDrawItemWidgetTextColor', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetDispatchOnDrawItemWidgetTextColor', _value);
 end;
 
 procedure jListView.SetDispatchOnDrawItemWidgetText(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetDispatchOnDrawItemWidgetText', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetDispatchOnDrawItemWidgetText', _value);
 end;
 
 procedure jListView.SetWidgetInputTypeIsCurrency(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetWidgetInputTypeIsCurrency', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetWidgetInputTypeIsCurrency', _value);
 end;
 
 procedure jListView.SetWidgetFontFromAssets(_customFontName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetWidgetFontFromAssets', _customFontName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetWidgetFontFromAssets', _customFontName);
 end;
 
 procedure jListView.DispatchOnDrawWidgetItemWidgetTextColor(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawWidgetItemWidgetTextColor', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawWidgetItemWidgetTextColor', _value);
 end;
 
 procedure jListView.DispatchOnDrawItemWidgetImage(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemWidgetImage', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemWidgetImage', _value);
 end;
 
 procedure jListView.SetBackgroundByResIdentifier(_imgResIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetBackgroundByResIdentifier', _imgResIdentifier);
 end;
 
 function jListView.SplitCenterItemCaption(_centerItemCaption: string; _delimiter: string): TDynArrayOfString;
@@ -10060,28 +9888,28 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jListView_SplitCenterItemCaption(FjEnv, FjObject, _centerItemCaption ,_delimiter);
+   Result:= jListView_SplitCenterItemCaption(gApp.jni.jEnv, FjObject, _centerItemCaption ,_delimiter);
 end;
 
 procedure jListView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelection', _index);
 end;
 
 procedure jListView.SmoothScrollToPosition(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SmoothScrollToPosition', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SmoothScrollToPosition', _index);
 end;
 
 procedure jListView.SetItemChecked(_index: integer; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iz(FjEnv, FjObject, 'SetItemChecked', _index ,_value);
+     jni_proc_iz(gApp.jni.jEnv, FjObject, 'SetItemChecked', _index ,_value);
 end;
 
 function jListView.GetCheckedItemPosition(): integer;
@@ -10089,42 +9917,42 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetCheckedItemPosition');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetCheckedItemPosition');
 end;
 
 procedure jListView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jListView.DisableScroll(_disable : boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DisableScroll', _disable);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DisableScroll', _disable);
 end;
 
 procedure jListView.SetFastScrollEnabled(_enable : boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFastScrollEnabled', _enable);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFastScrollEnabled', _enable);
 end;
 
 procedure jListView.SaveToFile(_appInternalFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SaveToFile', _appInternalFileName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SaveToFile', _appInternalFileName);
 end;
 
 procedure jListView.LoadFromFile(_appInternalFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jListView_LoadFromFile(FjEnv, FjObject, _appInternalFileName);
+     jListView_LoadFromFile(gApp.jni.jEnv, FjObject, _appInternalFileName);
 end;
 
 
@@ -10132,42 +9960,42 @@ procedure jListView.SetFilterQuery(_query: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetFilterQuery', _query);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetFilterQuery', _query);
 end;
 
 procedure jListView.SetFilterQuery(_query: string; _filterMode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetFilterQuery', _query ,_filterMode);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'SetFilterQuery', _query ,_filterMode);
 end;
 
 procedure jListView.SetFilterMode(_filterMode: TFilterMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetFilterMode', Ord(_filterMode));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFilterMode', Ord(_filterMode));
 end;
 
 procedure jListView.ClearFilterQuery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ClearFilterQuery');
+     jni_proc(gApp.jni.jEnv, FjObject, 'ClearFilterQuery');
 end;
 
 procedure jListView.SetDrawItemBackColorAlpha(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetDrawItemBackColorAlpha', _alpha);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetDrawItemBackColorAlpha', _alpha);
 end;
 
 procedure jListView.DispatchOnDrawItemTextCustomFont(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnDrawItemTextCustomFont', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemTextCustomFont', _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -10195,38 +10023,38 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jScrollView.Init(refApp: jApp);
+procedure jScrollView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject := jScrollView_jCreate(FjEnv, int64(Self) , Ord(FInnerLayout), FjThis);
+   FjObject := jScrollView_jCreate(gApp.jni.jEnv, int64(Self) , Ord(FInnerLayout), gApp.jni.jThis);
 
    if FjObject = nil then exit;
 
-   //FjRLayout:= jScrollView_getView(FjEnv, FjObject ); //Self.View
+   //FjRLayout:= jScrollView_getView(gApp.jni.jEnv, FjObject ); //Self.View
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -10235,7 +10063,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -10243,14 +10071,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -10263,9 +10091,9 @@ begin
       SetFillViewport(FFillViewportEnabled);
 
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 end;
 
@@ -10273,33 +10101,33 @@ procedure jScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jScrollView.RemoveFromViewParent;
 begin
 //if FInitialized then
-  // jScrollView_RemoveFromViewParent(FjEnv, FjObject);
+  // jScrollView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jScrollView.GetView: jObject;
 begin
     result := nil;
     if FInitialized then
-       Result:= View_GetViewGroup(FjEnv, FjObject);
+       Result:= View_GetViewGroup(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 procedure jScrollView.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jScrollView.SetScrollSize(Value: integer);
@@ -10307,7 +10135,7 @@ begin
   FScrollSize:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv,FjObject, 'setScrollSize', FScrollSize);
+  jni_proc_i(gApp.jni.jEnv,FjObject, 'setScrollSize', FScrollSize);
 end;
 
 procedure jScrollView.SetInnerLayout(layout: TScrollInnerLayout);
@@ -10323,17 +10151,17 @@ begin
     //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -10346,7 +10174,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jScrollView.SetFillViewport(fillenabled: boolean);
@@ -10355,7 +10183,7 @@ begin
   FFillViewportEnabled:= fillenabled;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setFillViewport', fillenabled);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setFillViewport', fillenabled);
 end;
 
 
@@ -10363,21 +10191,21 @@ procedure jScrollView.ScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'ScrollTo', _x ,_y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'ScrollTo', _x ,_y);
 end;
 
 procedure jScrollView.SmoothScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollTo', _x ,_y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SmoothScrollTo', _x ,_y);
 end;
 
 procedure jScrollView.SmoothScrollBy(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollBy', _x ,_y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SmoothScrollBy', _x ,_y);
 end;
 
 function jScrollView.GetScrollX(): integer;
@@ -10385,7 +10213,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollX');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetScrollX');
 end;
 
 function jScrollView.GetScrollY(): integer;
@@ -10393,7 +10221,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollY');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetScrollY');
 end;
 
 function jScrollView.GetBottom(): integer;
@@ -10401,7 +10229,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBottom');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetBottom');
 end;
 
 function jScrollView.GetTop(): integer;
@@ -10409,7 +10237,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetTop');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetTop');
 end;
 
 function jScrollView.GetLeft(): integer;
@@ -10417,7 +10245,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLeft');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetLeft');
 end;
 
 function jScrollView.GetRight(): integer;
@@ -10425,7 +10253,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRight');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetRight');
 end;
 
 function jScrollView.GetWidth: integer;
@@ -10436,7 +10264,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jScrollView.GetHeight: integer;
@@ -10447,91 +10275,91 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jScrollView.DispatchOnScrollChangedEvent(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnScrollChangedEvent', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnScrollChangedEvent', _value);
 end;
 
 procedure jScrollView.AddView(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jScrollView_AddView(FjEnv, FjObject, _view);
+     jScrollView_AddView(gApp.jni.jEnv, FjObject, _view);
 end;
 
 procedure jScrollView.AddImage(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp(FjEnv, FjObject, 'AddImage', _bitmap);
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'AddImage', _bitmap);
 end;
 
 procedure jScrollView.AddImageFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'AddImageFromFile', _path ,_filename);
 end;
 
 procedure jScrollView.AddImageFromAssets(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AddImageFromAssets', _filename);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AddImageFromAssets', _filename);
 end;
 
 procedure jScrollView.AddImage(_bitmap: jObject; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId);
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'AddImage', _bitmap ,_itemId);
 end;
 
 procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tti(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId);
+     jni_proc_tti(gApp.jni.jEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId);
 end;
 
 procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId);
 end;
 
 procedure jScrollView.AddText(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AddText', _text);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AddText', _text);
 end;
 
 procedure jScrollView.AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_ii(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId ,Ord(_scaleType));
+     jni_proc_bmp_ii(gApp.jni.jEnv, FjObject, 'AddImage', _bitmap ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ttii(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId ,Ord(_scaleType));
+     jni_proc_ttii(gApp.jni.jEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tii(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId , Ord(_scaleType));
+     jni_proc_tii(gApp.jni.jEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId , Ord(_scaleType));
 end;
 
 function jScrollView.GetInnerItemId(_index: integer): integer;
@@ -10539,7 +10367,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemId', _index);
+   Result:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetInnerItemId', _index);
 end;
 
 function jScrollView.GetInnerItemIndex(_itemId: integer): integer;
@@ -10547,21 +10375,21 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemIndex', _itemId);
+   Result:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetInnerItemIndex', _itemId);
 end;
 
 procedure jScrollView.Delete(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Delete', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'Delete', _index);
 end;
 
 procedure jScrollView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Clear');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end;
 
 procedure jScrollView.BringToFront;
@@ -10570,7 +10398,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -10615,36 +10443,36 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jHorizontalScrollView.Init(refApp: jApp);
+procedure jHorizontalScrollView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject  := jHorizontalScrollView_jCreate(FjEnv, int64(Self) , Ord(FInnerLayout), FjThis);
+   FjObject  := jHorizontalScrollView_jCreate(gApp.jni.jEnv, int64(Self) , Ord(FInnerLayout), gApp.jni.jThis);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -10653,7 +10481,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
 
@@ -10661,14 +10489,14 @@ begin
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -10677,9 +10505,9 @@ begin
 
    SetScrollSize(FScrollSize);
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 
 end;
@@ -10688,13 +10516,13 @@ procedure jHorizontalScrollView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jHorizontalScrollView.RemoveFromViewParent;
 begin
 //if FInitialized then
-  // jHorizontalScrollView_RemoveFromViewParent(FjEnv, FjObject);
+  // jHorizontalScrollView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jHorizontalScrollView.GetWidth: integer;
@@ -10705,7 +10533,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jHorizontalScrollView.GetHeight: integer;
@@ -10716,27 +10544,27 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 function jHorizontalScrollView.GetView: jObject;
 begin
     result := nil;
     if FInitialized then
-       Result:= View_GetViewGroup(FjEnv, FjObject);
+       Result:= View_GetViewGroup(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jHorizontalScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 procedure jHorizontalScrollView.Refresh;
 begin
   if not FInitialized then Exit;
-  View_Invalidate(FjEnv, FjObject );
+  View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jHorizontalScrollView.SetScrollSize(Value: integer);
@@ -10744,7 +10572,7 @@ begin
   FScrollSize := Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv,FjObject, 'setScrollSize', FScrollSize);
+  jni_proc_i(gApp.jni.jEnv,FjObject, 'setScrollSize', FScrollSize);
 end;
 
 procedure jHorizontalScrollView.SetInnerLayout(layout: TScrollInnerLayout);
@@ -10760,17 +10588,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -10783,28 +10611,28 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jHorizontalScrollView.ScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'ScrollTo', _x ,_y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'ScrollTo', _x ,_y);
 end;
 
 procedure jHorizontalScrollView.SmoothScrollTo(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollTo', _x ,_y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SmoothScrollTo', _x ,_y);
 end;
 
 procedure jHorizontalScrollView.SmoothScrollBy(_x: integer; _y: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SmoothScrollBy', _x ,_y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SmoothScrollBy', _x ,_y);
 end;
 
 function jHorizontalScrollView.GetScrollX(): integer;
@@ -10812,7 +10640,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollX');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetScrollX');
 end;
 
 function jHorizontalScrollView.GetScrollY(): integer;
@@ -10820,7 +10648,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScrollY');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetScrollY');
 end;
 
 function jHorizontalScrollView.GetBottom(): integer;
@@ -10828,7 +10656,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetBottom');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetBottom');
 end;
 
 function jHorizontalScrollView.GetTop(): integer;
@@ -10836,7 +10664,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetTop');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetTop');
 end;
 
 function jHorizontalScrollView.GetLeft(): integer;
@@ -10844,7 +10672,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetLeft');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetLeft');
 end;
 
 function jHorizontalScrollView.GetRight(): integer;
@@ -10852,91 +10680,91 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRight');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetRight');
 end;
 
 procedure jHorizontalScrollView.DispatchOnScrollChangedEvent(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'DispatchOnScrollChangedEvent', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnScrollChangedEvent', _value);
 end;
 
 procedure jHorizontalScrollView.AddView(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_viw(FjEnv, FjObject, 'AddView', _view);
+     jni_proc_viw(gApp.jni.jEnv, FjObject, 'AddView', _view);
 end;
 
 procedure jHorizontalScrollView.AddImage(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp(FjEnv, FjObject, 'AddImage', _bitmap);
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'AddImage', _bitmap);
 end;
 
 procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'AddImageFromFile', _path ,_filename);
 end;
 
 procedure jHorizontalScrollView.AddImageFromAssets(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AddImageFromAssets', _filename);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AddImageFromAssets', _filename);
 end;
 
 procedure jHorizontalScrollView.AddImage(_bitmap: jObject; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_i(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId);
+     jni_proc_bmp_i(gApp.jni.jEnv, FjObject, 'AddImage', _bitmap ,_itemId);
 end;
 
 procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tti(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId);
+     jni_proc_tti(gApp.jni.jEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId);
 end;
 
 procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId);
+     jni_proc_ti(gApp.jni.jEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId);
 end;
 
 procedure jHorizontalScrollView.AddText(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'AddText', _text);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AddText', _text);
 end;
 
 procedure jHorizontalScrollView.AddImage(_bitmap: jObject; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_ii(FjEnv, FjObject, 'AddImage', _bitmap ,_itemId ,Ord(_scaleType));
+     jni_proc_bmp_ii(gApp.jni.jEnv, FjObject, 'AddImage', _bitmap ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jHorizontalScrollView.AddImageFromFile(_path: string; _filename: string; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ttii(FjEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId ,Ord(_scaleType));
+     jni_proc_ttii(gApp.jni.jEnv, FjObject, 'AddImageFromFile', _path ,_filename ,_itemId ,Ord(_scaleType));
 end;
 
 procedure jHorizontalScrollView.AddImageFromAssets(_filename: string; _itemId: integer; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tii(FjEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId ,Ord(_scaleType));
+     jni_proc_tii(gApp.jni.jEnv, FjObject, 'AddImageFromAssets', _filename ,_itemId ,Ord(_scaleType));
 end;
 
 function jHorizontalScrollView.GetInnerItemId(_index: integer): integer;
@@ -10944,7 +10772,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemId', _index);
+   Result:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetInnerItemId', _index);
 end;
 
 function jHorizontalScrollView.GetInnerItemIndex(_itemId: integer): integer;
@@ -10952,21 +10780,21 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_i(FjEnv, FjObject, 'GetInnerItemIndex', _itemId);
+   Result:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetInnerItemIndex', _itemId);
 end;
 
 procedure jHorizontalScrollView.Delete(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Delete', _index);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'Delete', _index);
 end;
 
 procedure jHorizontalScrollView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Clear');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Clear');
 end;
 
 procedure jHorizontalScrollView.GenEvent_OnChanged(Obj: TObject; currHor: Integer; currVerti: Integer; prevHor: Integer; prevVertical: Integer; onPosition: Integer;  scrolldiff: integer);
@@ -11011,35 +10839,35 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jWebView.Init(refApp: jApp);
+procedure jWebView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
-   FjObject := jWebView_Create(FjEnv, FjThis, Self);
+   inherited Init;
+   FjObject := jWebView_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -11048,21 +10876,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -11078,9 +10906,9 @@ begin
      SetZoomControl(FZoomControl);
 
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 
 end;
@@ -11089,26 +10917,26 @@ procedure jWebView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jWebView.RemoveFromViewParent;
 begin
 //if FInitialized then
-  // jWebView_RemoveFromViewParent(FjEnv, FjObject);
+  // jWebView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 Procedure jWebView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 Procedure jWebView.Refresh;
  begin
   if not FInitialized then Exit;
-  View_Invalidate(FjEnv, FjObject );
+  View_Invalidate(gApp.jni.jEnv, FjObject );
  end;
 
 Procedure jWebView.SetJavaScript(Value : Boolean);
@@ -11116,7 +10944,7 @@ begin
   FJavaScript:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setJavaScript', FJavaScript);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'setJavaScript', FJavaScript);
 end;
 
 procedure jWebView.SetZoomControl(Value: Boolean);
@@ -11126,7 +10954,7 @@ begin
     FZoomControl := Value;
     if FjObject = nil then exit;
 
-    jni_proc_z(FjEnv, FjObject, 'setZoomControl', FZoomControl);
+    jni_proc_z(gApp.jni.jEnv, FjObject, 'setZoomControl', FZoomControl);
   end;
 end;
 
@@ -11134,7 +10962,7 @@ Procedure jWebView.Navigate(url: string);
 begin
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'loadUrl', url);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'loadUrl', url);
 end;
 
 Procedure jWebView.LoadFromHtmlFile(environmentDirectoryPath: string; htmlFileName: string);
@@ -11148,21 +10976,21 @@ procedure jWebView.LoadFromHtmlString(_htmlString: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'LoadFromHtmlString', _htmlString);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'LoadFromHtmlString', _htmlString);
 end;
 
 procedure jWebView.ClearHistory();  // By ADiV
 begin
  //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ClearHistory');
+     jni_proc(gApp.jni.jEnv, FjObject, 'ClearHistory');
 end;
 
 procedure jWebView.ClearCache( _clearDiskFiles : boolean ); // By ADiV
 begin
  //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'ClearCache', _clearDiskFiles);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'ClearCache', _clearDiskFiles);
 end;
 
 function jWebView.CanGoBack(): boolean;
@@ -11170,7 +10998,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'CanGoBack');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'CanGoBack');
 end;
 
 function jWebView.CanGoBackOrForward(_steps: integer): boolean;
@@ -11178,7 +11006,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_z(FjEnv, FjObject, 'CanGoBackOrForward', _steps);
+   Result:= jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'CanGoBackOrForward', _steps);
 end;
 
 function jWebView.CanGoForward(): boolean;
@@ -11186,28 +11014,28 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'CanGoForward');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'CanGoForward');
 end;
 
 procedure jWebView.GoBack();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'GoBack');
+     jni_proc(gApp.jni.jEnv, FjObject, 'GoBack');
 end;
 
 procedure jWebView.GoBackOrForward(steps: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'GoBackOrForward', steps);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'GoBackOrForward', steps);
 end;
 
 procedure jWebView.GoForward();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'GoForward');
+     jni_proc(gApp.jni.jEnv, FjObject, 'GoForward');
 end;
 
 procedure jWebView.ClearLayout();
@@ -11218,17 +11046,17 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -11241,7 +11069,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 
@@ -11249,7 +11077,7 @@ procedure jWebView.SetHttpAuthUsernamePassword(_hostName: string; _domain: strin
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_SetHttpAuthUsernamePassword(FjEnv, FjObject, _hostName ,_domain ,_username ,_password);
+     jWebView_SetHttpAuthUsernamePassword(gApp.jni.jEnv, FjObject, _hostName ,_domain ,_username ,_password);
 end;
 
 // Event : Java -> Pascal
@@ -11261,7 +11089,7 @@ end;
 procedure jWebView.ScrollTo(_x, _y: integer);
 begin
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'scrollTo', _x, _y);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'scrollTo', _x, _y);
 end;
 
 //LMB
@@ -11270,7 +11098,7 @@ begin
   result := 0;
 
   if FInitialized then
-     result := jni_func_out_i(FjEnv, FjObject, 'getScrollY');
+     result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'getScrollY');
 end;
 
 //LMB
@@ -11278,28 +11106,28 @@ procedure jWebView.LoadDataWithBaseURL(s1,s2,s3,s4,s5: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jWebView_LoadDataWithBaseURL(FjEnv, FjObject, s1,s2,s3,s4,s5);
+     jWebView_LoadDataWithBaseURL(gApp.jni.jEnv, FjObject, s1,s2,s3,s4,s5);
 end;
 
 //LMB
 procedure jWebView.FindAll(_s: string);
 begin
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'findAllAsync', _s);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'findAllAsync', _s);
 end;
 
 //LMB
 procedure jWebView.FindNext(_forward: boolean);
 begin
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'findNext', _forward);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'findNext', _forward);
 end;
 
 //LMB
 procedure jWebView.ClearMatches();
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'clearMatches');
+     jni_proc(gApp.jni.jEnv, FjObject, 'clearMatches');
 end;
 
 //LMB
@@ -11307,7 +11135,7 @@ function jWebView.GetFindIndex: integer;
 begin
   result := 0;
   if FInitialized then
-     result := jni_func_out_i(FjEnv, FjObject, 'getFindIndex');
+     result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'getFindIndex');
 end;
 
 //LMB
@@ -11315,7 +11143,7 @@ function jWebView.GetFindCount: integer;
 begin
   result := 0;
   if FInitialized then
-     result := jni_func_out_i(FjEnv, FjObject, 'getFindCount');
+     result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'getFindCount');
 end;
 
 function jWebView.GetWidth: integer;
@@ -11326,7 +11154,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jni_func_out_i(FjEnv, FjObject, 'getWidth' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getWidth' );
 end;
 
 function jWebView.GetHeight: integer;
@@ -11337,7 +11165,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jni_func_out_i(FjEnv, FjObject, 'getHeight' );
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getHeight' );
 end;
 
 //by segator
@@ -11345,7 +11173,7 @@ procedure jWebView.CallEvaluateJavascript(_jsInnerCode: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'CallEvaluateJavascript', _jsInnerCode);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'CallEvaluateJavascript', _jsInnerCode);
 end;
 
 procedure jWebView.SetDomStorage(_domStorage: boolean);
@@ -11355,112 +11183,112 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetDomStorage', _domStorage);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetDomStorage', _domStorage);
 end;
 
 procedure jWebView.SetLoadWithOverviewMode(_overviewMode: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetLoadWithOverviewMode', _overviewMode);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetLoadWithOverviewMode', _overviewMode);
 end;
 
 procedure jWebView.SetUseWideViewPort(_wideViewport: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetUseWideViewPort', _wideViewport);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetUseWideViewPort', _wideViewport);
 end;
 
 procedure jWebView.SetAllowContentAccess(_allowContentAccess: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllowContentAccess', _allowContentAccess);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllowContentAccess', _allowContentAccess);
 end;
 
 procedure jWebView.SetAllowFileAccess(_allowFileAccess: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllowFileAccess', _allowFileAccess);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllowFileAccess', _allowFileAccess);
 end;
 
 procedure jWebView.SetAppCacheEnabled(_cacheEnabled: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAppCacheEnabled', _cacheEnabled);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAppCacheEnabled', _cacheEnabled);
 end;
 
 procedure jWebView.SetDisplayZoomControls(_displayZoomControls: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetDisplayZoomControls', _displayZoomControls);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetDisplayZoomControls', _displayZoomControls);
 end;
 
 procedure jWebView.SetGeolocationEnabled(_geolocationEnabled: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetGeolocationEnabled', _geolocationEnabled);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetGeolocationEnabled', _geolocationEnabled);
 end;
 
 procedure jWebView.SetJavaScriptCanOpenWindowsAutomatically(_javaScriptCanOpenWindows: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetJavaScriptCanOpenWindowsAutomatically', _javaScriptCanOpenWindows);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetJavaScriptCanOpenWindowsAutomatically', _javaScriptCanOpenWindows);
 end;
 
 procedure jWebView.SetLoadsImagesAutomatically(_loadsImagesAutomatically: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetLoadsImagesAutomatically', _loadsImagesAutomatically);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetLoadsImagesAutomatically', _loadsImagesAutomatically);
 end;
 
 procedure jWebView.SetSupportMultipleWindows(_supportMultipleWindows: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetSupportMultipleWindows', _supportMultipleWindows);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetSupportMultipleWindows', _supportMultipleWindows);
 end;
 
 procedure jWebView.SetAllowUniversalAccessFromFileURLs(_allowUniversalAccessFromFileURLs: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllowUniversalAccessFromFileURLs', _allowUniversalAccessFromFileURLs);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetAllowUniversalAccessFromFileURLs', _allowUniversalAccessFromFileURLs);
 end;
 
 procedure jWebView.SetMediaPlaybackRequiresUserGesture(_mediaPlaybackRequiresUserGesture: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetMediaPlaybackRequiresUserGesture', _mediaPlaybackRequiresUserGesture);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetMediaPlaybackRequiresUserGesture', _mediaPlaybackRequiresUserGesture);
 end;
 
 procedure jWebView.SetSafeBrowsingEnabled(_safeBrowsingEnabled: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetSafeBrowsingEnabled', _safeBrowsingEnabled);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetSafeBrowsingEnabled', _safeBrowsingEnabled);
 end;
 
 procedure jWebView.SetSupportZoom(_supportZoom: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetSupportZoom', _supportZoom);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetSupportZoom', _supportZoom);
 end;
 
 procedure jWebView.SetUserAgent(_userAgent: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetUserAgent', _userAgent);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetUserAgent', _userAgent);
 end;
 
 
@@ -11499,18 +11327,18 @@ destructor jBitmap.Destroy;
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jBitmap.Init(refApp: jApp);
+procedure jBitmap.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject  := jBitmap_Create(FjEnv, FjThis, Self);
+  inherited Init;
+  FjObject  := jBitmap_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
   if FjObject = nil then exit;
 
@@ -11522,7 +11350,7 @@ begin
 
   if FImageList <> nil then
   begin
-    FImageList.Init(refApp);
+    FImageList.Init;
     if FImageList.Images.Count > 0 then
     begin
        if FImageIndex >=0 then SetImageByIndex(FImageIndex);
@@ -11555,10 +11383,10 @@ begin
        if path <> '' then FImageName:= ExtractFileName(fullFileName)
        else  FImageName:= fullFileName;
 
-       jni_proc_t(FjEnv, FjObject, 'loadFile', GetFilePath(FFilePath)+'/'+FImageName);
+       jni_proc_t(gApp.jni.jEnv, FjObject, 'loadFile', GetFilePath(FFilePath)+'/'+FImageName);
 
-       FWidth:= jni_func_out_i(FjEnv, FjObject, 'GetWidth' );
-       FHeight:= jni_func_out_i(FjEnv, FjObject, 'GetHeight' );
+       FWidth:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth' );
+       FHeight:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight' );
      end;
   end;
 end;
@@ -11567,9 +11395,9 @@ procedure jBitmap.LoadFromRes(imgResIdentifier: String);  // ..res/drawable
 begin
    if FInitialized then
    begin
-       jni_proc_t(FjEnv, FjObject, 'loadRes', imgResIdentifier);
-       FWidth:= jni_func_out_i(FjEnv, FjObject, 'GetWidth' );
-       FHeight:= jni_func_out_i(FjEnv, FjObject, 'GetHeight' );
+       jni_proc_t(gApp.jni.jEnv, FjObject, 'loadRes', imgResIdentifier);
+       FWidth:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth' );
+       FHeight:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight' );
    end;
 end;
 
@@ -11581,7 +11409,7 @@ begin
   begin
     FWidth  := w;
     FHeight := h;
-    jni_proc_ii(FjEnv, FjObject, 'createBitmap', w, h);
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'createBitmap', w, h);
   end;
 end;
 
@@ -11595,7 +11423,7 @@ begin
   result := nil;
 
   if FInitialized then
-     Result:= jni_func_out_bmp(FjEnv, FjObject, 'jInstance' );
+     Result:= jni_func_out_bmp(gApp.jni.jEnv, FjObject, 'jInstance' );
 
 end;
 
@@ -11605,7 +11433,7 @@ begin
   result := nil;
 
   if FInitialized then
-     Result:= jBitmap_GetCanvas(FjEnv, FjObject );
+     Result:= jBitmap_GetCanvas(gApp.jni.jEnv, FjObject );
 
 end;
 
@@ -11613,7 +11441,7 @@ procedure jBitmap.GetBitmapSizeFromFile(_fullPathFile: string; var w, h :integer
 begin
   if not FInitialized then exit;
 
-  jBitmap_GetBitmapSizeFromFile(FjEnv, FjObject, _fullPathFile, w, h);
+  jBitmap_GetBitmapSizeFromFile(gApp.jni.jEnv, FjObject, _fullPathFile, w, h);
 end;
 
 function jBitmap.BitmapToArrayOfJByte(var bufferImage: TDynArrayOfJByte): integer; //local/self
@@ -11656,13 +11484,13 @@ function jBitmap.GetByteArrayFromBitmap(var bufferImage: TDynArrayOfJByte): inte
 begin
   result := 0;
   if FInitialized then
-   Result:= jBitmap_GetByteArrayFromBitmap(FjEnv, FjObject , bufferImage);
+   Result:= jBitmap_GetByteArrayFromBitmap(gApp.jni.jEnv, FjObject , bufferImage);
 end;
 
 procedure jBitmap.SetByteArrayToBitmap(var bufferImage: TDynArrayOfJByte; size: integer);
 begin
   if FInitialized then
-    jBitmap_SetByteArrayToBitmap(FjEnv, FjObject , bufferImage, size);
+    jBitmap_SetByteArrayToBitmap(gApp.jni.jEnv, FjObject , bufferImage, size);
 end;
 
 procedure jBitmap.Notification(AComponent: TComponent; Operation: TOperation);
@@ -11699,7 +11527,7 @@ begin
    //in designing component state: result value here...
   Result:= FHeight;
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetWidth');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
 end;
 
 function jBitmap.GetWidth: integer;
@@ -11707,7 +11535,7 @@ begin
   //in designing component state: result value here...
    Result:= FWidth;
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetHeight');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
 end;
 
 procedure jBitmap.SetImageByIndex(Value: integer);
@@ -11721,8 +11549,8 @@ begin
       FImageName:= Trim(FImageList.Images.Strings[Value]);
       if  (FImageName <> '') then
       begin
-        jni_proc_t(FjEnv, FjObject, 'loadFile', GetFilePath(FFilePath)+'/'+FImageName);
-        jBitmap_getWH(FjEnv, FjObject , integer(FWidth),integer(FHeight));
+        jni_proc_t(gApp.jni.jEnv, FjObject, 'loadFile', GetFilePath(FFilePath)+'/'+FImageName);
+        jBitmap_getWH(gApp.jni.jEnv, FjObject , integer(FWidth),integer(FHeight));
       end;
    end;
 end;
@@ -11756,25 +11584,25 @@ end;
 procedure jBitmap.LockPixels(var PDWordPixel : PScanLine);
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(FjEnv, Self.GetJavaBitmap, @PDWordPixel);
+    AndroidBitmap_lockPixels(gApp.jni.jEnv, Self.GetJavaBitmap, @PDWordPixel);
 end;
 
 procedure jBitmap.LockPixels(var PBytePixel : PScanByte {delphi mode});
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(FjEnv, Self.GetJavaBitmap, @PBytePixel);
+    AndroidBitmap_lockPixels(gApp.jni.jEnv, Self.GetJavaBitmap, @PBytePixel);
 end;
 
 procedure jBitmap.LockPixels(var PSJByte: PJByte {FPC mode });
 begin
   if FInitialized then
-    AndroidBitmap_lockPixels(FjEnv, Self.GetJavaBitmap, @PSJByte);
+    AndroidBitmap_lockPixels(gApp.jni.jEnv, Self.GetJavaBitmap, @PSJByte);
 end;
 
 procedure jBitmap.UnlockPixels;
 begin
   if FInitialized then
-     AndroidBitmap_unlockPixels(FjEnv, Self.GetJavaBitmap);
+     AndroidBitmap_unlockPixels(gApp.jni.jEnv, Self.GetJavaBitmap);
 end;
 
 function jBitmap.GetInfo: boolean;
@@ -11784,7 +11612,7 @@ begin
   Result:= False;
   if FInitialized then
   begin
-    rtn:= AndroidBitmap_getInfo(FjEnv,Self.GetJavaBitmap,@Self.FBitmapInfo);
+    rtn:= AndroidBitmap_getInfo(gApp.jni.jEnv,Self.GetJavaBitmap,@Self.FBitmapInfo);
     case rtn = 0 of
       True  :begin
                  Result:= True;
@@ -11899,7 +11727,7 @@ begin
   if _bmp = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'ClockWise', _bmp);
+   Result:= jni_func_bmp_out_bmp(gApp.jni.jEnv, FjObject, 'ClockWise', _bmp);
 end;
 
 function jBitmap.AntiClockWise(_bmp: jObject ): jObject;
@@ -11909,7 +11737,7 @@ begin
   if _bmp = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_bmp_out_bmp(FjEnv, FjObject, 'AntiClockWise', _bmp);
+   Result:= jni_func_bmp_out_bmp(gApp.jni.jEnv, FjObject, 'AntiClockWise', _bmp);
 end;
 
 function jBitmap.SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
@@ -11920,7 +11748,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_bmp_ff_out_bmp(FjEnv, FjObject, 'SetScale', _bmp ,_scaleX ,_scaleY);
+   Result:= jni_func_bmp_ff_out_bmp(gApp.jni.jEnv, FjObject, 'SetScale', _bmp ,_scaleX ,_scaleY);
 end;
 
 function jBitmap.SetScale(_scaleX: single; _scaleY: single): jObject;
@@ -11928,7 +11756,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ff_out_bmp(FjEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
+   Result:= jni_func_ff_out_bmp(gApp.jni.jEnv, FjObject, 'SetScale' ,_scaleX ,_scaleY);
 end;
 
 function jBitmap.LoadFromAssets(fileName: string): jObject;
@@ -11937,7 +11765,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromAssets', fileName);
+   Result:= jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'LoadFromAssets', fileName);
 end;
 
 procedure jBitmap.LoadFromBuffer(buffer: Pointer; size: Integer);
@@ -11945,7 +11773,7 @@ begin
   if buffer = nil then exit;
 
   if FInitialized then
-    jBitmap_LoadFromBuffer(FjEnv, FjObject, buffer, size);
+    jBitmap_LoadFromBuffer(gApp.jni.jEnv, FjObject, buffer, size);
 end;
 
 function jBitmap.LoadFromBuffer(var buffer: TDynArrayOfJByte): jObject;
@@ -11956,7 +11784,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dab_out_bmp(FjEnv, FjObject, 'LoadFromBuffer2', buffer);
+   Result:= jni_func_dab_out_bmp(gApp.jni.jEnv, FjObject, 'LoadFromBuffer2', buffer);
 end;
 
 function jBitmap.GetResizedBitmap(_bmp: jObject; _newWidth: integer; _newHeight: integer): jObject;
@@ -11967,7 +11795,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetResizedBitmap(FjEnv, FjObject, _bmp ,_newWidth ,_newHeight);
+   Result:= jBitmap_GetResizedBitmap(gApp.jni.jEnv, FjObject, _bmp ,_newWidth ,_newHeight);
 end;
 
 function jBitmap.GetResizedBitmap(_newWidth: integer; _newHeight: integer): jObject;
@@ -11976,7 +11804,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ii_out_bmp(FjEnv, FjObject, 'GetResizedBitmap', _newWidth ,_newHeight);
+   Result:= jni_func_ii_out_bmp(gApp.jni.jEnv, FjObject, 'GetResizedBitmap', _newWidth ,_newHeight);
 end;
 
 function jBitmap.GetResizedBitmap(_factorScaleX: single; _factorScaleY: single): jObject;
@@ -11985,7 +11813,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ff_out_bmp(FjEnv, FjObject, 'GetResizedBitmap', _factorScaleX ,_factorScaleY);
+   Result:= jni_func_ff_out_bmp(gApp.jni.jEnv, FjObject, 'GetResizedBitmap', _factorScaleX ,_factorScaleY);
 end;
 
 function jBitmap.GetJByteBuffer(_width: integer; _height: integer): jObject;
@@ -11994,7 +11822,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetByteBuffer(FjEnv, FjObject, _width ,_height);
+   Result:= jBitmap_GetByteBuffer(gApp.jni.jEnv, FjObject, _width ,_height);
 end;
 
 function jBitmap.GetBitmapFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer): jObject;
@@ -12005,7 +11833,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetBitmapFromByteBuffer(FjEnv, FjObject, _jbyteBuffer ,_width ,_height);
+   Result:= jBitmap_GetBitmapFromByteBuffer(gApp.jni.jEnv, FjObject, _jbyteBuffer ,_width ,_height);
 end;
 
 function jBitmap.GetBitmapFromJByteArray(var _image: TDynArrayOfJByte): jObject;
@@ -12016,7 +11844,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dab_out_bmp(FjEnv, FjObject, 'GetBitmapFromByteArray', _image);
+   Result:= jni_func_dab_out_bmp(gApp.jni.jEnv, FjObject, 'GetBitmapFromByteArray', _image);
 end;
 
 function jBitmap.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
@@ -12026,7 +11854,7 @@ begin
   if jbyteBuffer = nil then exit;
 
   if FInitialized then
-   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
+   Result:= PJByte((gApp.jni.jEnv^).GetDirectBufferAddress(gApp.jni.jEnv,jbyteBuffer));
 end;
 
 function jBitmap.GetJByteBufferFromImage(_bmap: jObject): jObject;
@@ -12037,7 +11865,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject, _bmap);
+   Result:= jBitmap_GetByteBufferFromBitmap(gApp.jni.jEnv, FjObject, _bmap);
 end;
 
 function jBitmap.GetJByteBufferFromImage(): jObject;
@@ -12046,7 +11874,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetByteBufferFromBitmap(FjEnv, FjObject);
+   Result:= jBitmap_GetByteBufferFromBitmap(gApp.jni.jEnv, FjObject);
 end;
 
 function jBitmap.GetImageFromFile(_fullPathFile: string): jObject;
@@ -12055,7 +11883,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'LoadFromFile', _fullPathFile);
+   Result:= jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'LoadFromFile', _fullPathFile);
 end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject): jObject;
@@ -12066,7 +11894,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage);
+   Result:= jBitmap_GetRoundedShape(gApp.jni.jEnv, FjObject, _bitmapImage);
 end;
 
 function jBitmap.GetRoundedShape(_bitmapImage: jObject; _diameter: integer): jObject;
@@ -12076,7 +11904,7 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetRoundedShape(FjEnv, FjObject, _bitmapImage ,_diameter);
+   Result:= jBitmap_GetRoundedShape(gApp.jni.jEnv, FjObject, _bitmapImage ,_diameter);
 end;
 
 function jBitmap.DrawText(_bitmapImage: jObject; _text: string; _left: integer; _top: integer; _fontSize: integer; _color: TARGBColorBridge): jObject;
@@ -12086,14 +11914,14 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_DrawText(FjEnv, FjObject, _bitmapImage ,_text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
+   Result:= jBitmap_DrawText(gApp.jni.jEnv, FjObject, _bitmapImage ,_text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
 end;
 
 procedure jBitmap.SaveToFileJPG(_fullPathFile: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SaveToFileJPG', _fullPathFile);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SaveToFileJPG', _fullPathFile);
 end;
 
 procedure jBitmap.SaveToFileJPG(_bitmapImage: jObject; _Path: string);
@@ -12102,7 +11930,7 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_t(FjEnv, FjObject, 'SaveToFileJPG', _bitmapImage ,_Path);
+     jni_proc_bmp_t(gApp.jni.jEnv, FjObject, 'SaveToFileJPG', _bitmapImage ,_Path);
 end;
 
 procedure jBitmap.SetImage(_bitmapImage: jObject);
@@ -12112,9 +11940,9 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jni_proc_bmp(FjEnv, FjObject, 'SetImage', _bitmapImage);
-     FWidth:= jni_func_out_i(FjEnv, FjObject, 'GetWidth' );
-     FHeight:= jni_func_out_i(FjEnv, FjObject, 'GetHeight' );
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'SetImage', _bitmapImage);
+     FWidth:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth' );
+     FHeight:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight' );
   end;
 end;
 
@@ -12123,7 +11951,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jBitmap_DrawText(FjEnv, FjObject, _text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
+    Result:= jBitmap_DrawText(gApp.jni.jEnv, FjObject, _text ,_left ,_top ,_fontSize ,GetARGB(FCustomColor, _color));
 end;
 
 function jBitmap.DrawBitmap(_bitmapImageIn: jObject; _left: integer; _top: integer): jObject;
@@ -12132,7 +11960,7 @@ begin
   if _bitmapImageIn = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jBitmap_DrawBitmap(FjEnv, FjObject, _bitmapImageIn ,_left ,_top);
+    Result:= jBitmap_DrawBitmap(gApp.jni.jEnv, FjObject, _bitmapImageIn ,_left ,_top);
 end;
 
 function jBitmap.CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
@@ -12140,7 +11968,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_CreateBitmap(FjEnv, FjObject, _width ,_height, GetARGB(FCustomColor, _backgroundColor));
+   Result:= jBitmap_CreateBitmap(gApp.jni.jEnv, FjObject, _width ,_height, GetARGB(FCustomColor, _backgroundColor));
 end;
 
 function jBitmap.GetThumbnailImage(_fullPathFile: string; _thumbnailSize: integer): jObject;
@@ -12148,7 +11976,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_thumbnailSize);
+   Result:= jni_func_ti_out_bmp(gApp.jni.jEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_thumbnailSize);
 end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _thumbnailSize: integer): jObject;
@@ -12157,7 +11985,7 @@ begin
   if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_thumbnailSize);
+   Result:= jBitmap_GetThumbnailImage(gApp.jni.jEnv, FjObject, _bitmap ,_thumbnailSize);
 end;
 
 function jBitmap.GetThumbnailImage(_bitmap: jObject; _width: integer; _height: integer): jObject;
@@ -12166,7 +11994,7 @@ begin
   if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetThumbnailImage(FjEnv, FjObject, _bitmap ,_width ,_height);
+   Result:= jBitmap_GetThumbnailImage(gApp.jni.jEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
 function jBitmap.GetThumbnailImageFromAssets(_fileName: string; thumbnailSize: integer): jObject;
@@ -12174,7 +12002,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ti_out_bmp(FjEnv, FjObject, 'GetThumbnailImageFromAssets', _fileName ,thumbnailSize);
+   Result:= jni_func_ti_out_bmp(gApp.jni.jEnv, FjObject, 'GetThumbnailImageFromAssets', _fileName ,thumbnailSize);
 end;
 
 function jBitmap.GetThumbnailImage(_fullPathFile: string; _width: integer; _height: integer): jObject;
@@ -12182,7 +12010,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tii_out_bmp(FjEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_width ,_height);
+   Result:= jni_func_tii_out_bmp(gApp.jni.jEnv, FjObject, 'GetThumbnailImage', _fullPathFile ,_width ,_height);
 end;
 
 function jBitmap.GetThumbnailImageFromAssets(_filename: string; _width: integer; _height: integer): jObject;
@@ -12190,14 +12018,14 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tii_out_bmp(FjEnv, FjObject, 'GetThumbnailImageFromAssets', _filename ,_width ,_height);
+   Result:= jni_func_tii_out_bmp(gApp.jni.jEnv, FjObject, 'GetThumbnailImageFromAssets', _filename ,_width ,_height);
 end;
 
 procedure jBitmap.LoadFromStream(Stream: TMemoryStream);
  begin
    if Stream = nil then Exit;
    if FInitialized then
-     jBitmap_LoadFromBuffer(FjEnv, FjObject, Stream.Memory, Stream.Size);
+     jBitmap_LoadFromBuffer(gApp.jni.jEnv, FjObject, Stream.Memory, Stream.Size);
  end;
 
 function jBitmap.GetBase64StringFromImage(_bitmap: jObject; _compressFormat: TBitmapCompressFormat): string;
@@ -12206,7 +12034,7 @@ begin
   if _bitmap = nil then exit;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBitmap_GetBase64StringFromImage(FjEnv, FjObject, _bitmap ,Ord(_compressFormat));
+   Result:= jBitmap_GetBase64StringFromImage(gApp.jni.jEnv, FjObject, _bitmap ,Ord(_compressFormat));
 end;
 
 function jBitmap.GetImageFromBase64String(_imageBase64String: string): jObject;
@@ -12214,7 +12042,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetImageFromBase64String', _imageBase64String);
+   Result:= jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'GetImageFromBase64String', _imageBase64String);
 end;
 
 function jBitmap.GetBase64StringFromImageFile(_fullPathToImageFile: string): string;
@@ -12222,7 +12050,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetBase64StringFromImageFile', _fullPathToImageFile);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetBase64StringFromImageFile', _fullPathToImageFile);
 end;
 
 //------------------------------------------------------------------------------
@@ -12249,18 +12077,18 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-Procedure jCanvas.Init(refApp: jApp);
+Procedure jCanvas.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject := jCanvas_Create(FjEnv, FjThis, Self); // jSelf !
+  inherited Init;
+  FjObject := jCanvas_Create(gApp.jni.jEnv, gApp.jni.jThis, Self); // jSelf !
 
   if FjObject = nil then exit;
 
@@ -12272,11 +12100,11 @@ begin
 
   //new!
   if (FFontFace <> ffNormal) or (FTextTypeFace <> tfNormal) then
-    jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+    jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 
   // PaintShader new! //by kordal
   if FPaintShader <> nil then
-    FPaintShader.Init(refApp, GetPaint);
+    FPaintShader.Init(gApp, GetPaint);
 end;
 
 procedure jCanvas.InitPaintShader(refApp: jApp);
@@ -12292,7 +12120,7 @@ begin
   FPaintStrokeWidth:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_f(FjEnv, FjObject, 'setStrokeWidth', FPaintStrokeWidth);
+  jni_proc_f(gApp.jni.jEnv, FjObject, 'setStrokeWidth', FPaintStrokeWidth);
 end;
 
 Procedure jCanvas.SetStyle(Value : TPaintStyle);
@@ -12300,7 +12128,7 @@ begin
   FPaintStyle:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'setStyle', Ord(FPaintStyle));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setStyle', Ord(FPaintStyle));
 end;
 
 Procedure jCanvas.SetColor(Value : TARGBColorBridge);
@@ -12309,7 +12137,7 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'setColor', GetARGB(FCustomColor, FPaintColor));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'setColor', GetARGB(FCustomColor, FPaintColor));
 end;
 
 Procedure jCanvas.SetTextSize(Value: single);
@@ -12317,7 +12145,7 @@ begin
   FPaintTextSize:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_f(FjEnv, FjObject, 'setTextSize', FPaintTextSize);
+  jni_proc_f(gApp.jni.jEnv, FjObject, 'setTextSize', FPaintTextSize);
 end;
 
 procedure jCanvas.SetPaintShader(Value: jPaintShader);
@@ -12344,7 +12172,7 @@ begin
   OldRotation:=FPaintRotation;
   FPaintRotation:= Value;
   if FInitialized then
-     jni_proc_f(FjEnv, FjObject, 'rotate', FPaintRotation-OldRotation);
+     jni_proc_f(gApp.jni.jEnv, FjObject, 'rotate', FPaintRotation-OldRotation);
 end;
 
 procedure jCanvas.Notification(AComponent: TComponent; Operation: TOperation);
@@ -12362,68 +12190,68 @@ end;
 Procedure jCanvas.drawText(_text: string; x, y: single);
 begin
   if FInitialized then
-     jCanvas_drawText(FjEnv, FjObject ,_text, x, y);
+     jCanvas_drawText(gApp.jni.jEnv, FjObject ,_text, x, y);
 end;
 
 Procedure jCanvas.DrawLine(x1,y1,x2,y2 : single);
 begin
   if FInitialized then
-     jni_proc_ffff(FjEnv, FjObject, 'drawLine', x1,y1,x2,y2);
+     jni_proc_ffff(gApp.jni.jEnv, FjObject, 'drawLine', x1,y1,x2,y2);
 end;
 
 procedure jCanvas.DrawLine(var _points: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_drawLine(FjEnv, FjObject, _points);
+     jCanvas_drawLine(gApp.jni.jEnv, FjObject, _points);
 end;
 
 Procedure jCanvas.DrawPoint(x1,y1 : single);
 begin
   if FInitialized then
-     jni_proc_ff(FjEnv, FjObject, 'drawPoint', x1,y1);
+     jni_proc_ff(gApp.jni.jEnv, FjObject, 'drawPoint', x1,y1);
 end;
 
 procedure jCanvas.drawCircle(_cx: single; _cy: single; _radius: single);
 begin
   if FInitialized then
-     jni_proc_fff(FjEnv, FjObject, 'drawCircle',  _cx, _cy, _radius);
+     jni_proc_fff(gApp.jni.jEnv, FjObject, 'drawCircle',  _cx, _cy, _radius);
 end;
 
 procedure jCanvas.drawOval(_left, _top, _right, _bottom: single);
 begin
   if FInitialized then
-     jni_proc_ffff(FjEnv, FjObject, 'drawOval', _left, _top, _right, _bottom);
+     jni_proc_ffff(gApp.jni.jEnv, FjObject, 'drawOval', _left, _top, _right, _bottom);
 end;
 
 procedure jCanvas.drawBackground(_color: integer);
 begin
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'drawBackground', _color);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'drawBackground', _color);
 end;
 
 procedure jCanvas.drawRect(_left, _top, _right, _bottom: single);
 begin
   if FInitialized then
-     jni_proc_ffff(FjEnv, FjObject, 'drawRect', _left, _top, _right, _bottom);
+     jni_proc_ffff(gApp.jni.jEnv, FjObject, 'drawRect', _left, _top, _right, _bottom);
 end;
 
 procedure jCanvas.drawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
 begin
   if FInitialized then
-     jCanvas_drawRoundRect(FjEnv, FjObject , _left, _top, _right, _bottom, _rx, _ry);
+     jCanvas_drawRoundRect(gApp.jni.jEnv, FjObject , _left, _top, _right, _bottom, _rx, _ry);
 end;
 
 Procedure jCanvas.DrawBitmap(bmp: jObject; b,l,r,t: integer);
 begin
   if FInitialized then
-     jCanvas_drawBitmap(FjEnv, FjObject ,bmp, b, l, r, t);
+     jCanvas_drawBitmap(gApp.jni.jEnv, FjObject ,bmp, b, l, r, t);
 end;
 
 Procedure jCanvas.DrawBitmap(bmp: jBitmap; b,l,r,t: integer);
 begin
   if FInitialized then
-     jCanvas_drawBitmap(FjEnv, FjObject ,bmp.GetJavaBitmap, b, l, r, t);
+     jCanvas_drawBitmap(gApp.jni.jEnv, FjObject ,bmp.GetJavaBitmap, b, l, r, t);
 end;
 
 Procedure jCanvas.DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
@@ -12433,7 +12261,7 @@ begin
   r1:= size-20;
   t1:= Round((size-20)*(1/ratio));
   if FInitialized then
-    jCanvas_drawBitmap(FjEnv, FjObject , bmp, x1, y1, r1, t1);
+    jCanvas_drawBitmap(gApp.jni.jEnv, FjObject , bmp, x1, y1, r1, t1);
 end;
 
 Procedure jCanvas.DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single);
@@ -12445,7 +12273,7 @@ begin
   r1:= size-10;
   t1:= Round((size-10)*(1/ratio));
   if FInitialized then
-    jCanvas_drawBitmap(FjEnv, FjObject , bmp.GetJavaBitmap, x1, y1, r1, t1);
+    jCanvas_drawBitmap(gApp.jni.jEnv, FjObject , bmp.GetJavaBitmap, x1, y1, r1, t1);
 end;
 
 procedure jCanvas.DrawBitmap(_bitmap: jObject; _width: integer; _height: integer);
@@ -12453,7 +12281,7 @@ begin
   if _bitmap = nil then exit;
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_drawBitmap(FjEnv, FjObject, _bitmap ,_width ,_height);
+     jCanvas_drawBitmap(gApp.jni.jEnv, FjObject, _bitmap ,_width ,_height);
 end;
 
 // by Kordal
@@ -12462,7 +12290,7 @@ begin
   if bitMap = nil then exit;
 
   if FInitialized then
-    jCanvas_DrawBitmap(FjEnv, FjObject, bitMap.GetImage, srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB);
+    jCanvas_DrawBitmap(gApp.jni.jEnv, FjObject, bitMap.GetImage, srcL, srcT, srcR, srcB, dstL, dstT, dstR, dstB);
 end;
 
 procedure jCanvas.DrawFrame(bitMap: jObject; srcX, srcY, srcW, srcH: Integer; X, Y, Wh, Ht, rotateDegree: Single);
@@ -12471,7 +12299,7 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawFrame(FjEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, Wh, Ht, rotateDegree);
+     jCanvas_DrawFrame(gApp.jni.jEnv, FjObject, bitMap, srcX, srcY, srcW, srcH, X, Y, Wh, Ht, rotateDegree);
 end;
 
 procedure jCanvas.DrawFrame(bitMap: jObject; X, Y: Single; Index, Size: Integer; scaleFactor, rotateDegree: Single);
@@ -12480,33 +12308,33 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawFrame(FjEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
+     jCanvas_DrawFrame(gApp.jni.jEnv, FjObject, bitMap, X, Y, Index, Size, scaleFactor, rotateDegree);
 end;
 
 function jCanvas.GetDensity(): Single;
 begin
   result := 0;
   if FInitialized then
-    Result := jni_func_out_f(FjEnv, FjObject, 'GetDensity');
+    Result := jni_func_out_f(gApp.jni.jEnv, FjObject, 'GetDensity');
 end;
 
 procedure jCanvas.ClipRect(Left, Top, Right, Bottom: Single);
 begin
   if FInitialized then
-    jni_proc_ffff(FjEnv, FjObject, 'ClipRect', Left, Top, Right, Bottom);
+    jni_proc_ffff(gApp.jni.jEnv, FjObject, 'ClipRect', Left, Top, Right, Bottom);
 end;
 
 procedure jCanvas.DrawGrid(Left, Top, Width, Height: Single; cellsX, cellsY: Integer);
 begin
   if FInitialized then
-    jCanvas_DrawGrid(FjEnv, FjObject, Left, Top, Width, Height, cellsX, cellsY);
+    jCanvas_DrawGrid(gApp.jni.jEnv, FjObject, Left, Top, Width, Height, cellsX, cellsY);
 end;
 
 procedure jCanvas.SetCanvas(_canvas: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_setCanvas(FjEnv, FjObject, _canvas);
+     jCanvas_setCanvas(gApp.jni.jEnv, FjObject, _canvas);
 end;
 
 //by CC
@@ -12527,7 +12355,7 @@ begin
   end;
 
   if FInitialized then
-     jCanvas_drawTextAligned(FjEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer );
+     jCanvas_drawTextAligned(gApp.jni.jEnv, FjObject, _text, _left, _top, _right, _bottom, alignHor, aligVer );
 
 end;
 
@@ -12536,7 +12364,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
+   Result:= jCanvas_GetNewPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 function jCanvas.GetNewPath(_points: array of single): jObject;
@@ -12544,35 +12372,35 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetNewPath(FjEnv, FjObject, _points);
+   Result:= jCanvas_GetNewPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jCanvas.DrawPath(var _points: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawPath(FjEnv, FjObject, _points);
+     jCanvas_DrawPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jCanvas.DrawPath(_points: array of single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawPath(FjEnv, FjObject, _points);
+     jCanvas_DrawPath(gApp.jni.jEnv, FjObject, _points);
 end;
 
 procedure jCanvas.DrawPath(_path: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawPath(FjEnv, FjObject, _path);
+     jCanvas_DrawPath(gApp.jni.jEnv, FjObject, _path);
 end;
 
 procedure jCanvas.DrawArc(_leftRectF: single; _topRectF: single; _rightRectF: single; _bottomRectF: single; _startAngle: single; _sweepAngle: single; _useCenter: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawArc(FjEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF,_bottomRectF,_startAngle,_sweepAngle ,_useCenter);
+     jCanvas_DrawArc(gApp.jni.jEnv, FjObject, _leftRectF ,_topRectF ,_rightRectF,_bottomRectF,_startAngle,_sweepAngle ,_useCenter);
 end;
 
 function jCanvas.CreateBitmap(_width: integer; _height: integer; _backgroundColor: TARGBColorBridge): jObject;
@@ -12580,7 +12408,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, GetARGB(FCustomColor, _backgroundColor));
+   Result:= jCanvas_CreateBitmap(gApp.jni.jEnv, FjObject, _width,_height, GetARGB(FCustomColor, _backgroundColor));
 end;
 
 function jCanvas.CreateBitmap(_width: integer; _height: integer; _backgroundColor: integer): jObject;
@@ -12588,7 +12416,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_CreateBitmap(FjEnv, FjObject, _width,_height, _backgroundColor);
+   Result:= jCanvas_CreateBitmap(gApp.jni.jEnv, FjObject, _width,_height, _backgroundColor);
 end;
 
 function jCanvas.GetBitmap(): jObject;
@@ -12596,7 +12424,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_bmp(FjEnv, FjObject, 'GetBitmap');
+   Result:= jni_func_out_bmp(gApp.jni.jEnv, FjObject, 'GetBitmap');
 end;
 
 // by Kordal
@@ -12604,21 +12432,21 @@ function jCanvas.GetPaint(): JObject;
 begin
   result := nil;
   if FInitialized then
-    Result := jCanvas_GetPaint(FjEnv, FjObject);
+    Result := jCanvas_GetPaint(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCanvas.DrawBitmap(_left: single; _top: single; _bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawBitmap(FjEnv, FjObject, _left ,_top ,_bitmap);
+     jCanvas_DrawBitmap(gApp.jni.jEnv, FjObject, _left ,_top ,_bitmap);
 end;
 
 procedure jCanvas.SetDensityScale(_scale: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetDensityScale', _scale);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetDensityScale', _scale);
 end;
 
 procedure jCanvas.SetBitmap(_bitmap: jObject);
@@ -12627,7 +12455,7 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp(FjEnv, FjObject, 'SetBitmap', _bitmap);
+     jni_proc_bmp(gApp.jni.jEnv, FjObject, 'SetBitmap', _bitmap);
 end;
 
 procedure jCanvas.SetBitmap(_bitmap: jObject; _width: integer; _height: integer);
@@ -12636,42 +12464,42 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_bmp_ii(FjEnv, FjObject, 'SetBitmap', _bitmap,_width ,_height);
+     jni_proc_bmp_ii(gApp.jni.jEnv, FjObject, 'SetBitmap', _bitmap,_width ,_height);
 end;
 
 procedure jCanvas.DrawText(_text: string; _x: single; _y: single; _angleDegree: single; _rotateCenter: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
+     jCanvas_DrawText(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree ,_rotateCenter);
 end;
 
 procedure jCanvas.DrawText(_text: string; _x: single; _y: single; _angleDegree: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawText(FjEnv, FjObject, _text ,_x ,_y ,_angleDegree);
+     jCanvas_DrawText(gApp.jni.jEnv, FjObject, _text ,_x ,_y ,_angleDegree);
 end;
 
 procedure jCanvas.DrawRect(_P0x: single; _P0y: single; _P1x: single; _P1y: single; _P2x: single; _P2y: single; _P3x: single; _P3y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawRect(FjEnv, FjObject, _P0x ,_P0y ,_P1x ,_P1y ,_P2x ,_P2y ,_P3x ,_P3y);
+     jCanvas_DrawRect(gApp.jni.jEnv, FjObject, _P0x ,_P0y ,_P1x ,_P1y ,_P2x ,_P2y ,_P3x ,_P3y);
 end;
 
 procedure jCanvas.DrawRect(var _box: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawRect(FjEnv, FjObject, _box);
+     jCanvas_DrawRect(gApp.jni.jEnv, FjObject, _box);
 end;
 
 procedure jCanvas.DrawTextMultiLine(_text: string; _left: single; _top: single; _right: single; _bottom: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCanvas_DrawTextMultiLine(FjEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
+     jCanvas_DrawTextMultiLine(gApp.jni.jEnv, FjObject, _text ,_left ,_top ,_right ,_bottom);
 end;
 
 procedure jCanvas.Clear( _color : TARGBColorBridge );
@@ -12685,7 +12513,7 @@ procedure jCanvas.Clear(_color: DWord);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Clear', _color);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'Clear', _color);
 end;
 
 function jCanvas.GetJInstance(): jObject;
@@ -12693,14 +12521,14 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetJInstance(FjEnv, FjObject);
+   Result:= jCanvas_GetJInstance(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCanvas.SaveBitmapJPG(_fullPathFileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SaveBitmapJPG', _fullPathFileName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SaveBitmapJPG', _fullPathFileName);
 end;
 
 function jCanvas.GetTextHeight(_text: string): single;
@@ -12708,7 +12536,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetTextHeight(FjEnv, FjObject, _text);
+   Result:= jCanvas_GetTextHeight(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jCanvas.GetTextWidth(_text: string): single;
@@ -12716,21 +12544,21 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jCanvas_GetTextWidth(FjEnv, FjObject, _text);
+   Result:= jCanvas_GetTextWidth(gApp.jni.jEnv, FjObject, _text);
 end;
 
 procedure jCanvas.SetFontAndTextTypeFace(_fontFace: integer; _fontStyle: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', _fontFace ,_fontStyle);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetFontAndTextTypeFace', _fontFace ,_fontStyle);
 end;
 
 procedure jCanvas.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;
  if(FInitialized) then
-   jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+   jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 {  //deprecated
@@ -12739,7 +12567,7 @@ begin
   //in designing component state: set value here...
   FTypeFace:= Value; //deprecated
   if(FInitialized) then
-   jCanvas_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jCanvas_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 end;
 }
 
@@ -12747,7 +12575,7 @@ procedure jCanvas.SetTextTypeFace(AValue: TTextTypeFace);
 begin
   FTextTypeFace:= AValue ;
   if(FInitialized) then
-   jni_proc_ii(FjEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
+   jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetFontAndTextTypeFace', Ord(FFontFace), Ord(FTextTypeFace));
 end;
 
 
@@ -12779,42 +12607,42 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jView.Init(refApp: jApp);
+procedure jView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
+   inherited Init;
 
-   FjObject  := jView_Create(FjEnv, FjThis, Self);
+   FjObject  := jView_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
    if FjObject = nil then exit;
 
    if  FjCanvas <> nil then
    begin
-    FjCanvas.Init(refApp);
-    jView_setjCanvas(FjEnv,FjObject ,FjCanvas.jSelf); //JavaObj
+    FjCanvas.Init;
+    jView_setjCanvas(gApp.jni.jEnv,FjObject ,FjCanvas.jSelf); //JavaObj
    end;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv,FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.jni.jEnv,FjObject , FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -12823,28 +12651,28 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1;
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 
 end;
@@ -12853,13 +12681,13 @@ procedure jView.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-    View_SetViewParent(FjEnv,FjObject , FjPRLayout);
+    View_SetViewParent(gApp.jni.jEnv,FjObject , FjPRLayout);
 end;
 
 procedure jView.RemoveFromViewParent;
 begin
 //if FInitialized then
-  // jView_RemoveFromViewParent(FjEnv, FjObject);
+  // jView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -12867,7 +12695,7 @@ Procedure jView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
 
 // LORDMAN 2013-08-14
@@ -12882,9 +12710,9 @@ begin
      if str <> 'null' then
      begin
         if  Pos('/', str) > 0  then
-          jni_proc_t(FjEnv, FjObject, 'saveView', str)
+          jni_proc_t(gApp.jni.jEnv, FjObject, 'saveView', str)
         else
-          jni_proc_t(FjEnv, FjObject, 'saveView', GetFilePath(FFilePath)+'/'+str);  //intern app
+          jni_proc_t(gApp.jni.jEnv, FjObject, 'saveView', GetFilePath(FFilePath)+'/'+str);  //intern app
      end;
   end;
 end;
@@ -12892,7 +12720,7 @@ end;
 Procedure jView.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 // Event : Java Event -> Pascal
@@ -12919,16 +12747,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end; 
@@ -12941,7 +12769,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 function jView.GetWidth: integer;
@@ -12952,7 +12780,7 @@ begin
    if sysIsWidthExactToParent(Self) then
     Result := sysGetWidthOfParent(FParent)
    else
-    Result:= View_GetLParamWidth(FjEnv, FjObject );
+    Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jView.GetHeight: integer;
@@ -12963,7 +12791,7 @@ begin
    if sysIsHeightExactToParent(Self) then
     Result := sysGetHeightOfParent(FParent)
    else
-    Result:= View_GetLParamHeight(FjEnv, FjObject );
+    Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -13005,14 +12833,14 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_bmp(FjEnv, FjObject, 'GetBitmap');
+   Result:= jni_func_out_bmp(gApp.jni.jEnv, FjObject, 'GetBitmap');
 end;
 
 
 procedure jView.SetLayerType(Value: TLayerType);
 begin
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetLayerType', Byte(Value));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetLayerType', Byte(Value));
 end;
 
 procedure jView.BringToFront;
@@ -13021,7 +12849,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -13046,18 +12874,18 @@ begin
   begin
     if FjObject  <> nil then
     begin
-       jni_free(FjEnv, FjObject );
+       jni_free(gApp.jni.jEnv, FjObject );
        FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-Procedure jTimer.Init(refApp: jApp);
+Procedure jTimer.Init;
 begin
   if FInitialized then Exit;
-  inherited Init(refApp);
-  FjObject := jTimer_Create(FjEnv, FjThis, Self);
+  inherited Init;
+  FjObject := jTimer_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
   if FjObject = nil then exit;
 
@@ -13070,7 +12898,7 @@ begin
   FEnabled:= False;
   if not (csDesigning in ComponentState) then FEnabled:= Value;
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetEnabled', Value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnabled', Value);
 end;
 
 Procedure jTimer.SetInterval(Value: integer);
@@ -13078,7 +12906,7 @@ begin
   FInterval:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetInterval', FInterval);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetInterval', FInterval);
 end;
 
 //------------------------------------------------------------------------------
@@ -13103,19 +12931,19 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jDialogYN.Init(refApp: jApp);
+procedure jDialogYN.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
 
-  FjObject := jDialogYN_Create(FjEnv, FjThis, Self, FTitle, FMsg, FYes, FNo);
+  FjObject := jDialogYN_Create(gApp.jni.jEnv, gApp.jni.jThis, Self, FTitle, FMsg, FYes, FNo);
 
   if FjObject = nil then exit;
 
@@ -13134,13 +12962,13 @@ end;
 Procedure jDialogYN.Show(titleText, msgText, yesText, noText, neutralText: string);
 begin
   if FInitialized then
-     jni_proc_ttttt(FjEnv, FjObject, 'show', titleText, msgText, yesText, noText, neutralText);
+     jni_proc_ttttt(gApp.jni.jEnv, FjObject, 'show', titleText, msgText, yesText, noText, neutralText);
 end;
 
 Procedure jDialogYN.Show(titleText, msgText, yesText, noText: string);
 begin
   if FInitialized then
-     jni_proc_tttt(FjEnv, FjObject, 'show', titleText, msgText, yesText, noText);
+     jni_proc_tttt(gApp.jni.jEnv, FjObject, 'show', titleText, msgText, yesText, noText);
 end;
 
 Procedure jDialogYN.Show(titleText, msgText: string);
@@ -13153,14 +12981,14 @@ procedure jDialogYN.ShowOK(titleText: string; msgText: string; _OkText: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ttt(FjEnv, FjObject, 'ShowOK', titleText ,msgText ,_OkText);
+     jni_proc_ttt(gApp.jni.jEnv, FjObject, 'ShowOK', titleText ,msgText ,_OkText);
 end;
 
 // by ADiV
 Procedure jDialogYN.SetFontSize( fontSize : integer );
 begin
   if FInitialized then
-     jni_proc_i( FjEnv, FjObject, 'SetFontSize', fontSize );
+     jni_proc_i( gApp.jni.jEnv, FjObject, 'SetFontSize', fontSize );
 end;
 
 Procedure jDialogYN.SetTitleAlign( _titleAlign : TTextAlign );
@@ -13169,56 +12997,56 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_i( FjEnv, FjObject, 'SetTitleAlign', ord(FTitleAlign) );
+  jni_proc_i( gApp.jni.jEnv, FjObject, 'SetTitleAlign', ord(FTitleAlign) );
 end;
 
 procedure jDialogYN.SetColorBackground(_color: TARGBColorBridge);
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorBackground', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorBackground', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDialogYN.SetColorBackgroundTitle(_color: TARGBColorBridge); // by ADiV
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorBackgroundTitle', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorBackgroundTitle', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDialogYN.SetColorTitle(_color: TARGBColorBridge);
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorTitle', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorTitle', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDialogYN.SetColorText(_color: TARGBColorBridge);
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorText', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorText', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDialogYN.SetColorNegative(_color: TARGBColorBridge);
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorNegative', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorNegative', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDialogYN.SetColorPositive(_color: TARGBColorBridge);
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorPositive', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorPositive', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDialogYN.SetColorNeutral(_color: TARGBColorBridge);
 begin
 
   if (FInitialized = True) then
-    jni_proc_i(FjEnv, FjObject, 'SetColorNeutral', GetARGB(FCustomColor, _color));
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetColorNeutral', GetARGB(FCustomColor, _color));
 end;
 
 // Event : Java -> Pascal
@@ -13251,19 +13079,21 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jDialogProgress.Init(refApp: jApp);
+procedure jDialogProgress.Init;
 begin
+  if (gApp.Jni.jEnv = nil) or (gApp.Jni.jThis = nil) then exit;
+
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject:= jDialogProgress_Create(FjEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
+  FjObject:= jDialogProgress_Create(gApp.jni.jEnv, gApp.Jni.jThis, Self, FTitle, FMsg);
 
   if FjObject = nil then exit;
 
@@ -13273,7 +13103,7 @@ end;
 procedure jDialogProgress.Stop;
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Stop');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Stop');
 end;
 
 
@@ -13285,7 +13115,7 @@ end;
 procedure jDialogProgress.Start;
 begin
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Show')
+     jni_proc(gApp.jni.jEnv, FjObject, 'Show')
 
 end;
 
@@ -13299,14 +13129,14 @@ procedure jDialogProgress.Show(_title: string; _msg: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'Show', _title ,_msg);
+     jni_proc_tt(gApp.jni.jEnv, FjObject, 'Show', _title ,_msg);
 end;
 
 procedure jDialogProgress.Show(_layout: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDialogProgress_Show(FjEnv, FjObject, _layout);
+     jDialogProgress_Show(gApp.jni.jEnv, FjObject, _layout);
 end;
 
 procedure jDialogProgress.SetMessage(_msg: string);
@@ -13316,7 +13146,7 @@ begin
   if not FInitialized then  Exit;
 
   if FjObject <> nil then
-    jni_proc_t(FjEnv, FjObject, 'SetMessage', _msg);
+    jni_proc_t(gApp.jni.jEnv, FjObject, 'SetMessage', _msg);
 end;
 
 procedure jDialogProgress.SetTitle(_title: string);
@@ -13324,14 +13154,14 @@ begin
   //in designing component state: set value here...
   FTitle:= _title;
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetTitle', _title);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetTitle', _title);
 end;
 
 procedure jDialogProgress.SetCancelable(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetCancelable', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetCancelable', _value);
 end;
 
 //------------------------------------------------------------------------------
@@ -13384,38 +13214,38 @@ Destructor jImageBtn.Destroy;
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.Jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jImageBtn.Init(refApp: jApp);
+procedure jImageBtn.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp);
-   FjObject := jImageBtn_Create(FjEnv, FjThis, Self);
+   inherited Init;
+   FjObject := jImageBtn_Create(gApp.Jni.jEnv, gApp.Jni.jThis, Self);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    if FGravityInParent <> lgNone then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.Jni.jEnv, FjObject, Ord(FGravityInParent));
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-   View_SetId(FjEnv, FjObject , Self.Id);
+   View_SetViewParent(gApp.Jni.jEnv, FjObject , FjPRLayout);
+   View_SetId(gApp.Jni.jEnv, FjObject , Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.Jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -13424,14 +13254,14 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.Jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
      begin
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.Jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
   end;
 
@@ -13451,7 +13281,7 @@ begin
 
   if FImageList <> nil then
   begin
-    FImageList.Init(refApp);   //must have!
+    FImageList.Init;   //must have!
     if FImageList.Images.Count > 0 then
     begin
        if FImageDownIndex >=0 then SetImageDownByIndex(FImageDownIndex);
@@ -13459,7 +13289,7 @@ begin
     end;
   end;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.Jni.jEnv, FjObject , Self.AnchorId);
 
   if FSleepDown > 0 then
      SetSleepDown(FSleepDown);
@@ -13469,9 +13299,9 @@ begin
    FInitialized:= True;
    
    if FColor <> colbrDefault then
-     View_SetBackGroundColor(FjEnv, FjThis, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.Jni.jEnv, gApp.jni.jThis, FjObject , GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjThis, FjObject , FVisible);
+   View_SetVisible(gApp.Jni.jEnv, gApp.jni.jThis, FjObject , FVisible);
   end;
 
   if FAnimationDurationIn <> 1500 then
@@ -13491,13 +13321,13 @@ procedure jImageBtn.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+     View_SetViewParent(gApp.Jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jImageBtn.RemoveFromViewParent;
 begin
  if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.Jni.jEnv, FjObject);
 end;
 
 // by ADiV
@@ -13507,7 +13337,7 @@ begin
 
   if not FInitialized then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetAlpha', FAlpha);
+  jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetAlpha', FAlpha);
 end;
 
 // by ADiV
@@ -13516,7 +13346,7 @@ begin
 
   if not FInitialized then exit;
 
-  jni_proc_f(FjEnv, FjObject, 'SetSaturation', Value);
+  jni_proc_f(gApp.Jni.jEnv, FjObject, 'SetSaturation', Value);
 end;
 
 // by ADiV
@@ -13525,14 +13355,14 @@ begin
 
   if not FInitialized then exit;
 
-  jni_proc_ffff(FjEnv, FjObject, 'SetColorScale', _red, _green, _blue, _alpha);
+  jni_proc_ffff(gApp.Jni.jEnv, FjObject, 'SetColorScale', _red, _green, _blue, _alpha);
 end;
 
 Procedure jImageBtn.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-     View_SetBackGroundColor(FjEnv, FjObject , GetARGB(FCustomColor, FColor));
+     View_SetBackGroundColor(gApp.Jni.jEnv, FjObject , GetARGB(FCustomColor, FColor));
 end;
  
 // LORDMAN 2013-08-16
@@ -13541,13 +13371,13 @@ begin
   FEnabled:= Value;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'setEnabled', FEnabled);
+  jni_proc_z(gApp.Jni.jEnv, FjObject, 'setEnabled', FEnabled);
 end;
 
 procedure jImageBtn.Refresh;
 begin
   if FInitialized then
-     View_Invalidate(FjEnv, FjObject );
+     View_Invalidate(gApp.Jni.jEnv, FjObject );
 end;
 
 procedure jImageBtn.SetAnimationDurationIn(_animationDurationIn: integer);
@@ -13555,7 +13385,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationIn:= _animationDurationIn;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
+     jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
 procedure jImageBtn.SetAnimationDurationOut(_animationDurationOut: integer);
@@ -13563,7 +13393,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationOut:= _animationDurationOut;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
+     jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
 end;
 
 procedure jImageBtn.SetAnimationMode(_animationMode: TAnimationMode);
@@ -13571,28 +13401,28 @@ begin
   //in designing component state: set value here...
   FAnimationMode:= _animationMode;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
+     jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
 end;
 
 procedure jImageBtn.Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
+  jni_proc_zii(gApp.Jni.jEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
 procedure jImageBtn.AnimateRotate( _angleFrom, _angleTo : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_ii(FjEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
+  jni_proc_ii(gApp.Jni.jEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
 end;
 
 procedure jImageBtn.SetRotation(  _angle : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetRotation',  _angle );
+  jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetRotation',  _angle );
 end;
 
 // by ADiV
@@ -13603,7 +13433,7 @@ begin
    SetImageUpByRes('');
    SetImageUpByIndex(-1);
 
-   jni_proc_bmp(FjEnv, FjObject, 'SetImageUp', _bmp);
+   jni_proc_bmp(gApp.Jni.jEnv, FjObject, 'SetImageUp', _bmp);
 end;
 
 // by ADiV
@@ -13614,7 +13444,7 @@ begin
   SetImageDownByRes('');
   SetImageDownByIndex(-1);
 
-  jni_proc_bmp(FjEnv, FjObject, 'SetImageDown', _bmp);
+  jni_proc_bmp(gApp.Jni.jEnv, FjObject, 'SetImageDown', _bmp);
 end;
 
 // by ADiV
@@ -13630,7 +13460,7 @@ begin
     SetImageDownByRes('');
     SetImageDownByIndex(-1);
 
-    jni_proc_f(FjEnv, FjObject, 'SetImageDownScale', value);
+    jni_proc_f(gApp.Jni.jEnv, FjObject, 'SetImageDownScale', value);
    end;
 
 end;
@@ -13647,7 +13477,7 @@ begin
       FImageDownName:= Trim(FImageList.Images.Strings[Value]);
       if  FImageDownName <> '' then
       begin
-        jni_proc_t(FjEnv, FjObject, 'setButtonDown', GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
+        jni_proc_t(gApp.Jni.jEnv, FjObject, 'setButtonDown', GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageDownName);
       end;
    end;
 
@@ -13666,7 +13496,7 @@ begin
       FImageUpName:= Trim(FImageList.Images.Strings[Value]);
       if  FImageUpName <> '' then
       begin
-        jni_proc_t(FjEnv, FjObject, 'setButtonUp', GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
+        jni_proc_t(gApp.Jni.jEnv, FjObject, 'setButtonUp', GetFilePath(FFilePath){jForm(Owner).App.Path.Dat}+'/'+FImageUpName);
       end;
    end;
    
@@ -13678,7 +13508,7 @@ begin
 
    if FjObject = nil then exit;
 
-   jni_proc_t(FjEnv, FjObject, 'setButtonDownByRes', imgResIdentifief);
+   jni_proc_t(gApp.Jni.jEnv, FjObject, 'setButtonDownByRes', imgResIdentifief);
 end;
 
 procedure jImageBtn.SetImageUpByRes(imgResIdentifief: string);
@@ -13687,7 +13517,7 @@ begin
 
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'setButtonUpByRes', imgResIdentifief);
+  jni_proc_t(gApp.Jni.jEnv, FjObject, 'setButtonUpByRes', imgResIdentifief);
 end;
 
 // by ADiV
@@ -13715,7 +13545,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamWidth(FjEnv, FjObject);
+   Result:= View_GetLParamWidth(gApp.Jni.jEnv, FjObject);
 end;
 
 function jImageBtn.GetLParamHeight(): integer;
@@ -13723,7 +13553,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamHeight(FjEnv, FjObject);
+   Result:= View_GetLParamHeight(gApp.Jni.jEnv, FjObject);
 end;
 
 procedure jImageBtn.BringToFront;
@@ -13732,7 +13562,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.Jni.jEnv, FjObject);
  end;
 end;
 
@@ -13744,16 +13574,16 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.Jni.jEnv, FjObject);
      for rToP := rpBottom to rpCenterVertical do
      begin
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.Jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
      end;
      for rToA := raAbove to raAlignRight do
      begin
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.Jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
      end;
   end;
 end;
@@ -13766,7 +13596,7 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jImageBtn.Notification(AComponent: TComponent; Operation: TOperation);
@@ -13810,7 +13640,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     View_SetLGravity(gApp.Jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jImageBtn.SetSleepDown(_sleepMiliSeconds: integer);
@@ -13822,7 +13652,7 @@ begin
   
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetSleepDown', _sleepMiliSeconds);
+  jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetSleepDown', _sleepMiliSeconds);
 end;
 
 
@@ -13831,7 +13661,7 @@ begin
   //in designing component state: set value here...
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetImageState', Ord(_imageState));
+  jni_proc_i(gApp.Jni.jEnv, FjObject, 'SetImageState', Ord(_imageState));
 end;
 
 //------------------------------------------------------------------------------
@@ -13853,19 +13683,19 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
   inherited Destroy;
 end;
 
-procedure jAsyncTask.Init(refApp: jApp);
+procedure jAsyncTask.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
 
-  FjObject:= jAsyncTask_Create(FjEnv, FjThis, Self);
+  FjObject:= jAsyncTask_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
   if FjObject = nil then exit;
 
@@ -13881,9 +13711,8 @@ Procedure jAsyncTask.Execute;
 begin
   if  (FInitialized = True) and (FRunning = False) then
   begin
-    Self.UpdateJNI(gApp);
     FRunning:= True;
-    jni_proc(FjEnv, FjObject, 'Execute');
+    jni_proc(gApp.jni.jEnv, FjObject, 'Execute');
   end;
 end;
 
@@ -13954,10 +13783,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jGLViewEvent.Init(refApp: jApp);
+procedure jGLViewEvent.Init;
 begin
   if FInitialized then Exit;
-  inherited Init(refApp);
+  inherited Init;
   FInitialized:= True;
 end;
 
@@ -14006,7 +13835,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -14014,11 +13843,11 @@ begin
   inherited Destroy;
 end;
 
-Procedure jSqliteCursor.Init(refApp: jApp);
+Procedure jSqliteCursor.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
-  FjObject := jSqliteCursor_Create(FjEnv, FjThis, Self);
+  inherited Init;
+  FjObject := jSqliteCursor_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
 
   if FjObject = nil then exit;
 
@@ -14029,7 +13858,7 @@ function jSqliteCursor.GetCursor: jObject;
 begin
   result := nil;
   if FInitialized  then
-   result := jSqliteCursor_GetCursor(FjEnv, FjObject);
+   result := jSqliteCursor_GetCursor(gApp.jni.jEnv, FjObject);
 end;
 
 function jSqliteCursor.GetEOF: Boolean;
@@ -14111,7 +13940,7 @@ begin
   if not FInitialized then Exit;
   if FObservers = nil then exit;
 
-  jSqliteCursor_SetCursor(FjEnv, FjObject, Value);
+  jSqliteCursor_SetCursor(gApp.jni.jEnv, FjObject, Value);
 
   if FObserverCount > 0 then
   begin
@@ -14127,59 +13956,59 @@ end;
 procedure jSqliteCursor.MoveToFirst;
 begin
    if not FInitialized  then Exit;
-   jni_proc(FjEnv, FjObject, 'MoveToFirst' );
+   jni_proc(gApp.jni.jEnv, FjObject, 'MoveToFirst' );
 end;
 
 procedure jSqliteCursor.MoveToNext;
 begin
   if not FInitialized  then Exit;
-  jni_proc(FjEnv, FjObject, 'MoveToNext' );
+  jni_proc(gApp.jni.jEnv, FjObject, 'MoveToNext' );
 end;
 
 procedure jSqliteCursor.MoveToPrev;
 begin
   if not FInitialized  then Exit;
-  jni_proc(FjEnv, FjObject, 'MoveToPrev' );
+  jni_proc(gApp.jni.jEnv, FjObject, 'MoveToPrev' );
 end;
 
 procedure jSqliteCursor.MoveToLast;
 begin
   if not FInitialized  then Exit;
-  jni_proc(FjEnv, FjObject, 'MoveToLast' );
+  jni_proc(gApp.jni.jEnv, FjObject, 'MoveToLast' );
 end;
 
 procedure jSqliteCursor.MoveToPosition(position: integer);
 begin
   if not FInitialized  then Exit;
-  jni_proc_i(FjEnv, FjObject, 'MoveToPosition', position);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'MoveToPosition', position);
 end;
 
 function jSqliteCursor.GetRowCount: integer;
 begin
    result := 0;
    if FInitialized  then
-    result:= jni_func_out_i(FjEnv, FjObject, 'GetRowCount' );
+    result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetRowCount' );
 end;
 
 function jSqliteCursor.GetColumnCount: integer;
 begin
   result := 0;
   if FInitialized  then
-   Result := jni_func_out_i(FjEnv, FjObject, 'GetColumnCount' );
+   Result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetColumnCount' );
 end;
 
 function jSqliteCursor.GetColumnIndex(colName: string): integer;
 begin
    result := -1;
    if FInitialized  then
-    result:= jni_func_t_out_i(FjEnv, FjObject, 'GetColumnIndex', colName);
+    result:= jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'GetColumnIndex', colName);
 end;
 
 function jSqliteCursor.GetColumName(columnIndex: integer): string;
 begin
    result := '';
    if FInitialized  then
-    result:= jni_func_i_out_t(FjEnv, FjObject, 'GetColumName', columnIndex);
+    result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetColumName', columnIndex);
 end;
 {
 Cursor.FIELD_TYPE_NULL    //0
@@ -14196,7 +14025,7 @@ begin
 
    if not FInitialized  then Exit;
 
-   colType:= jni_func_i_out_i(FjEnv, FjObject, 'GetColType', columnIndex);
+   colType:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetColType', columnIndex);
 
    case colType of
      0: Result:= ftNull;
@@ -14211,7 +14040,7 @@ function jSqliteCursor.GetValueAsString(columnIndex: integer): string;
 begin
  result := '';
  if FInitialized  then
-  result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueAsString', columnIndex);
+  result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetValueAsString', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsString(colName: string): string;
@@ -14225,7 +14054,7 @@ function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
 begin
   result := nil;
   if FInitialized  then
-   result:= jni_func_i_out_bmp(FjEnv, FjObject, 'GetValueAsBitmap', columnIndex);
+   result:= jni_func_i_out_bmp(gApp.jni.jEnv, FjObject, 'GetValueAsBitmap', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
@@ -14239,7 +14068,7 @@ function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
 begin
   result := -1;
   if FInitialized  then
-   result := jni_func_i_out_i(FjEnv, FjObject, 'GetValueAsInteger', columnIndex);
+   result := jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetValueAsInteger', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsInteger(colName: string): integer;
@@ -14253,7 +14082,7 @@ function jSqliteCursor.GetValueAsDouble(columnIndex: integer): double;
 begin
   result := -1;
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsDouble(FjEnv, FjObject , columnIndex);
+   result := jSqliteCursor_GetValueAsDouble(gApp.jni.jEnv, FjObject , columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsDouble(colName: string): double;
@@ -14267,7 +14096,7 @@ function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
 begin
   result := -1;
   if FInitialized  then
-   Result := jSqliteCursor_GetValueAsFloat(FjEnv, FjObject , columnIndex);
+   Result := jSqliteCursor_GetValueAsFloat(gApp.jni.jEnv, FjObject , columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsFloat(colName: string): real;
@@ -14282,7 +14111,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   result := jni_func_i_out_t(FjEnv, FjObject, 'GetValueToString', columnIndex);
+   result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetValueToString', columnIndex);
 end;
 
 function jSqliteCursor.GetValueToString(colName: string): string;
@@ -14297,7 +14126,7 @@ begin
   result := -1;
   //in designing component state: result value here...
   if FInitialized then
-   result := jni_func_out_i(FjEnv, FjObject, 'GetPosition');
+   result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetPosition');
 end;
 
 {jSqliteDataAccess}
@@ -14320,7 +14149,7 @@ begin
   begin
     if FjObject  <> nil then
     begin
-      jni_free(FjEnv, FjObject );
+      jni_free(gApp.jni.jEnv, FjObject );
       FjObject := nil;
     end;
   end;
@@ -14331,13 +14160,13 @@ begin
   inherited Destroy;
 end;
 
-procedure jSqliteDataAccess.Init(refApp: jApp);
+procedure jSqliteDataAccess.Init;
 var
   i: integer;
 begin
   if FInitialized then Exit;
-  inherited Init(refApp);
-  FjObject := jSqliteDataAccess_Create(FjEnv, FjThis, Self, FDataBaseName, FColDelimiter, FRowDelimiter);
+  inherited Init;
+  FjObject := jSqliteDataAccess_Create(gApp.jni.jEnv, gApp.jni.jThis, Self, FDataBaseName, FColDelimiter, FRowDelimiter);
 
   if FjObject = nil then exit;
 
@@ -14345,11 +14174,11 @@ begin
 
   if FTableName <> nil then
    for i:= 0 to FTableName.Count-1 do
-     jni_proc_t(FjEnv, FjObject, 'AddTableName', FTableName.Strings[i]);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AddTableName', FTableName.Strings[i]);
 
   if FCreateTableQuery <> nil then
    for i:= 0 to FCreateTableQuery.Count-1 do
-     jni_proc_t(FjEnv, FjObject, 'AddCreateTableQuery', FCreateTableQuery.Strings[i]);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'AddCreateTableQuery', FCreateTableQuery.Strings[i]);
 
   if not FReturnHeaderOnSelect then
       SetReturnHeaderOnSelect(FReturnHeaderOnSelect);
@@ -14363,7 +14192,7 @@ begin
  result := -1;
 
  if FInitialized then
-    result := jni_func_t_out_j(FjEnv, FjObject, 'Insert', _tableName);
+    result := jni_func_t_out_j(gApp.jni.jEnv, FjObject, 'Insert', _tableName);
 end;
 
 function jSqliteDataAccess.Update( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
@@ -14371,7 +14200,7 @@ begin
  result := 0;
 
  if FInitialized then
-    result := jni_func_tt_ars_out_i(FjEnv, FjObject, 'Update', _tableName, _whereClause, _whereArgs);
+    result := jni_func_tt_ars_out_i(gApp.jni.jEnv, FjObject, 'Update', _tableName, _whereClause, _whereArgs);
 end;
 
 function jSqliteDataAccess.UpdateAll( _tableName : string ) : integer;
@@ -14379,7 +14208,7 @@ begin
  result := 0;
 
  if FInitialized then
-    result := jni_func_t_out_i(FjEnv, FjObject, 'UpdateAll', _tableName);
+    result := jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'UpdateAll', _tableName);
 end;
 
 function jSqliteDataAccess.Delete( _tableName, _whereClause : string; _whereArgs: array of string ) : integer;
@@ -14387,7 +14216,7 @@ begin
  result := 0;
 
  if FInitialized then
-    result := jni_func_tt_ars_out_i(FjEnv, FjObject, 'Delete', _tableName, _whereClause, _whereArgs);
+    result := jni_func_tt_ars_out_i(gApp.jni.jEnv, FjObject, 'Delete', _tableName, _whereClause, _whereArgs);
 end;
 
 function jSqliteDataAccess.DeleteAll( _tableName : string ) : integer;
@@ -14395,61 +14224,61 @@ begin
  result := 0;
 
  if FInitialized then
-    result := jni_func_t_out_i(FjEnv, FjObject, 'DeleteAll', _tableName);
+    result := jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'DeleteAll', _tableName);
 end;
 
 procedure jSqliteDataAccess.ContentValuesClear;
 begin
  if FInitialized then
-  jni_proc( FjEnv, FjObject, 'ContentValuesClear');
+  jni_proc( gApp.jni.jEnv, FjObject, 'ContentValuesClear');
 end;
 
 procedure jSqliteDataAccess.PutString( _colum : string; _value : string );
 begin
  if FInitialized then
-  jni_proc_tt( FjEnv, FjObject, 'PutString', _colum, _value);
+  jni_proc_tt( gApp.jni.jEnv, FjObject, 'PutString', _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutShort( _colum : string; _value : smallint );
 begin
  if FInitialized then
-  jSqliteDataAccess_PutShort(FjEnv, FjObject, _colum, _value);
+  jSqliteDataAccess_PutShort(gApp.jni.jEnv, FjObject, _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutLong( _colum  : string; _value : int64 );
 begin
  if FInitialized then
-  jni_proc_tj( FjEnv, FjObject, 'PutLong', _colum, _value);
+  jni_proc_tj( gApp.jni.jEnv, FjObject, 'PutLong', _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutDouble( _colum : string; _value : double );
 begin
  if FInitialized then
-  jSqliteDataAccess_PutDouble(FjEnv, FjObject, _colum, _value);
+  jSqliteDataAccess_PutDouble(gApp.jni.jEnv, FjObject, _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutInteger( _colum : string; _value : integer );
 begin
  if FInitialized then
-  jni_proc_ti( FjEnv, FjObject, 'PutInteger', _colum, _value);
+  jni_proc_ti( gApp.jni.jEnv, FjObject, 'PutInteger', _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutBoolean( _colum : string; _value : boolean );
 begin
  if FInitialized then
-  jni_proc_tz( FjEnv, FjObject, 'PutBoolean', _colum, _value);
+  jni_proc_tz( gApp.jni.jEnv, FjObject, 'PutBoolean', _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutFloat( _colum  : string; _value : single );
 begin
  if FInitialized then
-  jni_proc_tf( FjEnv, FjObject, 'PutFloat', _colum, _value);
+  jni_proc_tf( gApp.jni.jEnv, FjObject, 'PutFloat', _colum, _value);
 end;
 
 procedure jSqliteDataAccess.PutByte( _colum  : string; _value : byte );
 begin
  if FInitialized then
-  jSqliteDataAccess_PutByte(FjEnv, FjObject, _colum, _value);
+  jSqliteDataAccess_PutByte(gApp.jni.jEnv, FjObject, _colum, _value);
 end;
 
 function jSqliteDataAccess.DBExport( _dbExportDir, _dbExportFileName : string ) : boolean;
@@ -14458,7 +14287,7 @@ begin
   result := false;
 
   if FInitialized then
-    result := jni_func_tt_out_z(FjEnv, FjObject, 'DBExport', _dbExportDir, _dbExportFileName);
+    result := jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'DBExport', _dbExportDir, _dbExportFileName);
 
 end;
 
@@ -14468,7 +14297,7 @@ begin
   result := false;
 
   if FInitialized then
-    result := jni_func_uri_out_z( FjEnv, FjObject, 'DBExport', _dbExportUri );
+    result := jni_func_uri_out_z( gApp.jni.jEnv, FjObject, 'DBExport', _dbExportUri );
 
 end;
 
@@ -14478,7 +14307,7 @@ begin
   result := false;
 
   if FInitialized then
-    result := jni_func_t_out_z(FjEnv, FjObject, 'DBImport', _dbImportFileFull);
+    result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'DBImport', _dbImportFileFull);
 
 end;
 
@@ -14488,7 +14317,7 @@ begin
   result := false;
 
   if FInitialized then
-    result := jni_func_uri_out_z( FjEnv, FjObject, 'DBImport', _dbImportUri );
+    result := jni_func_uri_out_z( gApp.jni.jEnv, FjObject, 'DBImport', _dbImportUri );
 
 end;
 
@@ -14497,7 +14326,7 @@ function jSqliteDataAccess.ExecSQL(execQuery: string) : boolean;
 begin
    result := false;
    if FInitialized then
-    result := jni_func_t_out_z(FjEnv, FjObject, 'ExecSQL', execQuery);
+    result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'ExecSQL', execQuery);
 end;
 
 //"data/data/com.data.pack/databases/" + myData.db;
@@ -14510,7 +14339,7 @@ begin                      {/data/data/com.example.program/databases}
   if not FInitialized then Exit;
 
   fullPathDB:=  GetFilePath(fpathDataBase) + '/' + databaseName;
-  Result:= jni_func_t_out_z(FjEnv, FjObject, 'CheckDataBaseExists', fullPathDB);
+  Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'CheckDataBaseExists', fullPathDB);
 end;
 
 procedure jSqliteDataAccess.OpenOrCreate(dataBaseName: string);
@@ -14518,34 +14347,34 @@ begin
   if not FInitialized then Exit;
   FDataBaseName:= dataBaseName;
   if dataBaseName = '' then Exit;
-  jni_proc_t(FjEnv, FjObject, 'OpenOrCreate', FDataBaseName);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'OpenOrCreate', FDataBaseName);
 end;
 
 procedure jSqliteDataAccess.SetVersion(version :integer); //renabor
 begin
   if not FInitialized then Exit;
-  jni_proc_i(FjEnv, FjObject, 'SetVersion', version);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetVersion', version);
 end;
 
 function jSqliteDataAccess.GetVersion():integer; // renabor
 begin
   Result := -1;
   if not FInitialized then Exit;
-  Result:=jni_func_out_i(FjEnv, FjObject, 'GetVersion');
+  Result:=jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetVersion');
 end;
 
 procedure jSqliteDataAccess.AddTable(tableName: string; createTableQuery: string);
 begin
   if not FInitialized then Exit;
 
-  jni_proc_t(FjEnv, FjObject, 'AddTableName', tableName);
-  jni_proc_t(FjEnv, FjObject, 'AddCreateTableQuery', createTableQuery);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'AddTableName', tableName);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'AddCreateTableQuery', createTableQuery);
 end;
 
 procedure jSqliteDataAccess.CreateAllTables;
 begin
   if not FInitialized then Exit;
-  jni_proc(FjEnv, FjObject, 'CreateAllTables' );
+  jni_proc(gApp.jni.jEnv, FjObject, 'CreateAllTables' );
 end;
 
 function jSqliteDataAccess.Select(selectQuery: string): string;
@@ -14554,7 +14383,7 @@ begin
 
    if not FInitialized then Exit;
 
-   Result := jni_func_t_out_t(FjEnv, FjObject, 'Select', selectQuery);
+   Result := jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'Select', selectQuery);
    //Restult: True or false must select the cursor to maintain consistency
    if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
@@ -14565,7 +14394,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result:= jni_func_tz_out_z(FjEnv, FjObject, 'Select', selectQuery ,moveToLast);
+  Result:= jni_func_tz_out_z(gApp.jni.jEnv, FjObject, 'Select', selectQuery ,moveToLast);
 
   if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
@@ -14576,14 +14405,14 @@ begin
 
   if not FInitialized then Exit;
 
-  Result:= jSqliteDataAccess_GetCursor(FjEnv, FjObject );
+  Result:= jSqliteDataAccess_GetCursor(gApp.jni.jEnv, FjObject );
   //DBListView_Log('Internal cursor is ' + BoolToStr(result = nil, 'INVALID', 'VALID'));
 end;
 
 procedure jSqliteDataAccess.SetSelectDelimiters(coldelim: char; rowdelim: char);
 begin
   if not FInitialized then Exit;
-  jSqliteDataAccess_SetSelectDelimiters(FjEnv, FjObject , coldelim, rowdelim);
+  jSqliteDataAccess_SetSelectDelimiters(gApp.jni.jEnv, FjObject , coldelim, rowdelim);
 end;
 
 function jSqliteDataAccess.CreateTable(createQuery: string) : boolean;
@@ -14592,7 +14421,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jni_func_t_out_z(FjEnv, FjObject, 'ExecSQL', createQuery);
+  Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'ExecSQL', createQuery);
 end;
 
 function jSqliteDataAccess.DropTable(tableName: string) : boolean;
@@ -14601,7 +14430,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jni_func_t_out_z(FjEnv, FjObject, 'DropTable', tableName);
+  Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'DropTable', tableName);
 end;
 
 //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('BRASILIA','CENTRO OESTE')"
@@ -14611,7 +14440,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jni_func_t_out_z(FjEnv, FjObject, 'InsertIntoTable', insertQuery);
+  Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'InsertIntoTable', insertQuery);
 end;
 
 //ex: "DELETE FROM TABLE1  WHERE PLACE = 'BR'";
@@ -14621,7 +14450,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jni_func_t_out_z(FjEnv, FjObject, 'DeleteFromTable', deleteQuery);
+  Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'DeleteFromTable', deleteQuery);
 end;
 
 //ex: "UPDATE TABLE1 SET NAME = 'MAX' WHERE PLACE = 'BR'"
@@ -14631,7 +14460,7 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jni_func_t_out_z(FjEnv, FjObject, 'UpdateTable', updateQuery);
+  Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'UpdateTable', updateQuery);
 end;
 
 function jSqliteDataAccess.UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string;imageValue: jObject;keyValue: integer) : boolean;
@@ -14640,14 +14469,14 @@ begin
 
   if not FInitialized then Exit;
 
-  Result := jSqliteDataAccess_UpdateImage(FjEnv, FjObject ,
+  Result := jSqliteDataAccess_UpdateImage(gApp.jni.jEnv, FjObject ,
                                  tableName,imageFieldName,keyFieldName,imageValue,keyValue);
 end;
 
 procedure jSqliteDataAccess.Close;
 begin
   if not FInitialized then Exit;
-  jni_proc(FjEnv, FjObject, 'Close');
+  jni_proc(gApp.jni.jEnv, FjObject, 'Close');
 end;
 
 procedure jSqliteDataAccess.Notification(AComponent: TComponent; Operation: TOperation);
@@ -14683,21 +14512,21 @@ procedure jSqliteDataAccess.SetForeignKeyConstraintsEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetForeignKeyConstraintsEnabled', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetForeignKeyConstraintsEnabled', _value);
 end;
 
 procedure jSqliteDataAccess.SetDefaultLocale();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetDefaultLocale');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetDefaultLocale');
 end;
 
 procedure jSqliteDataAccess.DeleteDatabase(_dbName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'DeleteDatabase', _dbName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'DeleteDatabase', _dbName);
 end;
 
 function jSqliteDataAccess.UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean;
@@ -14707,7 +14536,7 @@ begin
   //in designing component state: set value here...
   if not FInitialized then exit;
 
-  Result := jSqliteDataAccess_UpdateImage(FjEnv, FjObject, _tabName ,_imageFieldName ,_keyFieldName ,_imageResIdentifier ,_keyValue);
+  Result := jSqliteDataAccess_UpdateImage(gApp.jni.jEnv, FjObject, _tabName ,_imageFieldName ,_keyFieldName ,_imageResIdentifier ,_keyValue);
 end;
 
 (*
@@ -14715,14 +14544,14 @@ procedure jSqliteDataAccess.InsertIntoTableBatch(var _insertQueries: TDynArrayOf
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_InsertIntoTableBatch(FjEnv, FjObject, _insertQueries);
+     jSqliteDataAccess_InsertIntoTableBatch(gApp.jni.jEnv, FjObject, _insertQueries);
 end;
 
 procedure jSqliteDataAccess.UpdateTableBatch(var _updateQueries: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_UpdateTableBatch(FjEnv, FjObject, _updateQueries);
+     jSqliteDataAccess_UpdateTableBatch(gApp.jni.jEnv, FjObject, _updateQueries);
 end;
 *)
 
@@ -14731,7 +14560,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSqliteDataAccess_InsertIntoTableBatch(FjEnv, FjObject, _insertQueries);
+   Result:= jSqliteDataAccess_InsertIntoTableBatch(gApp.jni.jEnv, FjObject, _insertQueries);
 end;
 
 function jSqliteDataAccess.UpdateTableBatch(var _updateQueries: TDynArrayOfString): boolean;
@@ -14739,7 +14568,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSqliteDataAccess_UpdateTableBatch(FjEnv, FjObject, _updateQueries);
+   Result:= jSqliteDataAccess_UpdateTableBatch(gApp.jni.jEnv, FjObject, _updateQueries);
 end;
 
 function jSqliteDataAccess.CheckDataBaseExistsByName(_dbName: string): boolean;
@@ -14749,14 +14578,14 @@ begin
 
   if not FInitialized then exit;
 
-  Result:= jni_func_t_out_z(FjEnv, FjObject, 'CheckDataBaseExistsByName', _dbName);
+  Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'CheckDataBaseExistsByName', _dbName);
 end;
 
 procedure jSqliteDataAccess.UpdateImageBatch(var _imageResIdentifierDataArray: TDynArrayOfString; _delimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_UpdateImageBatch(FjEnv, FjObject, _imageResIdentifierDataArray ,_delimiter);
+     jSqliteDataAccess_UpdateImageBatch(gApp.jni.jEnv, FjObject, _imageResIdentifierDataArray ,_delimiter);
 end;
 
 procedure jSqliteDataAccess.SetDataBaseName(_dbName: string);
@@ -14764,7 +14593,7 @@ begin
   //in designing component state: set value here...
   FDatabaseName:= _dbName;
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetDataBaseName', _dbName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetDataBaseName', _dbName);
 end;
 
 function jSqliteDataAccess.GetFullPathDataBaseName(): string;
@@ -14783,14 +14612,14 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'DatabaseExists', _databaseName);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'DatabaseExists', _databaseName);
 end;
 
 procedure jSqliteDataAccess.SetAssetsSearchFolder(_folderName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetAssetsSearchFolder', _folderName);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetAssetsSearchFolder', _folderName);
 end;
 
 procedure jSqliteDataAccess.SetReturnHeaderOnSelect(_returnHeader: boolean);
@@ -14799,7 +14628,7 @@ begin
   FReturnHeaderOnSelect:= _returnHeader;
   if FjObject = nil then exit;
 
-  jni_proc_z(FjEnv, FjObject, 'SetReturnHeaderOnSelect', _returnHeader);
+  jni_proc_z(gApp.jni.jEnv, FjObject, 'SetReturnHeaderOnSelect', _returnHeader);
 end;
 
 procedure jSqliteDataAccess.SetBatchAsyncTaskType(_batchAsyncTaskType: TBatchAsyncTaskType);
@@ -14807,14 +14636,14 @@ begin
   //in designing component state: set value here...
   FBatchAsyncTaskType:= _batchAsyncTaskType;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetBatchAsyncTaskType', Ord(_batchAsyncTaskType));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetBatchAsyncTaskType', Ord(_batchAsyncTaskType));
 end;
 
 procedure jSqliteDataAccess.ExecSQLBatchAsync(var _execSql: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSqliteDataAccess_ExecSQLBatchAsync(FjEnv, FjObject, _execSql);
+     jSqliteDataAccess_ExecSQLBatchAsync(gApp.jni.jEnv, FjObject, _execSql);
 end;
 
 procedure jSqliteDataAccess.GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender:TObject;count:integer;msgResult:string);
@@ -14852,38 +14681,38 @@ begin
   begin
    if FjObject  <> nil then
    begin
-     jni_free(FjEnv, FjObject);
+     jni_free(gApp.jni.jEnv, FjObject);
      FjObject := nil;
    end;
   end;
   inherited Destroy;
 end;
 
-procedure jPanel.Init(refApp: jApp);
+procedure jPanel.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-    inherited Init(refApp);
-    FjObject := jPanel_Create(FjEnv, FjThis, Self); //jSelf !
+    inherited Init;
+    FjObject := jPanel_Create(gApp.jni.jEnv, gApp.jni.jThis, Self); //jSelf !
 
     if FjObject = nil then exit;
 
     if FParent <> nil then
-     sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+     sysTryNewParent( FjPRLayout, FParent);
 
     FjPRLayoutHome:= FjPRLayout;
 
-    View_SetViewParent(FjEnv, FjObject , FjPRLayout);
-    View_SetId(FjEnv, FjObject, Self.Id);
+    View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
+    View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
   FWidth  := sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight );
   FHeight := sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom );
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            FWidth, FHeight);
 
@@ -14891,7 +14720,7 @@ begin
   begin
    if rToA in FPositionRelativeToAnchor then
    begin
-     View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
    end;
   end;
 
@@ -14899,7 +14728,7 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
     end;
   end;
 
@@ -14912,7 +14741,7 @@ begin
    if FMaxZoomFactor <> 4.00 then SetMaxZoomFactor(FMaxZoomFactor);
   end;
 
-  View_SetLayoutAll(FjEnv, FjObject , Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject , Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -14929,9 +14758,9 @@ begin
      SetAnimationDurationOut(FAnimationDurationOut);
 
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjThis, FjObject{FjRLayout}{!}, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, gApp.jni.jThis, FjObject{FjRLayout}{!}, GetARGB(FCustomColor, FColor));
 
-    View_SetVisible(FjEnv, FjThis, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, gApp.jni.jThis, FjObject, FVisible);
   end;
   
 end;
@@ -14940,13 +14769,13 @@ Procedure jPanel.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjObject{FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); //@@
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject{FjRLayout}{view!}, GetARGB(FCustomColor, FColor)); //@@
 end;
 
 Procedure jPanel.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject );
+    View_Invalidate(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jPanel.SetParamWidth(Value: TLayoutParams);
@@ -14973,7 +14802,7 @@ begin
   Result:= 0;
   if not FInitialized then exit;
 
-  Result:= jni_func_out_i(FjEnv, FjObject, 'getTop' );
+  Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getTop' );
 end;
 
 // By ADiV
@@ -14982,7 +14811,7 @@ begin
   Result:= 0;
   if not FInitialized then exit;
 
-  Result:= jni_func_out_i(FjEnv, FjObject, 'getLeft' );
+  Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getLeft' );
 end;
 
 // By ADiV
@@ -14991,7 +14820,7 @@ begin
   Result:= 0;
   if not FInitialized then exit;
 
-  Result:= jni_func_out_i(FjEnv, FjObject, 'getBottom' );
+  Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getBottom' );
 end;
 
 // By ADiV
@@ -15000,7 +14829,7 @@ begin
   Result:= 0;
   if not FInitialized then exit;
 
-  Result:= jni_func_out_i(FjEnv, FjObject, 'getRight' );
+  Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'getRight' );
 end;
 
 function jPanel.GetWidth: integer;
@@ -15011,7 +14840,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= View_GetLParamWidth(FjEnv, FjObject );
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jPanel.GetHeight: integer;
@@ -15022,7 +14851,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= View_GetLParamHeight(FjEnv, FjObject );
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jPanel.ClearLayout;
@@ -15030,17 +14859,17 @@ var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
-  jni_proc(FjEnv, FjObject, 'resetLParamsRules' );
+  jni_proc(gApp.jni.jEnv, FjObject, 'resetLParamsRules' );
 
   for rToP := rpBottom to rpCenterVertical do
   begin
      if rToP in FPositionRelativeToParent then
-       View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+       View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
   end;
   for rToA := raAbove to raAlignRight do
   begin
     if rToA in FPositionRelativeToAnchor then
-      View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -15052,41 +14881,41 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jPanel.SetViewParent(Value: jObject);
 begin
   FjPRLayout:= Value;
   if FInitialized then
-   View_SetViewParent(FjEnv, FjObject , FjPRLayout);
+   View_SetViewParent(gApp.jni.jEnv, FjObject , FjPRLayout);
 end;
 
 procedure jPanel.RemoveFromViewParent;
 begin
 if FInitialized then
-   View_RemoveFromViewParent(FjEnv, FjObject);
+   View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jPanel.ResetViewParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jPanel.RemoveView(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_viw(FjEnv, FjObject, 'RemoveView', _view);
+     jni_proc_viw(gApp.jni.jEnv, FjObject, 'RemoveView', _view);
 end;
 
 procedure jPanel.RemoveAllViews();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RemoveAllViews');
+     jni_proc(gApp.jni.jEnv, FjObject, 'RemoveAllViews');
 end;
 
 function jPanel.GetChildCount(): integer;
@@ -15094,14 +14923,14 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetChildCount');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetChildCount');
 end;
 
 procedure jPanel.BringChildToFront(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_viw(FjEnv, FjObject, 'BringChildToFront', _view);
+     jni_proc_viw(gApp.jni.jEnv, FjObject, 'BringChildToFront', _view);
 end;
 
 procedure jPanel.BringToFront;
@@ -15110,7 +14939,7 @@ begin
  if FInitialized then
  begin
     FVisible := true;
-    View_BringToFront(FjEnv, FjObject);
+    View_BringToFront(gApp.jni.jEnv, FjObject);
  end;
 end;
 
@@ -15118,7 +14947,7 @@ procedure jPanel.SetVisibilityGone();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetVisibilityGone');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetVisibilityGone');
 end;
 
 procedure jPanel.SetAnimationDurationIn(_animationDurationIn: integer);
@@ -15126,7 +14955,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationIn:= _animationDurationIn;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
 procedure jPanel.SetAnimationDurationOut(_animationDurationOut: integer);
@@ -15134,7 +14963,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationOut:= _animationDurationOut;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
 end;
 
 procedure jPanel.SetAnimationMode(_animationMode: TAnimationMode);
@@ -15142,21 +14971,21 @@ begin
   //in designing component state: set value here...
   FAnimationMode:= _animationMode;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
 end;
 
 procedure jPanel.Animate( _animateIn : boolean; _xFromTo, yFromTo : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_zii(FjEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
+  jni_proc_zii(gApp.jni.jEnv, FjObject, 'Animate', _animateIn, _xFromTo, yFromTo );
 end;
 
 procedure jPanel.AnimateRotate( _angleFrom, _angleTo : integer );
 begin
   if FjObject = nil then exit;
 
-  jni_proc_ii(FjEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
+  jni_proc_ii(gApp.jni.jEnv, FjObject, 'AnimateRotate', _angleFrom, _angleTo );
 end;
 
 // Event : Java -> Pascal
@@ -15193,17 +15022,14 @@ end;
 Procedure Java_Event_pOnFlingGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; direction: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jPanel then
   begin
-    jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
   if Obj is jViewFlipper then
   begin
-    jViewFlipper(Obj).UpdateJNI(gApp);
     jViewFlipper(Obj).GenEvent_OnFlingGestureDetected(Obj, direction);
   end;
 end;
@@ -15216,12 +15042,10 @@ end;
 Procedure Java_Event_pOnPinchZoomGestureDetected(env: PJNIEnv; this: jobject; Obj: TObject; scaleFactor: single; state: integer);
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jPanel then
   begin
-    jPanel(Obj).UpdateJNI(gApp);
     jPanel(Obj).GenEvent_OnPinchZoomGestureDetected(Obj,  scaleFactor, state);
   end;
 end;
@@ -15233,7 +15057,7 @@ begin
   FMinZoomFactor:= _minZoomFactor;
   if FjObject = nil then exit;
 
-  jni_proc_f(FjEnv, FjObject, 'SetMinZoomFactor', _minZoomFactor);
+  jni_proc_f(gApp.jni.jEnv, FjObject, 'SetMinZoomFactor', _minZoomFactor);
 end;
 
 procedure jPanel.SetMaxZoomFactor(_maxZoomFactor: single);
@@ -15242,56 +15066,56 @@ begin
   FMaxZoomFactor:= _maxZoomFactor;
   if FjObject = nil then exit;
 
-  jni_proc_f(FjEnv, FjObject, 'SetMaxZoomFactor', _maxZoomFactor);
+  jni_proc_f(gApp.jni.jEnv, FjObject, 'SetMaxZoomFactor', _maxZoomFactor);
 end;
 
 procedure jPanel.CenterInParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'CenterInParent');
+     jni_proc(gApp.jni.jEnv, FjObject, 'CenterInParent');
 end;
 
 procedure jPanel.MatchParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'MatchParent');
+     jni_proc(gApp.jni.jEnv, FjObject, 'MatchParent');
 end;
 
 procedure jPanel.WrapContent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'WrapContent');
+     jni_proc(gApp.jni.jEnv, FjObject, 'WrapContent');
 end;
 
 procedure jPanel.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetRoundCorner');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetRoundCorner');
 end;
 
 procedure jPanel.SetRoundCorners( _TopLeftRadius, _TopRightRadius, _BottomRightRadius, _BottomLeftRadius : single );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ffff(FjEnv, FjObject, 'SetRoundCorners', _TopLeftRadius, _TopRightRadius, _BottomRightRadius, _BottomLeftRadius );
+     jni_proc_ffff(gApp.jni.jEnv, FjObject, 'SetRoundCorners', _TopLeftRadius, _TopRightRadius, _BottomRightRadius, _BottomLeftRadius );
 end;
 
 procedure jPanel.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRadiusRoundCorner', _radius);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRadiusRoundCorner', _radius);
 end;
 
 procedure jPanel.SetBackgroundAlpha(_alpha: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetBackgroundAlpha', _alpha);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetBackgroundAlpha', _alpha);
 end;
 
 procedure jPanel.SetMarginLeftTopRightBottom(_left,_top,_right,_bottom: integer);
@@ -15301,7 +15125,7 @@ begin
   FMarginRight:= _right;
   FMarginBottom:= _bottom;
   if FInitialized then
-      jni_proc_iiii(FjEnv, FjObject, 'SetMarginLeftTopRightBottom',
+      jni_proc_iiii(gApp.jni.jEnv, FjObject, 'SetMarginLeftTopRightBottom',
                                           _left,_top,_right,_bottom);
 end;
 
@@ -15310,7 +15134,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 (*
@@ -15318,14 +15142,14 @@ procedure jPanel.AddView(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jPanel_AddView(FjEnv, FjObject, _view);
+     jPanel_AddView(gApp.jni.jEnv, FjObject, _view);
 end;
 *)
 procedure jPanel.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 {---------  jDBListView  --------------}
@@ -15370,7 +15194,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jDBListView.Init(refApp: jApp);
+procedure jDBListView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -15380,7 +15204,7 @@ var
 begin
   if not FInitialized then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate();  //jSelf !
 
@@ -15402,7 +15226,7 @@ begin
     SetLength(weights, FColWeights.Count);
     for i := 0 to FColWeights.Count-1 do
       weights[i] := StrToFloat(FColWeights[i]);
-    jDBListView_SetColumnWeights(FjEnv, FjObject, weights{FColWeights});
+    jDBListView_SetColumnWeights(gApp.jni.jEnv, FjObject, weights{FColWeights});
    end;
 
    names := nil;
@@ -15412,19 +15236,19 @@ begin
     SetLength(names, FColNames.Count);
     for i := 0 to FColNames.Count-1 do
       names[i] := FColNames[i];
-    jDBListView_SetColumnNames(FjEnv, FjObject, names{FColNames});
+    jDBListView_SetColumnNames(gApp.jni.jEnv, FjObject, names{FColNames});
    end;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_setId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_setId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -15434,7 +15258,7 @@ begin
   //  SetLength(names, FColNames.Count);
   //  for i := 0 to FColNames.Count-1 do
   //    names[i] := FColNames[i];
-  //  jDBListView_SetColumnNames(FjEnv, FjObject, names{FColNames});
+  //  jDBListView_SetColumnNames(gApp.jni.jEnv, FjObject, names{FColNames});
   //end;
 
 
@@ -15442,7 +15266,7 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject,
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject,
         GetPositionRelativeToAnchor(rToA));
     end;
   end;
@@ -15450,7 +15274,7 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddLParamsParentRule(FjEnv, FjObject,
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject,
         GetPositionRelativeToParent(rToP));
     end;
   end;
@@ -15460,15 +15284,15 @@ begin
   else
     Self.AnchorId := -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -15476,7 +15300,7 @@ procedure jDBListView.SetColor(Value: TARGBColorBridge);
 begin
   FColor := Value;
   if (FInitialized = True) and (FColor <> colbrDefault) then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 procedure jDBListView.Notification(AComponent: TComponent; Operation: TOperation);
@@ -15509,7 +15333,7 @@ begin
     SetLength(weights, Value.Count);
     for i := 0 to Value.Count-1 do
       weights[i] := StrToFloat(Value[i]);
-    jDBListView_SetColumnWeights(FjEnv, FjObject, weights);
+    jDBListView_SetColumnWeights(gApp.jni.jEnv, FjObject, weights);
   end;
 end;
 
@@ -15532,7 +15356,7 @@ begin
     if (Value.Count <> 0) then
       for i := 0 to Value.Count-1 do
         names[i] := Value[i];
-    jDBListView_SetColumnNames(FjEnv, FjObject, names);
+    jDBListView_SetColumnNames(gApp.jni.jEnv, FjObject, names);
   end;
 end;
 
@@ -15568,7 +15392,7 @@ procedure jDBListView.SetVisible(Value: boolean);
 begin
   FVisible := Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jDBListView.UpdateLayout;
@@ -15579,13 +15403,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jDBListView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -15604,14 +15428,14 @@ end;
 function jDBListView.jCreate(): jObject;
 begin
   //in designing component state: result value here...
-  Result := jDBListView_jCreate(FjEnv, int64(Self), FjThis);
+  Result := jDBListView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jDBListView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_free(FjEnv, FjObject);
+    jni_free(gApp.jni.jEnv, FjObject);
 end;
 
 function jDBListView.GetView(): jObject;
@@ -15619,7 +15443,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-    Result := View_GetView(FjEnv, FjObject);
+    Result := View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDBListView.SetViewParent(_viewgroup: jObject);
@@ -15627,14 +15451,14 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-    View_SetViewParent(FjEnv, FjObject, _viewgroup);
+    View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jDBListView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_RemoveFromViewParent(FjEnv, FjObject);
+    View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jDBListView.GetParent(): jObject;
@@ -15642,35 +15466,35 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-    Result := View_GetParent(FjEnv, FjObject);
+    Result := View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDBListView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLParamWidth(FjEnv, FjObject, _w);
+    View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jDBListView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLParamHeight(FjEnv, FjObject, _h);
+    View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jDBListView.setLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLGravity(FjEnv, FjObject, _g);
+    View_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jDBListView.setLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLWeight(FjEnv, FjObject, _w);
+    View_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
@@ -15678,28 +15502,28 @@ procedure jDBListView.SetLeftTopRightBottomWidthHeight(_left: integer;
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left, _top, _right, _bottom, _w, _h);
+    View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left, _top, _right, _bottom, _w, _h);
 end;
 
 procedure jDBListView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+    View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDBListView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+    View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDBListView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+    View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jDBListView.ClearLayout();
@@ -15710,15 +15534,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         View_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -15727,7 +15551,7 @@ procedure jDBListView.UpdateView();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_UpdateView(FjEnv, FjObject);
+    jDBListView_UpdateView(gApp.jni.jEnv, FjObject);
 end;
 }
 (*
@@ -15735,7 +15559,7 @@ procedure jDBListView.SetItemsLayout(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_SetItemsLayout(FjEnv, FjObject, _value);
+    jDBListView_SetItemsLayout(gApp.jni.jEnv, FjObject, _value);
 end;
 *)
 function jDBListView.GetItemIndex(): integer;
@@ -15743,7 +15567,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-    Result := jni_func_out_i(FjEnv, FjObject, 'GetItemIndex');
+    Result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetItemIndex');
 end;
 
 function jDBListView.GetItemCaption(): string;
@@ -15751,14 +15575,14 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-    Result := jni_func_out_t(FjEnv, FjObject, 'GetItemCaption');
+    Result := jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetItemCaption');
 end;
 
 procedure jDBListView.SetSelection(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetSelection', _index);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSelection', _index);
 end;
 
 procedure jDBListView.SetFontSize(_size: DWord);
@@ -15767,7 +15591,7 @@ begin
   FFontSize := _size;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSize', _size);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSize', _size);
 end;
 
 procedure jDBListView.SetFontColor(_color: TARGBColorBridge);
@@ -15776,7 +15600,7 @@ begin
   FFontColor := _color;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontColor', GetARGB(FCustomColor, _color));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jDBListView.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -15785,14 +15609,14 @@ begin
   FFontSizeUnit := _unit;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetFontSizeUnit', Ord(_unit));
 end;
 
 procedure jDBListView.ChangeCursor(NewCursor: jSqliteCursor);
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jDBListView_ChangeCursor(FjEnv, FjObject, NewCursor.Cursor);
+    jDBListView_ChangeCursor(gApp.jni.jEnv, FjObject, NewCursor.Cursor);
 end;
 
 Procedure Java_Event_pOnClickDBListItem(env: PJNIEnv; this: jobject; Obj: TObject; position: integer; caption: JString);
@@ -15801,12 +15625,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jDBListView then
   begin
-    jForm(jDBListView(Obj).Owner).UpdateJNI(gApp);
     pascaption := '';
     if caption <> nil then
     begin
@@ -15823,12 +15645,10 @@ var
   _jBoolean: JBoolean;
 begin
   gApp.Jni.jEnv:= env;
-  //if gApp.Jni.jThis = nil then gApp.Jni.jThis := this;
   if this <> nil then gApp.Jni.jThis := this;
 
   if Obj is jDBListView then
   begin
-    jForm(jDBListView(Obj).Owner).UpdateJNI(gApp);
     pascaption := '';
     if caption <> nil then
     begin

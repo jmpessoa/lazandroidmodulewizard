@@ -20,7 +20,7 @@ jGdxBitmapFont = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetColor(_red: single; _green: single; _blue: single; _alpha: single);
@@ -67,11 +67,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxBitmapFont.Init(refApp: jApp);
+procedure jGdxBitmapFont.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -80,49 +80,49 @@ end;
 
 function jGdxBitmapFont.jCreate(): jObject;
 begin
-   Result:= jGdxBitmapFont_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxBitmapFont_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxBitmapFont.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxBitmapFont_jFree(FjEnv, FjObject);
+     jGdxBitmapFont_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxBitmapFont.SetColor(_red: single; _green: single; _blue: single; _alpha: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxBitmapFont_SetColor(FjEnv, FjObject, _red ,_green ,_blue ,_alpha);
+     jGdxBitmapFont_SetColor(gApp.jni.jEnv, FjObject, _red ,_green ,_blue ,_alpha);
 end;
 
 procedure jGdxBitmapFont.DrawText(_batch: jObject; _text: string; _x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxBitmapFont_DrawText(FjEnv, FjObject, _batch ,_text ,_x ,_y);
+     jGdxBitmapFont_DrawText(gApp.jni.jEnv, FjObject, _batch ,_text ,_x ,_y);
 end;
 
 procedure jGdxBitmapFont.SetScaleXY(_scaleXY: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxBitmapFont_SetScaleXY(FjEnv, FjObject, _scaleXY);
+     jGdxBitmapFont_SetScaleXY(gApp.jni.jEnv, FjObject, _scaleXY);
 end;
 
 procedure jGdxBitmapFont.Scale(_amount: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxBitmapFont_Scale(FjEnv, FjObject, _amount);
+     jGdxBitmapFont_Scale(gApp.jni.jEnv, FjObject, _amount);
 end;
 
 procedure jGdxBitmapFont.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxBitmapFont_Dispose(FjEnv, FjObject);
+     jGdxBitmapFont_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGdxBitmapFont_JNI_Bridge ----------}

@@ -483,7 +483,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Retry;
     procedure GenEvent_OnBillingClientEvent(const xml: string); // called by Java side Callback
     procedure ShowMessage(msg: string);
@@ -1011,7 +1011,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -1486,7 +1486,7 @@ end;
 function jcBillingClient.GetStatus: string;
 begin
   if FInitialized then
-    result := jni_func_out_t(FjEnv, FjObject, 'GetStatus')
+    result := jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetStatus')
   else
     result := 'Object not initialized';
 end;
@@ -1586,7 +1586,7 @@ begin
       FireEvent('test', 'error', '<error>404</error><msg>not found</msg>');
 
     //if Param1 = 'init' then
-    //  Init(gApp);  // list of owned products
+    //  init;  // list of owned products
     if Param1 = 'query_purchases' then
       QueryPurchases();  // list of owned products
     if Param1 = 'query_inapp' then
@@ -1688,7 +1688,7 @@ function Test(F: jForm; WV: jWebView; InApps, Subs: string): jcBillingClient;
 begin
   if TestBC = nil then begin
     TestBC := jcBillingClient.Create(F);
-    TestBC.Init(gApp);
+    TestBC.init;
   end;
   TestBC.InappSkus := InApps;
   TestBC.SubsSkus  := Subs;
@@ -2063,7 +2063,7 @@ begin
 
   fInFlow  := 'buy=' + sku;
 
-  jni_proc_t(FjEnv, FjObject, 'Buy', sku);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'Buy', sku);
 end;
 
 procedure jcBillingClient.Subscribe(const sku: string; const OldSubsSKU: string);
@@ -2074,7 +2074,7 @@ begin
 
   fInFlow  := 'sub=' + sku;
 
-  jni_proc_tt(FjEnv, FjObject, 'Sub', sku, OldSubsSKU);
+  jni_proc_tt(gApp.jni.jEnv, FjObject, 'Sub', sku, OldSubsSKU);
 end;
 
 procedure jcBillingClient.AcknowledgeAll;
@@ -2102,14 +2102,14 @@ begin
 
   LogEvent(beOperation, 'Acknowledge');
 
-  jni_proc_tt(FjEnv, FjObject, 'Acknowledge', PurchaseToken, Payload);
+  jni_proc_tt(gApp.jni.jEnv, FjObject, 'Acknowledge', PurchaseToken, Payload);
 end;
 
 procedure jcBillingClient.Consume(Item: TPurchaseItem; const Payload: string);
 begin
   if FInitialized and (Item<>nil) then begin
     AddConsumed(Item, csPending);
-    jni_proc_tt(FjEnv, FjObject, 'Consume', Item.PurchaseToken, Payload);
+    jni_proc_tt(gApp.jni.jEnv, FjObject, 'Consume', Item.PurchaseToken, Payload);
   end;
 end;
 
@@ -2176,7 +2176,7 @@ begin
   else
     LogEvent(beOperation, 'Connect');
 
-  jni_proc_t(FjEnv, FjObject,'Connect', Base64PublicKey);
+  jni_proc_t(gApp.jni.jEnv, FjObject,'Connect', Base64PublicKey);
 end;
 
 procedure jcBillingClient.DeleteConsumed(Item: TConsumedItem);
@@ -2205,7 +2205,7 @@ begin
 
   LogEvent(beOperation, 'QueryPurchases');
 
-  jni_proc(FjEnv, FjObject, 'QueryPurchases');
+  jni_proc(gApp.jni.jEnv, FjObject, 'QueryPurchases');
 end;
 
 procedure jcBillingClient.QueryInappList();
@@ -2219,7 +2219,7 @@ begin
     exit;
   end;
 
-  jni_proc_t(FjEnv, FjObject, 'QueryInappList', InappSkus);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'QueryInappList', InappSkus);
 end;
 
 procedure jcBillingClient.QuerySubsList();
@@ -2233,7 +2233,7 @@ begin
     exit;
   end;
 
-  jni_proc_t(FjEnv, FjObject, 'QuerySubsList', SubsSkus);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'QuerySubsList', SubsSkus);
 end;
 
 function jcBillingClient.IsSubs(const sku: string): boolean;
@@ -2246,13 +2246,13 @@ begin
   result := FindInapp(sku) <> nil
 end;
 
-procedure jcBillingClient.Init(refApp: jApp);
+procedure jcBillingClient.Init;
 begin
   if FInitialized  then Exit;
 
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
 
-  FjObject := jcBillingClient_Create(FjEnv, FjThis, Self);
+  FjObject := jcBillingClient_Create(gApp.jni.jEnv, gApp.jni.jThis, Self);
   //DBG := 'Dbg1';
   if FjObject = nil then exit;
   //DBG := 'Dbg2';

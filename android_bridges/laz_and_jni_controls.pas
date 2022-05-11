@@ -23,7 +23,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 
   procedure AddParentRule(Value: integer);
   procedure AddAnchorRule(Value: integer; AnchorId: integer); overload;
@@ -50,7 +50,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 
   property Text: string read GetText write SetText;
   //property TextColor: integer read GetTextColor write SetTextColor;
@@ -63,7 +63,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 end;
 
 TAndroidButton= class(TAndroidTextView)
@@ -72,7 +72,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 end;
 
 TAndroidRadioButton= class(TAndroidTextView)
@@ -81,7 +81,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 
   function IsChecked: boolean;
   procedure SetChecked(Value: boolean );
@@ -94,7 +94,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp); override;
+  procedure Init; override;
 
   function IsChecked: boolean;
   procedure SetChecked(Value: boolean );
@@ -109,7 +109,7 @@ protected
 public
   constructor Create(AOwner: TComponent); override;
   destructor Destroy; override;
-  procedure Init(refApp: jApp);  override;
+  procedure Init;  override;
   procedure SetArrayAdapter(jAdapter: jObject);
   function GetStringListAdapter(strList: array of string): jObject;
   function GetItemAtPosition(position: integer): jObject;
@@ -150,14 +150,14 @@ begin
  inherited Destroy;
 end;
 
-procedure TAndroidVisualControl.Init(refApp: jApp);
+procedure TAndroidVisualControl.Init;
 var
   jParamsContext:array[0..0] of jValue;
   jParamsInt: array[0..1] of jValue;
   jParamsLayout: array[0..0] of jValue;
   jMethodId_setLayoutParams: jMethodID;
 begin
-  Inherited Init(refApp);
+  inherited Init;
 
   jParamsContext[0].l:= refApp.GetContext; //get Activity/Context jObject
 
@@ -326,9 +326,9 @@ begin
  inherited Destroy;
 end;
 
-procedure TAndroidTextView.Init(refApp: jApp);
+procedure TAndroidTextView.Init;
 begin
-  Inherited Init(refApp);
+  inherited Init;
   if FText <> '' then Self.SetText(FText);
 end;
 
@@ -409,9 +409,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidEditText.Init(refApp: jApp);
+procedure TAndroidEditText.Init;
 begin
-   Inherited Init(refApp);
+   inherited Init;
 end;
 
 {TAndroidButton}
@@ -428,9 +428,9 @@ begin
  inherited Destroy;
 end;
 
-procedure TAndroidButton.Init(refApp: jApp);
+procedure TAndroidButton.Init;
 begin
- Inherited Init(refApp);
+ inherited Init;
 end;
 
 {TAndroidRadioButton}
@@ -447,9 +447,9 @@ begin
  inherited Destroy;
 end;
 
-procedure TAndroidRadioButton.Init(refApp: jApp);
+procedure TAndroidRadioButton.Init;
 begin
- Inherited Init(refApp);
+ inherited Init;
 end;
 
 function TAndroidRadioButton.IsChecked: boolean;
@@ -491,9 +491,9 @@ begin
  inherited Destroy;
 end;
 
-procedure TAndroidCheckBox.Init(refApp: jApp);
+procedure TAndroidCheckBox.Init;
 begin
- Inherited Init(refApp);
+ inherited Init;
 end;
 
 function TAndroidCheckBox.IsChecked: boolean;
@@ -536,9 +536,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidListView.Init(refApp: jApp);
+procedure TAndroidListView.Init;
 begin
-  Inherited Init(refApp);
+  inherited Init;
 end;
 
 procedure TAndroidListView.SetItems(Value: TStrings);

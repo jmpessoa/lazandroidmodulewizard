@@ -20,7 +20,7 @@ jDownloadService = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Start(_urlString: string; _intentActionNotification: string);
@@ -63,10 +63,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jDownloadService.Init(refApp: jApp);
+procedure jDownloadService.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -75,35 +75,35 @@ end;
 
 function jDownloadService.jCreate(): jObject;
 begin
-   Result:= jDownloadService_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jDownloadService_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jDownloadService.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadService_jFree(FjEnv, FjObject);
+     jDownloadService_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDownloadService.Start(_urlString: string; _intentActionNotification: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadService_Start(FjEnv, FjObject, _urlString ,_intentActionNotification);
+     jDownloadService_Start(gApp.jni.jEnv, FjObject, _urlString ,_intentActionNotification);
 end;
 
 procedure jDownloadService.SaveToFile(_filepath: string; _filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadService_SaveToFile(FjEnv, FjObject,_filepath, _filename);
+     jDownloadService_SaveToFile(gApp.jni.jEnv, FjObject,_filepath, _filename);
 end;
 
 procedure jDownloadService.SaveToFile(_filename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDownloadService_SaveToFile(FjEnv, FjObject, _filename);
+     jDownloadService_SaveToFile(gApp.jni.jEnv, FjObject, _filename);
 end;
 
 {-------- jDownloadService_JNI_Bridge ----------}

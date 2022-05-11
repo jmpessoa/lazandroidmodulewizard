@@ -30,7 +30,7 @@ jMyHello = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate( _flag: integer; _hello: string): jObject;
     procedure jFree();
     function GetStringArray(): TDynArrayOfString;
@@ -83,10 +83,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jMyHello.Init(refApp: jApp);
+procedure jMyHello.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   if  Fhello = '' then Fhello:= 'Hello Android World!';
   FjObject:= jCreate(Fflag ,Fhello);
@@ -98,14 +98,14 @@ end;
 
 function jMyHello.jCreate( _flag: integer; _hello: string): jObject;
 begin
-  Result:= jMyHello_jCreate(FjEnv, FjThis , int64(Self) ,_flag ,_hello);
+  Result:= jMyHello_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self) ,_flag ,_hello);
 end;
 
 procedure jMyHello.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMyHello_jFree(FjEnv, FjObject);
+     jMyHello_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMyHello.SetFlag(_flag: integer);
@@ -113,7 +113,7 @@ begin
   //in designing component state: set value here...
   Fflag:= _flag;
   if FInitialized then
-     jMyHello_SetFlag(FjEnv, FjObject, _flag);
+     jMyHello_SetFlag(gApp.jni.jEnv, FjObject, _flag);
 end;
 
 function jMyHello.GetFlag(): integer;
@@ -121,7 +121,7 @@ begin
   //in designing component state: result value here...
   Result:= Fflag;
   if FInitialized then
-   Result:= jMyHello_GetFlag(FjEnv, FjObject);
+   Result:= jMyHello_GetFlag(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMyHello.SetHello(_hello: string);
@@ -129,7 +129,7 @@ begin
   //in designing component state: set value here...
   Fhello:= _hello;
   if FInitialized then
-     jMyHello_SetHello(FjEnv, FjObject, _hello);
+     jMyHello_SetHello(gApp.jni.jEnv, FjObject, _hello);
 end;
 
 function jMyHello.GetHello(): string;
@@ -137,49 +137,49 @@ begin
   //in designing component state: result value here...
   Result:= Fhello;
   if FInitialized then
-   Result:= jMyHello_GetHello(FjEnv, FjObject);
+   Result:= jMyHello_GetHello(gApp.jni.jEnv, FjObject);
 end;
 
 function jMyHello.GetStringArray(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_GetStringArray(FjEnv, FjObject);
+   Result:= jMyHello_GetStringArray(gApp.jni.jEnv, FjObject);
 end;
 
 function jMyHello.ToUpperStringArray(var _msgArray: TDynArrayOfString): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_ToUpperStringArray(FjEnv, FjObject, _msgArray);
+   Result:= jMyHello_ToUpperStringArray(gApp.jni.jEnv, FjObject, _msgArray);
 end;
 
 function jMyHello.ConcatStringArray(var _strArrayA: TDynArrayOfString; var _strArrayB: TDynArrayOfString): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_ConcatStringArray(FjEnv, FjObject, _strArrayA ,_strArrayB);
+   Result:= jMyHello_ConcatStringArray(gApp.jni.jEnv, FjObject, _strArrayA ,_strArrayB);
 end;
 
 function jMyHello.GetIntArray(): TDynArrayOfInteger;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_GetIntArray(FjEnv, FjObject);
+   Result:= jMyHello_GetIntArray(gApp.jni.jEnv, FjObject);
 end;
 
 function jMyHello.GetSumIntArray(var _vA: TDynArrayOfInteger; var _vB: TDynArrayOfInteger; _size: integer): TDynArrayOfInteger;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMyHello_GetSumIntArray(FjEnv, FjObject, _vA ,_vB ,_size);
+   Result:= jMyHello_GetSumIntArray(gApp.jni.jEnv, FjObject, _vA ,_vB ,_size);
 end;
 
 procedure jMyHello.ShowHello();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMyHello_ShowHello(FjEnv, FjObject);
+     jMyHello_ShowHello(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jMyHello_JNI_Bridge ----------}
