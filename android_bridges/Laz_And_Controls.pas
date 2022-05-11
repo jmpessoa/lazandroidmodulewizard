@@ -12104,7 +12104,7 @@ begin
 
   // PaintShader new! //by kordal
   if FPaintShader <> nil then
-    FPaintShader.Init(gApp, GetPaint);
+    FPaintShader.Init(GetPaint);
 end;
 
 procedure jCanvas.InitPaintShader(refApp: jApp);
@@ -12112,7 +12112,7 @@ begin
   if FjObject = nil then exit;
   // PaintShader new! //by kordal
   if FPaintShader <> nil then
-    FPaintShader.Init(refApp, GetPaint);
+    FPaintShader.Init(GetPaint);
 end;
 
 Procedure jCanvas.SetStrokeWidth(Value : single );

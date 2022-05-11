@@ -540,7 +540,7 @@ begin
 
     // PaintShader new!
     if FPaintShader <> nil then
-      FPaintShader.Init(gApp, GetPaint);
+      FPaintShader.Init(GetPaint);
   end;
 end;
 

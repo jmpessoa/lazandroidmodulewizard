@@ -44,7 +44,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp; Paint: JObject); reintroduce;
+    procedure Init(Paint: JObject); reintroduce;
     procedure Bind(const ID: Integer);
     procedure Clear();
     procedure Combine(shdrA, shdrB: Integer; Mode: TPorterDuff; dstID: Integer);
@@ -130,7 +130,7 @@ begin
   inherited Destroy;
 end;
 
-procedure JPaintShader.Init(refApp: jApp; Paint: JObject);
+procedure JPaintShader.Init(Paint: JObject);
 begin
   if FInitialized then Exit;
   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
