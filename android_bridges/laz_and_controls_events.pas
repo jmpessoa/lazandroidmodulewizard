@@ -211,9 +211,10 @@ uses
 
    Procedure Java_Event_pOnZBarcodeScannerViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
                                                        codedata: JString; codetype: integer);
-   Procedure Java_Event_pOnZBarcodeScannerViewPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject;
-                                                       picture: JObject; fullPath: JString);
-   Procedure Java_Event_pOnZBarcodeScannerViewPictureMake(env: PJNIEnv; this: jobject; Obj: TObject);
+
+   //Procedure Java_Event_pOnZBarcodeScannerViewPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                      // picture: JObject; fullPath: JString);
+   //Procedure Java_Event_pOnZBarcodeScannerViewPictureMake(env: PJNIEnv; this: jobject; Obj: TObject);
 
    procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
    procedure Java_Event_pOnMidiManagerDeviceRemoved(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
@@ -2537,6 +2538,7 @@ begin
   end;
 end;
 
+{
 procedure Java_Event_pOnZBarcodeScannerViewPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject; picture: JObject; fullPath: JString);
 var
   pasfullPath: string;
@@ -2567,6 +2569,7 @@ begin
     jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewPictureMake(Obj);
   end;
 end;
+}
 
 procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
 begin

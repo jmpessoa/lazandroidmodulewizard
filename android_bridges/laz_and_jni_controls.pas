@@ -159,12 +159,12 @@ var
 begin
   inherited Init;
 
-  jParamsContext[0].l:= refApp.GetContext; //get Activity/Context jObject
+  jParamsContext[0].l:= gApp.GetContext(); //refApp.GetContext; //get Activity/Context jObject
 
   FjObject := Create_jObjectLocalRefA(FjClass, 'Landroid/content/Context;', jParamsContext);
 
-  jParamsInt[0].i:= GetLayoutParams(refApp, FLParamWidth, sdW);  //W
-  jParamsInt[1].i:= GetLayoutParams(refApp, FLParamHeight, sdH);  //H
+  jParamsInt[0].i:= GetLayoutParams(gApp.GetContext(), FLParamWidth, sdW);  //W    //refApp
+  jParamsInt[1].i:= GetLayoutParams(gApp.GetContext(), FLParamHeight, sdH);  //H   ////refApp
 
   FjClass_Param:= Get_jClassLocalRef('android/widget/RelativeLayout$LayoutParams');
   FjObj_layoutParams:= Create_jObjectLocalRefA(FjClass_Param,'II', jParamsInt);
