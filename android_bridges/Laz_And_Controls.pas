@@ -2201,7 +2201,7 @@ type
     constructor Create(AOwner: TComponent); override;
     Destructor  Destroy; override;
     procedure Init; override;
-    procedure InitPaintShader(refApp: jApp);
+    procedure InitPaintShader;
 
     Procedure DrawLine(x1, y1, x2, y2: single); overload;
     procedure DrawLine(var _points: TDynArrayOfSingle);  overload;
@@ -12107,7 +12107,7 @@ begin
     FPaintShader.Init(GetPaint);
 end;
 
-procedure jCanvas.InitPaintShader(refApp: jApp);
+procedure jCanvas.InitPaintShader;
 begin
   if FjObject = nil then exit;
   // PaintShader new! //by kordal
