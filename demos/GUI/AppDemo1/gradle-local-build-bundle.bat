@@ -1,4 +1,4 @@
-set Path=%PATH%;c:\laztoapk\downloads\android-sdk-windows\platform-tools
-set GRADLE_HOME=c:\laztoapk\downloads\gradle-6.6.1\
+set Path=%PATH%;C:\Users\sotrafa\AppData\Local\Android\Sdk\platform-tools
+set GRADLE_HOME=C:\laztoapk\downloads\gradle-6.6.1\
 set PATH=%PATH%;%GRADLE_HOME%\bin
 gradle clean bundle --info

@@ -25,7 +25,7 @@ jcMikrotikRouterOS = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetUsername(_Username: string);
@@ -91,11 +91,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcMikrotikRouterOS.Init(refApp: jApp);
+procedure jcMikrotikRouterOS.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -104,14 +104,14 @@ end;
 
 function jcMikrotikRouterOS.jCreate(): jObject;
 begin
-   Result:= jcMikrotikRouterOS_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcMikrotikRouterOS_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcMikrotikRouterOS.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcMikrotikRouterOS_jFree(FjEnv, FjObject);
+     jcMikrotikRouterOS_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcMikrotikRouterOS.SetUsername(_Username: string);
@@ -119,7 +119,7 @@ begin
   //in designing component state: set value here...
   FUsername:= _Username;
   if FInitialized then
-     jcMikrotikRouterOS_SetUsername(FjEnv, FjObject, _Username);
+     jcMikrotikRouterOS_SetUsername(gApp.jni.jEnv, FjObject, _Username);
 end;
 
 procedure jcMikrotikRouterOS.SetPassword(_password: string);
@@ -127,77 +127,77 @@ begin
   //in designing component state: set value here...
   FPassword:= _password;
   if FInitialized then
-     jcMikrotikRouterOS_SetPassword(FjEnv, FjObject, _password);
+     jcMikrotikRouterOS_SetPassword(gApp.jni.jEnv, FjObject, _password);
 end;
 
 function jcMikrotikRouterOS.Connect(_host: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_Connect(FjEnv, FjObject, _host);
+   Result:= jcMikrotikRouterOS_Connect(gApp.jni.jEnv, FjObject, _host);
 end;
 
 function jcMikrotikRouterOS.IsConnected(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_IsConnected(FjEnv, FjObject);
+   Result:= jcMikrotikRouterOS_IsConnected(gApp.jni.jEnv, FjObject);
 end;
 
 function jcMikrotikRouterOS.Connect(_host: string; _port: integer; _timeout: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_Connect(FjEnv, FjObject, _host ,_port ,_timeout);
+   Result:= jcMikrotikRouterOS_Connect(gApp.jni.jEnv, FjObject, _host ,_port ,_timeout);
 end;
 
 function jcMikrotikRouterOS.Login(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_Login(FjEnv, FjObject);
+   Result:= jcMikrotikRouterOS_Login(gApp.jni.jEnv, FjObject);
 end;
 
 function jcMikrotikRouterOS.Login(_username: string; _password: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_Login(FjEnv, FjObject, _username ,_password);
+   Result:= jcMikrotikRouterOS_Login(gApp.jni.jEnv, FjObject, _username ,_password);
 end;
 
 function jcMikrotikRouterOS.IsLogged(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_IsLogged(FjEnv, FjObject);
+   Result:= jcMikrotikRouterOS_IsLogged(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcMikrotikRouterOS.Disconnect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcMikrotikRouterOS_Disconnect(FjEnv, FjObject);
+     jcMikrotikRouterOS_Disconnect(gApp.jni.jEnv, FjObject);
 end;
 
 function jcMikrotikRouterOS.Execute(_cmd: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_Execute(FjEnv, FjObject, _cmd);
+   Result:= jcMikrotikRouterOS_Execute(gApp.jni.jEnv, FjObject, _cmd);
 end;
 
 function jcMikrotikRouterOS.ExecuteForResult(_cmd: string): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_ExecuteForResult(FjEnv, FjObject, _cmd);
+   Result:= jcMikrotikRouterOS_ExecuteForResult(gApp.jni.jEnv, FjObject, _cmd);
 end;
 
 function jcMikrotikRouterOS.ExecuteAsync(_cmd: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcMikrotikRouterOS_ExecuteAsync(FjEnv, FjObject, _cmd);
+   Result:= jcMikrotikRouterOS_ExecuteAsync(gApp.jni.jEnv, FjObject, _cmd);
 end;
 
 procedure jcMikrotikRouterOS.GenEvent_OnMikrotikAsyncReceive(Obj: TObject; delimitedContent: string; delimiter: string);

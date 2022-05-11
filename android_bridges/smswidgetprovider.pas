@@ -20,7 +20,7 @@ jSMSWidgetProvider = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -57,10 +57,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jSMSWidgetProvider.Init(refApp: jApp);
+procedure jSMSWidgetProvider.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -69,14 +69,14 @@ end;
 
 function jSMSWidgetProvider.jCreate(): jObject;
 begin
-   Result:= jSMSWidgetProvider_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSMSWidgetProvider_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jSMSWidgetProvider.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSMSWidgetProvider_jFree(FjEnv, FjObject);
+     jSMSWidgetProvider_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jSMSWidgetProvider_JNI_Bridge ----------}

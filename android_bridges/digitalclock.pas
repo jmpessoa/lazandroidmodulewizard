@@ -23,7 +23,7 @@ jDigitalClock = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -109,30 +109,30 @@ begin
   inherited Destroy;
 end;
 
-procedure jDigitalClock.Init(refApp: jApp);
+procedure jDigitalClock.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jDigitalClock_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    jDigitalClock_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   jDigitalClock_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jDigitalClock_SetId(FjEnv, FjObject, Self.Id);
+   jDigitalClock_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jDigitalClock_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jDigitalClock_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jDigitalClock_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -141,38 +141,38 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jDigitalClock_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jDigitalClock_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jDigitalClock_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jDigitalClock_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jDigitalClock_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jDigitalClock_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFontColor <> colbrDefault then
-       jDigitalClock_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+       jDigitalClock_setTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
    if FFontSizeUnit <> unitDefault then
-        jDigitalClock_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+        jDigitalClock_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(FFontSizeUnit));
 
    if FFontSize <> 0 then
-      jDigitalClock_SetTextSize(FjEnv, FjObject, FFontSize);
+      jDigitalClock_SetTextSize(gApp.jni.jEnv, FjObject, FFontSize);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -180,13 +180,13 @@ procedure jDigitalClock.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jDigitalClock.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jDigitalClock.UpdateLayout;
@@ -197,13 +197,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jDigitalClock.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -214,77 +214,77 @@ end;
 
 function jDigitalClock.jCreate(): jObject;
 begin
-   Result:= jDigitalClock_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jDigitalClock_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jDigitalClock.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_jFree(FjEnv, FjObject);
+     jDigitalClock_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDigitalClock.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jDigitalClock_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jDigitalClock.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_RemoveFromViewParent(FjEnv, FjObject);
+     jDigitalClock_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jDigitalClock.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jDigitalClock_GetView(FjEnv, FjObject);
+   Result:= jDigitalClock_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jDigitalClock.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_SetLParamWidth(FjEnv, FjObject, _w);
+     jDigitalClock_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jDigitalClock.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_SetLParamHeight(FjEnv, FjObject, _h);
+     jDigitalClock_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jDigitalClock.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jDigitalClock_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jDigitalClock.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jDigitalClock_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDigitalClock.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jDigitalClock_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jDigitalClock.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jDigitalClock_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jDigitalClock_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jDigitalClock.ClearLayout();
@@ -295,15 +295,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jDigitalClock_clearLayoutAll(FjEnv, FjObject);
+     jDigitalClock_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jDigitalClock_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jDigitalClock_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jDigitalClock_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jDigitalClock_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -312,14 +312,14 @@ begin
   //in designing component state: set value here...
   FFontSize:= _size;
   if FInitialized then
-     jDigitalClock_SetTextSize(FjEnv, FjObject, _size);
+     jDigitalClock_SetTextSize(gApp.jni.jEnv, FjObject, _size);
 end;
 
 Procedure jDigitalClock.SetFontColor(Value: TARGBColorBridge);
 begin
  FFontColor:= Value;
  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jDigitalClock_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jDigitalClock_setTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jDigitalClock.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -327,7 +327,7 @@ begin
   //in designing component state: set value here...
   FFontSizeUnit:= _unit;
   if FInitialized then
-     jDigitalClock_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+     jDigitalClock_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(_unit));
 end;
 
 procedure jDigitalClock.SetLGravity(_value: TLayoutGravity);
@@ -335,7 +335,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jDigitalClock_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     jDigitalClock_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 {-------- jDigitalClock_JNI_Bridge ----------}

@@ -35,7 +35,7 @@ jAutoTextView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     function GetWidth: integer;  override;
     function GetHeight: integer; override;
@@ -222,7 +222,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jAutoTextView.Init(refApp: jApp);
+procedure jAutoTextView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -230,23 +230,23 @@ var
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jAutoTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    jAutoTextView_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   jAutoTextView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jAutoTextView_SetId(FjEnv, FjObject, Self.Id);
+   jAutoTextView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jAutoTextView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jAutoTextView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jAutoTextView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -255,50 +255,50 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jAutoTextView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jAutoTextView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jAutoTextView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jAutoTextView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jAutoTextView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jAutoTextView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if  FFontColor <> colbrDefault then
-    jAutoTextView_SetTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    jAutoTextView_SetTextColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
    if FFontSizeUnit <> unitDefault then
-     jAutoTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+     jAutoTextView_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(FFontSizeUnit));
 
    if FFontSize > 0 then
-    jAutoTextView_SetTextSize(FjEnv, FjObject , FFontSize);
+    jAutoTextView_SetTextSize(gApp.jni.jEnv, FjObject , FFontSize);
 
-   jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jAutoTextView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
    if not FCloseSoftInputOnEnter then
-    jAutoTextView_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
+    jAutoTextView_SetCloseSoftInputOnEnter(gApp.jni.jEnv, FjObject, FCloseSoftInputOnEnter);
 
    if FHint <> '' then
-     jAutoTextView_SetHint(FjEnv, FjObject, FHint);
+     jAutoTextView_SetHint(gApp.jni.jEnv, FjObject, FHint);
 
    for i:= 0 to FItems.Count-1 do
-     jAutoTextView_Add(FjEnv, FjObject , FItems.Strings[i]);
+     jAutoTextView_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i]);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -306,13 +306,13 @@ procedure jAutoTextView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jAutoTextView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jAutoTextView.UpdateLayout;
@@ -323,13 +323,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jAutoTextView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -340,77 +340,77 @@ end;
 
 function jAutoTextView.jCreate(): jObject;
 begin
-   Result:= jAutoTextView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jAutoTextView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jAutoTextView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_jFree(FjEnv, FjObject);
+     jAutoTextView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jAutoTextView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jAutoTextView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_RemoveFromViewParent(FjEnv, FjObject);
+     jAutoTextView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jAutoTextView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAutoTextView_GetView(FjEnv, FjObject);
+   Result:= jAutoTextView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetLParamWidth(FjEnv, FjObject, _w);
+     jAutoTextView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jAutoTextView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetLParamHeight(FjEnv, FjObject, _h);
+     jAutoTextView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jAutoTextView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jAutoTextView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jAutoTextView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jAutoTextView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jAutoTextView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jAutoTextView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jAutoTextView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jAutoTextView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jAutoTextView.ClearLayout();
@@ -421,15 +421,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jAutoTextView_clearLayoutAll(FjEnv, FjObject);
+     jAutoTextView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jAutoTextView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jAutoTextView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jAutoTextView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jAutoTextView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -437,7 +437,7 @@ function jAutoTextView.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAutoTextView_GetItemIndex(FjEnv, FjObject);
+   Result:= jAutoTextView_GetItemIndex(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetText(_text: string);
@@ -445,7 +445,7 @@ begin
   //in designing component state: set value here...
   FText:= _text;
   if FInitialized then
-     jAutoTextView_SetText(FjEnv, FjObject, _text);
+     jAutoTextView_SetText(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jAutoTextView.GetText(): string;
@@ -453,7 +453,7 @@ begin
   //in designing component state: result value here...
   Result:= FText;
   if FInitialized then
-   Result:= jAutoTextView_GetText(FjEnv, FjObject);
+   Result:= jAutoTextView_GetText(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.Clear();
@@ -461,21 +461,21 @@ begin
   //in designing component state: set value here...
   FText:= '';
   if FInitialized then
-     jAutoTextView_Clear(FjEnv, FjObject);
+     jAutoTextView_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.ShowDropDown();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_ShowDropDown(FjEnv, FjObject);
+     jAutoTextView_ShowDropDown(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetThreshold(_threshold: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetThreshold(FjEnv, FjObject, _threshold);
+     jAutoTextView_SetThreshold(gApp.jni.jEnv, FjObject, _threshold);
 end;
 
 procedure jAutoTextView.Add(_text: string);
@@ -483,7 +483,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jAutoTextView_Add(FjEnv, FjObject, _text);
+     jAutoTextView_Add(gApp.jni.jEnv, FjObject, _text);
      FItems.Add(_text);
   end;
 end;
@@ -492,7 +492,7 @@ function jAutoTextView.CountDropDown(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jAutoTextView_CountDropDown(FjEnv, FjObject);
+   Result:= jAutoTextView_CountDropDown(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.ClearAll();
@@ -500,7 +500,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jAutoTextView_ClearAll(FjEnv, FjObject);
+     jAutoTextView_ClearAll(gApp.jni.jEnv, FjObject);
      FItems.Clear;
   end;
 end;
@@ -511,7 +511,7 @@ begin
   if FInitialized then
   begin
      FItems.Clear;
-     jAutoTextView_ClearDropDown(FjEnv, FjObject);
+     jAutoTextView_ClearDropDown(gApp.jni.jEnv, FjObject);
   end;
 end;
 
@@ -520,42 +520,42 @@ begin
   //in designing component state: set value here...
   FTextAlignment:= AValue;
   if FInitialized then
-     jAutoTextView_SetTextAlignment(FjEnv, FjObject, Ord(AValue));
+     jAutoTextView_SetTextAlignment(gApp.jni.jEnv, FjObject, Ord(AValue));
 end;
 
 procedure jAutoTextView.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_CopyToClipboard(FjEnv, FjObject);
+     jAutoTextView_CopyToClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_PasteFromClipboard(FjEnv, FjObject);
+     jAutoTextView_PasteFromClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.Append(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_Append(FjEnv, FjObject, _text);
+     jAutoTextView_Append(gApp.jni.jEnv, FjObject, _text);
 end;
 
 procedure jAutoTextView.AppendLn(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_AppendLn(FjEnv, FjObject, _text);
+     jAutoTextView_AppendLn(gApp.jni.jEnv, FjObject, _text);
 end;
 
 procedure jAutoTextView.AppendTab();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_AppendTab(FjEnv, FjObject);
+     jAutoTextView_AppendTab(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetFontAndTextTypeFace(_fontFace: TFontFace; _fontStyle: TTextTypeFace);
@@ -564,7 +564,7 @@ begin
   FFontFace:=  _fontFace;
   FTextTypeFace:= _fontStyle;
   if FInitialized then
-     jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(_fontFace) ,Ord(_fontStyle));
+     jAutoTextView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(_fontFace) ,Ord(_fontStyle));
 end;
 
 
@@ -573,7 +573,7 @@ begin
   //in designing component state: set value here...
   FFontFace:=  AValue;
   if FInitialized then
-     jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(AValue) ,Ord(FTextTypeFace));
+     jAutoTextView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(AValue) ,Ord(FTextTypeFace));
 end;
 
 procedure jAutoTextView.SetTextTypeFace(AValue: TTextTypeFace);
@@ -581,7 +581,7 @@ begin
   //in designing component state: set value here...
   FTextTypeFace:= AValue;
   if FInitialized then
-     jAutoTextView_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace) ,Ord(AValue));
+     jAutoTextView_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace) ,Ord(AValue));
 end;
 
 
@@ -590,7 +590,7 @@ begin
   //in designing component state: set value here...
   FFontSize:= AValue;
   if FInitialized then
-     jAutoTextView_SetTextSize(FjEnv, FjObject, AValue);
+     jAutoTextView_SetTextSize(gApp.jni.jEnv, FjObject, AValue);
 end;
 
 procedure jAutoTextView.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -598,14 +598,14 @@ begin
   //in designing component state: set value here...
   FFontSizeUnit:= _unit;
   if FInitialized then
-     jAutoTextView_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+     jAutoTextView_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(_unit));
 end;
 
 procedure jAutoTextView.SetFontColor(Value: TARGBColorBridge);
 begin
  FFontColor:= Value;
  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jAutoTextView_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor))
+     jAutoTextView_setTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor))
 end;
 
 procedure jAutoTextView.SetItems(AValue: TStrings);
@@ -622,7 +622,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jAutoTextView_GetLParamWidth(FjEnv, FjObject );
+   Result:= jAutoTextView_GetLParamWidth(gApp.jni.jEnv, FjObject );
 
   if Result = -1 then //lpMatchParent
    Result := sysGetWidthOfParent(FParent);
@@ -636,42 +636,42 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jAutoTextView_GetLParamHeight(FjEnv, FjObject );
+   Result:= jAutoTextView_GetLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jAutoTextView.ShowSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_ShowSoftInput(FjEnv, FjObject);
+     jAutoTextView_ShowSoftInput(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.HideSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_HideSoftInput(FjEnv, FjObject);
+     jAutoTextView_HideSoftInput(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetSoftInputOptions(_imeOption: TImeOptions);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetSoftInputOptions(FjEnv, FjObject, Ord(_imeOption));
+     jAutoTextView_SetSoftInputOptions(gApp.jni.jEnv, FjObject, Ord(_imeOption));
 end;
 
 procedure jAutoTextView.SetFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_SetFocus(FjEnv, FjObject);
+     jAutoTextView_SetFocus(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.RequestFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jAutoTextView_RequestFocus(FjEnv, FjObject);
+     jAutoTextView_RequestFocus(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAutoTextView.SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
@@ -679,7 +679,7 @@ begin
   //in designing component state: set value here...
   FCloseSoftInputOnEnter:= _closeSoftInput;
   if FInitialized then
-     jAutoTextView_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
+     jAutoTextView_SetCloseSoftInputOnEnter(gApp.jni.jEnv, FjObject, _closeSoftInput);
 end;
 
 procedure jAutoTextView.SetHint(_hint: string);
@@ -687,7 +687,7 @@ begin
   //in designing component state: set value here...
   FHint:= _hint;
   if FInitialized then
-     jAutoTextView_SetHint(FjEnv, FjObject, _hint);
+     jAutoTextView_SetHint(gApp.jni.jEnv, FjObject, _hint);
 end;
 
 procedure jAutoTextView.SetLGravity(_value: TLayoutGravity);
@@ -695,7 +695,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jAutoTextView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     jAutoTextView_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 Procedure jAutoTextView.GenEvent_OnBeforeDispatchDraw(Obj: TObject; canvas: jObject; tag: integer);

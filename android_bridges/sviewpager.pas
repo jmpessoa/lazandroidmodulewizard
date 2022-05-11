@@ -26,7 +26,7 @@ jsViewPager = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -132,33 +132,33 @@ begin
   inherited Destroy;
 end;
 
-procedure jsViewPager.Init(refApp: jApp);
+procedure jsViewPager.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject:= jCreate(Ord(FPagerStrip)); //jSelf !
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jsViewPager_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     jsViewPager_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
 
-   jsViewPager_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsViewPager_SetId(FjEnv, FjObject, Self.Id);
+   jsViewPager_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsViewPager_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsViewPager_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsViewPager_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -167,33 +167,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsViewPager_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsViewPager_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsViewPager_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsViewPager_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsViewPager_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsViewPager_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsViewPager_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsViewPager_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -201,13 +201,13 @@ procedure jsViewPager.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsViewPager.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsViewPager.UpdateLayout;
@@ -218,13 +218,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsViewPager.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -235,70 +235,70 @@ end;
 
 function jsViewPager.jCreate(_pageStrip: integer): jObject;
 begin
-  Result:= jsViewPager_jCreate(FjEnv, int64(Self) ,_pageStrip, FjThis);
+  Result:= jsViewPager_jCreate(gApp.jni.jEnv, int64(Self) ,_pageStrip, gApp.jni.jThis);
 end;
 
 procedure jsViewPager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_jFree(FjEnv, FjObject);
+     jsViewPager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsViewPager_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsViewPager.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsViewPager_GetParent(FjEnv, FjObject);
+   Result:= jsViewPager_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_RemoveFromViewParent(FjEnv, FjObject);
+     jsViewPager_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsViewPager.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsViewPager_GetView(FjEnv, FjObject);
+   Result:= jsViewPager_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetLParamWidth(FjEnv, FjObject, _w);
+     jsViewPager_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsViewPager.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetLParamHeight(FjEnv, FjObject, _h);
+     jsViewPager_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsViewPager.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsViewPager_GetLParamWidth(FjEnv, FjObject);
+   Result:= jsViewPager_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsViewPager.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsViewPager_GetLParamHeight(FjEnv, FjObject);
+   Result:= jsViewPager_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.SetLGravity(_gravity: TLayoutGravity);
@@ -306,42 +306,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jsViewPager_SetLGravity(FjEnv, FjObject, Ord(_gravity));
+     jsViewPager_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jsViewPager.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetLWeight(FjEnv, FjObject, _w);
+     jsViewPager_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsViewPager.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsViewPager_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsViewPager.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsViewPager_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsViewPager.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsViewPager_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsViewPager.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsViewPager_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsViewPager.ClearLayout();
@@ -352,15 +352,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsViewPager_clearLayoutAll(FjEnv, FjObject);
+     jsViewPager_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsViewPager_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsViewPager_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsViewPager_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsViewPager_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -368,21 +368,21 @@ procedure jsViewPager.AddPage(_view: jObject; _title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_AddPage(FjEnv, FjObject, _view ,_title);
+     jsViewPager_AddPage(gApp.jni.jEnv, FjObject, _view ,_title);
 end;
 
 function jsViewPager.GetPageTitle(_position: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsViewPager_GetPageTitle(FjEnv, FjObject, _position);
+   Result:= jsViewPager_GetPageTitle(gApp.jni.jEnv, FjObject, _position);
 end;
 
 function jsViewPager.GetPosition(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsViewPager_GetPosition(FjEnv, FjObject);
+   Result:= jsViewPager_GetPosition(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.SetFitsSystemWindows(_value: boolean);
@@ -390,42 +390,42 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsViewPager_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsViewPager_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsViewPager.SetPosition(_position: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetPosition(FjEnv, FjObject, _position);
+     jsViewPager_SetPosition(gApp.jni.jEnv, FjObject, _position);
 end;
 
 procedure jsViewPager.SetAppBarLayoutScrollingViewBehavior();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetAppBarLayoutScrollingViewBehavior(FjEnv, FjObject);
+     jsViewPager_SetAppBarLayoutScrollingViewBehavior(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.SetClipToPadding(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetClipToPadding(FjEnv, FjObject, _value);
+     jsViewPager_SetClipToPadding(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsViewPager.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetBackgroundToPrimaryColor(FjEnv, FjObject);
+     jsViewPager_SetBackgroundToPrimaryColor(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsViewPager.SetPageMargin(_value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsViewPager_SetPageMargin(FjEnv, FjObject, _value);
+     jsViewPager_SetPageMargin(gApp.jni.jEnv, FjObject, _value);
 end;
 
 {-------- jsViewPager_JNI_Bridge ----------}

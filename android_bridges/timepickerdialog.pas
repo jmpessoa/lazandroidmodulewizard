@@ -24,7 +24,7 @@ jTimePickerDialog = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Show(); overload;
@@ -63,10 +63,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jTimePickerDialog.Init(refApp: jApp);
+procedure jTimePickerDialog.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -75,21 +75,21 @@ end;
 
 function jTimePickerDialog.jCreate(): jObject;
 begin
-   Result:= jTimePickerDialog_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jTimePickerDialog_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jTimePickerDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
 end;
 
 procedure jTimePickerDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Show');
+     jni_proc(gApp.jni.jEnv, FjObject, 'Show');
 end;
 
 procedure jTimePickerDialog.GenEvent_OnTimePicker(Obj: TObject;  hourOfDay: integer; minute: integer);
@@ -101,7 +101,7 @@ procedure jTimePickerDialog.Show(_hourOfDay24Based: integer; _minute: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'Show', _hourOfDay24Based ,_minute);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'Show', _hourOfDay24Based ,_minute);
 end;
 
 {-------- jTimePickerDialog_JNI_Bridge ----------}

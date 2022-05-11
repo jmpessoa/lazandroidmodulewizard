@@ -42,7 +42,7 @@ jToneGenerator = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate( _stream: integer; _volume: integer): jObject;
     procedure jFree();
 
@@ -99,11 +99,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jToneGenerator.Init(refApp: jApp);
+procedure jToneGenerator.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(Ord(FStream), FVolume); //jSelf !
 
@@ -115,14 +115,14 @@ end;
 
 function jToneGenerator.jCreate( _stream: integer; _volume: integer): jObject;
 begin
-   Result:= jToneGenerator_jCreate(FjEnv, int64(Self) ,_stream ,_volume, FjThis);
+   Result:= jToneGenerator_jCreate(gApp.jni.jEnv, int64(Self) ,_stream ,_volume, gApp.jni.jThis);
 end;
 
 procedure jToneGenerator.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToneGenerator_jFree(FjEnv, FjObject);
+     jToneGenerator_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -130,28 +130,28 @@ function jToneGenerator.Play(_toneType: TToneType; _durationMilliseconds: intege
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToneGenerator_Play(FjEnv, FjObject, Ord(_toneType) ,_durationMilliseconds);
+   Result:= jToneGenerator_Play(gApp.jni.jEnv, FjObject, Ord(_toneType) ,_durationMilliseconds);
 end;
 
 function jToneGenerator.Play(_durationMilliseconds: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToneGenerator_Play(FjEnv, FjObject, Ord(FTone) ,_durationMilliseconds);
+   Result:= jToneGenerator_Play(gApp.jni.jEnv, FjObject, Ord(FTone) ,_durationMilliseconds);
 end;
 
 function jToneGenerator.Play(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jToneGenerator_Play(FjEnv, FjObject, Ord(FTone) , FDurationMilliseconds);
+    Result:= jToneGenerator_Play(gApp.jni.jEnv, FjObject, Ord(FTone) , FDurationMilliseconds);
 end;
 
 function jToneGenerator.GetToneDescription(_toneType: TToneType): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToneGenerator_GetToneDescription(FjEnv, FjObject, Ord(_toneType));
+   Result:= jToneGenerator_GetToneDescription(gApp.jni.jEnv, FjObject, Ord(_toneType));
 end;
 
 procedure jToneGenerator.SetVolume(_volume: integer);
@@ -159,7 +159,7 @@ begin
   //in designing component state: set value here...
   FVolume:= _volume;
   if FInitialized then
-     jToneGenerator_SetVolume(FjEnv, FjObject, _volume);
+     jToneGenerator_SetVolume(gApp.jni.jEnv, FjObject, _volume);
 end;
 
 procedure jToneGenerator.SetStream(_stream: TToneStream);
@@ -167,14 +167,14 @@ begin
   //in designing component state: set value here...
   FStream:= _stream;
   if FInitialized then
-     jToneGenerator_SetStream(FjEnv, FjObject, Ord(_stream));
+     jToneGenerator_SetStream(gApp.jni.jEnv, FjObject, Ord(_stream));
 end;
 
 procedure jToneGenerator.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToneGenerator_Stop(FjEnv, FjObject);
+     jToneGenerator_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jToneGenerator_JNI_Bridge ----------}

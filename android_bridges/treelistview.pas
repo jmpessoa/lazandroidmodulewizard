@@ -39,7 +39,7 @@ type
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -152,26 +152,26 @@ begin
   inherited Destroy;
 end;
 
-procedure jTreeListView.Init(refApp: jApp);
+procedure jTreeListView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
-   jTreeListView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jTreeListView_SetId(FjEnv, FjObject, Self.Id);
+   jTreeListView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jTreeListView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jTreeListView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jTreeListView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -180,30 +180,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jTreeListView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jTreeListView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jTreeListView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jTreeListView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jTreeListView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jTreeListView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -211,13 +211,13 @@ procedure jTreeListView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jTreeListView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jTreeListView.UpdateLayout;
@@ -228,13 +228,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jTreeListView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -253,112 +253,112 @@ end;
 function jTreeListView.jCreate(): jObject;
 begin
   //in designing component state: result value here...
-   Result:= jTreeListView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jTreeListView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jTreeListView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_jFree(FjEnv, FjObject);
+     jTreeListView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTreeListView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jTreeListView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jTreeListView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTreeListView_GetParent(FjEnv, FjObject);
+   Result:= jTreeListView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTreeListView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_RemoveFromViewParent(FjEnv, FjObject);
+     jTreeListView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jTreeListView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTreeListView_GetView(FjEnv, FjObject);
+   Result:= jTreeListView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTreeListView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetLParamWidth(FjEnv, FjObject, _w);
+     jTreeListView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jTreeListView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetLParamHeight(FjEnv, FjObject, _h);
+     jTreeListView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jTreeListView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTreeListView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jTreeListView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jTreeListView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTreeListView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jTreeListView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTreeListView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetLGravity(FjEnv, FjObject, _g);
+     jTreeListView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jTreeListView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetLWeight(FjEnv, FjObject, _w);
+     jTreeListView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jTreeListView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jTreeListView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jTreeListView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jTreeListView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jTreeListView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jTreeListView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jTreeListView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jTreeListView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jTreeListView.ClearLayout();
@@ -369,15 +369,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jTreeListView_clearLayoutAll(FjEnv, FjObject);
+     jTreeListView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jTreeListView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jTreeListView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jTreeListView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jTreeListView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -386,58 +386,58 @@ begin
   //in designing component state: set value here...
   FLevels := count;
   if FInitialized then
-     jTreeListView_SetLevels(FjEnv, FjObject, FLevels);
+     jTreeListView_SetLevels(gApp.jni.jEnv, FjObject, FLevels);
 end;
 
 procedure jTreeListView.Clear;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_Clear(FjEnv, FjObject);
+     jTreeListView_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 function jTreeListView.AddChild(AParent: integer): integer;
 begin
   Result := -1;
   if FInitialized then
-     Result:= jTreeListView_AddChild(FjEnv, FjObject, AParent);
+     Result:= jTreeListView_AddChild(gApp.jni.jEnv, FjObject, AParent);
 end;
 
 procedure jTreeListView.SetNodeCaption(id: integer; caption: string);
 begin
   if FInitialized then
-     jTreeListView_SetNodeCaption(FjEnv, FjObject, id, caption);
+     jTreeListView_SetNodeCaption(gApp.jni.jEnv, FjObject, id, caption);
 end;
 
 function jTreeListView.GetNodeData(id: integer): string;
 begin
   if FInitialized then
-    Result := jTreeListView_GetNodeData(FjEnv, FjObject, id);
+    Result := jTreeListView_GetNodeData(gApp.jni.jEnv, FjObject, id);
 end;
 
 function jTreeListView.GetFirstChild(parent_id: integer): integer;
 begin
   if FInitialized then
-    Result := jTreeListView_GetFirstChild(FjEnv, FjObject, parent_id);
+    Result := jTreeListView_GetFirstChild(gApp.jni.jEnv, FjObject, parent_id);
 end;
 
 function jTreeListView.GetNextSibling(id :integer): integer;
 begin
   if FInitialized then
-    Result := jTreeListView_GetNextSibling(FjEnv, FjObject, id);
+    Result := jTreeListView_GetNextSibling(gApp.jni.jEnv, FjObject, id);
 end;
 
 function jTreeListView.GetNodeHasChildren(id: integer): boolean;
 begin
   if FInitialized then
-    Result := jTreeListView_GetNodeHasChildren(FjEnv, FjObject, id);
+    Result := jTreeListView_GetNodeHasChildren(gApp.jni.jEnv, FjObject, id);
 end;
 
 procedure jTreeListView.ToggleNode(id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTreeListView_ToggleNode(FjEnv, FjObject, id);
+     jTreeListView_ToggleNode(gApp.jni.jEnv, FjObject, id);
 end;
 
 procedure jTreeListView.SetFocusedNode(id: integer);
@@ -445,19 +445,19 @@ begin
   //in designing component state: set value here...
   FFocusedNode := id;
   if FInitialized then
-     jTreeListView_SetFocusedNode(FjEnv, FjObject, FFocusedNode);
+     jTreeListView_SetFocusedNode(gApp.jni.jEnv, FjObject, FFocusedNode);
 end;
 
 function jTreeListView.GetRootNode: integer;
 begin
   if FInitialized then
-    Result := jTreeListView_GetRootNode(FjEnv, FjObject);
+    Result := jTreeListView_GetRootNode(gApp.jni.jEnv, FjObject);
 end;
 
 function jTreeListView.GetParentNode(id: integer): integer;
 begin
   if FInitialized then
-    Result := jTreeListView_GetParentNode(FjEnv, FjObject, id);
+    Result := jTreeListView_GetParentNode(gApp.jni.jEnv, FjObject, id);
 end;
 
 {-------- jTreeListView_JNI_Bridge ----------}

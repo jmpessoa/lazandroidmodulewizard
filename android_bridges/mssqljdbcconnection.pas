@@ -33,7 +33,7 @@ jMsSqlJDBCConnection = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -110,28 +110,28 @@ begin
   inherited Destroy;
 end;
 
-procedure jMsSqlJDBCConnection.Init(refApp: jApp);
+procedure jMsSqlJDBCConnection.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
 
   if FServerIP <> '' then
-    jMsSqlJDBCConnection_SetServerIP(FjEnv, FjObject, FServerIP);
+    jMsSqlJDBCConnection_SetServerIP(gApp.jni.jEnv, FjObject, FServerIP);
 
   if FUserName <> '' then
-    jMsSqlJDBCConnection_SetUserName(FjEnv, FjObject, FUserName);
+    jMsSqlJDBCConnection_SetUserName(gApp.jni.jEnv, FjObject, FUserName);
 
   if FPassword <> '' then
-    jMsSqlJDBCConnection_SetPassword(FjEnv, FjObject, FPassword);
+    jMsSqlJDBCConnection_SetPassword(gApp.jni.jEnv, FjObject, FPassword);
 
   if FDatabaseName <> '' then
-    jMsSqlJDBCConnection_SetDatabaseName(FjEnv, FjObject, FDatabaseName);
+    jMsSqlJDBCConnection_SetDatabaseName(gApp.jni.jEnv, FjObject, FDatabaseName);
 
   if FLanguage <> slEnglish then
-     jMsSqlJDBCConnection_SetLanguage(FjEnv, FjObject, Ord(FLanguage));
+     jMsSqlJDBCConnection_SetLanguage(gApp.jni.jEnv, FjObject, Ord(FLanguage));
 
   FInitialized:= True;
 end;
@@ -139,35 +139,35 @@ end;
 
 function jMsSqlJDBCConnection.jCreate(): jObject;
 begin
-   Result:= jMsSqlJDBCConnection_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jMsSqlJDBCConnection_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jMsSqlJDBCConnection.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMsSqlJDBCConnection_jFree(FjEnv, FjObject);
+     jMsSqlJDBCConnection_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jMsSqlJDBCConnection.Open(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMsSqlJDBCConnection_Open(FjEnv, FjObject);
+   Result:= jMsSqlJDBCConnection_Open(gApp.jni.jEnv, FjObject);
 end;
 
 function jMsSqlJDBCConnection.ExecuteQuery(_sqlQuery: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMsSqlJDBCConnection_ExecuteQuery(FjEnv, FjObject, _sqlQuery);
+   Result:= jMsSqlJDBCConnection_ExecuteQuery(gApp.jni.jEnv, FjObject, _sqlQuery);
 end;
 
 function jMsSqlJDBCConnection.ExecuteUpdate(_sqlExecute: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMsSqlJDBCConnection_ExecuteUpdate(FjEnv, FjObject, _sqlExecute);
+   Result:= jMsSqlJDBCConnection_ExecuteUpdate(gApp.jni.jEnv, FjObject, _sqlExecute);
 end;
 
 procedure jMsSqlJDBCConnection.SetServerIP(_ip: string);
@@ -175,7 +175,7 @@ begin
   //in designing component state: set value here...
   FServerIP:= _ip;
   if FInitialized then
-     jMsSqlJDBCConnection_SetServerIP(FjEnv, FjObject, _ip);
+     jMsSqlJDBCConnection_SetServerIP(gApp.jni.jEnv, FjObject, _ip);
 end;
 
 procedure jMsSqlJDBCConnection.SetUserName(_username: string);
@@ -183,7 +183,7 @@ begin
   //in designing component state: set value here...
   FUserName:= _username;
   if FInitialized then
-     jMsSqlJDBCConnection_SetUserName(FjEnv, FjObject, _username);
+     jMsSqlJDBCConnection_SetUserName(gApp.jni.jEnv, FjObject, _username);
 end;
 
 procedure jMsSqlJDBCConnection.SetPassword(_password: string);
@@ -191,7 +191,7 @@ begin
   //in designing component state: set value here...
   FPassword:=_password;
   if FInitialized then
-     jMsSqlJDBCConnection_SetPassword(FjEnv, FjObject, _password);
+     jMsSqlJDBCConnection_SetPassword(gApp.jni.jEnv, FjObject, _password);
 end;
 
 procedure jMsSqlJDBCConnection.SetDatabaseName(_databaseName: string);
@@ -199,14 +199,14 @@ begin
   //in designing component state: set value here...
   FDatabaseName:= _databaseName;
   if FInitialized then
-     jMsSqlJDBCConnection_SetDatabaseName(FjEnv, FjObject, _databaseName);
+     jMsSqlJDBCConnection_SetDatabaseName(gApp.jni.jEnv, FjObject, _databaseName);
 end;
 
 procedure jMsSqlJDBCConnection.Close();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMsSqlJDBCConnection_Close(FjEnv, FjObject);
+     jMsSqlJDBCConnection_Close(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMsSqlJDBCConnection.SetLanguage(_language: TSpeechLanguage);
@@ -214,28 +214,28 @@ begin
   //in designing component state: set value here...
   FLanguage:= _language;
   if FInitialized then
-     jMsSqlJDBCConnection_SetLanguage(FjEnv, FjObject, Ord(_language));
+     jMsSqlJDBCConnection_SetLanguage(gApp.jni.jEnv, FjObject, Ord(_language));
 end;
 
 procedure jMsSqlJDBCConnection.ExecuteQueryAsync(_sqlQuery: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMsSqlJDBCConnection_ExecuteQueryAsync(FjEnv, FjObject, _sqlQuery);
+     jMsSqlJDBCConnection_ExecuteQueryAsync(gApp.jni.jEnv, FjObject, _sqlQuery);
 end;
 
 procedure jMsSqlJDBCConnection.OpenAsync();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMsSqlJDBCConnection_OpenAsync(FjEnv, FjObject);
+     jMsSqlJDBCConnection_OpenAsync(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMsSqlJDBCConnection.ExecuteUpdateAsync(_sqlUpdate: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMsSqlJDBCConnection_ExecuteUpdateAsync(FjEnv, FjObject, _sqlUpdate);
+     jMsSqlJDBCConnection_ExecuteUpdateAsync(gApp.jni.jEnv, FjObject, _sqlUpdate);
 end;
 
 procedure jMsSqlJDBCConnection.GenEvent_OnMsSqlJDBCConnectionExecuteQueryAsync(Sender:TObject;messageStatus:string);

@@ -35,7 +35,7 @@ jContactManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function GetMobilePhoneNumber(_displayName: string): string;
@@ -127,10 +127,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jContactManager.Init(refApp: jApp);
+procedure jContactManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -139,105 +139,105 @@ end;
 
 function jContactManager.jCreate(): jObject;
 begin
-   Result:= jContactManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jContactManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jContactManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_jFree(FjEnv, FjObject);
+     jContactManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jContactManager.GetMobilePhoneNumber(_displayName: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetMobilePhoneNumber(FjEnv, FjObject, _displayName);
+   Result:= jContactManager_GetMobilePhoneNumber(gApp.jni.jEnv, FjObject, _displayName);
 end;
 
 function jContactManager.GetContactID(_displayName: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetContactID(FjEnv, FjObject, _displayName);
+   Result:= jContactManager_GetContactID(gApp.jni.jEnv, FjObject, _displayName);
 end;
 
 procedure jContactManager.UpdateDisplayName(_displayName: string; _newDisplayName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateDisplayName(FjEnv, FjObject, _displayName ,_newDisplayName);
+     jContactManager_UpdateDisplayName(gApp.jni.jEnv, FjObject, _displayName ,_newDisplayName);
 end;
 
 procedure jContactManager.UpdateMobilePhoneNumber(_displayName: string; _newMobileNumber: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateMobilePhoneNumber(FjEnv, FjObject, _displayName ,_newMobileNumber);
+     jContactManager_UpdateMobilePhoneNumber(gApp.jni.jEnv, FjObject, _displayName ,_newMobileNumber);
 end;
 
 procedure jContactManager.UpdateWorkPhoneNumber(_displayName: string; _newWorkNumber: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateWorkPhoneNumber(FjEnv, FjObject, _displayName ,_newWorkNumber);
+     jContactManager_UpdateWorkPhoneNumber(gApp.jni.jEnv, FjObject, _displayName ,_newWorkNumber);
 end;
 
 procedure jContactManager.UpdateHomePhoneNumber(_displayName: string; _newHomeNumber: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateHomePhoneNumber(FjEnv, FjObject, _displayName ,_newHomeNumber);
+     jContactManager_UpdateHomePhoneNumber(gApp.jni.jEnv, FjObject, _displayName ,_newHomeNumber);
 end;
 
 procedure jContactManager.UpdateHomeEmail(_displayName: string; _newHomeEmail: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateHomeEmail(FjEnv, FjObject, _displayName ,_newHomeEmail);
+     jContactManager_UpdateHomeEmail(gApp.jni.jEnv, FjObject, _displayName ,_newHomeEmail);
 end;
 
 procedure jContactManager.UpdateWorkEmail(_displayName: string; _newWorkEmail: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateWorkEmail(FjEnv, FjObject, _displayName ,_newWorkEmail);
+     jContactManager_UpdateWorkEmail(gApp.jni.jEnv, FjObject, _displayName ,_newWorkEmail);
 end;
 
 procedure jContactManager.UpdateOrganization(_displayName: string; _newCompany: string; _newJobTitle: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdateOrganization(FjEnv, FjObject, _displayName ,_newCompany ,_newJobTitle);
+     jContactManager_UpdateOrganization(gApp.jni.jEnv, FjObject, _displayName ,_newCompany ,_newJobTitle);
 end;
 
 procedure jContactManager.UpdatePhoto(_displayName: string; _bitmapImage: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_UpdatePhoto(FjEnv, FjObject, _displayName ,_bitmapImage);
+     jContactManager_UpdatePhoto(gApp.jni.jEnv, FjObject, _displayName ,_bitmapImage);
 end;
 
 function jContactManager.GetPhoto(_displayName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetPhoto(FjEnv, FjObject, _displayName);
+   Result:= jContactManager_GetPhoto(gApp.jni.jEnv, FjObject, _displayName);
 end;
 
 procedure jContactManager.AddContact(_displayName: string; _mobileNumber: string; _homeNumber: string;  _workNumber: string; _homeEmail: string; _workEmail: string; _companyName: string; _jobTitle: string; _bitmapImage: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_AddContact(FjEnv, FjObject, _displayName , _mobileNumber, _homeNumber  ,_workNumber ,_homeEmail ,_workEmail ,_companyName ,_jobTitle ,_bitmapImage);
+     jContactManager_AddContact(gApp.jni.jEnv, FjObject, _displayName , _mobileNumber, _homeNumber  ,_workNumber ,_homeEmail ,_workEmail ,_companyName ,_jobTitle ,_bitmapImage);
 end;
 
 procedure jContactManager.GetContactsAsync(_delimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_GetContactsAsync(FjEnv, FjObject, _delimiter);
+     jContactManager_GetContactsAsync(gApp.jni.jEnv, FjObject, _delimiter);
 end;
 
 procedure jContactManager.GenEvent_OnContactManagerContactsExecuted(Sender: TObject; count: integer);
@@ -260,42 +260,42 @@ procedure jContactManager.AddContact(_displayName: string; _mobileNumber: string
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_AddContact(FjEnv, FjObject, _displayName ,_mobileNumber);
+     jContactManager_AddContact(gApp.jni.jEnv, FjObject, _displayName ,_mobileNumber);
 end;
 
 function jContactManager.GetDisplayName(_contactID: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetDisplayName(FjEnv, FjObject, _contactID);
+   Result:= jContactManager_GetDisplayName(gApp.jni.jEnv, FjObject, _contactID);
 end;
 
 procedure jContactManager.DeleteContact(_displayName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_DeleteContact(FjEnv, FjObject, _displayName);
+     jContactManager_DeleteContact(gApp.jni.jEnv, FjObject, _displayName);
 end;
 
 function jContactManager.GetPhotoByUriAsString(_uriAsString: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetPhotoByUriAsString(FjEnv, FjObject, _uriAsString);
+   Result:= jContactManager_GetPhotoByUriAsString(gApp.jni.jEnv, FjObject, _uriAsString);
 end;
 
 function jContactManager.GetContactInfo(_displayName: string; _delimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetContactInfo(FjEnv, FjObject, _displayName ,_delimiter);
+   Result:= jContactManager_GetContactInfo(gApp.jni.jEnv, FjObject, _displayName ,_delimiter);
 end;
 
 function jContactManager.GetContactsFromSIMCard(_delimiter: string): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jContactManager_GetContactsFromSIMCard(FjEnv, FjObject, _delimiter);
+   Result:= jContactManager_GetContactsFromSIMCard(gApp.jni.jEnv, FjObject, _delimiter);
 end;
 
 {
@@ -303,7 +303,7 @@ procedure jContactManager.DeleteContactFromSIMCard(_displayName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jContactManager_DeleteContactFromSIMCard(FjEnv, FjObject, _displayName);
+     jContactManager_DeleteContactFromSIMCard(gApp.jni.jEnv, FjObject, _displayName);
 end;
 }
 

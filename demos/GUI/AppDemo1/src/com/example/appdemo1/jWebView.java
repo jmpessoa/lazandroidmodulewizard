@@ -3,10 +3,15 @@ package com.example.appdemo1;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.http.SslError;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
+import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebView.FindListener; //LMB
 import android.webkit.WebViewClient;
@@ -120,7 +125,46 @@ class jWebClient extends WebViewClient {
         else{
             controls.pOnWebViewStatus(PasObj,WVConst.WebView_OnError, description);
         }
+    }
 
+    //https://www.ti-enxame.com/pt/android/o-android-webview-nao-esta-carregando-um-url-https/940018636/
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        //super.onReceivedSslError(view, handler, error); //DOT CALL SUPER METHOD !!!!
+        boolean proceed = false;
+        String message = error.toString();
+
+        //Log.i("LAMW", "0:  "+message);
+
+        switch (error.getPrimaryError()) {
+            case SslError.SSL_NOTYETVALID:
+                message = "The certificate is not yet valid.";
+                break;
+
+            case SslError.SSL_EXPIRED:
+                message = "The certificate has expired.";
+                break;
+
+            case SslError.SSL_IDMISMATCH:
+                message = "The certificate Hostname mismatch.";
+                break;
+
+            case SslError.SSL_UNTRUSTED:
+                message = "The certificate authority is not trusted.";
+                break;
+        }
+
+        //Log.i("LAMW", "1:  "+message);
+
+        proceed = controls.pOnWebViewReceivedSslError(PasObj, message, error.getPrimaryError());
+
+        if (proceed) {
+            //Log.i("LAMW", "2:  TRUE");
+            handler.proceed();
+        }
+        else {
+            handler.cancel();
+        }
     }
 
 }
@@ -160,9 +204,12 @@ public class jWebView extends WebView {
 
         MyWebView =  this;
 
-        setWebViewClient(webclient); // Prevent to run External Browser
         this.getSettings().setJavaScriptEnabled(true);
-        
+        this.getSettings().setDomStorageEnabled(true);
+        this.getSettings().setBuiltInZoomControls(true);
+
+        setWebViewClient(webclient); // Prevent to run External Browser
+
         onClickListener = new OnLongClickListener() {        	
 		@Override
 		public boolean onLongClick(View arg0) {
@@ -172,7 +219,8 @@ public class jWebView extends WebView {
             }			
 			return false;
 		};
-        };                       
+
+        };
         setOnLongClickListener(onClickListener);
 
         //[ifdef_api16up]
@@ -249,15 +297,6 @@ public class jWebView extends WebView {
 
     public void ClearLayoutAll() {
     	LAMWCommon.clearLayoutAll();
-    }
-
-    public  void setJavaScript(boolean javascript) {
-        this.getSettings().setJavaScriptEnabled(javascript);
-    }
-
-    // Fatih - ZoomControl
-    public  void setZoomControl(boolean zoomControl) {
-        this.getSettings().setBuiltInZoomControls(zoomControl);
     }
 
     //TODO: http://www.learn2crack.com/2014/01/android-oauth2-webview.html
@@ -373,6 +412,92 @@ public class jWebView extends WebView {
            controls.pOnWebViewEvaluateJavascriptResult(PasObj, "Sorry... device Api ["+Build.VERSION.SDK_INT+"] but the requirement is Api >= 19");  // <<---- fire native method/event here!
        }
 
+    }
+
+    public  void setJavaScript(boolean javascript) {
+        this.getSettings().setJavaScriptEnabled(javascript);
+    }
+
+    // Fatih - ZoomControl
+    public  void setZoomControl(boolean zoomControl) {
+        this.getSettings().setBuiltInZoomControls(zoomControl);
+    }
+
+    public void SetDomStorage(boolean _domStorage) {
+        this.getSettings().setDomStorageEnabled(_domStorage);
+    }
+
+    public void SetLoadWithOverviewMode(boolean _overviewMode) {
+        this.getSettings().setLoadWithOverviewMode(_overviewMode);
+    }
+
+    public void SetUseWideViewPort(boolean _wideViewport) {
+        this.getSettings().setUseWideViewPort(_wideViewport);
+    }
+
+    //***
+    public void SetAllowContentAccess(boolean _allowContentAccess) {
+        this.getSettings().setAllowContentAccess(_allowContentAccess);
+    }
+
+    public void SetAllowFileAccess(boolean _allowFileAccess) {
+        this.getSettings().setAllowFileAccess(_allowFileAccess);
+    }
+
+    public void SetAppCacheEnabled(boolean _cacheEnabled) {
+        this.getSettings().setAppCacheEnabled(_cacheEnabled);
+    }
+
+    public void SetDisplayZoomControls(boolean _displayZoomControls) {
+        this.getSettings().setDisplayZoomControls(_displayZoomControls);
+    }
+
+    public void SetGeolocationEnabled(boolean _geolocationEnabled) {
+        this.getSettings().setGeolocationEnabled(_geolocationEnabled);
+    }
+
+    public void SetJavaScriptCanOpenWindowsAutomatically(boolean _javaScriptCanOpenWindows) {
+        this.getSettings().setJavaScriptCanOpenWindowsAutomatically(_javaScriptCanOpenWindows);
+    }
+
+    public void SetLoadsImagesAutomatically(boolean _loadsImagesAutomatically) {
+        this.getSettings().setLoadsImagesAutomatically(_loadsImagesAutomatically);
+    }
+
+    public void SetSupportMultipleWindows(boolean _supportMultipleWindows) {
+        this.getSettings().setSupportMultipleWindows(_supportMultipleWindows);
+    }
+
+    public void SetAllowUniversalAccessFromFileURLs(boolean _allowUniversalAccessFromFileURLs) {
+        if (Build.VERSION.SDK_INT >= 16) {
+            //[ifdef_api16up]
+            this.getSettings().setAllowUniversalAccessFromFileURLs(_allowUniversalAccessFromFileURLs);
+            //[endif_api16up]
+        }
+    }
+
+    public void SetMediaPlaybackRequiresUserGesture(boolean _mediaPlaybackRequiresUserGesture) {
+        if (Build.VERSION.SDK_INT >= 17) {
+            //[ifdef_api17up]
+            this.getSettings().setMediaPlaybackRequiresUserGesture(_mediaPlaybackRequiresUserGesture);
+            //[endif_api17up]
+        }
+    }
+
+    public void SetSafeBrowsingEnabled(boolean _safeBrowsingEnabled) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            this.getSettings().setSafeBrowsingEnabled(_safeBrowsingEnabled);
+            //[endif_api26up]
+        }
+    }
+
+    public void SetSupportZoom(boolean _supportZoom) {
+        this.getSettings().setSupportZoom(_supportZoom);
+    }
+
+    public void SetUserAgent(String _userAgent) {
+        this.getSettings().setUserAgentString(_userAgent);
     }
 
 }

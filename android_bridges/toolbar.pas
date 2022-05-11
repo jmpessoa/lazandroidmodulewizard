@@ -29,7 +29,7 @@ jToolbar = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -146,27 +146,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jToolbar.Init(refApp: jApp);
+procedure jToolbar.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jToolbar_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jToolbar_SetId(FjEnv, FjObject, Self.Id);
+   jToolbar_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jToolbar_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jToolbar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jToolbar_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -175,50 +175,50 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jToolbar_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jToolbar_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jToolbar_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jToolbar_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jToolbar_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jToolbar_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FNavigationIcon <> '' then
-     jToolbar_SetNavigationIcon(FjEnv, FjObject, FNavigationIcon);
+     jToolbar_SetNavigationIcon(gApp.jni.jEnv, FjObject, FNavigationIcon);
 
    if  FTitle <> '' then
-    jToolbar_SetTitle(FjEnv, FjObject, FTitle);
+    jToolbar_SetTitle(gApp.jni.jEnv, FjObject, FTitle);
 
    if FLogoIcon <> '' then
-    jToolbar_SetLogo(FjEnv, FjObject, FLogoIcon);
+    jToolbar_SetLogo(gApp.jni.jEnv, FjObject, FLogoIcon);
 
    {
    if FAsActionBar then
-    jToolbar_SetAsActionBar(FjEnv, FjObject, FAsActionBar);
+    jToolbar_SetAsActionBar(gApp.jni.jEnv, FjObject, FAsActionBar);
 
    if (FAsActionBar) and (FSubtitle <> '') then
-    jToolbar_SetSubtitle(FjEnv, FjObject, FSubtitle);
+    jToolbar_SetSubtitle(gApp.jni.jEnv, FjObject, FSubtitle);
 
    if FAsActionBar then
-    jToolbar_SetHomeButtonEnabled(FjEnv, FjObject, FHomeButtonEnabled);
+    jToolbar_SetHomeButtonEnabled(gApp.jni.jEnv, FjObject, FHomeButtonEnabled);
    }
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -226,13 +226,13 @@ procedure jToolbar.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jToolbar.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jToolbar.UpdateLayout;
@@ -243,13 +243,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jToolbar.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -260,14 +260,14 @@ end;
 
 function jToolbar.jCreate(): jObject;
 begin
-   Result:= jToolbar_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jToolbar_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jToolbar.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_jFree(FjEnv, FjObject);
+     jToolbar_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jToolbar.SetViewParent(_viewgroup: jObject);
@@ -275,98 +275,98 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-     jToolbar_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jToolbar_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jToolbar.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToolbar_GetParent(FjEnv, FjObject);
+   Result:= jToolbar_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jToolbar.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_RemoveFromViewParent(FjEnv, FjObject);
+     jToolbar_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jToolbar.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToolbar_GetView(FjEnv, FjObject);
+   Result:= jToolbar_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jToolbar.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetLParamWidth(FjEnv, FjObject, _w);
+     jToolbar_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jToolbar.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetLParamHeight(FjEnv, FjObject, _h);
+     jToolbar_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jToolbar.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToolbar_GetLParamWidth(FjEnv, FjObject);
+   Result:= jToolbar_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jToolbar.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jToolbar_GetLParamHeight(FjEnv, FjObject);
+   Result:= jToolbar_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jToolbar.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetLGravity(FjEnv, FjObject, _g);
+     jToolbar_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jToolbar.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetLWeight(FjEnv, FjObject, _w);
+     jToolbar_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jToolbar.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jToolbar_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jToolbar.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jToolbar_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jToolbar.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jToolbar_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jToolbar.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jToolbar_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jToolbar.ClearLayout();
@@ -377,15 +377,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jToolbar_clearLayoutAll(FjEnv, FjObject);
+     jToolbar_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jToolbar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jToolbar_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jToolbar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jToolbar_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -396,7 +396,7 @@ begin
   if FInitialized then
   begin
      if FTitle <> '' then
-       jToolbar_SetTitle(FjEnv, FjObject, FTitle);
+       jToolbar_SetTitle(gApp.jni.jEnv, FjObject, FTitle);
   end;
 end;
 
@@ -407,7 +407,7 @@ begin
   if FInitialized then
   begin
      if FNavigationIcon <> '' then
-        jToolbar_SetNavigationIcon(FjEnv, FjObject, FNavigationIcon);
+        jToolbar_SetNavigationIcon(gApp.jni.jEnv, FjObject, FNavigationIcon);
   end;
 end;
 
@@ -418,7 +418,7 @@ begin
   if FInitialized then
   begin
      if FLogoIcon <> '' then
-       jToolbar_SetLogo(FjEnv, FjObject, FLogoIcon);
+       jToolbar_SetLogo(gApp.jni.jEnv, FjObject, FLogoIcon);
   end;
 end;
 
@@ -426,7 +426,7 @@ procedure jToolbar.SetAsActionBar(_value: boolean);
 begin
   //FAsActionBar:= _value;
   if FInitialized then
-     jToolbar_SetAsActionBar(FjEnv, FjObject, _value);
+     jToolbar_SetAsActionBar(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jToolbar.SetSubtitle(_subtitle: string);
@@ -436,7 +436,7 @@ begin
   if FInitialized then
   begin
      if _subtitle <> '' then
-       jToolbar_SetSubtitle(FjEnv, FjObject, _subtitle);
+       jToolbar_SetSubtitle(gApp.jni.jEnv, FjObject, _subtitle);
   end;
 end;
 
@@ -445,7 +445,7 @@ begin
   //in designing component state: set value here...
   //FHomeButtonEnabled:= _value;
   if FInitialized then
-    jToolbar_SetHomeButtonEnabled(FjEnv, FjObject, _value);
+    jToolbar_SetHomeButtonEnabled(gApp.jni.jEnv, FjObject, _value);
 end;
 
 {
@@ -453,7 +453,7 @@ procedure jToolbar.SetDisplayHomeAsUpEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jToolbar_SetDisplayHomeAsUpEnabled(FjEnv, FjObject, _value);
+     jToolbar_SetDisplayHomeAsUpEnabled(gApp.jni.jEnv, FjObject, _value);
 end;
 }
 {-------- jToolbar_JNI_Bridge ----------}

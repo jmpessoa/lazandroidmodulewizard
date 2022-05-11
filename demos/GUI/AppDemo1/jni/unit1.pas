@@ -62,12 +62,12 @@ procedure TAndroidModule1.AndroidModule1Close(Sender: TObject);
 begin
   jTimer1.Enabled:= False;   //Stop Timer
 
-  AndroidModule2.InitShowing(gapp);
+  AndroidModule2.InitShowing;
 end;
 
 procedure TAndroidModule1.AndroidModule1Init(Sender: TObject);
 begin
- gapp.SetDensityAssets(daHIGH);
+ self.SetDensityAssets(daHIGH);
 end;
 
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(

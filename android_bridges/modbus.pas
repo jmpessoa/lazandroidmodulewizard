@@ -22,7 +22,7 @@ jModbus = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -79,11 +79,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jModbus.Init(refApp: jApp);
+procedure jModbus.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -95,77 +95,77 @@ end;
 
 function jModbus.jCreate(): jObject;
 begin
-   Result:= jModbus_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jModbus_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jModbus.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_jFree(FjEnv, FjObject);
+     jModbus_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jModbus.Connect(_hostIP: string; _portNumber: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_Connect(FjEnv, FjObject, _hostIP ,_portNumber);
+     jModbus_Connect(gApp.jni.jEnv, FjObject, _hostIP ,_portNumber);
 end;
 
 function jModbus.IsConnected(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jModbus_IsConnected(FjEnv, FjObject);
+   Result:= jModbus_IsConnected(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jModbus.ReadCoil(_slaveId: integer; _start: integer; _len: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_ReadCoil(FjEnv, FjObject, _slaveId ,_start ,_len);
+     jModbus_ReadCoil(gApp.jni.jEnv, FjObject, _slaveId ,_start ,_len);
 end;
 
 procedure jModbus.ReadDiscreteInput(_slaveId: integer; _start: integer; _len: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_ReadDiscreteInput(FjEnv, FjObject, _slaveId ,_start ,_len);
+     jModbus_ReadDiscreteInput(gApp.jni.jEnv, FjObject, _slaveId ,_start ,_len);
 end;
 
 procedure jModbus.ReadHoldingRegisters(_slaveId: integer; _start: integer; _len: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_ReadHoldingRegisters(FjEnv, FjObject, _slaveId ,_start ,_len);
+     jModbus_ReadHoldingRegisters(gApp.jni.jEnv, FjObject, _slaveId ,_start ,_len);
 end;
 
 procedure jModbus.ReadInputRegisters(_slaveId: integer; _start: integer; _len: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_ReadInputRegisters(FjEnv, FjObject, _slaveId ,_start ,_len);
+     jModbus_ReadInputRegisters(gApp.jni.jEnv, FjObject, _slaveId ,_start ,_len);
 end;
 
 procedure jModbus.WriteCoil(_slaveId: integer; _offset: integer; _value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_WriteCoil(FjEnv, FjObject, _slaveId ,_offset ,_value);
+     jModbus_WriteCoil(gApp.jni.jEnv, FjObject, _slaveId ,_offset ,_value);
 end;
 
 procedure jModbus.WriteRegister(_slaveId: integer; _offset: integer; _value: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_WriteRegister(FjEnv, FjObject, _slaveId ,_offset ,_value);
+     jModbus_WriteRegister(gApp.jni.jEnv, FjObject, _slaveId ,_offset ,_value);
 end;
 
 procedure jModbus.WriteRegisters(_slaveId: integer; _start: integer; var _shortArrayValues: TDynArrayOfSmallint);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jModbus_WriteRegisters(FjEnv, FjObject, _slaveId ,_start ,_shortArrayValues);
+     jModbus_WriteRegisters(gApp.jni.jEnv, FjObject, _slaveId ,_start ,_shortArrayValues);
 end;
 
 procedure jModbus.GenEvent_OnModbusConnect(Sender:TObject;success:boolean;msg:string);

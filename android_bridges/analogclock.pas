@@ -22,7 +22,7 @@ jAnalogClock = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -77,7 +77,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -85,32 +85,32 @@ begin
   inherited Destroy;
 end;
 
-procedure jAnalogClock.Init(refApp: jApp);
+procedure jAnalogClock.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not Initialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
-   FjObject := jAnalogClock_jCreate(FjEnv, int64(Self), FjThis);
+   FjObject := jAnalogClock_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -119,30 +119,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -150,13 +150,13 @@ procedure jAnalogClock.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jAnalogClock.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jAnalogClock.UpdateLayout;
@@ -167,13 +167,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jAnalogClock.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -186,63 +186,63 @@ procedure jAnalogClock.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jAnalogClock.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jAnalogClock.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jAnalogClock.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jAnalogClock.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jAnalogClock.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jAnalogClock.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jAnalogClock.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jAnalogClock.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jAnalogClock.ClearLayout();
@@ -253,15 +253,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_AddlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_AddlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -270,7 +270,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     View_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     View_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 {-------- jAnalogClock_JNI_Bridge ----------}

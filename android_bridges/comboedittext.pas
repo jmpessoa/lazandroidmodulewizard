@@ -39,7 +39,7 @@ jComboEditText = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -250,7 +250,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jComboEditText.Init(refApp: jApp);
+procedure jComboEditText.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -258,23 +258,23 @@ var
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jComboEditText_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent));
+    jComboEditText_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 
-   jComboEditText_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jComboEditText_SetId(FjEnv, FjObject, Self.Id);
+   jComboEditText_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jComboEditText_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jComboEditText_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jComboEditText_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -283,61 +283,61 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jComboEditText_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jComboEditText_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jComboEditText_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jComboEditText_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jComboEditText_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jComboEditText_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if  FFontColor <> colbrDefault then
-    jComboEditText_SetTextColor(FjEnv, FjObject , GetARGB(FCustomColor, FFontColor));
+    jComboEditText_SetTextColor(gApp.jni.jEnv, FjObject , GetARGB(FCustomColor, FFontColor));
 
    if FDropListTextColor <> colbrDefault then
-    jComboEditText_SetDropListTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListTextColor));
+    jComboEditText_SetDropListTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FDropListTextColor));
 
    if FDropListBackgroundColor <> colbrDefault then
-    jComboEditText_SetDropListBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListBackgroundColor));
+    jComboEditText_SetDropListBackgroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FDropListBackgroundColor));
 
    if FFontSizeUnit <> unitDefault then
-     jComboEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(FFontSizeUnit));
+     jComboEditText_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(FFontSizeUnit));
 
    if FFontSize > 0 then
-    jComboEditText_SetTextSize(FjEnv, FjObject , FFontSize);
+    jComboEditText_SetTextSize(gApp.jni.jEnv, FjObject , FFontSize);
 
-   jComboEditText_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
+   jComboEditText_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace), Ord(FTextTypeFace));
 
    if FItemPaddingTop <> 25 then
-     jComboEditText_SetItemPaddingTop(FjEnv, FjObject, FItemPaddingTop);
+     jComboEditText_SetItemPaddingTop(gApp.jni.jEnv, FjObject, FItemPaddingTop);
 
    if FItemPaddingBottom <> 25 then
-     jComboEditText_SetItemPaddingBottom(FjEnv, FjObject, FItemPaddingBottom);
+     jComboEditText_SetItemPaddingBottom(gApp.jni.jEnv, FjObject, FItemPaddingBottom);
 
    if not FCloseSoftInputOnEnter then
-    jComboEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, FCloseSoftInputOnEnter);
+    jComboEditText_SetCloseSoftInputOnEnter(gApp.jni.jEnv, FjObject, FCloseSoftInputOnEnter);
 
    if FHint <> '' then
-      jComboEditText_SetHint(FjEnv, FjObject, FHint);
+      jComboEditText_SetHint(gApp.jni.jEnv, FjObject, FHint);
 
    for i:= 0 to FItems.Count-1 do
-     jComboEditText_Add(FjEnv, FjObject , FItems.Strings[i]);
+     jComboEditText_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i]);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -345,14 +345,14 @@ procedure jComboEditText.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 procedure jComboEditText.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jComboEditText.UpdateLayout;
@@ -363,13 +363,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jComboEditText.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -380,77 +380,77 @@ end;
 
 function jComboEditText.jCreate(): jObject;
 begin
-   Result:= jComboEditText_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jComboEditText_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jComboEditText.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_jFree(FjEnv, FjObject);
+     jComboEditText_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jComboEditText.GetPasObj(): int64;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetPasObj(FjEnv, FjObject);
+   Result:= jComboEditText_GetPasObj(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jComboEditText_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jComboEditText.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetParent(FjEnv, FjObject);
+   Result:= jComboEditText_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_RemoveFromViewParent(FjEnv, FjObject);
+     jComboEditText_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetLeftTopRightBottomWidthHeight(left: integer; top: integer; right: integer; bottom: integer; w: integer; h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, left ,top ,right ,bottom ,w ,h);
+     jComboEditText_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, left ,top ,right ,bottom ,w ,h);
 end;
 
 procedure jComboEditText.SetLParamWidth(w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetLParamWidth(FjEnv, FjObject, w);
+     jComboEditText_SetLParamWidth(gApp.jni.jEnv, FjObject, w);
 end;
 
 procedure jComboEditText.SetLParamHeight(h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetLParamHeight(FjEnv, FjObject, h);
+     jComboEditText_SetLParamHeight(gApp.jni.jEnv, FjObject, h);
 end;
 
 function jComboEditText.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetLParamHeight(FjEnv, FjObject);
+   Result:= jComboEditText_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 function jComboEditText.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetLParamWidth(FjEnv, FjObject);
+   Result:= jComboEditText_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetLGravity(_gravity: TLayoutGravity);
@@ -458,35 +458,35 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jComboEditText_SetLGravity(FjEnv, FjObject, Ord(_gravity));
+     jComboEditText_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jComboEditText.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetLWeight(FjEnv, FjObject, _w);
+     jComboEditText_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jComboEditText.AddLParamsAnchorRule(rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_AddLParamsAnchorRule(FjEnv, FjObject, rule);
+     jComboEditText_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, rule);
 end;
 
 procedure jComboEditText.AddLParamsParentRule(rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_AddLParamsParentRule(FjEnv, FjObject, rule);
+     jComboEditText_AddLParamsParentRule(gApp.jni.jEnv, FjObject, rule);
 end;
 
 procedure jComboEditText.SetLayoutAll(idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetLayoutAll(FjEnv, FjObject, idAnchor);
+     jComboEditText_SetLayoutAll(gApp.jni.jEnv, FjObject, idAnchor);
 end;
 
 procedure jComboEditText.ClearLayout();
@@ -497,15 +497,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jComboEditText_clearLayoutAll(FjEnv, FjObject);
+     jComboEditText_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jComboEditText_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jComboEditText_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jComboEditText_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jComboEditText_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -513,14 +513,14 @@ function jComboEditText.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetView(FjEnv, FjObject);
+   Result:= jComboEditText_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 function jComboEditText.GetItemIndex(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetItemIndex(FjEnv, FjObject);
+   Result:= jComboEditText_GetItemIndex(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetText(_text: string);
@@ -528,7 +528,7 @@ begin
   //in designing component state: set value here...
   FText:= _text;
   if FInitialized then
-     jComboEditText_SetText(FjEnv, FjObject, _text);
+     jComboEditText_SetText(gApp.jni.jEnv, FjObject, _text);
 end;
 
 function jComboEditText.GetText(): string;
@@ -536,28 +536,28 @@ begin
   //in designing component state: result value here...
   Result:= FText;
   if FInitialized then
-   Result:= jComboEditText_GetText(FjEnv, FjObject);
+   Result:= jComboEditText_GetText(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_Clear(FjEnv, FjObject);
+     jComboEditText_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.ShowDropDown();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_ShowDropDown(FjEnv, FjObject);
+     jComboEditText_ShowDropDown(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetThreshold(_threshold: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetThreshold(FjEnv, FjObject, _threshold);
+     jComboEditText_SetThreshold(gApp.jni.jEnv, FjObject, _threshold);
 end;
 
 procedure jComboEditText.Add(_text: string);
@@ -565,7 +565,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jComboEditText_Add(FjEnv, FjObject, _text);
+     jComboEditText_Add(gApp.jni.jEnv, FjObject, _text);
      FItems.Add(_text);
   end;
 end;
@@ -574,7 +574,7 @@ function jComboEditText.CountDropDown(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_CountDropDown(FjEnv, FjObject);
+   Result:= jComboEditText_CountDropDown(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.ClearAll();
@@ -583,7 +583,7 @@ begin
   if FInitialized then
   begin
      FItems.Clear;
-     jComboEditText_ClearAll(FjEnv, FjObject);
+     jComboEditText_ClearAll(gApp.jni.jEnv, FjObject);
   end;
 end;
 
@@ -593,7 +593,7 @@ begin
   if FInitialized then
   begin
      FItems.Clear;
-     jComboEditText_ClearDropDown(FjEnv, FjObject);
+     jComboEditText_ClearDropDown(gApp.jni.jEnv, FjObject);
   end;
 end;
 
@@ -602,14 +602,14 @@ begin
   //in designing component state: set value here...
   FTextAlignment:= _alignment;
   if FInitialized then
-     jComboEditText_SetTextAlignment(FjEnv, FjObject, Ord(_alignment));
+     jComboEditText_SetTextAlignment(gApp.jni.jEnv, FjObject, Ord(_alignment));
 end;
 
 procedure jComboEditText.SetFontColor(Value: TARGBColorBridge);
 begin
  FFontColor:= Value;
  if (FInitialized = True) and (FFontColor <> colbrDefault) then
-     jComboEditText_setTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor))
+     jComboEditText_setTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor))
 
 end;
 
@@ -618,7 +618,7 @@ begin
   //in designing component state: set value here...
   FFontSize:= AValue;
   if FInitialized then
-     jComboEditText_SetTextSize(FjEnv, FjObject, AValue);
+     jComboEditText_SetTextSize(gApp.jni.jEnv, FjObject, AValue);
 end;
 
 procedure jComboEditText.SetFontFace(AValue: TFontFace);
@@ -626,7 +626,7 @@ begin
   //in designing component state: set value here...
   FFontFace:=  AValue;
   if FInitialized then
-     jComboEditText_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(AValue) ,Ord(FTextTypeFace));
+     jComboEditText_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(AValue) ,Ord(FTextTypeFace));
 end;
 
 procedure jComboEditText.SetTextTypeFace(AValue: TTextTypeFace);
@@ -634,7 +634,7 @@ begin
   //in designing component state: set value here...
   FTextTypeFace:= AValue;
   if FInitialized then
-     jComboEditText_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(FFontFace) ,Ord(AValue));
+     jComboEditText_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(FFontFace) ,Ord(AValue));
 end;
 
 procedure jComboEditText.SetItems(AValue: TStrings);
@@ -647,35 +647,35 @@ procedure jComboEditText.CopyToClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_CopyToClipboard(FjEnv, FjObject);
+     jComboEditText_CopyToClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.PasteFromClipboard();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_PasteFromClipboard(FjEnv, FjObject);
+     jComboEditText_PasteFromClipboard(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.Append(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_Append(FjEnv, FjObject, _text);
+     jComboEditText_Append(gApp.jni.jEnv, FjObject, _text);
 end;
 
 procedure jComboEditText.AppendLn(_text: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_AppendLn(FjEnv, FjObject, _text);
+     jComboEditText_AppendLn(gApp.jni.jEnv, FjObject, _text);
 end;
 
 procedure jComboEditText.AppendTab();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_AppendTab(FjEnv, FjObject);
+     jComboEditText_AppendTab(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetFontAndTextTypeFace(_fontFace: TFontFace; _fontStyle: TTextTypeFace);
@@ -684,7 +684,7 @@ begin
   FFontFace:=  _fontFace;
   FTextTypeFace:= _fontStyle;
   if FInitialized then
-     jComboEditText_SetFontAndTextTypeFace(FjEnv, FjObject, Ord(_fontFace), Ord(_fontStyle));
+     jComboEditText_SetFontAndTextTypeFace(gApp.jni.jEnv, FjObject, Ord(_fontFace), Ord(_fontStyle));
 end;
 
 procedure jComboEditText.SetFontSizeUnit(_unit: TFontSizeUnit);
@@ -692,7 +692,7 @@ begin
   //in designing component state: set value here...
  FFontSizeUnit:= _unit;
  if FInitialized then
-     jComboEditText_SetFontSizeUnit(FjEnv, FjObject, Ord(_unit));
+     jComboEditText_SetFontSizeUnit(gApp.jni.jEnv, FjObject, Ord(_unit));
 end;
 
 procedure jComboEditText.Add(_item: string; _strTag: string);
@@ -700,7 +700,7 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jComboEditText_Add(FjEnv, FjObject, _item ,_strTag);
+     jComboEditText_Add(gApp.jni.jEnv, FjObject, _item ,_strTag);
      FItems.Add(_item);
   end;
 end;
@@ -714,7 +714,7 @@ begin
      if _index < FItems.Count then
      begin
        FItems.Strings[_index]:= _item;
-       jComboEditText_SetItem(FjEnv, FjObject, _index ,_item ,_strTag);
+       jComboEditText_SetItem(gApp.jni.jEnv, FjObject, _index ,_item ,_strTag);
      end;
   end;
 end;
@@ -723,21 +723,21 @@ procedure jComboEditText.SetItemTagString(_index: integer; _strTag: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetItemTagString(FjEnv, FjObject, _index ,_strTag);
+     jComboEditText_SetItemTagString(gApp.jni.jEnv, FjObject, _index ,_strTag);
 end;
 
 function jComboEditText.GetItemTagString(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jComboEditText_GetItemTagString(FjEnv, FjObject, _index);
+   Result:= jComboEditText_GetItemTagString(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jComboEditText.Delete(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_Delete(FjEnv, FjObject, _index);
+     jComboEditText_Delete(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jComboEditText.SetDropListTextColor(_color: TARGBColorBridge);
@@ -745,7 +745,7 @@ begin
   //in designing component state: set value here...
   FDropListTextColor:= _color;
   if FInitialized then
-     jComboEditText_SetDropListTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListTextColor));
+     jComboEditText_SetDropListTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FDropListTextColor));
 end;
 
 procedure jComboEditText.SetDropListBackgroundColor(_color: TARGBColorBridge);
@@ -753,21 +753,21 @@ begin
   //in designing component state: set value here...
   FDropListBackgroundColor:= _color;
   if FInitialized then
-     jComboEditText_SetDropListBackgroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FDropListBackgroundColor));
+     jComboEditText_SetDropListBackgroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FDropListBackgroundColor));
 end;
 
 procedure jComboEditText.SetSelectedPaddingTop(_paddingTop: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetSelectedPaddingTop(FjEnv, FjObject, _paddingTop);
+     jComboEditText_SetSelectedPaddingTop(gApp.jni.jEnv, FjObject, _paddingTop);
 end;
 
 procedure jComboEditText.SetSelectedPaddingBottom(_paddingBottom: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetSelectedPaddingBottom(FjEnv, FjObject, _paddingBottom);
+     jComboEditText_SetSelectedPaddingBottom(gApp.jni.jEnv, FjObject, _paddingBottom);
 end;
 
 
@@ -775,35 +775,35 @@ procedure jComboEditText.ShowSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_ShowSoftInput(FjEnv, FjObject);
+     jComboEditText_ShowSoftInput(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.HideSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_HideSoftInput(FjEnv, FjObject);
+     jComboEditText_HideSoftInput(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetSoftInputOptions(_imeOption: TImeOptions);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetSoftInputOptions(FjEnv, FjObject, Ord(_imeOption));
+     jComboEditText_SetSoftInputOptions(gApp.jni.jEnv, FjObject, Ord(_imeOption));
 end;
 
 procedure jComboEditText.SetFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_SetFocus(FjEnv, FjObject);
+     jComboEditText_SetFocus(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.RequestFocus();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jComboEditText_RequestFocus(FjEnv, FjObject);
+     jComboEditText_RequestFocus(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jComboEditText.SetItemPaddingTop(_paddingTop: integer);
@@ -811,7 +811,7 @@ begin
   //in designing component state: set value here...
   FItemPaddingTop:= _paddingTop;
   if FInitialized then
-     jComboEditText_SetItemPaddingTop(FjEnv, FjObject, _paddingTop);
+     jComboEditText_SetItemPaddingTop(gApp.jni.jEnv, FjObject, _paddingTop);
 end;
 
 procedure jComboEditText.SetItemPaddingBottom(_paddingBottom: integer);
@@ -819,7 +819,7 @@ begin
   //in designing component state: set value here...
   FItemPaddingBottom:= _paddingBottom;
   if FInitialized then
-     jComboEditText_SetItemPaddingBottom(FjEnv, FjObject, _paddingBottom);
+     jComboEditText_SetItemPaddingBottom(gApp.jni.jEnv, FjObject, _paddingBottom);
 end;
 
 procedure jComboEditText.SetCloseSoftInputOnEnter(_closeSoftInput: boolean);
@@ -827,7 +827,7 @@ begin
   //in designing component state: set value here...
   FCloseSoftInputOnEnter:= _closeSoftInput;
   if FInitialized then
-     jComboEditText_SetCloseSoftInputOnEnter(FjEnv, FjObject, _closeSoftInput);
+     jComboEditText_SetCloseSoftInputOnEnter(gApp.jni.jEnv, FjObject, _closeSoftInput);
 end;
 
 procedure jComboEditText.SetHint(_hint: string);
@@ -835,7 +835,7 @@ begin
   //in designing component state: set value here...
   FHint:= _hint;
   if FInitialized then
-     jComboEditText_SetHint(FjEnv, FjObject, _hint);
+     jComboEditText_SetHint(gApp.jni.jEnv, FjObject, _hint);
 end;
 
 Procedure jComboEditText.GenEvent_OnClickComboDropDownItem(Obj: TObject; index: integer;  caption: string);

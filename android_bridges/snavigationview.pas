@@ -34,7 +34,7 @@ jsNavigationView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -215,31 +215,31 @@ begin
   inherited Destroy;
 end;
 
-procedure jsNavigationView.Init(refApp: jApp);
+procedure jsNavigationView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
        //http://androidahead.com/2017/01/12/navigation-drawer
    if FGravityInParent <> lgNone then
-     jsNavigationView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     jsNavigationView_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   jsNavigationView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsNavigationView_SetId(FjEnv, FjObject, Self.Id);
+   jsNavigationView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsNavigationView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsNavigationView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsNavigationView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -248,31 +248,31 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsNavigationView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsNavigationView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsNavigationView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsNavigationView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsNavigationView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsNavigationView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if FFontColor <> colbrDefault then
-     jsNavigationView_SetItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jsNavigationView_SetItemTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    SetHeader(FHeaderBackgroundImageIdentifier, FHeaderLogoImageIdentifier,
                           GetPositionRelativeToParent(FHeaderLogoPosition),
@@ -281,7 +281,7 @@ begin
    SetFitsSystemWindows(FFitsSystemWindows);
 
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -289,14 +289,14 @@ procedure jsNavigationView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 procedure jsNavigationView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsNavigationView.UpdateLayout;
@@ -307,13 +307,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsNavigationView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -324,105 +324,105 @@ end;
 
 function jsNavigationView.jCreate(): jObject;
 begin
-   Result:= jsNavigationView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsNavigationView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsNavigationView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_jFree(FjEnv, FjObject);
+     jsNavigationView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsNavigationView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsNavigationView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_GetParent(FjEnv, FjObject);
+   Result:= jsNavigationView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_RemoveFromViewParent(FjEnv, FjObject);
+     jsNavigationView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsNavigationView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_GetView(FjEnv, FjObject);
+   Result:= jsNavigationView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetLParamWidth(FjEnv, FjObject, _w);
+     jsNavigationView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsNavigationView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetLParamHeight(FjEnv, FjObject, _h);
+     jsNavigationView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsNavigationView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jsNavigationView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsNavigationView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jsNavigationView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetLWeight(FjEnv, FjObject, _w);
+     jsNavigationView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsNavigationView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsNavigationView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsNavigationView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsNavigationView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsNavigationView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsNavigationView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsNavigationView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsNavigationView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsNavigationView.ClearLayout();
@@ -433,15 +433,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsNavigationView_clearLayoutAll(FjEnv, FjObject);
+     jsNavigationView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsNavigationView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsNavigationView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsNavigationView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsNavigationView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -449,21 +449,21 @@ procedure jsNavigationView.SetItemBackground(_imageIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetItemBackground(FjEnv, FjObject, _imageIdentifier);
+     jsNavigationView_SetItemBackground(gApp.jni.jEnv, FjObject, _imageIdentifier);
 end;
 
 procedure jsNavigationView.SetItemBackgroundResource(_imageIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetItemBackgroundResource(FjEnv, FjObject, _imageIdentifier);
+     jsNavigationView_SetItemBackgroundResource(gApp.jni.jEnv, FjObject, _imageIdentifier);
 end;
 
 function jsNavigationView.GetMenu(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_GetMenu(FjEnv, FjObject);
+   Result:= jsNavigationView_GetMenu(gApp.jni.jEnv, FjObject);
 end;
 
 (*
@@ -471,7 +471,7 @@ procedure jsNavigationView.AddMenuItemInNavMenuDrawer();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddMenuItemInNavMenuDrawer(FjEnv, FjObject);
+     jsNavigationView_AddMenuItemInNavMenuDrawer(gApp.jni.jEnv, FjObject);
 end;
 *)
 
@@ -479,7 +479,7 @@ procedure jsNavigationView.ClearMenu();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_ClearMenu(FjEnv, FjObject);
+     jsNavigationView_ClearMenu(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.SetLGravity(_value: TLayoutGravity);
@@ -487,49 +487,49 @@ begin
   //in designing component state: set value here...
   FGravityInParent:=  _value;
   if FInitialized then
-     jsNavigationView_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     jsNavigationView_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 end;
 
 procedure jsNavigationView.AddHeaderView(_headerView: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddHeaderView(FjEnv, FjObject, _headerView);
+     jsNavigationView_AddHeaderView(gApp.jni.jEnv, FjObject, _headerView);
 end;
 
 function jsNavigationView.AddMenu(_headerTitle: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_AddMenu(FjEnv, FjObject, _headerTitle);
+   Result:= jsNavigationView_AddMenu(gApp.jni.jEnv, FjObject, _headerTitle);
 end;
 
 procedure jsNavigationView.AddItemIcon(_menuItem: jObject; _drawableIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddItemIcon(FjEnv, FjObject, _menuItem ,_drawableIdentifier);
+     jsNavigationView_AddItemIcon(gApp.jni.jEnv, FjObject, _menuItem ,_drawableIdentifier);
 end;
 
 procedure jsNavigationView.SetItemTextColor(_menuItem: jObject; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetItemTextColor(FjEnv, FjObject, _menuItem ,  GetARGB(FCustomColor, _color));
+     jsNavigationView_SetItemTextColor(gApp.jni.jEnv, FjObject, _menuItem ,  GetARGB(FCustomColor, _color));
 end;
 
 procedure jsNavigationView.SetAllItemsTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetAllItemsTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsNavigationView_SetAllItemsTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsNavigationView.ResetAllItemsTextColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_ResetAllItemsTextColor(FjEnv, FjObject);
+     jsNavigationView_ResetAllItemsTextColor(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.SetFontColor(_color: TARGBColorBridge);
@@ -537,91 +537,91 @@ begin
   //in designing component state: set value here...
   FFontColor:=  _color;
   if FInitialized then
-     jsNavigationView_SetItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jsNavigationView_SetItemTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jsNavigationView.SetSelectedItemTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetSelectedItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsNavigationView_SetSelectedItemTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsNavigationView.AddHeaderView(_color: TARGBColorBridge; _drawableLogoIdentifier: string; _text: string; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddHeaderView(FjEnv, FjObject, GetARGB(FCustomColor, _color) ,_drawableLogoIdentifier ,_text ,_height);
+     jsNavigationView_AddHeaderView(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color) ,_drawableLogoIdentifier ,_text ,_height);
 end;
 
 function jsNavigationView.AddItem(_menu: jObject; _itemId: integer; _itemCaption: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNavigationView_AddItem(FjEnv, FjObject, _menu ,_itemId ,_itemCaption);
+   Result:= jsNavigationView_AddItem(gApp.jni.jEnv, FjObject, _menu ,_itemId ,_itemCaption);
 end;
 
 procedure jsNavigationView.AddItem(_menu: jObject; _itemId: integer; _itemCaption: string; _drawableIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddItem(FjEnv, FjObject, _menu ,_itemId ,_itemCaption ,_drawableIdentifier);
+     jsNavigationView_AddItem(gApp.jni.jEnv, FjObject, _menu ,_itemId ,_itemCaption ,_drawableIdentifier);
 end;
 
 procedure jsNavigationView.SetSubtitleTextColor(_color: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetSubtitleTextColor(FjEnv, FjObject, _color);
+     jsNavigationView_SetSubtitleTextColor(gApp.jni.jEnv, FjObject, _color);
 end;
 
 procedure jsNavigationView.SetTitleTextColor(_color: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetTitleTextColor(FjEnv, FjObject, _color);
+     jsNavigationView_SetTitleTextColor(gApp.jni.jEnv, FjObject, _color);
 end;
 
 procedure jsNavigationView.AddHeaderView(_drawableBackgroundIdentifier: string; _drawableLogoIdentifier: string; _text: string; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddHeaderView(FjEnv, FjObject, _drawableBackgroundIdentifier ,_drawableLogoIdentifier ,_text ,_height);
+     jsNavigationView_AddHeaderView(gApp.jni.jEnv, FjObject, _drawableBackgroundIdentifier ,_drawableLogoIdentifier ,_text ,_height);
 end;
 
 procedure jsNavigationView.SetTitleTextSize(_textSize: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetTitleTextSize(FjEnv, FjObject, _textSize);
+     jsNavigationView_SetTitleTextSize(gApp.jni.jEnv, FjObject, _textSize);
 end;
 
 procedure jsNavigationView.SetTitleSizeDecorated(_sizeDecorated: TTextSizeDecorated);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetTitleSizeDecorated(FjEnv, FjObject, Ord(_sizeDecorated) );
+     jsNavigationView_SetTitleSizeDecorated(gApp.jni.jEnv, FjObject, Ord(_sizeDecorated) );
 end;
 
 procedure jsNavigationView.SetTitleSizeDecoratedGap(_textSizeGap: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetTitleSizeDecoratedGap(FjEnv, FjObject, _textSizeGap);
+     jsNavigationView_SetTitleSizeDecoratedGap(gApp.jni.jEnv, FjObject, _textSizeGap);
 end;
 
 procedure jsNavigationView.AddHeaderView(_color: integer; _bitmapLogo: jObject; _text: string; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddHeaderView(FjEnv, FjObject, _color ,_bitmapLogo ,_text ,_height);
+     jsNavigationView_AddHeaderView(gApp.jni.jEnv, FjObject, _color ,_bitmapLogo ,_text ,_height);
 end;
 
 procedure jsNavigationView.AddHeaderView(_drawableBackgroundIdentifier: string; _bitmapLogo: jObject; _text: string; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_AddHeaderView(FjEnv, FjObject, _drawableBackgroundIdentifier ,_bitmapLogo ,_text ,_height);
+     jsNavigationView_AddHeaderView(gApp.jni.jEnv, FjObject, _drawableBackgroundIdentifier ,_bitmapLogo ,_text ,_height);
 end;
 
 {
@@ -630,7 +630,7 @@ begin
   //in designing component state: set value here...
   FLogoPosition:= _logoPosition;
   if FInitialized then
-     jsNavigationView_SetLogoPosition(FjEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
+     jsNavigationView_SetLogoPosition(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
 end;
 }
 
@@ -638,7 +638,7 @@ procedure jsNavigationView.SetFitsSystemWindows(_value: boolean);
 begin
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsNavigationView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsNavigationView_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsNavigationView.SetHeaderBackgroundImageIdentifier(_backgroundIdentifier: string);
@@ -646,7 +646,7 @@ begin
   //in designing component state: set value here...
    FHeaderBackgroundImageIdentifier:= _backgroundIdentifier;
   if FInitialized then
-     jsNavigationView_SetHeaderBackgroundImageIdentifier(FjEnv, FjObject, _backgroundIdentifier);
+     jsNavigationView_SetHeaderBackgroundImageIdentifier(gApp.jni.jEnv, FjObject, _backgroundIdentifier);
 end;
 
 procedure jsNavigationView.SetHeaderLogoImageIdentifier(_logoIdentifier: string);
@@ -654,7 +654,7 @@ begin
   //in designing component state: set value here...
   FHeaderLogoImageIdentifier:= _logoIdentifier;
   if FInitialized then
-     jsNavigationView_SetHeaderLogoImageIdentifier(FjEnv, FjObject, _logoIdentifier);
+     jsNavigationView_SetHeaderLogoImageIdentifier(gApp.jni.jEnv, FjObject, _logoIdentifier);
 end;
 
 procedure jsNavigationView.SetHeaderLogoPosition(_logoPosition: TPositionRelativeToParent);
@@ -662,42 +662,42 @@ begin
   //in designing component state: set value here...
   FHeaderLogoPosition:= _logoPosition;
   if FInitialized then
-     jsNavigationView_SetHeaderLogoPosition(FjEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
+     jsNavigationView_SetHeaderLogoPosition(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(_logoPosition) );
 end;
 
 procedure jsNavigationView.SetHeaderColor(_color: TARGBColorBridge);
 begin
    FHeaderColor:=_color;
   if FInitialized then
-     jsNavigationView_SetHeaderColor(FjEnv, FjObject, Ord(_color));
+     jsNavigationView_SetHeaderColor(gApp.jni.jEnv, FjObject, Ord(_color));
 end;
 
 procedure jsNavigationView.SetHeaderTitle(_headerTitle: string);
 begin
   FHeaderTitle:= _headerTitle;
   if FInitialized then
-     jsNavigationView_SetHeaderTitle(FjEnv, FjObject, _headerTitle);
+     jsNavigationView_SetHeaderTitle(gApp.jni.jEnv, FjObject, _headerTitle);
 end;
 
 procedure jsNavigationView.SetHeaderHeight(_value: integer);
 begin
   FHeaderHeight:= _value;
   if FInitialized then
-     jsNavigationView_SetHeaderHeight(FjEnv, FjObject, _value);
+     jsNavigationView_SetHeaderHeight(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsNavigationView.UpdateHeader();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_UpdateHeader(FjEnv, FjObject);
+     jsNavigationView_UpdateHeader(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNavigationView.SetHeader(_backgroundIdentifier: string; _logoIdentifier: string; _logoPosition: integer; _color: integer; _headerTitle: string; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNavigationView_SetHeader(FjEnv, FjObject, _backgroundIdentifier ,_logoIdentifier ,_logoPosition ,_color ,_headerTitle ,_height);
+     jsNavigationView_SetHeader(gApp.jni.jEnv, FjObject, _backgroundIdentifier ,_logoIdentifier ,_logoPosition ,_color ,_headerTitle ,_height);
 end;
 
 {-------- jsNavigationView_JNI_Bridge ----------}

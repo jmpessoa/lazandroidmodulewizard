@@ -22,7 +22,7 @@ jFrameLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
 
     procedure ClearLayout();
@@ -108,27 +108,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jFrameLayout.Init(refApp: jApp);
+procedure jFrameLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jFrameLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jFrameLayout_SetId(FjEnv, FjObject, Self.Id);
+   jFrameLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jFrameLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jFrameLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jFrameLayout_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -137,30 +137,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jFrameLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jFrameLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jFrameLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jFrameLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jFrameLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jFrameLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -168,13 +168,13 @@ procedure jFrameLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jFrameLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jFrameLayout.UpdateLayout;
@@ -185,13 +185,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jFrameLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -202,56 +202,56 @@ end;
 
 function jFrameLayout.jCreate(): jObject;
 begin
-   Result:= jFrameLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jFrameLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jFrameLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_jFree(FjEnv, FjObject);
+     jFrameLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jFrameLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jFrameLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jFrameLayout.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFrameLayout_GetParent(FjEnv, FjObject);
+   Result:= jFrameLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jFrameLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jFrameLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jFrameLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jFrameLayout_GetView(FjEnv, FjObject);
+   Result:= jFrameLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jFrameLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jFrameLayout_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jFrameLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jFrameLayout_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jFrameLayout.GetWidth(): integer;
@@ -262,7 +262,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jFrameLayout_getLParamWidth(FjEnv, FjObject );
+   Result:= jFrameLayout_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jFrameLayout.GetHeight(): integer;
@@ -273,49 +273,49 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jFrameLayout_getLParamHeight(FjEnv, FjObject );
+   Result:= jFrameLayout_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jFrameLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLGravity(FjEnv, FjObject, _g);
+     jFrameLayout_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jFrameLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLWeight(FjEnv, FjObject, _w);
+     jFrameLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jFrameLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jFrameLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jFrameLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jFrameLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jFrameLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jFrameLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jFrameLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jFrameLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jFrameLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jFrameLayout.ClearLayout();
@@ -326,15 +326,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jFrameLayout_clearLayoutAll(FjEnv, FjObject);
+     jFrameLayout_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jFrameLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jFrameLayout_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jFrameLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jFrameLayout_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 

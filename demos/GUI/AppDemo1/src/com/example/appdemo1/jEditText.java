@@ -1,16 +1,15 @@
 package com.example.appdemo1;
 
 import java.io.BufferedReader;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -33,6 +32,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -45,8 +45,10 @@ import android.widget.TextView;
 //Reviewed by TR3E on 08/20/2019
 
 public class jEditText extends EditText {
+
 	//Pascal Interface
-	//private long           PasObj   = 0;      // Pascal Obj
+	//private long           pascalObj   = 0;      // Pascal Obj
+
 	private Controls      controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
 	//
@@ -83,10 +85,14 @@ public class jEditText extends EditText {
 	boolean mAllUpperCase = false;
 	boolean mAllLowerCase = false;
 
+	Drawable mActionIcon = null;
+	boolean mActionIconActived = false;
+
 	//Constructor
 	public  jEditText(android.content.Context context,
 					  Controls ctrls,long pasobj ) {
 		super(context);
+
 		canDispatchChangeEvent = false;
 		canDispatchChangedEvent = false;
 
@@ -214,6 +220,60 @@ public class jEditText extends EditText {
 
 		addTextChangedListener(textwatcher);
 
+		//https://google-developer-training.github.io/android-developer-advanced-course-practicals/unit-5-advanced-graphics-and-views/lesson-10-custom-views/10-1a-p-using-custom-views/10-1a-p-using-custom-views.html
+		setOnTouchListener(new OnTouchListener() {   //to handle ActionIcon
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+
+				float actionIconStart; // Used for LTR languages
+				float actionIconEnd;  // Used for RTL languages
+				boolean isActionIconClicked = false;
+
+				// Use the getCompoundDrawables()[2] expression to check
+				// if the drawable is on the "end" of text [2].
+
+				if (GetCompoundDrawablesRelative() != null) {
+
+					// Detect the touch in RTL or LTR layout direction.
+					if (IsLayoutDirectionRTL()) {
+						// If RTL, get the end of the button on the left side.
+						actionIconEnd = mActionIcon.getIntrinsicWidth() + GetPaddingStart();
+						// If the touch occurred before the end of the button,
+						// set isClearButtonClicked to true.
+						if (event.getX() < actionIconEnd) {
+							isActionIconClicked = true;
+						}
+					} else {
+						// Layout is LTR.
+						// Get the start of the button on the right side.
+						actionIconStart = (GetWidth() - GetPaddingEnd() - mActionIcon.getIntrinsicWidth());
+						// If the touch occurred after the start of the button,
+						// set isClearButtonClicked to true.
+						if (event.getX() > actionIconStart) {
+							isActionIconClicked = true;
+						}
+					}
+
+					// Check for actions if the button is tapped.
+					if (isActionIconClicked) {
+
+						if (event.getAction() == MotionEvent.ACTION_DOWN) {
+							controls.pEditTextOnActionIconTouchDown(LAMWCommon.getPasObj(), mEdit.getText().toString());
+		}
+						if (event.getAction() == MotionEvent.ACTION_UP) {
+							controls.pEditTextOnActionIconTouchUp(LAMWCommon.getPasObj(), mEdit.getText().toString());
+
+							return true;
+						}
+					} else {
+						return false;
+					}
+
+				}
+				return false;
+			}
+		});
+
 	}
 
 	//Free object except Self, Pascal Code Free the class.
@@ -228,7 +288,7 @@ public class jEditText extends EditText {
 		return LAMWCommon.getPasObj();
 	}
 
-	public  void SetViewParent(ViewGroup _viewgroup ) {		
+	public  void SetViewParent(ViewGroup _viewgroup ) {
 		LAMWCommon.setParent(_viewgroup);
 	}
 	
@@ -518,6 +578,15 @@ public class jEditText extends EditText {
 		this.setText("");
 	}
 
+	public long GetTextLength() {
+		return this.getText().length();
+	}
+
+	public boolean IsEmpty() {
+		if (this.getText().length() == 0) return true;
+		else return false;
+	}
+
 	public void SetTextSize(float size) {
 		mTextSize = size;
 		String t = this.getText().toString();
@@ -683,12 +752,9 @@ public class jEditText extends EditText {
 	
 	
 	public void LoadFromFile(String _filename) {
-
 		     String retStr = "";
-
 		     try {
-		         InputStream inputStream = controls.activity.openFileInput(_filename);
-
+		         FileInputStream inputStream = new FileInputStream(new File(_filename));
 		         if ( inputStream != null ) {
 		             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -697,13 +763,12 @@ public class jEditText extends EditText {
 		             while ( (receiveString = bufferedReader.readLine()) != null ) {
 		                 stringBuilder.append(receiveString);
 		             }
-
 		             inputStream.close();
 		             retStr = stringBuilder.toString();
 		         }
 		     }
 		     catch (IOException e) {
-		        // Log.i("jTextFileManager", "LoadFromFile error: " + e.toString());
+		        Log.i("LAMW", "LoadFromFile error: " + e.toString());
 		     }
 		     this.setText(retStr);
     }
@@ -753,6 +818,7 @@ public class jEditText extends EditText {
 			if (background instanceof ColorDrawable) {
 				color = ((ColorDrawable)this.getBackground()).getColor();
 				shape.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+				shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 			}
 
 			if(Build.VERSION.SDK_INT >= 16) {
@@ -782,5 +848,85 @@ public class jEditText extends EditText {
 		mRoundBackgroundColor =  _color;
 	}
 
-}
 
+	public float GetPaddingStart() {
+		if (Build.VERSION.SDK_INT >= 17) {
+			return  this.getPaddingStart();
+		} else return 0;
+	}
+
+	public float GetPaddingEnd() {
+		if (Build.VERSION.SDK_INT >= 17) {
+			return  this.getPaddingEnd();
+		} else return 0;
+	}
+
+	public float GetWidth() {
+		return  this.getWidth();
+	}
+
+	public boolean IsLayoutDirectionRTL() {
+        boolean isRTL = false;
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			if ( this.getLayoutDirection() == LAYOUT_DIRECTION_RTL ) {
+				isRTL =  true;
+			}
+			//[endif_api17up]
+		}
+		return isRTL;
+	}
+
+	// Use the getCompoundDrawables()[2] expression to check
+	// if the drawable is on the "end" of text [2].
+	private Drawable GetCompoundDrawablesRelative() {
+		Drawable drawable = null;
+		if (android.os.Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			drawable = this.getCompoundDrawablesRelative()[2];
+			//[endif_api17up]
+		}
+		return drawable;
+	}
+
+	//https://google-developer-training.github.io/android-developer-advanced-course-practicals/unit-5-advanced-graphics-and-views/lesson-10-custom-views/10-1a-p-using-custom-views/10-1a-p-using-custom-views.html
+	public void SetActionIconIdentifier(String _actionIconIdentifier) {		
+		mActionIcon = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_actionIconIdentifier));
+	}
+
+	public void ShowActionIcon() {
+		if (mActionIcon == null) return;
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			this.setCompoundDrawablesRelativeWithIntrinsicBounds
+					(null,                      // Start of text.
+							null,               // Above text.
+							mActionIcon,  // End of text.
+							null);              // Below text.
+			//[endif_api17up]
+		}
+		mActionIconActived = true;
+	}
+
+	public void HideActionIcon() {
+		if (Build.VERSION.SDK_INT >= 17) {
+			//[ifdef_api17up]
+			this.setCompoundDrawablesRelativeWithIntrinsicBounds
+					(null,                      // Start of text.
+							null,                // Above text.
+							null,                // End of text.
+							null);             // Below text.
+			//[endif_api17up]
+		}
+		mActionIconActived = false;
+	}
+
+	public boolean IsActionIconShowing() {
+		return mActionIconActived;
+	}
+	
+	public void ApplyDrawableXML(String _xmlIdentifier) {
+		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+    }
+
+}

@@ -22,7 +22,7 @@ jUDPSocket = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Send(_ip: string; _port: integer; _message: string);
@@ -69,10 +69,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jUDPSocket.Init(refApp: jApp);
+procedure jUDPSocket.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -81,42 +81,42 @@ end;
 
 function jUDPSocket.jCreate(): jObject;
 begin
-   Result:= jUDPSocket_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jUDPSocket_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jUDPSocket.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUDPSocket_jFree(FjEnv, FjObject);
+     jUDPSocket_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jUDPSocket.Send(_ip: string; _port: integer; _message: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUDPSocket_Send(FjEnv, FjObject, _ip ,_port ,_message);
+     jUDPSocket_Send(gApp.jni.jEnv, FjObject, _ip ,_port ,_message);
 end;
 
 procedure jUDPSocket.Listen(_port: integer; _bufferLen: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUDPSocket_AsyncListen(FjEnv, FjObject, _port ,_bufferLen);
+     jUDPSocket_AsyncListen(gApp.jni.jEnv, FjObject, _port ,_bufferLen);
 end;
 
 procedure jUDPSocket.StopListening();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUDPSocket_AsyncListenStop(FjEnv, FjObject);
+     jUDPSocket_AsyncListenStop(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jUDPSocket.SetTimeout(_miliTimeout: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUDPSocket_SetTimeout(FjEnv, FjObject, _miliTimeout);
+     jUDPSocket_SetTimeout(gApp.jni.jEnv, FjObject, _miliTimeout);
 end;
 
 procedure jUDPSocket.GenEvent_OnUDPSocketReceived(Obj: TObject; content: string;

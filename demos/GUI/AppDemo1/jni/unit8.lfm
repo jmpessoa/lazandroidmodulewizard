@@ -131,7 +131,6 @@ object AndroidModule8: TAndroidModule8
     PaintStyle = psFillAndStroke
     PaintTextSize = 20
     PaintColor = colbrBlue
-    Typeface = ffNormal
     left = 93
     top = 88
   end

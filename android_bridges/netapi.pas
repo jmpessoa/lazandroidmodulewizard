@@ -20,7 +20,7 @@ jNetApi = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -92,11 +92,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jNetApi.Init(refApp: jApp);
+procedure jNetApi.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -108,133 +108,133 @@ end;
 
 function jNetApi.jCreate(): jObject;
 begin
-   Result:= jNetApi_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jNetApi_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jNetApi.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNetApi_jFree(FjEnv, FjObject);
+     jNetApi_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jNetApi.OpenDevice(ip: string; iPort: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_OpenDevice(FjEnv, FjObject, ip ,iPort);
+   Result:= jNetApi_OpenDevice(gApp.jni.jEnv, FjObject, ip ,iPort);
 end;
 
 procedure jNetApi.CloseDevice();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNetApi_CloseDevice(FjEnv, FjObject);
+     jNetApi_CloseDevice(gApp.jni.jEnv, FjObject);
 end;
 
 function jNetApi.GetDeviceSystemInfo(bDevAdr: byte; var pucSystemInfo: TDynArrayOfJByte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_GetDeviceSystemInfo(FjEnv, FjObject, bDevAdr ,pucSystemInfo);
+   Result:= jNetApi_GetDeviceSystemInfo(gApp.jni.jEnv, FjObject, bDevAdr ,pucSystemInfo);
 end;
 
 function jNetApi.ReadDeviceOneParam(bDevAdr: byte; pucDevParamAddr: byte; var pValue: TDynArrayOfJByte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_ReadDeviceOneParam(FjEnv, FjObject, bDevAdr ,pucDevParamAddr ,pValue);
+   Result:= jNetApi_ReadDeviceOneParam(gApp.jni.jEnv, FjObject, bDevAdr ,pucDevParamAddr ,pValue);
 end;
 
 function jNetApi.SetDeviceOneParam(bDevAdr: byte; pucDevParamAddr: byte; pValue: byte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_SetDeviceOneParam(FjEnv, FjObject, bDevAdr ,pucDevParamAddr ,pValue);
+   Result:= jNetApi_SetDeviceOneParam(gApp.jni.jEnv, FjObject, bDevAdr ,pucDevParamAddr ,pValue);
 end;
 
 function jNetApi.StopRead(bDevAdr: byte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_StopRead(FjEnv, FjObject, bDevAdr);
+   Result:= jNetApi_StopRead(gApp.jni.jEnv, FjObject, bDevAdr);
 end;
 
 function jNetApi.StartRead(bDevAdr: byte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_StartRead(FjEnv, FjObject, bDevAdr);
+   Result:= jNetApi_StartRead(gApp.jni.jEnv, FjObject, bDevAdr);
 end;
 
 function jNetApi.InventoryG2(bDevAdr: byte; var pBuffer: TDynArrayOfJByte; var Totallen: TDynArrayOfInteger; var CardNum: TDynArrayOfInteger): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_InventoryG2(FjEnv, FjObject, bDevAdr ,pBuffer ,Totallen ,CardNum);
+   Result:= jNetApi_InventoryG2(gApp.jni.jEnv, FjObject, bDevAdr ,pBuffer ,Totallen ,CardNum);
 end;
 
 function jNetApi.WriteEPCG2(bDevAdr: byte; var Password: TDynArrayOfJByte; var WriteEPC: TDynArrayOfJByte; WriteEPClen: byte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_WriteEPCG2(FjEnv, FjObject, bDevAdr ,Password ,WriteEPC ,WriteEPClen);
+   Result:= jNetApi_WriteEPCG2(gApp.jni.jEnv, FjObject, bDevAdr ,Password ,WriteEPC ,WriteEPClen);
 end;
 
 function jNetApi.ReadCardG2(bDevAdr: byte; var Password: TDynArrayOfJByte; Mem: byte; WordPtr: byte; ReadEPClen: byte; var Data: TDynArrayOfJByte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_ReadCardG2(FjEnv, FjObject, bDevAdr ,Password ,Mem ,WordPtr ,ReadEPClen ,Data);
+   Result:= jNetApi_ReadCardG2(gApp.jni.jEnv, FjObject, bDevAdr ,Password ,Mem ,WordPtr ,ReadEPClen ,Data);
 end;
 
 function jNetApi.WriteCardG2(bDevAdr: byte; var Password: TDynArrayOfJByte; Mem: byte; WordPtr: byte; Writelen: byte; var Writedata: TDynArrayOfJByte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_WriteCardG2(FjEnv, FjObject, bDevAdr ,Password ,Mem ,WordPtr ,Writelen ,Writedata);
+   Result:= jNetApi_WriteCardG2(gApp.jni.jEnv, FjObject, bDevAdr ,Password ,Mem ,WordPtr ,Writelen ,Writedata);
 end;
 
 function jNetApi.RelayOn(bDevAdr: byte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_RelayOn(FjEnv, FjObject, bDevAdr);
+   Result:= jNetApi_RelayOn(gApp.jni.jEnv, FjObject, bDevAdr);
 end;
 
 function jNetApi.RelayOff(bDevAdr: byte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_RelayOff(FjEnv, FjObject, bDevAdr);
+   Result:= jNetApi_RelayOff(gApp.jni.jEnv, FjObject, bDevAdr);
 end;
 
 function jNetApi.ClearTagBuf(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_ClearTagBuf(FjEnv, FjObject);
+   Result:= jNetApi_ClearTagBuf(gApp.jni.jEnv, FjObject);
 end;
 
 function jNetApi.GetTagBuf(var pBuf: TDynArrayOfJByte; var pLength: TDynArrayOfInteger; var pTagNumber: TDynArrayOfInteger): byte;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_GetTagBuf(FjEnv, FjObject, pBuf ,pLength ,pTagNumber);
+   Result:= jNetApi_GetTagBuf(gApp.jni.jEnv, FjObject, pBuf ,pLength ,pTagNumber);
 end;
 
 function jNetApi.SetFreq(bDevAdr: byte; var pFreq: TDynArrayOfJByte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_SetFreq(FjEnv, FjObject, bDevAdr ,pFreq);
+   Result:= jNetApi_SetFreq(gApp.jni.jEnv, FjObject, bDevAdr ,pFreq);
 end;
 
 function jNetApi.ReadFreq(bDevAdr: byte; var pFreq: TDynArrayOfJByte): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jNetApi_ReadFreq(FjEnv, FjObject, bDevAdr ,pFreq);
+   Result:= jNetApi_ReadFreq(gApp.jni.jEnv, FjObject, bDevAdr ,pFreq);
 end;
 
 {-------- jNetApi_JNI_Bridge ----------}

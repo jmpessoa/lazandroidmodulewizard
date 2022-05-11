@@ -44,7 +44,7 @@ jGL2SurfaceView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
 
     procedure ClearLayout();
@@ -198,25 +198,25 @@ begin
   inherited Destroy;
 end;
 
-procedure jGL2SurfaceView.Init(refApp: jApp);
+procedure jGL2SurfaceView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
-   jGL2SurfaceView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jGL2SurfaceView_SetId(FjEnv, FjObject, Self.Id);
+   jGL2SurfaceView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jGL2SurfaceView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jGL2SurfaceView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jGL2SurfaceView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -225,30 +225,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jGL2SurfaceView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jGL2SurfaceView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jGL2SurfaceView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jGL2SurfaceView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jGL2SurfaceView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jGL2SurfaceView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -256,13 +256,13 @@ procedure jGL2SurfaceView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jGL2SurfaceView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jGL2SurfaceView.UpdateLayout;
@@ -273,15 +273,15 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jGL2SurfaceView.Refresh;
 begin
   if FInitialized then
   begin
-     jGL2SurfaceView_RequestRender(FjEnv, FjObject);
-     //View_Invalidate(FjEnv, FjObject);  not for openGL
+     jGL2SurfaceView_RequestRender(gApp.jni.jEnv, FjObject);
+     //View_Invalidate(gApp.jni.jEnv, FjObject);  not for openGL
   end
 end;
 
@@ -294,112 +294,112 @@ end;
 }
 function jGL2SurfaceView.jCreate(): jObject;
 begin
-   Result:= jGL2SurfaceView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGL2SurfaceView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGL2SurfaceView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_jFree(FjEnv, FjObject);
+     jGL2SurfaceView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jGL2SurfaceView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jGL2SurfaceView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetParent(FjEnv, FjObject);
+   Result:= jGL2SurfaceView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_RemoveFromViewParent(FjEnv, FjObject);
+     jGL2SurfaceView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jGL2SurfaceView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetView(FjEnv, FjObject);
+   Result:= jGL2SurfaceView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLParamWidth(FjEnv, FjObject, _w);
+     jGL2SurfaceView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jGL2SurfaceView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLParamHeight(FjEnv, FjObject, _h);
+     jGL2SurfaceView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jGL2SurfaceView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jGL2SurfaceView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jGL2SurfaceView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jGL2SurfaceView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLGravity(FjEnv, FjObject, _g);
+     jGL2SurfaceView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jGL2SurfaceView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLWeight(FjEnv, FjObject, _w);
+     jGL2SurfaceView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jGL2SurfaceView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jGL2SurfaceView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jGL2SurfaceView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jGL2SurfaceView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jGL2SurfaceView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jGL2SurfaceView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jGL2SurfaceView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jGL2SurfaceView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jGL2SurfaceView.ClearLayout();
@@ -410,15 +410,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jGL2SurfaceView_clearLayoutAll(FjEnv, FjObject);
+     jGL2SurfaceView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jGL2SurfaceView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jGL2SurfaceView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jGL2SurfaceView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jGL2SurfaceView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -426,14 +426,14 @@ procedure jGL2SurfaceView.Pause();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_Pause(FjEnv, FjObject);
+     jGL2SurfaceView_Pause(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.Resume();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_Resume(FjEnv, FjObject);
+     jGL2SurfaceView_Resume(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -441,70 +441,70 @@ function jGL2SurfaceView.GetByteBufferFromByteArray(var _values: TDynArrayOfJByt
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetByteBufferFromByteArray(FjEnv, FjObject, _values);
+   Result:= jGL2SurfaceView_GetByteBufferFromByteArray(gApp.jni.jEnv, FjObject, _values);
 end;
 
 function jGL2SurfaceView.GetFloatBufferFromFloatArray(var _values: TDynArrayOfSingle): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetFloatBufferFromFloatArray(FjEnv, FjObject, _values);
+   Result:= jGL2SurfaceView_GetFloatBufferFromFloatArray(gApp.jni.jEnv, FjObject, _values);
 end;
 
 function jGL2SurfaceView.GetIntBufferFromIntArray(var _values: TDynArrayOfInteger): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetIntBufferFromIntArray(FjEnv, FjObject, _values);
+   Result:= jGL2SurfaceView_GetIntBufferFromIntArray(gApp.jni.jEnv, FjObject, _values);
 end;
 
 function jGL2SurfaceView.GetShortBufferFromShortArray(var _values: TDynArrayOfSmallint): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetShortBufferFromShortArray(FjEnv, FjObject, _values);
+   Result:= jGL2SurfaceView_GetShortBufferFromShortArray(gApp.jni.jEnv, FjObject, _values);
 end;
 
 procedure jGL2SurfaceView.ClearColor(red: single; green: single; blue: single; alpha: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_ClearColor(FjEnv, FjObject, red ,green ,blue ,alpha);
+     jGL2SurfaceView_ClearColor(gApp.jni.jEnv, FjObject, red ,green ,blue ,alpha);
 end;
 
 function jGL2SurfaceView.LoadVertexShader(_vShaderCode: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_LoadVertexShader(FjEnv, FjObject, _vShaderCode);
+   Result:= jGL2SurfaceView_LoadVertexShader(gApp.jni.jEnv, FjObject, _vShaderCode);
 end;
 
 function jGL2SurfaceView.LoadFragmentShader(_fShaderCode: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_LoadFragmentShader(FjEnv, FjObject, _fShaderCode);
+   Result:= jGL2SurfaceView_LoadFragmentShader(gApp.jni.jEnv, FjObject, _fShaderCode);
 end;
 
 function jGL2SurfaceView.CreateProgramShader(_handleVertexShader: integer; _handleFragmentShader: integer; _bindAttribDelimitedList: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_CreateProgramShader(FjEnv, FjObject, _handleVertexShader ,_handleFragmentShader ,_bindAttribDelimitedList);
+   Result:= jGL2SurfaceView_CreateProgramShader(gApp.jni.jEnv, FjObject, _handleVertexShader ,_handleFragmentShader ,_bindAttribDelimitedList);
 end;
 
 procedure jGL2SurfaceView.SetViewPort(_width: integer; _height: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetViewPort(FjEnv, FjObject, _width ,_height);
+     jGL2SurfaceView_SetViewPort(gApp.jni.jEnv, FjObject, _width ,_height);
 end;
 
 procedure jGL2SurfaceView.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_Clear(FjEnv, FjObject);
+     jGL2SurfaceView_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -512,63 +512,63 @@ procedure jGL2SurfaceView.SetProjectionMatrix(var _matrix: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetProjectionMatrix(FjEnv, FjObject, _matrix);
+     jGL2SurfaceView_SetProjectionMatrix(gApp.jni.jEnv, FjObject, _matrix);
 end;
 
 procedure jGL2SurfaceView.SetViewMatrix(var _matrix: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetViewMatrix(FjEnv, FjObject, _matrix);
+     jGL2SurfaceView_SetViewMatrix(gApp.jni.jEnv, FjObject, _matrix);
 end;
 
 procedure jGL2SurfaceView.SetMVPMatrix(var _matrix: TDynArrayOfSingle);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetMVPMatrix(FjEnv, FjObject, _matrix);
+     jGL2SurfaceView_SetMVPMatrix(gApp.jni.jEnv, FjObject, _matrix);
 end;
 
 procedure jGL2SurfaceView.SetOrthoM_Projection(_left: single; _right: single; _bottom: single; _top: single; _near: single; _far: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetOrthoM_Projection(FjEnv, FjObject, _left ,_right ,_bottom ,_top ,_near ,_far);
+     jGL2SurfaceView_SetOrthoM_Projection(gApp.jni.jEnv, FjObject, _left ,_right ,_bottom ,_top ,_near ,_far);
 end;
 
 procedure jGL2SurfaceView.SetLookAtM_View(_eyeX: single; _eyeY: single; _eyeZ: single; _centerX: single; _centerY: single; _centerZ: single; _upX: single; _upY: single; _upZ: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_SetLookAtM_View(FjEnv, FjObject, _eyeX ,_eyeY ,_eyeZ ,_centerX ,_centerY ,_centerZ ,_upX ,_upY ,_upZ);
+     jGL2SurfaceView_SetLookAtM_View(gApp.jni.jEnv, FjObject, _eyeX ,_eyeY ,_eyeZ ,_centerX ,_centerY ,_centerZ ,_upX ,_upY ,_upZ);
 end;
 
 procedure jGL2SurfaceView.MultiplyMM_MVP_Project_View();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_MultiplyMM_MVP_Project_View(FjEnv, FjObject);
+     jGL2SurfaceView_MultiplyMM_MVP_Project_View(gApp.jni.jEnv, FjObject);
 end;
 
 function jGL2SurfaceView.GenTexturesIDs(_count: integer): TDynArrayOfInteger;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GenTexturesIDs(FjEnv, FjObject, _count);
+   Result:= jGL2SurfaceView_GenTexturesIDs(gApp.jni.jEnv, FjObject, _count);
 end;
 
 function jGL2SurfaceView.GetMaxTextureUnits(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_GetMaxTextureUnits(FjEnv, FjObject);
+   Result:= jGL2SurfaceView_GetMaxTextureUnits(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.RequestRender();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_RequestRender(FjEnv, FjObject);
+     jGL2SurfaceView_RequestRender(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGL2SurfaceView.GenEvent_OnGL2SurfaceCreate(Obj: TObject);
@@ -615,21 +615,21 @@ procedure jGL2SurfaceView.DrawElements(_primitiveMode: TPrimitiveMode; indicesLe
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGL2SurfaceView_DrawElements(FjEnv, FjObject, Ord(_primitiveMode) ,indicesLength ,_drawListBuffer ,_bindDataCount ,_bindTextureHandle);
+     jGL2SurfaceView_DrawElements(gApp.jni.jEnv, FjObject, Ord(_primitiveMode) ,indicesLength ,_drawListBuffer ,_bindDataCount ,_bindTextureHandle);
 end;
 
 function jGL2SurfaceView.PrepareTexture(_programShader: integer; _uvBuffer: jObject; _vec2TextureCoord: string; _sampler2DTexture: string; _bitmap: jObject; _textureID: integer; _textureIndex: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_PrepareTexture(FjEnv, FjObject, _programShader ,_uvBuffer ,_vec2TextureCoord ,_sampler2DTexture ,_bitmap ,_textureID ,_textureIndex);
+   Result:= jGL2SurfaceView_PrepareTexture(gApp.jni.jEnv, FjObject, _programShader ,_uvBuffer ,_vec2TextureCoord ,_sampler2DTexture ,_bitmap ,_textureID ,_textureIndex);
 end;
 
 function jGL2SurfaceView.PrepareVertex(_programShader: integer; _vertexBuffer: jObject; _uMVP: string; var _attribArrayDataSize: TDynArrayOfInteger): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGL2SurfaceView_PrepareVertex(FjEnv, FjObject, _programShader ,_vertexBuffer ,_uMVP ,_attribArrayDataSize);
+   Result:= jGL2SurfaceView_PrepareVertex(gApp.jni.jEnv, FjObject, _programShader ,_vertexBuffer ,_uMVP ,_attribArrayDataSize);
 end;
 
 {-------- jGL2SurfaceView_JNI_Bridge ----------}

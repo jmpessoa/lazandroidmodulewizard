@@ -26,7 +26,7 @@ TOnNumberPicker = procedure(Sender: TObject; oldValue: integer; newValue: intege
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Show(); overload;
@@ -99,27 +99,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jNumberPickerDialog.Init(refApp: jApp);
+procedure jNumberPickerDialog.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
 
   if FMinValue <> 0 then
-    jNumberPicker_SetMinValue(FjEnv, FjObject, FMinValue);
+    jNumberPicker_SetMinValue(gApp.jni.jEnv, FjObject, FMinValue);
 
   if FMaxValue <> 10 then
-    jNumberPicker_SetMaxValue(FjEnv, FjObject, FMaxValue);
+    jNumberPicker_SetMaxValue(gApp.jni.jEnv, FjObject, FMaxValue);
 
   if FValue <> 0 then
-    jNumberPicker_SetValue(FjEnv, FjObject, FValue);
+    jNumberPicker_SetValue(gApp.jni.jEnv, FjObject, FValue);
 
   if FTitle <> 'NumberPicker' then
-    jNumberPicker_SetTitle(FjEnv, FjObject, FTitle);
+    jNumberPicker_SetTitle(gApp.jni.jEnv, FjObject, FTitle);
 
   if not FWrapSelectorWheel then
-    jNumberPicker_SetWrapSelectorWheel(FjEnv, FjObject, FWrapSelectorWheel);
+    jNumberPicker_SetWrapSelectorWheel(gApp.jni.jEnv, FjObject, FWrapSelectorWheel);
 
   FInitialized:= True;
 end;
@@ -127,28 +127,28 @@ end;
 
 function jNumberPickerDialog.jCreate(): jObject;
 begin
-   Result:= jNumberPicker_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jNumberPicker_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jNumberPickerDialog.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNumberPicker_jFree(FjEnv, FjObject);
+     jNumberPicker_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNumberPickerDialog.Show();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNumberPicker_Show(FjEnv, FjObject);
+     jNumberPicker_Show(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNumberPickerDialog.Cancel();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNumberPicker_Cancel(FjEnv, FjObject);
+     jNumberPicker_Cancel(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNumberPickerDialog.SetMinValue(_minValue: integer);
@@ -156,7 +156,7 @@ begin
   //in designing component state: set value here...
   FMinValue:= _minValue;
   if FInitialized then
-     jNumberPicker_SetMinValue(FjEnv, FjObject, _minValue);
+     jNumberPicker_SetMinValue(gApp.jni.jEnv, FjObject, _minValue);
 end;
 
 procedure jNumberPickerDialog.SetMaxValue(_maxValue: integer);
@@ -164,7 +164,7 @@ begin
   //in designing component state: set value here...
   FMaxValue:= _maxValue;
   if FInitialized then
-     jNumberPicker_SetMaxValue(FjEnv, FjObject, _maxValue);
+     jNumberPicker_SetMaxValue(gApp.jni.jEnv, FjObject, _maxValue);
 end;
 
 procedure jNumberPickerDialog.SetValue(_value: integer);
@@ -172,7 +172,7 @@ begin
   //in designing component state: set value here...
   FValue:= _value;
   if FInitialized then
-     jNumberPicker_SetValue(FjEnv, FjObject, _value);
+     jNumberPicker_SetValue(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jNumberPickerDialog.SetTitle(_title: string);
@@ -180,7 +180,7 @@ begin
   //in designing component state: set value here...
   FTitle:= _title;
   if FInitialized then
-     jNumberPicker_SetTitle(FjEnv, FjObject, _title);
+     jNumberPicker_SetTitle(gApp.jni.jEnv, FjObject, _title);
 end;
 
 procedure jNumberPickerDialog.SetWrapSelectorWheel(_value: boolean);
@@ -188,28 +188,28 @@ begin
   //in designing component state: set value here...
   FWrapSelectorWheel:= _value;
   if FInitialized then
-     jNumberPicker_SetWrapSelectorWheel(FjEnv, FjObject, _value);
+     jNumberPicker_SetWrapSelectorWheel(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jNumberPickerDialog.Show(_title: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNumberPicker_Show(FjEnv, FjObject, _title);
+     jNumberPicker_Show(gApp.jni.jEnv, FjObject, _title);
 end;
 
 procedure jNumberPickerDialog.SetDisplayedValues(var _values: TDynArrayOfString);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNumberPicker_SetDisplayedValues(FjEnv, FjObject, _values);
+     jNumberPicker_SetDisplayedValues(gApp.jni.jEnv, FjObject, _values);
 end;
 
 procedure jNumberPickerDialog.ClearDisplayedValues();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNumberPicker_ClearDisplayedValues(FjEnv, FjObject);
+     jNumberPicker_ClearDisplayedValues(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNumberPickerDialog.GenEvent_OnNumberPicker(Obj: TObject; oldValue: integer; newValue: integer);

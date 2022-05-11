@@ -25,7 +25,7 @@ jOracleJDBCConnection = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -86,11 +86,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jOracleJDBCConnection.Init(refApp: jApp);
+procedure jOracleJDBCConnection.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -99,70 +99,70 @@ end;
 
 function jOracleJDBCConnection.jCreate(): jObject;
 begin
-   Result:= jOracleJDBCConnection_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jOracleJDBCConnection_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jOracleJDBCConnection.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_jFree(FjEnv, FjObject);
+     jOracleJDBCConnection_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jOracleJDBCConnection.Open(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jOracleJDBCConnection_Open(FjEnv, FjObject);
+   Result:= jOracleJDBCConnection_Open(gApp.jni.jEnv, FjObject);
 end;
 
 function jOracleJDBCConnection.ExecuteQuery(_sqlQuery: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jOracleJDBCConnection_ExecuteQuery(FjEnv, FjObject, _sqlQuery);
+   Result:= jOracleJDBCConnection_ExecuteQuery(gApp.jni.jEnv, FjObject, _sqlQuery);
 end;
 
 function jOracleJDBCConnection.ExecuteUpdate(_sqlExecute: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jOracleJDBCConnection_ExecuteUpdate(FjEnv, FjObject, _sqlExecute);
+   Result:= jOracleJDBCConnection_ExecuteUpdate(gApp.jni.jEnv, FjObject, _sqlExecute);
 end;
 
 procedure jOracleJDBCConnection.Close();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_Close(FjEnv, FjObject);
+     jOracleJDBCConnection_Close(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jOracleJDBCConnection.SetDriver(_driver: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_SetDriver(FjEnv, FjObject, _driver);
+     jOracleJDBCConnection_SetDriver(gApp.jni.jEnv, FjObject, _driver);
 end;
 
 procedure jOracleJDBCConnection.SetUrl(_url: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_SetUrl(FjEnv, FjObject, _url);
+     jOracleJDBCConnection_SetUrl(gApp.jni.jEnv, FjObject, _url);
 end;
 
 procedure jOracleJDBCConnection.SetUserName(_username: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_SetUserName(FjEnv, FjObject, _username);
+     jOracleJDBCConnection_SetUserName(gApp.jni.jEnv, FjObject, _username);
 end;
 
 procedure jOracleJDBCConnection.SetPassword(_password: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jOracleJDBCConnection_SetPassword(FjEnv, FjObject, _password);
+     jOracleJDBCConnection_SetPassword(gApp.jni.jEnv, FjObject, _password);
 end;
 
 procedure jOracleJDBCConnection.SetLanguage(_language: TSpeechLanguage);
@@ -170,7 +170,7 @@ begin
   //in designing component state: set value here...
   FLanguage:= _language;
   if FInitialized then
-    jOracleJDBCConnection_SetLanguage(FjEnv, FjObject, Ord(_language));
+    jOracleJDBCConnection_SetLanguage(gApp.jni.jEnv, FjObject, Ord(_language));
 end;
 
 {-------- jOracleJDBCConnection_JNI_Bridge ----------}

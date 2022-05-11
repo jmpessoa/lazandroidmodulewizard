@@ -19,13 +19,13 @@ import android.widget.LinearLayout;
 import android.view.Gravity;
 
 class ConstES2 {
-	public static final int Renderer_onSurfaceCreated   =  0;
-	public static final int Renderer_onSurfaceChanged   =  1;
-	public static final int Renderer_onDrawFrame        =  2;
-	public static final int Renderer_onSurfaceDestroyed =  3;
-	public static final int Renderer_onSurfaceThread    =  4;
-	public static final int Renderer_onPause = 5;
-	public static final int Renderer_onResume = 6;	
+	public static final int renderer_onSurfaceCreated   =  0;
+	public static final int renderer_onSurfaceChanged   =  1;
+	public static final int renderer_onDrawFrame        =  2;
+	public static final int renderer_onSurfaceDestroyed =  3;
+	public static final int renderer_onSurfaceThread    =  4;
+	public static final int renderer_onPause = 5;
+	public static final int renderer_onResume = 6;	
 }
 //-------------------------------------------------------------------------
 //GLView
@@ -43,7 +43,7 @@ class ConstES2 {
 //https://android-developers.googleblog.com/2009/04/introducing-glsurfaceview.html
 
 /* 
- * Clients typically need to communicate with the renderer from the UI thread, 
+ * Clients typically need to communicate with the mRenderer from the UI thread, 
  * because that's where input events are received. 
  * Clients can communicate using any of the standard Java techniques for cross-thread communication,
  * or they can use the queueEvent(Runnable) convenience method.
@@ -57,7 +57,7 @@ public class jCanvasES2 extends GLSurfaceView {
 	//
 	private ViewGroup       parent   = null;   // parent view
 	private ViewGroup.MarginLayoutParams lparams = null;              // layout XYWH
-	private GLRenderer       renderer;
+	private GLRenderer      mRenderer = null;
 	private GL10            savGL;
 	
 	private jCommons LAMWCommon;
@@ -70,33 +70,33 @@ public class jCanvasES2 extends GLSurfaceView {
 
 	class GLRenderer implements GLSurfaceView.Renderer {	
 				
-		//public  void onSurfaceCreated(GL10 arg0, javax.microedition.khronos.egl.EGLConfig arg1) {controls.pOnGLRenderer(PasObj,Const.Renderer_onSurfaceCreated,0,0); }
+		//public  void onSurfaceCreated(GL10 arg0, javax.microedition.khronos.egl.EGLConfig arg1) {controls.pOnGLmRenderer(PasObj,Const.mRenderer_onSurfaceCreated,0,0); }
 		public  void onSurfaceCreated(GL10 gl, EGLConfig config) {
 			//Log.i("Java","onSurfaceCreated");
 			mflag = true;
-			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceCreated,0,0); 
+			controls.pOnGLRenderer2(PasObj,ConstES2.renderer_onSurfaceCreated,0,0); 
 		}		
 		public  void onSurfaceChanged(GL10 gl, int w, int h) {
 			//Log.i("Java","onSurfaceCreated");
-			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceChanged,w,h); 
+			controls.pOnGLRenderer2(PasObj,ConstES2.renderer_onSurfaceChanged,w,h); 
 		}
 		
 		public  void onDrawFrame(GL10 gl) {
 			//Log.i("Java","onDrawFrame");
-			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onDrawFrame,0,0); 
+			controls.pOnGLRenderer2(PasObj,ConstES2.renderer_onDrawFrame,0,0); 
 		}
 		
 		//http://androidblog.reindustries.com/a-real-open-gl-es-2-0-2d-tutorial-part-1/
 		
 		public void onPause() {
-	        /* Do stuff to pause the renderer */
-			controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onPause,0,0);
+	        /* Do stuff to pause the mRenderer */
+			controls.pOnGLRenderer2(PasObj,ConstES2.renderer_onPause,0,0);
 	    }
 	 
 	    public void onResume() {
-	        /* Do stuff to resume the renderer */
+	        /* Do stuff to resume the mRenderer */
 	        //mLastTime = System.currentTimeMillis();
-	    	controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onResume,0,0);
+	    	controls.pOnGLRenderer2(PasObj,ConstES2.renderer_onResume,0,0);
 	    }
 	    
 	}
@@ -111,13 +111,13 @@ public class jCanvasES2 extends GLSurfaceView {
 		
 		LAMWCommon = new jCommons(this,context,pasobj);
 			
-		renderer = new GLRenderer();
+		mRenderer = new GLRenderer();
 		if (version != 1) {setEGLContextClientVersion(2); };				
 		setEGLConfigChooser(8,8,8,8,16,8);       // RGBA,Depath,Stencil		
 	    // Turn on error-checking and logging
 	    //setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);		
 		//setPreserveEGLContextOnPause(false);
-		setRenderer(renderer);
+		setRenderer(mRenderer);
 		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);				
 	}
 	
@@ -286,7 +286,7 @@ public class jCanvasES2 extends GLSurfaceView {
 		queueEvent(new Runnable() {
 			@Override
 			public void run() {
-				controls.pOnGLRenderer2(PasObj, ConstES2.Renderer_onSurfaceDestroyed,0,0);
+				controls.pOnGLRenderer2(PasObj, ConstES2.renderer_onSurfaceDestroyed,0,0);
 			}
 		});
 		super.surfaceDestroyed(holder);
@@ -316,7 +316,9 @@ public class jCanvasES2 extends GLSurfaceView {
 					int[] ids = new int[1];
 					ids[0] = idx;
 					EGL10 egl = (EGL10) EGLContext.getEGL();
+					if(egl == null) return;
 					GL10 gl = (GL10) egl.eglGetCurrentContext().getGL();
+					if(gl == null) return;
 					//gl.glBindTexture(GL10.GL_TEXTURE_2D, idx);
 					gl.glDeleteTextures(1, ids, 0);
 				} catch (Exception e) {
@@ -331,14 +333,14 @@ public class jCanvasES2 extends GLSurfaceView {
 		queueEvent(new Runnable() {
 			@Override
 			public void run() {
-				controls.pOnGLRenderer2(PasObj,ConstES2.Renderer_onSurfaceThread,0,0); }
+				controls.pOnGLRenderer2(PasObj,ConstES2.renderer_onSurfaceThread,0,0); }
 		});
 	}
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		if (parent != null) { parent.removeView(this); }
-		renderer = null;
+		mRenderer = null;
 		lparams  = null;
 	}
 
@@ -404,13 +406,15 @@ public class jCanvasES2 extends GLSurfaceView {
 	@Override
 	public void onPause() {
 	     super.onPause();
-	     renderer.onPause();
+	     if(mRenderer == null) return;
+	     mRenderer.onPause();
 	}
 	 
 	@Override
 	public void onResume() {
 	     super.onResume();
-	     renderer.onResume();
+	     if(mRenderer == null) return;
+	     mRenderer.onResume();
 	}
 
 	public void Pause() {
@@ -424,8 +428,9 @@ public class jCanvasES2 extends GLSurfaceView {
 	
 	public  int[] GetBmpIntArray(String _fullFilename) {
 		 String file = _fullFilename;
-		 int[] pixels;					              			              
+		 int[] pixels = null;					              			              
 		 Bitmap bmp = BitmapFactory.decodeFile(file);
+		 if(bmp == null) return (pixels);
 		 int   length = bmp.getWidth()*bmp.getHeight();
 	     pixels = new int[length+2];
 		 bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());

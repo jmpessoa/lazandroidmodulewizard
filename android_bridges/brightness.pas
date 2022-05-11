@@ -20,7 +20,7 @@ jBrightness = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function getBrightness(): single;
     function isBrightnessManual(): boolean;
     procedure setBrightness(_brightness: single);
@@ -49,7 +49,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -57,12 +57,12 @@ begin
   inherited Destroy;
 end;
 
-procedure jBrightness.Init(refApp: jApp);
+procedure jBrightness.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jBrightness_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jBrightness_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
   if FjObject = nil then exit;
   FInitialized:= True;
 end;
@@ -71,21 +71,21 @@ function jBrightness.getBrightness(): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_f(FjEnv, FjObject, 'getBrightness');
+   Result:= jni_func_out_f(gApp.jni.jEnv, FjObject, 'getBrightness');
 end;
 
 function jBrightness.isBrightnessManual(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'isBrightnessManual');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'isBrightnessManual');
 end;
 
 procedure jBrightness.setBrightness(_brightness: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_f(FjEnv, FjObject, 'setBrightness', _brightness);
+     jni_proc_f(gApp.jni.jEnv, FjObject, 'setBrightness', _brightness);
 end;
 
 {-------- jBrightness_JNI_Bridge ----------}

@@ -24,7 +24,7 @@ jActivityLauncher = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -71,10 +71,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jActivityLauncher.Init(refApp: jApp);
+procedure jActivityLauncher.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -83,42 +83,42 @@ end;
 
 function jActivityLauncher.jCreate(): jObject;
 begin
-  Result:= jActivityLauncher_jCreate(FjEnv, int64(Self), FjThis);
+  Result:= jActivityLauncher_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jActivityLauncher.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActivityLauncher_jFree(FjEnv, FjObject);
+     jActivityLauncher_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jActivityLauncher.StartActivity(_packageName: string; _javaClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActivityLauncher_StartActivity(FjEnv, FjObject, _packageName ,_javaClassName);
+     jActivityLauncher_StartActivity(gApp.jni.jEnv, FjObject, _packageName ,_javaClassName);
 end;
 
 procedure jActivityLauncher.StartActivityForResult(_packageName: string; _javaClassName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActivityLauncher_StartActivityForResult(FjEnv, FjObject, _packageName ,_javaClassName ,_requestCode);
+     jActivityLauncher_StartActivityForResult(gApp.jni.jEnv, FjObject, _packageName ,_javaClassName ,_requestCode);
 end;
 
 procedure jActivityLauncher.StartActivity(_intent: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActivityLauncher_StartActivity(FjEnv, FjObject, _intent);
+     jActivityLauncher_StartActivity(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 procedure jActivityLauncher.StartActivityForResult(_intent: jObject; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jActivityLauncher_StartActivityForResult(FjEnv, FjObject, _intent ,_requestCode);
+     jActivityLauncher_StartActivityForResult(gApp.jni.jEnv, FjObject, _intent ,_requestCode);
 end;
 
 {-------- jActivityLauncher_JNI_Bridge ----------}

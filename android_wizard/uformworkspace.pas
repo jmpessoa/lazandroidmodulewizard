@@ -952,10 +952,10 @@ begin
   if Pos('pAppOnCreate=', Result) > 0 then
   begin
     if FModuleType = 0 then  //GUI
-      Result:= Result +  'AndroidModule1.Init(gApp);';
+      Result:= Result +  'AndroidModule1.init;';
 
     if FModuleType = -1 then //Gdx
-      Result:= Result +  'GdxModule1.Init(gApp);';
+      Result:= Result +  'GdxModule1.init;';
   end;
 
   listParam.Free;

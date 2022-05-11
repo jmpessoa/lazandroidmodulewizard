@@ -39,7 +39,7 @@ jcOpenMapView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -288,7 +288,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jcOpenMapView.Init(refApp: jApp);
+procedure jcOpenMapView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -296,22 +296,22 @@ begin
 
  if not FInitialized then
  begin
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(FShowScale, Ord(FTileSource), FZoom); //jSelf !
 
   if FjObject = nil then exit;
 
   if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
   FjPRLayoutHome:= FjPRLayout;
 
-  jcOpenMapView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jcOpenMapView_SetId(FjEnv, FjObject, Self.Id);
+  jcOpenMapView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+  jcOpenMapView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
  end;
 
-  jcOpenMapView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  jcOpenMapView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                         sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -320,30 +320,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jcOpenMapView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jcOpenMapView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jcOpenMapView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jcOpenMapView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jcOpenMapView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jcOpenMapView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
  if not FInitialized then
  begin
   FInitialized := true;
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+  View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
  end;
 end;
 
@@ -351,13 +351,13 @@ procedure jcOpenMapView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jcOpenMapView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jcOpenMapView.UpdateLayout;
@@ -369,14 +369,14 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 
 end;
 
 procedure jcOpenMapView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.ClearLayout;
@@ -387,15 +387,15 @@ begin
 
    if not FInitialized then Exit;
 
-  jcOpenMapView_ClearLayoutAll(FjEnv, FjObject );
+  jcOpenMapView_ClearLayoutAll(gApp.jni.jEnv, FjObject );
 
    for rToP := rpBottom to rpCenterVertical do
       if rToP in FPositionRelativeToParent then
-        jcOpenMapView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+        jcOpenMapView_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
    for rToA := raAbove to raAlignRight do
      if rToA in FPositionRelativeToAnchor then
-       jcOpenMapView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       jcOpenMapView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 
 end;
 
@@ -407,119 +407,119 @@ end;
 
 function jcOpenMapView.jCreate( _showScale: boolean; _tileSource: integer; _zoom: integer): jObject;
 begin
-   Result:= jcOpenMapView_jCreate(FjEnv, int64(Self),_showScale, _tileSource,_zoom,FjThis);
+   Result:= jcOpenMapView_jCreate(gApp.jni.jEnv, int64(Self),_showScale, _tileSource,_zoom,gApp.jni.jThis);
 end;
 
 procedure jcOpenMapView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_jFree(FjEnv, FjObject);
+     jcOpenMapView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jcOpenMapView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jcOpenMapView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetParent(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_RemoveFromViewParent(FjEnv, FjObject);
+     jcOpenMapView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetView(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetLParamWidth(FjEnv, FjObject, _w);
+     jcOpenMapView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jcOpenMapView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetLParamHeight(FjEnv, FjObject, _h);
+     jcOpenMapView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jcOpenMapView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetLGravity(FjEnv, FjObject, _g);
+     jcOpenMapView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jcOpenMapView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetLWeight(FjEnv, FjObject, _w);
+     jcOpenMapView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jcOpenMapView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jcOpenMapView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jcOpenMapView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jcOpenMapView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jcOpenMapView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jcOpenMapView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jcOpenMapView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jcOpenMapView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jcOpenMapView.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearLayoutAll(FjEnv, FjObject);
+     jcOpenMapView_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.SetZoom(_zoom: integer);
@@ -527,7 +527,7 @@ begin
   //in designing component state: set value here...
   FZoom:= _zoom;
   if FInitialized then
-     jcOpenMapView_SetZoom(FjEnv, FjObject, _zoom);
+     jcOpenMapView_SetZoom(gApp.jni.jEnv, FjObject, _zoom);
 end;
 
 procedure jcOpenMapView.SetShowScale(_show: boolean);
@@ -535,14 +535,14 @@ begin
   //in designing component state: set value here...
   FShowScale:= _show;
   if FInitialized then
-     jcOpenMapView_SetShowScale(FjEnv, FjObject, _show);
+     jcOpenMapView_SetShowScale(gApp.jni.jEnv, FjObject, _show);
 end;
 
 procedure jcOpenMapView.SetCenter(_latitude: double; _longitude: double);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetCenter(FjEnv, FjObject, _latitude ,_longitude);
+     jcOpenMapView_SetCenter(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 procedure jcOpenMapView.SetTileSource(_tileSource: TTileSource);
@@ -550,413 +550,413 @@ begin
   //in designing component state: set value here...
   FTileSource:= _tileSource;
   if FInitialized then
-     jcOpenMapView_SetTileSource(FjEnv, FjObject, Ord(_tileSource));
+     jcOpenMapView_SetTileSource(gApp.jni.jEnv, FjObject, Ord(_tileSource));
 end;
 
 procedure jcOpenMapView.ClearOverlays();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearOverlays(FjEnv, FjObject);
+     jcOpenMapView_ClearOverlays(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.Invalidate();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_Invalidate(FjEnv, FjObject);
+     jcOpenMapView_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.DrawCircle(_latitude: double; _longitude: double; _radiusInMetters: double; _title: string; _strokeColor: TARGBColorBridge; _strokeWidth: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_DrawCircle(FjEnv, FjObject, _latitude ,_longitude ,_radiusInMetters ,_title ,GetARGB(FCustomColor, _strokeColor ),_strokeWidth);
+     jcOpenMapView_DrawCircle(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_radiusInMetters ,_title ,GetARGB(FCustomColor, _strokeColor ),_strokeWidth);
 end;
 
 procedure jcOpenMapView.SetGroundImageOverlay(_latitude: double; _longitude: double; _imageIdentifier: string; _dimMetters: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetGroundImageOverlay(FjEnv, FjObject, _latitude ,_longitude ,_imageIdentifier ,_dimMetters);
+     jcOpenMapView_SetGroundImageOverlay(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_imageIdentifier ,_dimMetters);
 end;
 
 procedure jcOpenMapView.DrawRoad(_roadCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_DrawRoad(FjEnv, FjObject, _roadCode);
+     jcOpenMapView_DrawRoad(gApp.jni.jEnv, FjObject, _roadCode);
 end;
 
 procedure jcOpenMapView.DrawRoad();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_DrawRoad(FjEnv, FjObject);
+     jcOpenMapView_DrawRoad(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.DrawRoad(_roadCode: integer; _geoPointStartIndex: integer; _count: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_DrawRoad(FjEnv, FjObject, _roadCode ,_geoPointStartIndex ,_count);
+     jcOpenMapView_DrawRoad(gApp.jni.jEnv, FjObject, _roadCode ,_geoPointStartIndex ,_count);
 end;
 
 procedure jcOpenMapView.DrawRoad(_roadCode: integer; var _latitudeLongitude: TDynArrayOfDouble);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_DrawRoad(FjEnv, FjObject, _roadCode ,_latitudeLongitude);
+     jcOpenMapView_DrawRoad(gApp.jni.jEnv, FjObject, _roadCode ,_latitudeLongitude);
 end;
 
 function jcOpenMapView.GetGeoPoints(): TDynArrayOfDouble;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetGeoPoints(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetGeoPoints(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.AddGeoPoint(_latitude: double; _longitude: double): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddGeoPoint(FjEnv, FjObject, _latitude ,_longitude);
+   Result:= jcOpenMapView_AddGeoPoint(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 function jcOpenMapView.AddGeoPoint(_index: integer; _latitude: double; _longitude: double): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddGeoPoint(FjEnv, FjObject, _index ,_latitude ,_longitude);
+   Result:= jcOpenMapView_AddGeoPoint(gApp.jni.jEnv, FjObject, _index ,_latitude ,_longitude);
 end;
 
 procedure jcOpenMapView.ClearGeoPoints();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearGeoPoints(FjEnv, FjObject);
+     jcOpenMapView_ClearGeoPoints(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.ClearGeoPoint(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearGeoPoint(FjEnv, FjObject, _index);
+     jcOpenMapView_ClearGeoPoint(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jcOpenMapView.GetGeoPoint(_index: integer): TDynArrayOfDouble;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetGeoPoint(FjEnv, FjObject, _index);
+   Result:= jcOpenMapView_GetGeoPoint(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _iconIdentifier: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_iconIdentifier);
+   Result:= jcOpenMapView_AddMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_iconIdentifier);
 end;
 
 function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _title: string; _iconIdentifier: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier);
+   Result:= jcOpenMapView_AddMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier);
 end;
 
 function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _title: string; _snippetInfo: string; _iconIdentifier: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_snippetInfo ,_iconIdentifier);
+   Result:= jcOpenMapView_AddMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,_snippetInfo ,_iconIdentifier);
 end;
 
 function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _title: string; _snippetInfo: string; _markerIconIdentifier: string; _snippetImageIdentifier: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_snippetInfo ,_markerIconIdentifier ,_snippetImageIdentifier);
+   Result:= jcOpenMapView_AddMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,_snippetInfo ,_markerIconIdentifier ,_snippetImageIdentifier);
 end;
 
 procedure jcOpenMapView.ClearMarker(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearMarker(FjEnv, FjObject, _index);
+     jcOpenMapView_ClearMarker(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jcOpenMapView.ClearMarkers();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearMarkers(FjEnv, FjObject);
+     jcOpenMapView_ClearMarkers(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetMarker(_index: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetMarker(FjEnv, FjObject, _index);
+   Result:= jcOpenMapView_GetMarker(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jcOpenMapView.GetMarkerPosition(_marker: jObject): TDynArrayOfDouble;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetMarkerPosition(FjEnv, FjObject, _marker);
+   Result:= jcOpenMapView_GetMarkerPosition(gApp.jni.jEnv, FjObject, _marker);
 end;
 
 function jcOpenMapView.AddPolygon(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; _title: string; _color: TARGBColorBridge; _alphaTransparency: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddPolygon(FjEnv, FjObject, _latitude ,_longitude ,_title ,GetARGB(FCustomColor, _color) ,_alphaTransparency);
+   Result:= jcOpenMapView_AddPolygon(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,GetARGB(FCustomColor, _color) ,_alphaTransparency);
 end;
 
 function jcOpenMapView.AddPolygon( _geoPointStartIndex: integer; _count: integer;_title: string; _color: TARGBColorBridge; _alphaTransparency: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddPolygon(FjEnv, FjObject, _geoPointStartIndex ,_count, _title ,GetARGB(FCustomColor, _color) ,_alphaTransparency);
+   Result:= jcOpenMapView_AddPolygon(gApp.jni.jEnv, FjObject, _geoPointStartIndex ,_count, _title ,GetARGB(FCustomColor, _color) ,_alphaTransparency);
 end;
 
 procedure jcOpenMapView.ClearPolygon(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearPolygon(FjEnv, FjObject, _index);
+     jcOpenMapView_ClearPolygon(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jcOpenMapView.ClearPolygons();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearPolygons(FjEnv, FjObject);
+     jcOpenMapView_ClearPolygons(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.StopPanning();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_StopPanning(FjEnv, FjObject);
+     jcOpenMapView_StopPanning(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOPenMapView.SetIsMarkerDraggable(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOPenMapView_SetIsMarkerDraggable(FjEnv, FjObject, _value);
+     jcOPenMapView_SetIsMarkerDraggable(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jcOpenMapView.SetMarkerDraggable(_marker: jObject; _draggable: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetMarkerDraggable(FjEnv, FjObject, _marker ,_draggable);
+     jcOpenMapView_SetMarkerDraggable(gApp.jni.jEnv, FjObject, _marker ,_draggable);
 end;
 
 function jcOpenMapView.DrawMarker(_latitude: double; _longitude: double; _title: string; _iconIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_DrawMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier);
+   Result:= jcOpenMapView_DrawMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier);
 end;
 
 function jcOpenMapView.DrawMarker(_latitude: double; _longitude: double; _title: string; _snippetInfo: string; _iconIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_DrawMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_snippetInfo ,_iconIdentifier);
+   Result:= jcOpenMapView_DrawMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,_snippetInfo ,_iconIdentifier);
 end;
 
 procedure jcOpenMapView.ClearMarker(_marker: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearMarker(FjEnv, FjObject, _marker);
+     jcOpenMapView_ClearMarker(gApp.jni.jEnv, FjObject, _marker);
 end;
 
 procedure jcOpenMapView.MoveMarker(_marker: jObject; _latitude: double; _longitude: double);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_MoveMarker(FjEnv, FjObject, _marker ,_latitude ,_longitude);
+     jcOpenMapView_MoveMarker(gApp.jni.jEnv, FjObject, _marker ,_latitude ,_longitude);
 end;
 
 function jcOpenMapView.GetMarkersPositions(): TDynArrayOfDouble;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetMarkersPositions(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetMarkersPositions(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetMarkersCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetMarkersCount(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetMarkersCount(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetMarkerPosition(_index: integer): TDynArrayOfDouble;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetMarkerPosition(FjEnv, FjObject, _index);
+   Result:= jcOpenMapView_GetMarkerPosition(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jcOpenMapView.GetGeoPointsCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetGeoPointsCount(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetGeoPointsCount(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetPolygonsCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetPolygonsCount(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetPolygonsCount(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.AddPolygon(var _latitudeLongitude: TDynArrayOfDouble; _title: string; _color: TARGBColorBridge; _alphaTransparency: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddPolygon(FjEnv, FjObject, _latitudeLongitude ,_title ,GetARGB(FCustomColor, _color) ,_alphaTransparency);
+   Result:= jcOpenMapView_AddPolygon(gApp.jni.jEnv, FjObject, _latitudeLongitude ,_title ,GetARGB(FCustomColor, _color) ,_alphaTransparency);
 end;
 
 function jcOpenMapView.AddMarkers(var _latitudeLongitude: TDynArrayOfDouble; _title: string; _snippetInfo: string; _iconIdentifier: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarkers(FjEnv, FjObject, _latitudeLongitude ,_title ,_snippetInfo ,_iconIdentifier);
+   Result:= jcOpenMapView_AddMarkers(gApp.jni.jEnv, FjObject, _latitudeLongitude ,_title ,_snippetInfo ,_iconIdentifier);
 end;
 
 function jcOpenMapView.AddMarkers(var _latitudeLongitude: TDynArrayOfDouble; _iconIdentifier: string): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarkers(FjEnv, FjObject, _latitudeLongitude ,_iconIdentifier);
+   Result:= jcOpenMapView_AddMarkers(gApp.jni.jEnv, FjObject, _latitudeLongitude ,_iconIdentifier);
 end;
 
 function jcOpenMapView.DrawPolyline(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_DrawPolyline(FjEnv, FjObject, _latitude ,_longitude);
+   Result:= jcOpenMapView_DrawPolyline(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 function jcOpenMapView.DrawPolyline(_geoPointStartIndex: integer; _count: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_DrawPolyline(FjEnv, FjObject, _geoPointStartIndex ,_count);
+   Result:= jcOpenMapView_DrawPolyline(gApp.jni.jEnv, FjObject, _geoPointStartIndex ,_count);
 end;
 
 function jcOpenMapView.DrawLine(_latitude1: double; _longitude1: double; _latitude2: double; _longitude2: double; _strokeColor: integer; _strokeWidth: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_DrawLine(FjEnv, FjObject, _latitude1 ,_longitude1 ,_latitude2 ,_longitude2 ,_strokeColor ,_strokeWidth);
+   Result:= jcOpenMapView_DrawLine(gApp.jni.jEnv, FjObject, _latitude1 ,_longitude1 ,_latitude2 ,_longitude2 ,_strokeColor ,_strokeWidth);
 end;
 
 procedure jcOpenMapView.ClearPolyline(_polyline: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearPolyline(FjEnv, FjObject, _polyline);
+     jcOpenMapView_ClearPolyline(gApp.jni.jEnv, FjObject, _polyline);
 end;
 
 function jcOpenMapView.AddLine(_latitude1: double; _longitude1: double; _latitude2: double; _longitude2: double): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddLine(FjEnv, FjObject, _latitude1 ,_longitude1 ,_latitude2 ,_longitude2);
+   Result:= jcOpenMapView_AddLine(gApp.jni.jEnv, FjObject, _latitude1 ,_longitude1 ,_latitude2 ,_longitude2);
 end;
 
 function jcOpenMapView.AddLine(_latitude1: double; _longitude1: double; _latitude2: double; _longitude2: double; _strokeColor: integer; _strokeWidth: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddLine(FjEnv, FjObject, _latitude1 ,_longitude1 ,_latitude2 ,_longitude2 ,_strokeColor ,_strokeWidth);
+   Result:= jcOpenMapView_AddLine(gApp.jni.jEnv, FjObject, _latitude1 ,_longitude1 ,_latitude2 ,_longitude2 ,_strokeColor ,_strokeWidth);
 end;
 
 procedure jcOpenMapView.ClearLine(_line: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearLine(FjEnv, FjObject, _line);
+     jcOpenMapView_ClearLine(gApp.jni.jEnv, FjObject, _line);
 end;
 
 procedure jcOpenMapView.ClearLine(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearLine(FjEnv, FjObject, _index);
+     jcOpenMapView_ClearLine(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jcOpenMapView.ClearLines();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_ClearLines(FjEnv, FjObject);
+     jcOpenMapView_ClearLines(gApp.jni.jEnv, FjObject);
 end;
 
 function jcOpenMapView.GetLinesCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_GetLinesCount(FjEnv, FjObject);
+   Result:= jcOpenMapView_GetLinesCount(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcOpenMapView.SetStrokeColor(_strokeColor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetStrokeColor(FjEnv, FjObject, _strokeColor);
+     jcOpenMapView_SetStrokeColor(gApp.jni.jEnv, FjObject, _strokeColor);
 end;
 
 procedure jcOpenMapView.SetStrokeWidth(_strokeWidth: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetStrokeWidth(FjEnv, FjObject, _strokeWidth);
+     jcOpenMapView_SetStrokeWidth(gApp.jni.jEnv, FjObject, _strokeWidth);
 end;
 
 procedure jcOpenMapView.SetFillColor(_fillColor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetFillColor(FjEnv, FjObject, _fillColor);
+     jcOpenMapView_SetFillColor(gApp.jni.jEnv, FjObject, _fillColor);
 end;
 
 procedure jcOpenMapView.SetMarkerRotation(_marker: jObject; _angleDeg: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetMarkerRotation(FjEnv, FjObject, _marker ,_angleDeg);
+     jcOpenMapView_SetMarkerRotation(gApp.jni.jEnv, FjObject, _marker ,_angleDeg);
 end;
 
 function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _iconIdentifier: string; _rotationAngleDeg: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_iconIdentifier ,_rotationAngleDeg);
+   Result:= jcOpenMapView_AddMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_iconIdentifier ,_rotationAngleDeg);
 end;
 
 function jcOpenMapView.AddMarker(_latitude: double; _longitude: double; _title: string; _iconIdentifier: string; _rotationAngleDeg: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcOpenMapView_AddMarker(FjEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier ,_rotationAngleDeg);
+   Result:= jcOpenMapView_AddMarker(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,_title ,_iconIdentifier ,_rotationAngleDeg);
 end;
 
 procedure jcOpenMapView.SetMarkerXY(_x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcOpenMapView_SetMarkerXY(FjEnv, FjObject, _x ,_y);
+     jcOpenMapView_SetMarkerXY(gApp.jni.jEnv, FjObject, _x ,_y);
 end;
 
 procedure jcOpenMapView.GenEvent_OnOpenMapViewClick(Sender:TObject;latitude:double;longitude:double);

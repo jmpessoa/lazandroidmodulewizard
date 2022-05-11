@@ -63,7 +63,7 @@ jSensorManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     function GetDeviceSensorsTypes(): TDynArrayOfInteger;
     function GetDeviceSensorsNames(): TDynArrayOfString;
@@ -143,7 +143,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free( FjEnv, FjObject);
+       jni_free( gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -151,10 +151,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jSensorManager.Init(refApp: jApp);
+procedure jSensorManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -163,112 +163,112 @@ end;
 
 function jSensorManager.jCreate(): jObject;
 begin
-   Result:= jSensorManager_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jSensorManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 function jSensorManager.GetDeviceSensorsTypes(): TDynArrayOfInteger;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetDeviceSensorsTypes(FjEnv, FjObject);
+   Result:= jSensorManager_GetDeviceSensorsTypes(gApp.jni.jEnv, FjObject);
 end;
 
 function jSensorManager.GetDeviceSensorsNames(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetDeviceSensorsNames(FjEnv, FjObject);
+   Result:= jSensorManager_GetDeviceSensorsNames(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jSensorManager.RegisterListeningSensor(_sensorType: TSensorType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'RegisterListeningSensor', Ord(_sensorType));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'RegisterListeningSensor', Ord(_sensorType));
 end;
 
 procedure jSensorManager.RegisterListeningSensor(_sensorType: TSensorType; _delayType: TSensorDelay);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'RegisterListeningSensor', Ord(_sensorType) ,Ord(_delayType));
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'RegisterListeningSensor', Ord(_sensorType) ,Ord(_delayType));
 end;
 
 procedure jSensorManager.StopListeningAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'StopListeningAll');
+     jni_proc(gApp.jni.jEnv, FjObject, 'StopListeningAll');
 end;
 
 function jSensorManager.SensorExists(_sensorType: TSensorType): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_z(FjEnv, FjObject, 'SensorExists', Ord(_sensorType));
+   Result:= jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'SensorExists', Ord(_sensorType));
 end;
 
 function jSensorManager.GetSensorsNames(_sensorType: TSensorType): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorsNames(FjEnv, FjObject, Ord(_sensorType));
+   Result:= jSensorManager_GetSensorsNames(gApp.jni.jEnv, FjObject, Ord(_sensorType));
 end;
 
 function jSensorManager.GetSensor(_sensorType: TSensorType): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensor(FjEnv, FjObject, Ord(_sensorType));
+   Result:= jSensorManager_GetSensor(gApp.jni.jEnv, FjObject, Ord(_sensorType));
 end;
 
 function jSensorManager.GetSensorMaximumRange(_sensor: jObject): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorMaximumRange(FjEnv, FjObject, _sensor);
+   Result:= jSensorManager_GetSensorMaximumRange(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 function jSensorManager.GetSensorVendor(_sensor: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorVendor(FjEnv, FjObject, _sensor);
+   Result:= jSensorManager_GetSensorVendor(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 function jSensorManager.GetSensorMinDelay(_sensor: jObject): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorMinDelay(FjEnv, FjObject, _sensor);
+   Result:= jSensorManager_GetSensorMinDelay(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 function jSensorManager.GetSensorName(_sensor: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorName(FjEnv, FjObject, _sensor);
+   Result:= jSensorManager_GetSensorName(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 function jSensorManager.GetSensorType(_sensor: jObject): TSensorType;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= TSensorType(jSensorManager_GetSensorType(FjEnv, FjObject, _sensor));
+   Result:= TSensorType(jSensorManager_GetSensorType(gApp.jni.jEnv, FjObject, _sensor));
 end;
 
 procedure jSensorManager.UnregisterListenerSensor(_sensor: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSensorManager_UnregisterListenerSensor(FjEnv, FjObject, _sensor);
+     jSensorManager_UnregisterListenerSensor(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 function jSensorManager.GetGravityEarth(): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_f(FjEnv, FjObject, 'GetGravityEarth');
+   Result:= jni_func_out_f(gApp.jni.jEnv, FjObject, 'GetGravityEarth');
 end;
 
 procedure jSensorManager.GenEvent_OnChangedSensor(Obj: TObject; sensor: JObject;  sensorType: integer;  values: array of single; timestamp: int64);
@@ -290,49 +290,49 @@ function jSensorManager.GetAltitude(_localPressure: single): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetAltitude(FjEnv, FjObject, _localPressure);
+   Result:= jSensorManager_GetAltitude(gApp.jni.jEnv, FjObject, _localPressure);
 end;
 
 function jSensorManager.GetAltitude(_pressureAtSeaLevel: single; _localPressure: single): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetAltitude(FjEnv, FjObject, _pressureAtSeaLevel ,_localPressure);
+   Result:= jSensorManager_GetAltitude(gApp.jni.jEnv, FjObject, _pressureAtSeaLevel ,_localPressure);
 end;
 
 function jSensorManager.GetSensorPower(_sensor: jObject): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorPower(FjEnv, FjObject, _sensor);
+   Result:= jSensorManager_GetSensorPower(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 function jSensorManager.GetSensorResolution(_sensor: jObject): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensorResolution(FjEnv, FjObject, _sensor);
+   Result:= jSensorManager_GetSensorResolution(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 procedure jSensorManager.RegisterListeningSensor(_sensor: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSensorManager_RegisterListeningSensor(FjEnv, FjObject, _sensor);
+     jSensorManager_RegisterListeningSensor(gApp.jni.jEnv, FjObject, _sensor);
 end;
 
 procedure jSensorManager.RegisterListeningSensor(_sensor: jObject; _delayType: TSensorDelay);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jSensorManager_RegisterListeningSensor(FjEnv, FjObject, _sensor ,Ord(_delayType));
+     jSensorManager_RegisterListeningSensor(gApp.jni.jEnv, FjObject, _sensor ,Ord(_delayType));
 end;
 
 function jSensorManager.GetSensor(_sensorName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jSensorManager_GetSensor(FjEnv, FjObject, _sensorName);
+   Result:= jSensorManager_GetSensor(gApp.jni.jEnv, FjObject, _sensorName);
 end;
 
 {-------- jSensorManager_JNI_Bridge ----------}

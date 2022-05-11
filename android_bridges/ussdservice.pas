@@ -20,7 +20,7 @@ jUSSDService = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Start();
@@ -60,11 +60,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jUSSDService.Init(refApp: jApp);
+procedure jUSSDService.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -75,28 +75,28 @@ end;
 
 function jUSSDService.jCreate(): jObject;
 begin
-   Result:= jUSSDService_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jUSSDService_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jUSSDService.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUSSDService_jFree(FjEnv, FjObject);
+     jUSSDService_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jUSSDService.Start();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUSSDService_Start(FjEnv, FjObject);
+     jUSSDService_Start(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jUSSDService.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUSSDService_Stop(FjEnv, FjObject);
+     jUSSDService_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jUSSDService_JNI_Bridge ----------}

@@ -1,12 +1,14 @@
 package com.example.appdemo1;
 
+import android.graphics.Color;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
+import android.os.Build;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.view.Gravity;
-
 import android.content.res.ColorStateList;
-import android.graphics.PorterDuff.Mode.*;
-import android.graphics.drawable.Drawable;
 
 //Ref.
 //Style : http://developer.android.com/reference/android/R.attr.html
@@ -105,14 +107,15 @@ public class jProgressBar extends ProgressBar {
 	
 	public void SetColors(int _color, int _colorBack){		
 		
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+		if (android.os.Build.VERSION.SDK_INT >= 21) { //android.os.Build.VERSION_CODES.LOLLIPOP
+
+			//[ifdef_api21up]
 			this.setProgressTintList(ColorStateList.valueOf(_color));		    
 		    this.setProgressBackgroundTintList(ColorStateList.valueOf(_colorBack));
+		    if (this.isIndeterminate()) this.setIndeterminateTintList(ColorStateList.valueOf(_color));
+			//[endif_api21up]
 		    
-		    if (this.isIndeterminate()) 
-		    	this.setIndeterminateTintList(ColorStateList.valueOf(_color));
-		    
-		  } else {
+		} else {
 			  android.graphics.PorterDuff.Mode mode = android.graphics.PorterDuff.Mode.SRC_IN;
 		    
 		    if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.GINGERBREAD_MR1)
@@ -123,7 +126,7 @@ public class jProgressBar extends ProgressBar {
 		    else		    
 		    	this.getProgressDrawable().setColorFilter(_color, mode);
 		    
-		  }
+		}
 	}
 
   /* Pascal:
@@ -136,5 +139,21 @@ public class jProgressBar extends ProgressBar {
    */
    public void SetFrameGravity(int _value) {	   
       LAMWCommon.setLGravity(_value);
-   }	
+   }
+
+	public void ApplyDrawableXML(String _xmlIdentifier) {
+		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));
+	}
+
+	public void SetMarkerColor(int _color){
+		if (Build.VERSION.SDK_INT >= 21) {  //Build.VERSION_CODES.LOLLIPOP
+			//[ifdef_api21up]
+			this.setProgressTintList(ColorStateList.valueOf(_color));
+			//[endif_api21up]
+		}
+		else {
+			this.getProgressDrawable().setColorFilter(_color, android.graphics.PorterDuff.Mode.SRC_IN);
+		}
+	}
+
 }

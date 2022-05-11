@@ -27,7 +27,7 @@ jsFloatingButton = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -103,7 +103,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -111,30 +111,30 @@ begin
   inherited Destroy;
 end;
 
-procedure jsFloatingButton.Init(refApp: jApp);
+procedure jsFloatingButton.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jni_proc_i(FjEnv, FjObject, 'SetLGravity', Ord(FGravityInParent) );
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetLGravity', Ord(FGravityInParent) );
 
-   View_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   View_SetId(FjEnv, FjObject, Self.Id);
+   View_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   View_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  View_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  View_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -143,21 +143,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      View_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      View_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  View_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  View_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if FElevation <> 20 then
      SetCompatElevation(FElevation);
@@ -172,7 +172,7 @@ begin
    if FColor <> colbrDefault then
     SetColor(FColor);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -180,13 +180,13 @@ procedure jsFloatingButton.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if FInitialized and (FColor <> colbrDefault)  then
-     jni_proc_i(FjEnv, FjObject, 'SetBackgroundTintList', GetARGB(FCustomColor, FColor));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetBackgroundTintList', GetARGB(FCustomColor, FColor));
 end;
 procedure jsFloatingButton.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsFloatingButton.UpdateLayout;
@@ -197,13 +197,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsFloatingButton.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -214,63 +214,63 @@ end;
 
 function jsFloatingButton.jCreate(): jObject;
 begin
-   Result:= jsFloatingButton_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsFloatingButton_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsFloatingButton.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetViewParent(FjEnv, FjObject, _viewgroup);
+     View_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsFloatingButton.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetParent(FjEnv, FjObject);
+   Result:= View_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsFloatingButton.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_RemoveFromViewParent(FjEnv, FjObject);
+     View_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsFloatingButton.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetView(FjEnv, FjObject);
+   Result:= View_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsFloatingButton.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamWidth(FjEnv, FjObject, _w);
+     View_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsFloatingButton.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLParamHeight(FjEnv, FjObject, _h);
+     View_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsFloatingButton.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamWidth(FjEnv, FjObject);
+   Result:= View_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsFloatingButton.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= View_GetLParamHeight(FjEnv, FjObject);
+   Result:= View_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -278,35 +278,35 @@ procedure jsFloatingButton.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLWeight(FjEnv, FjObject, _w);
+     View_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsFloatingButton.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     View_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsFloatingButton.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     View_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsFloatingButton.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     View_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsFloatingButton.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     View_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsFloatingButton.ClearLayout();
@@ -317,15 +317,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     View_ClearLayoutAll(FjEnv, FjObject);
+     View_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          View_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          View_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         View_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         View_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -333,7 +333,7 @@ procedure jsFloatingButton.SetVisibility(_value: TViewVisibility);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetVisibility', Ord(_value));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetVisibility', Ord(_value));
 end;
 
 procedure jsFloatingButton.SetCompatElevation(_value: single);
@@ -341,7 +341,7 @@ begin
   //in designing component state: set value here...
   FElevation:= _value;
   if FjObject <> nil then
-     jni_proc_f(FjEnv, FjObject, 'SetCompatElevation', _value);
+     jni_proc_f(gApp.jni.jEnv, FjObject, 'SetCompatElevation', _value);
 end;
 
 procedure jsFloatingButton.SetImageIdentifier(_imageIdentifier: string);
@@ -349,14 +349,14 @@ begin
   //in designing component state: set value here...
   FImageIdentifier:= _imageIdentifier;
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetImage', _imageIdentifier);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetImage', _imageIdentifier);
 end;
 
 procedure jsFloatingButton.BringToFront();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     View_BringToFront(FjEnv, FjObject);
+     View_BringToFront(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsFloatingButton.SetSize(_value: TFABSize);
@@ -364,28 +364,28 @@ begin
   //in designing component state: set value here...
   FABSize:= _value;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSize', Ord(_value));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSize', Ord(_value));
 end;
 
 procedure jsFloatingButton.SetPressedRippleColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetPressedRippleColor', GetARGB(FCustomColor, _color));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetPressedRippleColor', GetARGB(FCustomColor, _color));
 end;
 
 procedure jsFloatingButton.SetContentDescription(_contentDescription: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetContentDescription', _contentDescription);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetContentDescription', _contentDescription);
 end;
 
 procedure jsFloatingButton.ShowSnackbar(_message: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ShowSnackbar', _message);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'ShowSnackbar', _message);
 end;
 
 procedure jsFloatingButton.SetLGravity(_value: TLayoutGravity);
@@ -393,7 +393,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLGravity', Ord(_value));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetLGravity', Ord(_value));
 end;
 
 
@@ -401,21 +401,21 @@ procedure jsFloatingButton.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetFitsSystemWindows', _value);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetFitsSystemWindows', _value);
 end;
 
 procedure jsFloatingButton.SetAnchorGravity(_value: TLayoutGravity; _anchorId: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ii(FjEnv, FjObject, 'SetAnchorGravity', ord(_value) ,_anchorId);
+     jni_proc_ii(gApp.jni.jEnv, FjObject, 'SetAnchorGravity', ord(_value) ,_anchorId);
 end;
 
 procedure jsFloatingButton.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'SetBackgroundToPrimaryColor');
+     jni_proc(gApp.jni.jEnv, FjObject, 'SetBackgroundToPrimaryColor');
 end;
 
 {-------- jsFloatingButton_JNI_Bridge ----------}

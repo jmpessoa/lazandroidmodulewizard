@@ -32,7 +32,7 @@ jcMail = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     procedure SetProtocol(_protocol: TMailProtocol);
     procedure SetHostName(_host: string);
@@ -81,7 +81,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -89,13 +89,13 @@ begin
   inherited Destroy;
 end;
 
-procedure jcMail.Init(refApp: jApp);
+procedure jcMail.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jcMail_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jcMail_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
   if FjObject = nil then exit;
   FInitialized:= True;
 
@@ -122,7 +122,7 @@ begin
   FProtocol:= _protocol;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetProtocol', Ord(_protocol));
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetProtocol', Ord(_protocol));
 end;
 
 procedure jcMail.SetHostName(_host: string);
@@ -131,7 +131,7 @@ begin
   FHostName:= _host;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetHostName', _host);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetHostName', _host);
 end;
 
 procedure jcMail.SetHostPort(_port: integer);
@@ -140,7 +140,7 @@ begin
   FHostPort:= _port;
   if FjObject = nil then exit;
 
-  jni_proc_i(FjEnv, FjObject, 'SetHostPort', _port);
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetHostPort', _port);
 end;
 
 procedure jcMail.SetUserName(_user: string);
@@ -149,7 +149,7 @@ begin
   FUserName:= _user;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetUserName', _user);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetUserName', _user);
 end;
 
 procedure jcMail.SetPassword(_password: string);
@@ -158,49 +158,49 @@ begin
   FPassword:= _password;
   if FjObject = nil then exit;
 
-  jni_proc_t(FjEnv, FjObject, 'SetPassword', _password);
+  jni_proc_t(gApp.jni.jEnv, FjObject, 'SetPassword', _password);
 end;
 
 procedure jcMail.SetAttachmentsSaveDirectory(_envDirectory: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetAttachmentsSaveDirectory', _envDirectory);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetAttachmentsSaveDirectory', _envDirectory);
 end;
 
 function jcMail.GetInBoxCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetInBoxCount');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetInBoxCount');
 end;
 
 function jcMail.GetInBoxMessage(_index: integer; _partsDelimiter: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_it_out_t(FjEnv, FjObject, 'GetInBoxMessage', _index ,_partsDelimiter);
+   Result:= jni_func_it_out_t(gApp.jni.jEnv, FjObject, 'GetInBoxMessage', _index ,_partsDelimiter);
 end;
 
 procedure jcMail.GetInBoxCountAsync();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'GetInBoxCountAsync');
+     jni_proc(gApp.jni.jEnv, FjObject, 'GetInBoxCountAsync');
 end;
 
 procedure jcMail.GetInBoxMessageAsync(_index: integer; _partsDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'GetInBoxMessageAsync', _index ,_partsDelimiter);
+     jni_proc_it(gApp.jni.jEnv, FjObject, 'GetInBoxMessageAsync', _index ,_partsDelimiter);
 end;
 
 procedure jcMail.GetInBoxMessagesAsync(_startIndex: integer; _count: integer; _partsDelimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_iit(FjEnv, FjObject, 'GetInBoxMessagesAsync', _startIndex ,_count ,_partsDelimiter);
+     jni_proc_iit(gApp.jni.jEnv, FjObject, 'GetInBoxMessagesAsync', _startIndex ,_count ,_partsDelimiter);
 end;
 
 procedure jcMail.GenEvent_OnMailMessagesCount(Sender:TObject;count:integer);

@@ -23,7 +23,7 @@ jHelloAdder = class(jControl)
 
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function Add(_a: integer; _b: integer): integer;
@@ -65,10 +65,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jHelloAdder.Init(refApp: jApp);
+procedure jHelloAdder.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -77,28 +77,28 @@ end;
 
 function jHelloAdder.jCreate(): jObject;
 begin
-   Result:= jHelloAdder_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jHelloAdder_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jHelloAdder.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jHelloAdder_jFree(FjEnv, FjObject);
+     jHelloAdder_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jHelloAdder.Add(_a: integer; _b: integer): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHelloAdder_Add(FjEnv, FjObject, _a ,_b);
+   Result:= jHelloAdder_Add(gApp.jni.jEnv, FjObject, _a ,_b);
 end;
 
 function jHelloAdder.StringUpperCase(_str: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHelloAdder_StringUpperCase(FjEnv, FjObject, _str);
+   Result:= jHelloAdder_StringUpperCase(gApp.jni.jEnv, FjObject, _str);
 end;
 
 function jHelloAdder.SQuare(x: integer): integer;

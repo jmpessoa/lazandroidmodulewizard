@@ -24,7 +24,7 @@ jBarcodeGen = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -77,11 +77,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jBarcodeGen.Init(refApp: jApp);
+procedure jBarcodeGen.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -93,63 +93,63 @@ end;
 
 function jBarcodeGen.jCreate(): jObject;
 begin
-   Result:= jBarcodeGen_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jBarcodeGen_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jBarcodeGen.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBarcodeGen_jFree(FjEnv, FjObject);
+     jBarcodeGen_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jBarcodeGen.GetCode128Bar(_data: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_Get128Bar(FjEnv, FjObject, _data ,_width ,_height);
+   Result:= jBarcodeGen_Get128Bar(gApp.jni.jEnv, FjObject, _data ,_width ,_height);
 end;
 
 function jBarcodeGen.GetBar1D(_format: TBarFormat1D; _data: string; _width: integer; _height: integer): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_GetBar1D(FjEnv, FjObject, Ord(_format) ,_data ,_width ,_height);
+   Result:= jBarcodeGen_GetBar1D(gApp.jni.jEnv, FjObject, Ord(_format) ,_data ,_width ,_height);
 end;
 
 function jBarcodeGen.GetEAN8Checksum(_data7digits: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_GetEAN8Checksum(FjEnv, FjObject, _data7digits);
+   Result:= jBarcodeGen_GetEAN8Checksum(gApp.jni.jEnv, FjObject, _data7digits);
 end;
 
 function jBarcodeGen.GetEAN13Checksum(_data12digits: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_GetEAN13Checksum(FjEnv, FjObject, _data12digits);
+   Result:= jBarcodeGen_GetEAN13Checksum(gApp.jni.jEnv, FjObject, _data12digits);
 end;
 
 function jBarcodeGen.GetCode39Checksum(_dataDigits: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_GetCode39Checksum(FjEnv, FjObject, _dataDigits);
+   Result:= jBarcodeGen_GetCode39Checksum(gApp.jni.jEnv, FjObject, _dataDigits);
 end;
 
 function jBarcodeGen.GetUPCAChecksum(_data11digits: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_GetUPCAChecksum(FjEnv, FjObject, _data11digits);
+   Result:= jBarcodeGen_GetUPCAChecksum(gApp.jni.jEnv, FjObject, _data11digits);
 end;
 
 function jBarcodeGen.GetUPCEChecksum(_data7digits: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBarcodeGen_GetUPCEChecksum(FjEnv, FjObject, _data7digits);
+   Result:= jBarcodeGen_GetUPCEChecksum(gApp.jni.jEnv, FjObject, _data7digits);
 end;
 
 {-------- jBarcodeGen_JNI_Bridge ----------}

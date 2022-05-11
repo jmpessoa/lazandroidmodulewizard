@@ -44,7 +44,7 @@ jBroadcastReceiver = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     procedure RegisterIntentActionFilter(_intentActionFilter: string); overload;
     procedure RegisterIntentActionFilter(_intentActionFilter: TIntentActionFiter); overload;
@@ -92,7 +92,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -100,19 +100,19 @@ begin
   inherited Destroy;
 end;
 
-procedure jBroadcastReceiver.Init(refApp: jApp);
+procedure jBroadcastReceiver.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
-  FjObject := jBroadcastReceiver_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jBroadcastReceiver_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
   FInitialized:= True;
   if FIntentActionFilter <> afNone then
   begin
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(FIntentActionFilter));
+     jBroadcastReceiver_RegisterIntentActionFilter(gApp.jni.jEnv, FjObject, Ord(FIntentActionFilter));
      FRegistered:= True;
   end;
 end;
@@ -123,7 +123,7 @@ begin
   if FInitialized then
   begin
      FRegistered:= True;
-     jni_proc_t(FjEnv, FjObject, 'RegisterIntentActionFilter', _intentActionFilter);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'RegisterIntentActionFilter', _intentActionFilter);
   end;
 end;
 
@@ -133,7 +133,7 @@ begin
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentActionFilter));
+     jBroadcastReceiver_RegisterIntentActionFilter(gApp.jni.jEnv, FjObject, Ord(_intentActionFilter));
   end;
 end;
 
@@ -144,7 +144,7 @@ begin
   if FInitialized then
   begin
      FRegistered:= True;
-     jBroadcastReceiver_RegisterIntentActionFilter(FjEnv, FjObject, Ord(_intentActionFilter));
+     jBroadcastReceiver_RegisterIntentActionFilter(gApp.jni.jEnv, FjObject, Ord(_intentActionFilter));
   end;
 end;
 
@@ -155,7 +155,7 @@ begin
   begin
      if FRegistered then
      begin
-       jni_proc(FjEnv, FjObject, 'Unregister');
+       jni_proc(gApp.jni.jEnv, FjObject, 'Unregister');
        FRegistered:= False;
      end;
   end;
@@ -172,7 +172,7 @@ begin
   Result:= RESULT_CANCELED;
   if FInitialized then
   begin
-     Result:= TAndroidResult(jni_func_out_i(FjEnv, FjObject, 'GetResultCode'));
+     Result:= TAndroidResult(jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetResultCode'));
   end;
 end;
 
@@ -180,14 +180,14 @@ function jBroadcastReceiver.GetResultData(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetResultData');
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetResultData');
 end;
 
 function jBroadcastReceiver.GetResultExtras(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBroadcastReceiver_GetResultExtras(FjEnv, FjObject);
+   Result:= jBroadcastReceiver_GetResultExtras(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jBroadcastReceiver_JNI_Bridge ----------}

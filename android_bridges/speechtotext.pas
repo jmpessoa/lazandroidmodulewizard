@@ -22,7 +22,7 @@ jSpeechToText = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function SpeakIn() : boolean;  overload;
     function SpeakIn(_promptMessage: string) : boolean; overload;
     procedure SetPromptMessage(_promptMessage: string);
@@ -60,7 +60,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_proc(FjEnv, FjObject, 'jFree');
+       jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
        FjObject:= nil;
      end;
   end;
@@ -68,13 +68,13 @@ begin
   inherited Destroy;
 end;
 
-procedure jSpeechToText.Init(refApp: jApp);
+procedure jSpeechToText.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
 
-  FjObject := jSpeechToText_jCreate(FjEnv, int64(Self), FjThis);
+  FjObject := jSpeechToText_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 
   if FjObject = nil then exit;
 
@@ -97,7 +97,7 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   result := jni_func_out_z(FjEnv, FjObject, 'SpeakIn');
+   result := jni_func_out_z(gApp.jni.jEnv, FjObject, 'SpeakIn');
 end;
 
 procedure jSpeechToText.SetPromptMessage(_promptMessage: string);
@@ -105,7 +105,7 @@ begin
   //in designing component state: set value here...
   FPromptMessage:= _promptMessage;
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetPromptMessage', _promptMessage);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetPromptMessage', _promptMessage);
 end;
 
 function jSpeechToText.SpeakIn(_promptMessage: string) : boolean;
@@ -115,7 +115,7 @@ begin
   FPromptMessage:= _promptMessage;
 
   if FInitialized then
-   result := jni_func_t_out_z(FjEnv, FjObject, 'SpeakIn', FPromptMessage);
+   result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'SpeakIn', FPromptMessage);
 end;
 
 procedure jSpeechToText.SetRequestCode(_requestCode: integer);
@@ -123,7 +123,7 @@ begin
   //in designing component state: set value here...
   FRequestCode:= _requestCode;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetRequestCode', _requestCode);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetRequestCode', _requestCode);
 end;
 
 function jSpeechToText.GetRequestCode(): integer;
@@ -131,14 +131,14 @@ begin
   //in designing component state: result value here...
   Result:= FRequestCode;
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRequestCode');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetRequestCode');
 end;
 
 function jSpeechToText.SpeakOut(_intentData: jObject): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_int_out_t(FjEnv, FjObject, 'SpeakOut', _intentData);
+   Result:= jni_func_int_out_t(gApp.jni.jEnv, FjObject, 'SpeakOut', _intentData);
 end;
 
 procedure jSpeechToText.SetLanguage(_language: TSpeechLanguage);
@@ -146,7 +146,7 @@ begin
   //in designing component state: set value here...
   FSpeechLanguage:= _language;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetLanguage', Ord(_language));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetLanguage', Ord(_language));
 end;
 
 {-------- jSpeechToText_JNI_Bridge ----------}

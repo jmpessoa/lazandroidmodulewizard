@@ -30,7 +30,7 @@ jCustomSpeechToText = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -83,18 +83,18 @@ begin
   inherited Destroy;
 end;
 
-procedure jCustomSpeechToText.Init(refApp: jApp);
+procedure jCustomSpeechToText.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
   if FjObject = nil then exit;
 
   if FSpeechLanguage <> slDefault then
-     jCustomSpeechToText_SetLanguage(FjEnv, FjObject, Ord(FSpeechLanguage));
+     jCustomSpeechToText_SetLanguage(gApp.jni.jEnv, FjObject, Ord(FSpeechLanguage));
 
   FInitialized:= True;
 end;
@@ -102,35 +102,35 @@ end;
 
 function jCustomSpeechToText.jCreate(): jObject;
 begin
-   Result:= jCustomSpeechToText_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jCustomSpeechToText_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jCustomSpeechToText.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomSpeechToText_jFree(FjEnv, FjObject);
+     jCustomSpeechToText_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomSpeechToText.StartListening();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomSpeechToText_StartListening(FjEnv, FjObject);
+     jCustomSpeechToText_StartListening(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomSpeechToText.StopListening();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomSpeechToText_StopListening(FjEnv, FjObject);
+     jCustomSpeechToText_StopListening(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jCustomSpeechToText.SetLanguage(_language: TSpeechLanguage);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jCustomSpeechToText_SetLanguage(FjEnv, FjObject, Ord(_language));
+     jCustomSpeechToText_SetLanguage(gApp.jni.jEnv, FjObject, Ord(_language));
 end;
 
 procedure jCustomSpeechToText.GenEvent_OnBeginOfSpeech(Sender:TObject);

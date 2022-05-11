@@ -23,7 +23,7 @@ jViewFlipper = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -130,27 +130,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jViewFlipper.Init(refApp: jApp);
+procedure jViewFlipper.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jViewFlipper_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jViewFlipper_SetId(FjEnv, FjObject, Self.Id);
+   jViewFlipper_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jViewFlipper_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jViewFlipper_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jViewFlipper_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -159,30 +159,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jViewFlipper_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jViewFlipper_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jViewFlipper_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jViewFlipper_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jViewFlipper_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jViewFlipper_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -190,13 +190,13 @@ procedure jViewFlipper.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jViewFlipper.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jViewFlipper.UpdateLayout;
@@ -207,13 +207,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jViewFlipper.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -224,56 +224,56 @@ end;
 
 function jViewFlipper.jCreate(): jObject;
 begin
-   Result:= jViewFlipper_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jViewFlipper_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jViewFlipper.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_jFree(FjEnv, FjObject);
+     jViewFlipper_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jViewFlipper_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jViewFlipper.GetViewParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jViewFlipper_GetParent(FjEnv, FjObject);
+   Result:= jViewFlipper_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_RemoveFromViewParent(FjEnv, FjObject);
+     jViewFlipper_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jViewFlipper.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jViewFlipper_GetView(FjEnv, FjObject);
+   Result:= jViewFlipper_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetLParamWidth(FjEnv, FjObject, _w);
+     jViewFlipper_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jViewFlipper.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetLParamHeight(FjEnv, FjObject, _h);
+     jViewFlipper_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jViewFlipper.GetWidth(): integer;
@@ -284,7 +284,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jViewFlipper_getLParamWidth(FjEnv, FjObject );
+   Result:= jViewFlipper_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jViewFlipper.GetHeight(): integer;
@@ -295,49 +295,49 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jViewFlipper_getLParamHeight(FjEnv, FjObject );
+   Result:= jViewFlipper_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jViewFlipper.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetLGravity(FjEnv, FjObject, _g);
+     jViewFlipper_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jViewFlipper.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetLWeight(FjEnv, FjObject, _w);
+     jViewFlipper_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jViewFlipper.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jViewFlipper_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jViewFlipper.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jViewFlipper_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jViewFlipper.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jViewFlipper_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jViewFlipper.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jViewFlipper_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jViewFlipper.ClearLayout();
@@ -348,15 +348,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jViewFlipper_clearLayoutAll(FjEnv, FjObject);
+     jViewFlipper_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jViewFlipper_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jViewFlipper_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jViewFlipper_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jViewFlipper_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -364,70 +364,70 @@ procedure jViewFlipper.SetAutoStart(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetAutoStart(FjEnv, FjObject, _value);
+     jViewFlipper_SetAutoStart(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jViewFlipper.SetFlipInterval(_milliseconds: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_SetFlipInterval(FjEnv, FjObject, _milliseconds);
+     jViewFlipper_SetFlipInterval(gApp.jni.jEnv, FjObject, _milliseconds);
 end;
 
 procedure jViewFlipper.StartFlipping();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_StartFlipping(FjEnv, FjObject);
+     jViewFlipper_StartFlipping(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.StopFlipping();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_StopFlipping(FjEnv, FjObject);
+     jViewFlipper_StopFlipping(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.AddView(_layout: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_AddView(FjEnv, FjObject, _layout);
+     jViewFlipper_AddView(gApp.jni.jEnv, FjObject, _layout);
 end;
 
 procedure jViewFlipper.AddView(_fullPathToImage: string; _scaleType: TImageScaleType);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_AddView(FjEnv, FjObject, _fullPathToImage, Ord(_scaleType), False);
+     jViewFlipper_AddView(gApp.jni.jEnv, FjObject, _fullPathToImage, Ord(_scaleType), False);
 end;
 
 procedure jViewFlipper.AddView(_fullPathToImage: string; _scaleType: TImageScaleType; _roundedShape: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_AddView(FjEnv, FjObject, _fullPathToImage, Ord(_scaleType) ,_roundedShape);
+     jViewFlipper_AddView(gApp.jni.jEnv, FjObject, _fullPathToImage, Ord(_scaleType) ,_roundedShape);
 end;
 
 procedure jViewFlipper.Next();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_Next(FjEnv, FjObject);
+     jViewFlipper_Next(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.Previous();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_Previous(FjEnv, FjObject);
+     jViewFlipper_Previous(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.Clear();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jViewFlipper_Clear(FjEnv, FjObject);
+     jViewFlipper_Clear(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jViewFlipper.GenEvent_OnFlingGestureDetected(Obj: TObject; direction: integer);

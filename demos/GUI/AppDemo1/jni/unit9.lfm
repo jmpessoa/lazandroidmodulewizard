@@ -110,7 +110,6 @@ object AndroidModule9: TAndroidModule9
     PaintStyle = psFillAndStroke
     PaintTextSize = 20
     PaintColor = colbrBlue
-    Typeface = ffNormal
     Left = 104
     Top = 152
   end

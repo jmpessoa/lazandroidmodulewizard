@@ -51,7 +51,7 @@ jMediaRecorder = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure SetAudioSource(_audioSource: TAudioSource);
@@ -108,10 +108,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jMediaRecorder.Init(refApp: jApp);
+procedure jMediaRecorder.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -120,84 +120,84 @@ end;
 
 function jMediaRecorder.jCreate(): jObject;
 begin
-   Result:= jMediaRecorder_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jMediaRecorder_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jMediaRecorder.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_jFree(FjEnv, FjObject);
+     jMediaRecorder_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaRecorder.SetAudioSource(_audioSource: TAudioSource);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_SetAudioSource(FjEnv, FjObject, Ord(_audioSource));
+     jMediaRecorder_SetAudioSource(gApp.jni.jEnv, FjObject, Ord(_audioSource));
 end;
 
 procedure jMediaRecorder.SetVideoSource(_videoSource: TVideoSource);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_SetVideoSource(FjEnv, FjObject, Ord(_videoSource));
+     jMediaRecorder_SetVideoSource(gApp.jni.jEnv, FjObject, Ord(_videoSource));
 end;
 
 procedure jMediaRecorder.SetOutputFormat(_outputFormat: TOutputFormat);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_SetOutputFormat(FjEnv, FjObject, Ord(_outputFormat));
+     jMediaRecorder_SetOutputFormat(gApp.jni.jEnv, FjObject, Ord(_outputFormat));
 end;
 
 procedure jMediaRecorder.SetAudioEncoder(_outputEncoderFormat: TOutputFormat);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_SetAudioEncoder(FjEnv, FjObject, Ord(_outputEncoderFormat));
+     jMediaRecorder_SetAudioEncoder(gApp.jni.jEnv, FjObject, Ord(_outputEncoderFormat));
 end;
 
 procedure jMediaRecorder.SetOutputFile(_fullPathOutputFilename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_SetOutputFile(FjEnv, FjObject, _fullPathOutputFilename);
+     jMediaRecorder_SetOutputFile(gApp.jni.jEnv, FjObject, _fullPathOutputFilename);
 end;
 
 procedure jMediaRecorder.SetOutputFile(_path: string; _outputFilename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_SetOutputFile(FjEnv, FjObject, _path ,_outputFilename);
+     jMediaRecorder_SetOutputFile(gApp.jni.jEnv, FjObject, _path ,_outputFilename);
 end;
 
 procedure jMediaRecorder.Prepare();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_Prepare(FjEnv, FjObject);
+     jMediaRecorder_Prepare(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaRecorder.Start();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_Start(FjEnv, FjObject);
+     jMediaRecorder_Start(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jMediaRecorder.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jMediaRecorder_Stop(FjEnv, FjObject);
+     jMediaRecorder_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 function jMediaRecorder.HasMicrophone(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jMediaRecorder_HasMicrophone(FjEnv, FjObject);
+   Result:= jMediaRecorder_HasMicrophone(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jMediaRecorder_JNI_Bridge ----------}

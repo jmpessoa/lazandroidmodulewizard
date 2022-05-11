@@ -61,7 +61,7 @@ jLocation = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     function jCreate( _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
     function StartTracker(): boolean;  overload;
@@ -182,7 +182,7 @@ begin
   begin
         if FjObject  <> nil then
         begin
-           jni_free(FjEnv, FjObject);
+           jni_free(gApp.jni.jEnv, FjObject);
            FjObject := nil;
         end;
   end;
@@ -190,17 +190,17 @@ begin
   inherited Destroy;
 end;
 
-procedure jLocation.Init(refApp: jApp);
+procedure jLocation.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   //your code here: set/initialize create params....
   FjObject := jCreate(FTimeForUpdates ,FDistanceForUpdates ,Ord(FCriteriaAccuracy) ,Ord(FMapType));
 
   if FjObject = nil then exit;
 
   if FGoogleMapsApiKey <> '' then
-     jni_proc_t(FjEnv, FjObject, 'SetGoogleMapsApiKey', FGoogleMapsApiKey);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetGoogleMapsApiKey', FGoogleMapsApiKey);
 
   FInitialized:= True;
 
@@ -208,13 +208,13 @@ end;
 
 function jLocation.jCreate( _TimeForUpdates: int64; _DistanceForUpdates: int64; _CriteriaAccuracy: integer; _MapType: integer): jObject;
 begin
-   Result:= jLocation_jCreate(FjEnv, FjThis , int64(Self) ,_TimeForUpdates ,_DistanceForUpdates ,_CriteriaAccuracy ,_MapType);
+   Result:= jLocation_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self) ,_TimeForUpdates ,_DistanceForUpdates ,_CriteriaAccuracy ,_MapType);
 end;
 
 function jLocation.GPSCreate(): boolean;
 begin
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjThis, 'GPSCreate');
+   Result:= jni_func_out_z(gApp.jni.jEnv, gApp.jni.jThis, 'GPSCreate');
 end;
 
 function jLocation.StartTracker(): boolean;
@@ -222,7 +222,7 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jni_func_z_out_z(FjEnv, FjObject, 'StartTracker', false);
+   Result:= jni_func_z_out_z(gApp.jni.jEnv, FjObject, 'StartTracker', false);
 end;
 
 function jLocation.StartTrackerSingle(): boolean;
@@ -230,7 +230,7 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'StartTrackerSingle');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'StartTrackerSingle');
 end;
 
 function jLocation.StartTracker( lastKnownLocation : boolean ): boolean;
@@ -238,28 +238,28 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jni_func_z_out_z(FjEnv, FjObject, 'StartTracker', lastKnownLocation );
+   Result:= jni_func_z_out_z(gApp.jni.jEnv, FjObject, 'StartTracker', lastKnownLocation );
 end;
 
 procedure jLocation.ShowLocationSouceSettings();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ShowLocationSourceSettings' );
+     jni_proc(gApp.jni.jEnv, FjObject, 'ShowLocationSourceSettings' );
 end;
 
 procedure jLocation.RequestLocationUpdates();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RequestLocationUpdates' );
+     jni_proc(gApp.jni.jEnv, FjObject, 'RequestLocationUpdates' );
 end;
 
 procedure jLocation.StopTracker();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'StopTracker' );
+     jni_proc(gApp.jni.jEnv, FjObject, 'StopTracker' );
 end;
 
 procedure jLocation.SetCriteriaAccuracy(_accuracy: TCriteriaAccuracy);
@@ -267,21 +267,21 @@ begin
   //in designing component state: set value here...
   FCriteriaAccuracy:= _accuracy;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetCriteriaAccuracy', Ord(_accuracy));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetCriteriaAccuracy', Ord(_accuracy));
 end;
 
 function jLocation.IsGPSProvider(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsGPSProvider' );
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsGPSProvider' );
 end;
 
 function jLocation.IsNetProvider(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsNetProvider' );
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsNetProvider' );
 end;
 
 procedure jLocation.SetTimeForUpdates(_time: int64);
@@ -289,7 +289,7 @@ begin
   //in designing component state: set value here...
   FTimeForUpdates:= _time;
   if FInitialized then
-     jni_proc_j(FjEnv, FjObject, 'SetTimeForUpdates', _time);
+     jni_proc_j(gApp.jni.jEnv, FjObject, 'SetTimeForUpdates', _time);
 end;
 
 procedure jLocation.SetDistanceForUpdates(_distance: int64);
@@ -297,55 +297,55 @@ begin
   //in designing component state: set value here...
   FDistanceForUpdates:= _distance;
   if FInitialized then
-     jni_proc_j(FjEnv, FjObject, 'SetDistanceForUpdates', _distance);
+     jni_proc_j(gApp.jni.jEnv, FjObject, 'SetDistanceForUpdates', _distance);
 end;
 
 function jLocation.GetLatitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_d(FjEnv, FjObject, 'GetLatitude' );
+   Result:= jni_func_out_d(gApp.jni.jEnv, FjObject, 'GetLatitude' );
 end;
 
 function jLocation.GetLongitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_d(FjEnv, FjObject, 'GetLongitude' );
+   Result:= jni_func_out_d(gApp.jni.jEnv, FjObject, 'GetLongitude' );
 end;
 
 function jLocation.GetAltitude(): double;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_d(FjEnv, FjObject, 'GetAltitude' );
+   Result:= jni_func_out_d(gApp.jni.jEnv, FjObject, 'GetAltitude' );
 end;
 
 function jLocation.IsWifiEnabled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsWifiEnabled' );
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsWifiEnabled' );
 end;
 
 procedure jLocation.SetWifiEnabled(_status: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetWifiEnabled', _status);
+     jni_proc_z(gApp.jni.jEnv, FjObject, 'SetWifiEnabled', _status);
 end;
 
 function jLocation.GetGoogleMapsUrl(_latitude: double; _longitude: double): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dd_out_t(FjEnv, FjObject, 'GetGoogleMapsUrl', _latitude ,_longitude);
+   Result:= jni_func_dd_out_t(gApp.jni.jEnv, FjObject, 'GetGoogleMapsUrl', _latitude ,_longitude);
 end;
 
 function jLocation.GetGoogleMapsWebUrl(_latitude : double; _longitude: double; _zoom : boolean): string;
 begin
  if FInitialized then
-  Result:= jni_func_ffz_out_t(FjEnv, FjObject, 'GetGoogleMapsWebUrl', _latitude, _longitude, _zoom);
+  Result:= jni_func_ffz_out_t(gApp.jni.jEnv, FjObject, 'GetGoogleMapsWebUrl', _latitude, _longitude, _zoom);
 end;
 
 procedure jLocation.SetMapWidth(_mapwidth: integer);
@@ -353,7 +353,7 @@ begin
   //in designing component state: set value here...
   FMapWidth:= _mapwidth;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetMapWidth', _mapwidth);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMapWidth', _mapwidth);
 end;
 
 procedure jLocation.SetMapHeight(_mapheight: integer);
@@ -361,7 +361,7 @@ begin
   //in designing component state: set value here...
   FMapHeight:=_mapheight;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetMapHeight', _mapheight);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMapHeight', _mapheight);
 end;
 
 procedure jLocation.SetMapZoom(_mapzoom: integer);
@@ -369,7 +369,7 @@ begin
   //in designing component state: set value here...
   FMapZoom:= _mapzoom;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetMapZoom', _mapzoom);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMapZoom', _mapzoom);
 end;
 
 procedure jLocation.SetMapType(_maptype: TMapType);
@@ -377,42 +377,42 @@ begin
   //in designing component state: set value here...
   FMapType:= _maptype;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetMapType', Ord(_maptype));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMapType', Ord(_maptype));
 end;
 
 function jLocation.GetAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetAddress' );
+   Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetAddress' );
 end;
 
 function jLocation.GetAddress(_latitude: double; _longitude: double): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dd_out_t(FjEnv, FjObject, 'GetAddress', _latitude ,_longitude);
+   Result:= jni_func_dd_out_t(gApp.jni.jEnv, FjObject, 'GetAddress', _latitude ,_longitude);
 end;
 
 function jLocation.StartTracker(_locationName: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'StartTracker', _locationName);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'StartTracker', _locationName);
 end;
 
 procedure jLocation.RequestLocationUpdates(_provider: TProvider);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'RequestLocationUpdates', Ord(_provider));
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'RequestLocationUpdates', Ord(_provider));
 end;
 
 function jLocation.GetLatitudeLongitude(_fullAddress: string): TDynArrayOfDouble;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetLatitudeLongitude(FjEnv, FjObject, _fullAddress);
+   Result:= jLocation_GetLatitudeLongitude(gApp.jni.jEnv, FjObject, _fullAddress);
 end;
 
 function jLocation.GetGeoPoint2D(_fullAddress: string): TGeoPoint2D;
@@ -422,7 +422,7 @@ begin
   //in designing component state: result value here...
   if FInitialized then
   begin
-   ll:= jLocation_GetLatitudeLongitude(FjEnv, FjObject, _fullAddress);
+   ll:= jLocation_GetLatitudeLongitude(gApp.jni.jEnv, FjObject, _fullAddress);
    Result.latitude:= ll[0];
    Result.longitude:= ll[1];
   end;
@@ -433,28 +433,28 @@ function jLocation.GetGoogleMapsUrl(_fullAddress: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetGoogleMapsUrl', _fullAddress);
+   Result:= jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetGoogleMapsUrl', _fullAddress);
 end;
 
 function jLocation.GetDistanceBetween(_startLatitude: double; _startLongitude: double; _endLatitude: double; _endLongitude: double): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dddd_out_f(FjEnv, FjObject, 'GetDistanceBetween', _startLatitude ,_startLongitude ,_endLatitude ,_endLongitude);
+   Result:= jni_func_dddd_out_f(gApp.jni.jEnv, FjObject, 'GetDistanceBetween', _startLatitude ,_startLongitude ,_endLatitude ,_endLongitude);
 end;
 
 function jLocation.GetDistanceTo(_latitude: double; _longitude: double): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dd_out_f(FjEnv, FjObject, 'GetDistanceTo', _latitude ,_longitude);
+   Result:= jni_func_dd_out_f(gApp.jni.jEnv, FjObject, 'GetDistanceTo', _latitude ,_longitude);
 end;
 
 function jLocation.GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, _latitude ,_longitude);
+   Result:= jLocation_GetGoogleMapsUrl(gApp.jni.jEnv, FjObject, _latitude ,_longitude);
 end;
 
 function jLocation.GetGoogleMapsUrl(geoPoints: array of TGeoPoint2D): string;
@@ -478,7 +478,7 @@ begin
       latitude[i]:= p.latitude;
       longitude[i]:= p.longitude;
     end;
-    Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, latitude ,longitude);
+    Result:= jLocation_GetGoogleMapsUrl(gApp.jni.jEnv, FjObject, latitude ,longitude);
     SetLength(latitude,  0);
     SetLength(longitude, 0);
   end;
@@ -505,7 +505,7 @@ begin
       latitude[i]:= p.latitude;
       longitude[i]:= p.longitude;
     end;
-    Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, latitude ,longitude, Ord(pictureStyle));
+    Result:= jLocation_GetGoogleMapsUrl(gApp.jni.jEnv, FjObject, latitude ,longitude, Ord(pictureStyle));
     SetLength(latitude,  0);
     SetLength(longitude, 0);
   end;
@@ -532,7 +532,7 @@ begin
       latitude[i]:= p.latitude;
       longitude[i]:= p.longitude;
     end;
-    Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, latitude ,longitude, Ord(pictureStyle), markerHighlightIndex);
+    Result:= jLocation_GetGoogleMapsUrl(gApp.jni.jEnv, FjObject, latitude ,longitude, Ord(pictureStyle), markerHighlightIndex);
     SetLength(latitude,  0);
     SetLength(longitude, 0);
   end;
@@ -542,42 +542,42 @@ function jLocation.GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longi
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, _latitude ,_longitude, Ord(pictureStyle));
+   Result:= jLocation_GetGoogleMapsUrl(gApp.jni.jEnv, FjObject, _latitude ,_longitude, Ord(pictureStyle));
 end;
 
 function jLocation.GetGoogleMapsUrl(var _latitude: TDynArrayOfDouble; var _longitude: TDynArrayOfDouble; pictureStyle: TPictureStyle; _markerHighlightIndex: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jLocation_GetGoogleMapsUrl(FjEnv, FjObject, _latitude ,_longitude ,Ord(pictureStyle) ,_markerHighlightIndex);
+   Result:= jLocation_GetGoogleMapsUrl(gApp.jni.jEnv, FjObject, _latitude ,_longitude ,Ord(pictureStyle) ,_markerHighlightIndex);
 end;
 
 procedure jLocation.SetMarkerHighlightColor(_color: TMarkerHighlightColor);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetMarkerHighlightColor', Ord(_color) );
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMarkerHighlightColor', Ord(_color) );
 end;
 
 function jLocation.GetSatelliteCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetSatelliteCount');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetSatelliteCount');
 end;
 
 function jLocation.GetSatelliteInfo(_index: integer): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetSatelliteInfo', _index);
+   Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetSatelliteInfo', _index);
 end;
 
 function jLocation.GetTimeToFirstFix(): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_f(FjEnv, FjObject, 'GetTimeToFirstFix');
+   Result:= jni_func_out_f(gApp.jni.jEnv, FjObject, 'GetTimeToFirstFix');
 end;
 
 {
@@ -585,7 +585,7 @@ procedure jLocation.Listen();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jLocation_Listen(FjEnv, FjObject);
+     jLocation_Listen(gApp.jni.jEnv, FjObject);
 end;
 }
 
@@ -594,14 +594,14 @@ begin
   //in designing component state: set value here...
   FGoogleMapsApiKey:= _key;
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'SetGoogleMapsApiKey', _key);
+     jni_proc_t(gApp.jni.jEnv, FjObject, 'SetGoogleMapsApiKey', _key);
 end;
 
 function jLocation.GetAccuracy(): single;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_f(FjEnv, FjObject, 'GetAccuracy');
+   Result:= jni_func_out_f(gApp.jni.jEnv, FjObject, 'GetAccuracy');
 end;
 
 procedure jLocation.GenEvent_OnLocationChanged(Obj: TObject; latitude: double; longitude: double; altitude: double; address: string);

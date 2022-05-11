@@ -20,7 +20,7 @@ jGif = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function LoadFromRawResource(_gifImageIdentifier: string): jObject;
@@ -66,11 +66,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGif.Init(refApp: jApp);
+procedure jGif.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -82,49 +82,49 @@ end;
 
 function jGif.jCreate(): jObject;
 begin
-   Result:= jGif_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGif_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGif.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGif_jFree(FjEnv, FjObject);
+     jGif_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jGif.LoadFromRawResource(_gifImageIdentifier: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGif_LoadFromRawResource(FjEnv, FjObject, _gifImageIdentifier);
+   Result:= jGif_LoadFromRawResource(gApp.jni.jEnv, FjObject, _gifImageIdentifier);
 end;
 
 function jGif.LoadFromAssets(_gifFilename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGif_LoadFromAssets(FjEnv, FjObject, _gifFilename);
+   Result:= jGif_LoadFromAssets(gApp.jni.jEnv, FjObject, _gifFilename);
 end;
 
 function jGif.LoadFromFile(_path: string; _gifFilename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGif_LoadFromFile(FjEnv, FjObject, _path ,_gifFilename);
+   Result:= jGif_LoadFromFile(gApp.jni.jEnv, FjObject, _path ,_gifFilename);
 end;
 
 procedure jGif.Start();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGif_Start(FjEnv, FjObject);
+     jGif_Start(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGif.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGif_Stop(FjEnv, FjObject);
+     jGif_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGif_JNI_Bridge ----------}

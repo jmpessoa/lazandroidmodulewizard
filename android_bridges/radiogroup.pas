@@ -29,7 +29,7 @@ jRadioGroup = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -147,7 +147,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jRadioGroup.Init(refApp: jApp);
+procedure jRadioGroup.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -156,20 +156,20 @@ begin
 
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jRadioGroup_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jRadioGroup_SetId(FjEnv, FjObject, Self.Id);
+   jRadioGroup_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jRadioGroup_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jRadioGroup_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jRadioGroup_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -178,37 +178,37 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jRadioGroup_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jRadioGroup_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jRadioGroup_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jRadioGroup_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jRadioGroup_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jRadioGroup_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
 
    for i:= 0 to FItems.Count-1 do
    begin
     if FItems.Strings[i] <> '' then
-        jRadioGroup_Add(FjEnv, FjObject , FItems.Strings[i]);
+        jRadioGroup_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i]);
    end;
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -216,14 +216,14 @@ procedure jRadioGroup.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 
 procedure jRadioGroup.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jRadioGroup.UpdateLayout;
@@ -234,13 +234,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jRadioGroup.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -253,14 +253,14 @@ end;
 
 function jRadioGroup.jCreate(): jObject;
 begin
-   Result:= jRadioGroup_jCreate(FjEnv, int64(Self), FjThis, Ord(FOrientation));
+   Result:= jRadioGroup_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis, Ord(FOrientation));
 end;
 
 procedure jRadioGroup.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_jFree(FjEnv, FjObject);
+     jRadioGroup_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRadioGroup.SetViewParent(_viewgroup: jObject);
@@ -268,63 +268,63 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;  // <<--------------
   if FInitialized then
-     jRadioGroup_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jRadioGroup_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jRadioGroup.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_RemoveFromViewParent(FjEnv, FjObject);
+     jRadioGroup_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jRadioGroup.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_GetView(FjEnv, FjObject);
+   Result:= jRadioGroup_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRadioGroup.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_SetLParamWidth(FjEnv, FjObject, _w);
+     jRadioGroup_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jRadioGroup.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_SetLParamHeight(FjEnv, FjObject, _h);
+     jRadioGroup_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jRadioGroup.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jRadioGroup_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jRadioGroup.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jRadioGroup_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jRadioGroup.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jRadioGroup_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jRadioGroup.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jRadioGroup_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jRadioGroup.ClearLayout();
@@ -335,15 +335,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jRadioGroup_clearLayoutAll(FjEnv, FjObject);
+     jRadioGroup_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jRadioGroup_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jRadioGroup_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jRadioGroup_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jRadioGroup_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -351,28 +351,28 @@ procedure jRadioGroup.Check(_id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_Check(FjEnv, FjObject, _id);
+     jRadioGroup_Check(gApp.jni.jEnv, FjObject, _id);
 end;
 
 procedure jRadioGroup.ClearCheck();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_ClearCheck(FjEnv, FjObject);
+     jRadioGroup_ClearCheck(gApp.jni.jEnv, FjObject);
 end;
 
 function jRadioGroup.GetCheckedRadioButtonId(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_GetCheckedRadioButtonId(FjEnv, FjObject);
+   Result:= jRadioGroup_GetCheckedRadioButtonId(gApp.jni.jEnv, FjObject);
 end;
 
 function jRadioGroup.GetChildCount(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_GetChildCount(FjEnv, FjObject);
+   Result:= jRadioGroup_GetChildCount(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRadioGroup.SetOrientation(_orientation: TRGOrientation);
@@ -380,14 +380,14 @@ begin
   //in designing component state: set value here...
   FOrientation:= _orientation;
   if FInitialized then
-     jRadioGroup_SetOrientation(FjEnv, FjObject, Ord(_orientation));
+     jRadioGroup_SetOrientation(gApp.jni.jEnv, FjObject, Ord(_orientation));
 end;
 
 procedure jRadioGroup.CheckRadioButtonByCaption(_caption: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_CheckRadioButtonByCaption(FjEnv, FjObject, _caption);
+     jRadioGroup_CheckRadioButtonByCaption(gApp.jni.jEnv, FjObject, _caption);
 end;
 
 procedure jRadioGroup.CheckRadioButtonByIndex(_index: integer);
@@ -395,14 +395,14 @@ begin
   //in designing component state: set value here...
   FCheckedIndex:= _index;
   if FInitialized then
-     jRadioGroup_CheckRadioButtonByIndex(FjEnv, FjObject, _index);
+     jRadioGroup_CheckRadioButtonByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 function jRadioGroup.GetChekedRadioButtonCaption(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_GetChekedRadioButtonCaption(FjEnv, FjObject);
+   Result:= jRadioGroup_GetChekedRadioButtonCaption(gApp.jni.jEnv, FjObject);
 end;
 
 function jRadioGroup.GetChekedRadioButtonIndex(): integer;
@@ -410,42 +410,42 @@ begin
   //in designing component state: result value here...
   Result:= FCheckedIndex;
   if FInitialized then
-   Result:= jRadioGroup_GetChekedRadioButtonIndex(FjEnv, FjObject);
+   Result:= jRadioGroup_GetChekedRadioButtonIndex(gApp.jni.jEnv, FjObject);
 end;
 
 function jRadioGroup.IsChekedRadioButtonByCaption(_caption: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_IsChekedRadioButtonByCaption(FjEnv, FjObject, _caption);
+   Result:= jRadioGroup_IsChekedRadioButtonByCaption(gApp.jni.jEnv, FjObject, _caption);
 end;
 
 function jRadioGroup.IsChekedRadioButtonById(_id: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_IsChekedRadioButtonById(FjEnv, FjObject, _id);
+   Result:= jRadioGroup_IsChekedRadioButtonById(gApp.jni.jEnv, FjObject, _id);
 end;
 
 function jRadioGroup.IsChekedRadioButtonByIndex(_index: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRadioGroup_IsChekedRadioButtonByIndex(FjEnv, FjObject, _index);
+   Result:= jRadioGroup_IsChekedRadioButtonByIndex(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jRadioGroup.SetRoundCorner();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_SetRoundCorner(FjEnv, FjObject);
+     jRadioGroup_SetRoundCorner(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRadioGroup.SetRadiusRoundCorner(_radius: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_SetRadiusRoundCorner(FjEnv, FjObject, _radius);
+     jRadioGroup_SetRadiusRoundCorner(gApp.jni.jEnv, FjObject, _radius);
 end;
 
 procedure jRadioGroup.SetItems(Value: TStrings);
@@ -459,7 +459,7 @@ begin
     for i:= 0 to FItems.Count - 1 do
     begin
        if FItems.Strings[i] <> '' then
-         jRadioGroup_Add(FjEnv, FjObject , FItems.Strings[i]);
+         jRadioGroup_Add(gApp.jni.jEnv, FjObject , FItems.Strings[i]);
     end;
   end;
 
@@ -469,14 +469,14 @@ procedure jRadioGroup.Add(_radioTitle: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_Add(FjEnv, FjObject, _radioTitle);
+     jRadioGroup_Add(gApp.jni.jEnv, FjObject, _radioTitle);
 end;
 
 procedure jRadioGroup.Add(_radioTitle: string; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRadioGroup_Add(FjEnv, FjObject, _radioTitle ,GetARGB(FCustomColor, _color));
+     jRadioGroup_Add(gApp.jni.jEnv, FjObject, _radioTitle ,GetARGB(FCustomColor, _color));
 end;
 
 {-------- jRadioGroup_JNI_Bridge ----------}

@@ -44,7 +44,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp; Paint: JObject); reintroduce;
+    procedure Init(Paint: JObject); reintroduce;
     procedure Bind(const ID: Integer);
     procedure Clear();
     procedure Combine(shdrA, shdrB: Integer; Mode: TPorterDuff; dstID: Integer);
@@ -122,7 +122,7 @@ begin
   begin
      if FjObject <> nil then
      begin
-       jni_free(FjEnv, FjObject);
+       jni_free(gApp.jni.jEnv, FjObject);
        FjObject:= nil;
      end;
   end;
@@ -130,18 +130,18 @@ begin
   inherited Destroy;
 end;
 
-procedure JPaintShader.Init(refApp: jApp; Paint: JObject);
+procedure JPaintShader.Init(Paint: JObject);
 begin
   if FInitialized then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
-  FjObject := jPaintShader_jCreate(FjEnv, Int64(Self), Paint, FjThis); //jSelf !
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
+  FjObject := jPaintShader_jCreate(gApp.jni.jEnv, Int64(Self), Paint, gApp.jni.jThis); //jSelf !
   FInitialized := True;
 end;
 
 procedure JPaintShader.SetPaint(Value: JObject);
 begin
   if FInitialized then
-    jPaintShader_SetPaint(FjEnv, FjObject, Value);
+    jPaintShader_SetPaint(gApp.jni.jEnv, FjObject, Value);
 end;
 
 procedure JPaintShader.SetCount(Value: Integer);
@@ -149,20 +149,20 @@ begin
   if FInitialized then
   begin
     FShaderCount := Value;
-    jni_proc_i(FjEnv, FjObject, 'SetCount', Value);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetCount', Value);
   end;
 end;
 
 procedure JPaintShader.SetIndex(Value: Integer);
 begin
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetIndex', Value);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetIndex', Value);
 end;
 
 function JPaintShader.GetColor(): Integer;
 begin
   if FInitialized then
-    Result := jni_func_out_i(FjEnv, FjObject, 'GetColor');
+    Result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetColor');
 end;
 
 procedure JPaintShader.Clear();
@@ -174,13 +174,13 @@ end;
 procedure JPaintShader.Combine(shdrA, shdrB: Integer; Mode: TPorterDuff; dstID: Integer);
 begin
   if FInitialized then
-    jPaintShader_Combine(FjEnv, FjObject, shdrA, shdrB, Byte(Mode), dstID);
+    jPaintShader_Combine(gApp.jni.jEnv, FjObject, shdrA, shdrB, Byte(Mode), dstID);
 end;
 
 procedure JPaintShader.Bind(const ID: Integer);
 begin
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'Bind', ID);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'Bind', ID);
 end;
 
 procedure jPaintShader.Disable();
@@ -191,103 +191,103 @@ end;
 procedure JPaintShader.SetIdentity(ID: Integer);
 begin
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetIdentity', ID);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetIdentity', ID);
 end;
 
 procedure JPaintShader.SetZeroCoords(ID: Integer);
 begin
   if FInitialized then
-    jni_proc_i(FjEnv, FjObject, 'SetZeroCoords', ID);
+    jni_proc_i(gApp.jni.jEnv, FjObject, 'SetZeroCoords', ID);
 end;
 
 procedure JPaintShader.SetMatrix(X, Y, scaleX, scaleY, Rotate: Single; ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetMatrix(FjEnv, FjObject, X, Y, scaleX, scaleY, Rotate, ID);
+    jPaintShader_SetMatrix(gApp.jni.jEnv, FjObject, X, Y, scaleX, scaleY, Rotate, ID);
 end;
 
 procedure JPaintShader.SetRotate(Degree: Single; ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetRotate(FjEnv, FjObject, Degree, ID);
+    jPaintShader_SetRotate(gApp.jni.jEnv, FjObject, Degree, ID);
 end;
 
 procedure JPaintShader.SetRotate(Degree, PointX, PointY: Single; ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetRotate(FjEnv, FjObject, Degree, PointX, PointY, ID);
+    jPaintShader_SetRotate(gApp.jni.jEnv, FjObject, Degree, PointX, PointY, ID);
 end;
 
 procedure JPaintShader.SetScale(X, Y: Single; ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetScale(FjEnv, FjObject, X, Y, ID);
+    jPaintShader_SetScale(gApp.jni.jEnv, FjObject, X, Y, ID);
 end;
 
 procedure JPaintShader.SetTranslate(X, Y: Single; ID: Integer);
 begin
   if FInitialized then
-    jPaintShader_SetTranslate(FjEnv, FjObject, X, Y, ID);
+    jPaintShader_SetTranslate(gApp.jni.jEnv, FjObject, X, Y, ID);
 end;
 
 function JPaintShader.NewBitmapShader(Bitmap: JOBject; tileX, tileY: TTileMode; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewBitmapShader(FjEnv, FjObject, Bitmap, Byte(tileX), Byte(tileY), ID);
+    Result := jPaintShader_NewBitmapShader(gApp.jni.jEnv, FjObject, Bitmap, Byte(tileX), Byte(tileY), ID);
 end;
 
 function JPaintShader.NewBitmapShader(Bitmap: JOBject; tileX, tileY: TTileMode; scaleX, scaleY, Rotate: Single; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewBitmapShader(FjEnv, FjObject, Bitmap, Byte(tileX), Byte(tileY), scaleX, scaleY, Rotate, ID);
+    Result := jPaintShader_NewBitmapShader(gApp.jni.jEnv, FjObject, Bitmap, Byte(tileX), Byte(tileY), scaleX, scaleY, Rotate, ID);
 end;
 
 function JPaintShader.NewLinearGradient(X0, Y0, X1, Y1: Single; Color0, Color1: TAlphaColor; tMode: TTileMode; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewLinearGradient(FjEnv, FjObject, X0, Y0, X1, Y1, Color0, Color1, Byte(tMode), ID);
+    Result := jPaintShader_NewLinearGradient(gApp.jni.jEnv, FjObject, X0, Y0, X1, Y1, Color0, Color1, Byte(tMode), ID);
 end;
 
 function JPaintShader.NewLinearGradient(X0, Y0, X1, Y1: Single; Colors: TGradientColors; Positions: TGradientPositions; tMode: TTileMode; ID: Integer=-1): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewLinearGradient(FjEnv, FjObject, X0, Y0, X1, Y1, Colors, Positions, Byte(tMode), ID);
+    Result := jPaintShader_NewLinearGradient(gApp.jni.jEnv, FjObject, X0, Y0, X1, Y1, Colors, Positions, Byte(tMode), ID);
 end;
 
 function JPaintShader.NewLinearGradient(X, Y, Wh, Ht, Rotate: Single; Color0, Color1: TAlphaColor; tMode: TTileMode; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewLinearGradient(FjEnv, FjObject, X, Y, Wh, Ht, Rotate, Color0, Color1, Byte(tMode), ID);
+    Result := jPaintShader_NewLinearGradient(gApp.jni.jEnv, FjObject, X, Y, Wh, Ht, Rotate, Color0, Color1, Byte(tMode), ID);
 end;
 
 function JPaintShader.NewLinearGradient(X, Y, Wh, Ht, Rotate: Single; Colors: TGradientColors; Positions: TGradientPositions; tMode: TTileMode; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewLinearGradient(FjEnv, FjObject, X, Y, Wh, Ht, Rotate, Colors, Positions, Byte(tMode), ID);
+    Result := jPaintShader_NewLinearGradient(gApp.jni.jEnv, FjObject, X, Y, Wh, Ht, Rotate, Colors, Positions, Byte(tMode), ID);
 end;
 
 function JPaintShader.NewRadialGradient(cX, cY, Radius: Single; cColor, eColor: TAlphaColor; tMode: TTileMode; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewRadialGradient(FjEnv, FjObject, cX, cY, Radius, cColor, eColor, Byte(tMode), ID);
+    Result := jPaintShader_NewRadialGradient(gApp.jni.jEnv, FjObject, cX, cY, Radius, cColor, eColor, Byte(tMode), ID);
 end;
 
 function JPaintShader.NewRadialGradient(cX, cY, Radius: Single; Colors: TGradientColors; Stops: TGradientPositions; tMode: TTileMode; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewRadialGradient(FjEnv, FjObject, cX, cY, Radius, Colors, Stops, Byte(tMode), ID);
+    Result := jPaintShader_NewRadialGradient(gApp.jni.jEnv, FjObject, cX, cY, Radius, Colors, Stops, Byte(tMode), ID);
 end;
 
 function JPaintShader.NewSweepGradient(cX, cY: Single; Color0, Color1: TAlphaColor; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewSweepGradient(FjEnv, FjObject, cX, cY, Color0, Color1, ID);
+    Result := jPaintShader_NewSweepGradient(gApp.jni.jEnv, FjObject, cX, cY, Color0, Color1, ID);
 end;
 
 function JPaintShader.NewSweepGradient(cX, cY: Single; Colors: TGradientColors; Positions: TGradientPositions; ID: Integer): Integer;
 begin
   if FInitialized then
-    Result := jPaintShader_NewSweepGradient(FjEnv, FjObject, cX, cY, Colors, Positions, ID);
+    Result := jPaintShader_NewSweepGradient(gApp.jni.jEnv, FjObject, cX, cY, Colors, Positions, ID);
 end;
 
 // -------- jPaintShader_JNI_Bridge ----------

@@ -32,7 +32,7 @@ jRatingBar = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -139,14 +139,14 @@ begin
   inherited Destroy;
 end;
 
-procedure jRatingBar.Init(refApp: jApp);
+procedure jRatingBar.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
 
    FjObject:= jCreate(FnumStars, Ord(FStyle), FIsIndicator); //jSelf !
@@ -154,19 +154,19 @@ begin
    if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-     jRatingBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+     jRatingBar_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   jRatingBar_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jRatingBar_SetId(FjEnv, FjObject, Self.Id);
+   jRatingBar_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jRatingBar_SetId(gApp.jni.jEnv, FjObject, Self.Id);
 
   end;
 
-  jRatingBar_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jRatingBar_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -175,21 +175,21 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jRatingBar_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jRatingBar_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jRatingBar_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jRatingBar_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jRatingBar_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jRatingBar_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
@@ -198,15 +198,15 @@ begin
     if FRating < 0 then  FRating:= 0;
     if FRating > FNumStars then  FRating:= FNumStars;
 
-    jRatingBar_SetRating(FjEnv, FjObject, FRating);
+    jRatingBar_SetRating(gApp.jni.jEnv, FjObject, FRating);
 
     if  FColor <> colbrDefault then
-      View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+      View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 
     if  FStep <> 0.5 then
-      jRatingBar_SetStepSize(FjEnv, FjObject, FStep);
+      jRatingBar_SetStepSize(gApp.jni.jEnv, FjObject, FStep);
 
   end;
 
@@ -217,13 +217,13 @@ procedure jRatingBar.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jRatingBar.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jRatingBar.UpdateLayout;
@@ -234,13 +234,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jRatingBar.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -252,77 +252,77 @@ end;
 
 function jRatingBar.jCreate( _numStars: integer;  _style: integer; _isIndicator: boolean): jObject;
 begin
-   Result:= jRatingBar_jCreate(FjEnv, int64(Self) ,_numStars ,_style ,_isIndicator, FjThis);
+   Result:= jRatingBar_jCreate(gApp.jni.jEnv, int64(Self) ,_numStars ,_style ,_isIndicator, gApp.jni.jThis);
 end;
 
 procedure jRatingBar.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_jFree(FjEnv, FjObject);
+     jRatingBar_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRatingBar.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jRatingBar_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 procedure jRatingBar.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_RemoveFromViewParent(FjEnv, FjObject);
+     jRatingBar_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jRatingBar.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRatingBar_GetView(FjEnv, FjObject);
+   Result:= jRatingBar_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRatingBar.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_SetLParamWidth(FjEnv, FjObject, _w);
+     jRatingBar_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jRatingBar.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_SetLParamHeight(FjEnv, FjObject, _h);
+     jRatingBar_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 procedure jRatingBar.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jRatingBar_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jRatingBar.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jRatingBar_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jRatingBar.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jRatingBar_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jRatingBar.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jRatingBar_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jRatingBar.ClearLayout();
@@ -333,15 +333,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jRatingBar_clearLayoutAll(FjEnv, FjObject);
+     jRatingBar_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jRatingBar_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jRatingBar_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jRatingBar_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jRatingBar_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -350,7 +350,7 @@ begin
   //in designing component state: result value here...
   Result:= FRating;
   if FInitialized then
-   Result:= jRatingBar_GetRating(FjEnv, FjObject);
+   Result:= jRatingBar_GetRating(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRatingBar.SetRating(_rating: single);
@@ -359,7 +359,7 @@ begin
   FRating:= _rating;
   if _rating > FNumStars then FRating:= FNumStars;
   if FInitialized then
-     jRatingBar_SetRating(FjEnv, FjObject, FRating);
+     jRatingBar_SetRating(gApp.jni.jEnv, FjObject, FRating);
 end;
 
 procedure jRatingBar.SetNumStars(_numStars: integer);
@@ -367,7 +367,7 @@ begin
   //in designing component state: set value here...
   FNumStars:= _numStars;
   if FInitialized then
-     jRatingBar_SetNumStars(FjEnv, FjObject, _numStars);
+     jRatingBar_SetNumStars(gApp.jni.jEnv, FjObject, _numStars);
 end;
 
 function jRatingBar.GetNumStars(): integer;
@@ -375,7 +375,7 @@ begin
   //in designing component state: result value here...
   Result:= FNumStars;
   if FInitialized then
-   Result:= jRatingBar_GetNumStars(FjEnv, FjObject);
+   Result:= jRatingBar_GetNumStars(gApp.jni.jEnv, FjObject);
 end;
 
 function jRatingBar.GetStepSize(): single;
@@ -383,7 +383,7 @@ begin
   //in designing component state: result value here...
   Result:= FStep;
   if FInitialized then
-   Result:= jRatingBar_GetStepSize(FjEnv, FjObject);
+   Result:= jRatingBar_GetStepSize(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jRatingBar.SetStepSize(_step: single);
@@ -391,7 +391,7 @@ begin
   //in designing component state: set value here...
   FStep:= _step;
   if FInitialized then
-     jRatingBar_SetStepSize(FjEnv, FjObject, _step);
+     jRatingBar_SetStepSize(gApp.jni.jEnv, FjObject, _step);
 end;
 
 procedure jRatingBar.SetIsIndicator(_isIndicator: boolean);
@@ -399,14 +399,14 @@ begin
   //in designing component state: set value here...
   FIsIndicator:= _isIndicator;
   if FInitialized then
-     jRatingBar_SetIsIndicator(FjEnv, FjObject, _isIndicator);
+     jRatingBar_SetIsIndicator(gApp.jni.jEnv, FjObject, _isIndicator);
 end;
 
 procedure jRatingBar.SetMax(_max: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jRatingBar_SetMax(FjEnv, FjObject, _max);
+     jRatingBar_SetMax(gApp.jni.jEnv, FjObject, _max);
 end;
 
 (*
@@ -414,7 +414,7 @@ function jRatingBar.IsIndicator(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jRatingBar_IsIndicator(FjEnv, FjObject);
+   Result:= jRatingBar_IsIndicator(gApp.jni.jEnv, FjObject);
 end;
 *)
 
@@ -423,7 +423,7 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _value;
   if FInitialized then
-     jRatingBar_SetFrameGravity(FjEnv, FjObject, Ord(FGravityInParent));
+     jRatingBar_SetFrameGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent));
 end;
 
 {-------- jRatingBar_JNI_Bridge ----------}

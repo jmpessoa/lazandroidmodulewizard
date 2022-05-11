@@ -20,7 +20,7 @@ jGdxOrthographicCamera = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -71,10 +71,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxOrthographicCamera.Init(refApp: jApp);
+procedure jGdxOrthographicCamera.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -83,56 +83,56 @@ end;
 
 function jGdxOrthographicCamera.jCreate(): jObject;
 begin
-   Result:= jGdxOrthographicCamera_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxOrthographicCamera_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxOrthographicCamera.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized and (FjObject <> nil) then
-     jGdxOrthographicCamera_jFree(FjEnv, FjObject);
+     jGdxOrthographicCamera_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxOrthographicCamera.SetToOrtho(_yDown: boolean; _viewportWidth: single; _viewportHeight: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxOrthographicCamera_SetToOrtho(FjEnv, FjObject, _yDown ,_viewportWidth ,_viewportHeight);
+     jGdxOrthographicCamera_SetToOrtho(gApp.jni.jEnv, FjObject, _yDown ,_viewportWidth ,_viewportHeight);
 end;
 
 function jGdxOrthographicCamera.GetMatrix4Combined(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxOrthographicCamera_GetMatrix4Combined(FjEnv, FjObject);
+   Result:= jGdxOrthographicCamera_GetMatrix4Combined(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxOrthographicCamera.Rotate(_angle: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxOrthographicCamera_Rotate(FjEnv, FjObject, _angle);
+     jGdxOrthographicCamera_Rotate(gApp.jni.jEnv, FjObject, _angle);
 end;
 
 procedure jGdxOrthographicCamera.Translate(_x: single; _y: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxOrthographicCamera_Translate(FjEnv, FjObject, _x ,_y);
+     jGdxOrthographicCamera_Translate(gApp.jni.jEnv, FjObject, _x ,_y);
 end;
 
 procedure jGdxOrthographicCamera.Update();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxOrthographicCamera_Update(FjEnv, FjObject);
+     jGdxOrthographicCamera_Update(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxOrthographicCamera.GetJInstance(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxOrthographicCamera_GetJInstance(FjEnv, FjObject);
+   Result:= jGdxOrthographicCamera_GetJInstance(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGdxOrthographicCamera_JNI_Bridge ----------}

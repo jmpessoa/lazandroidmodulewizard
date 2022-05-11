@@ -20,7 +20,7 @@ jUploadService = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Start(_strURL: string; _formName: string; _intentActionNotification: string);
@@ -62,11 +62,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jUploadService.Init(refApp: jApp);
+procedure jUploadService.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
 
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
@@ -75,35 +75,35 @@ end;
 
 function jUploadService.jCreate(): jObject;
 begin
-   Result:= jUploadService_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jUploadService_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jUploadService.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUploadService_jFree(FjEnv, FjObject);
+     jUploadService_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jUploadService.Start(_strURL: string; _formName: string; _intentActionNotification: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUploadService_Start(FjEnv, FjObject, _strURL ,_formName ,_intentActionNotification);
+     jUploadService_Start(gApp.jni.jEnv, FjObject, _strURL ,_formName ,_intentActionNotification);
 end;
 
 procedure jUploadService.UploadFile(_filePath: string; _fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUploadService_UploadFile(FjEnv, FjObject, _filePath ,_fileName);
+     jUploadService_UploadFile(gApp.jni.jEnv, FjObject, _filePath ,_fileName);
 end;
 
 procedure jUploadService.UploadFileFromAssets(_fileName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jUploadService_UploadFileFromAssets(FjEnv, FjObject, _fileName);
+     jUploadService_UploadFileFromAssets(gApp.jni.jEnv, FjObject, _fileName);
 end;
 
 {-------- jUploadService_JNI_Bridge ----------}

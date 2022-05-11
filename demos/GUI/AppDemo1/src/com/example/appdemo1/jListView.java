@@ -55,7 +55,7 @@ class jListItemRow {
 	int    id;
 	int widget = 0;   //there is not a widget!
 	View jWidget;     //fixed RadioButton Group default behavior: thanks to Leledumbo.
-	String widgetText;
+	String widgetText = "";
 	int widgetTextColor;
 	//int widgetInputType = -1;  //
 	
@@ -102,6 +102,8 @@ class jArrayAdapter extends ArrayAdapter {
 	public  ArrayAdapter thisAdapter;
 
 	private boolean mDispatchOnDrawItemTextColor;
+	private boolean mDispatchOnDrawItemTextCustomFont;
+
 	private boolean mDrawAllItemPartsTextColor;
 	private boolean mDispatchOnDrawItemBitmap;
 	private boolean mDispatchOnDrawItemWidgetTextColor;
@@ -114,7 +116,7 @@ class jArrayAdapter extends ArrayAdapter {
 	
     int mItemPaddingTop    = 10;
     int mItemPaddingBottom = 10;
-    // by tr3e
+    // by ADiV
     int mItemPaddingLeft   = 10; 
     int mItemPaddingRight  = 10;
     
@@ -132,20 +134,20 @@ class jArrayAdapter extends ArrayAdapter {
     int mItemImageWidgetSide = 0; // left, right, top, bottom
     
     int mDrawAlphaBackground = 0x57000000; // Alphablending for background default 22%
-    // by tr3e
+    // by ADiV
     
     Typeface mWidgetCustomFont = null;
 
 	public ValueFilter customFilter = null;
 	public int mFilterMode = 0;
 	
-	// tr3e Code optimization
+	// ADiV Code optimization
 	View      itemWidget   = null;
 	ImageView itemImage    = null;
 	TextView textViewnew   = null;
 	TextView itemTextLeft  = null; 
 	TextView itemTextRight = null;
-	// tr3e Code optimization
+	// ADiV Code optimization
 
 	private class ValueFilter extends Filter{
 
@@ -207,6 +209,8 @@ class jArrayAdapter extends ArrayAdapter {
 		//origItems = new ArrayList<jListItemRow>();
 		thisAdapter = this;
 		mDispatchOnDrawItemTextColor = true;
+		mDispatchOnDrawItemTextCustomFont = true;
+
 		mDrawAllItemPartsTextColor = true;
 		mDispatchOnDrawItemWidgetTextColor = true;
 		mDispatchOnDrawItemWidgetText = true;
@@ -243,7 +247,12 @@ class jArrayAdapter extends ArrayAdapter {
 	public void SetDispatchOnDrawItemTextColor(boolean _value) {
 		mDispatchOnDrawItemTextColor = _value;
 	}
-	
+
+	public void SetDispatchOnDrawItemTextCustomFont(boolean _value) {
+		mDispatchOnDrawItemTextCustomFont = _value;
+	}
+
+
 	public void SetDispatchOnDrawItemWidgetTextColor(boolean _value) { //+++
 		mDispatchOnDrawItemWidgetTextColor = _value;
 	}
@@ -276,7 +285,7 @@ class jArrayAdapter extends ArrayAdapter {
 	   mItemPaddingBottom =  _itemPaddingBottom;
 	}
 	
-	//by tr3e
+	//by ADiV
 	public void SetItemPaddingLeft(int _ItemPaddingLeft) { 
 		   mItemPaddingLeft = _ItemPaddingLeft;
 	}
@@ -317,7 +326,7 @@ class jArrayAdapter extends ArrayAdapter {
 		mItemImageWidgetSide = _side;
 	}
 	
-	// end by tr3e
+	// end by ADiV
 
     public void SetWidgetFontFromAssets(String _fontName) {			
          mWidgetCustomFont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);		
@@ -377,7 +386,7 @@ class jArrayAdapter extends ArrayAdapter {
 		return (ValueFilter)customFilter;
 	}
 	
-	// tr3e Code optimization
+	// ADiV Code optimization
 		private int getFaceTitle( int textDecorated ){
 			switch ( textDecorated) {
 			 case 0:  return Typeface.NORMAL;
@@ -426,7 +435,7 @@ class jArrayAdapter extends ArrayAdapter {
 				  
 				  d.setBounds( 0, 0, w, h );				  				  
 				  
-				  // by tr3e fix TextView center
+				  // by ADiV fix TextView center
 				  if( itemWidget.getClass().getName().equals("android.widget.TextView") )
 					  switch(_side) {
 					    case 0: case 1: ((TextView)itemWidget).setGravity(Gravity.CENTER_VERTICAL); break; //left, right					    
@@ -509,7 +518,7 @@ class jArrayAdapter extends ArrayAdapter {
 			
 			int leftSize  = items.get(position).leftDelimiter.length();
 			int pos1 = -1;
-			pos1     = line.indexOf(items.get(position).leftDelimiter);  //"("			
+			pos1     = line.indexOf(items.get(position).leftDelimiter);
 			
 			if (pos1 >= 0) {							   											    
 				   if ( pos1  !=  0) { 
@@ -529,7 +538,7 @@ class jArrayAdapter extends ArrayAdapter {
 						 itemTextLeft.setTextColor(items.get(position).textColor);
 					   				 
 					   itemTextLeft.setTypeface(items.get(position).typeFace, faceTitle);
-					   // tr3e fix change font size
+					   // ADiV fix change font size
 					   if (items.get(position).textSize != 0) 
 						   itemTextLeft.setTextSize(items.get(position).textSize);
 					   					   					  
@@ -576,7 +585,7 @@ class jArrayAdapter extends ArrayAdapter {
 				     }
 				     itemTextRight.setTypeface(items.get(position).typeFace, faceTitle);
 				     
-				     // tr3e fix change font size
+				     // ADiV fix change font size
 					 if (items.get(position).textSize != 0)
 						 itemTextRight.setTextSize(items.get(position).textSize);					 					 
 					 
@@ -641,7 +650,7 @@ class jArrayAdapter extends ArrayAdapter {
 		
 	}
 	
-	// tr3e Code optimization
+	// ADiV Code optimization
 
 	@Override
 	public  View getView(final int position, View v, ViewGroup parent) {
@@ -670,7 +679,7 @@ class jArrayAdapter extends ArrayAdapter {
 						
 			String line = items.get(position).label;			
 			
-			// tr3e Code optimization
+			// ADiV Code optimization
 			int faceTitle = getFaceTitle( items.get(position).textDecorated );
 			int faceBody  = getFaceBody( items.get(position).textDecorated );
 					
@@ -678,7 +687,7 @@ class jArrayAdapter extends ArrayAdapter {
 			line = getItemTextRight( line, position, faceTitle );			
 			
 			getItemImage( position );
-			// tr3e Code optimization
+			// ADiV Code optimization
 									
 			String[] lines = line.split(Pattern.quote(items.get(position).delimiter));
 						
@@ -692,11 +701,11 @@ class jArrayAdapter extends ArrayAdapter {
     		    		    		
 			for (int i=0; i < lines.length; i++) {
 
-				// tr3e Code optimization
+				// ADiV Code optimization
 				textViewnew = new TextView(ctx);
 								
 				float auxf = setTextSizeAndGetAuxf( position );
-				// tr3e Code optimization
+				// ADiV Code optimization
 				
 				itemText[i] = textViewnew;				
 				itemText[i].setPadding(mItemCenterMarginLeft, mItemPaddingTop, mItemCenterMarginRight, mItemPaddingBottom);
@@ -752,6 +761,14 @@ class jArrayAdapter extends ArrayAdapter {
 					}
 				}
 
+				if (mDispatchOnDrawItemTextCustomFont)  {
+					String _customFontName = controls.pOnListViewDrawItemCustomFont(PasObj, (int)position, lines[i]);
+					if (!_customFontName.equals("")) {
+						Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _customFontName);
+						if (customfont != null) itemText[i].setTypeface(customfont);
+					}
+				}
+
 				if (items.get(position).textAlign == 2)   //center  ***
 				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
 				
@@ -773,7 +790,7 @@ class jArrayAdapter extends ArrayAdapter {
 				case 1:  itemWidget = new CheckBox(ctx);
 					((CheckBox)itemWidget).setId(controls.getJavaNewId());
 
-					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((CheckBox)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light)); //fixed! thanks to guaracy!
 					
 					((CheckBox)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -812,7 +829,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 2:  itemWidget = new RadioButton(ctx);
 					((RadioButton)itemWidget).setId(controls.getJavaNewId());
-					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((RadioButton)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 					
 					((RadioButton)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -851,7 +868,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 3:  itemWidget = new Button(ctx);
 					((Button)itemWidget).setId(controls.getJavaNewId());
-					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((Button)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 					
 					((Button)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -888,7 +905,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 				case 4:  itemWidget = new TextView(ctx);
 					((TextView)itemWidget).setId(controls.getJavaNewId());
-					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+					((TextView)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 					
 					((TextView)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 					
@@ -925,7 +942,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 				case 5:  itemWidget = new EditText(ctx);
 				 ((EditText)itemWidget).setId(controls.getJavaNewId());
-				 ((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+				 ((EditText)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 
 				 if (items.get(position).widgetTextColor != 0) {
 					((EditText)itemWidget).setTextColor(items.get(position).widgetTextColor);
@@ -1014,7 +1031,7 @@ class jArrayAdapter extends ArrayAdapter {
 				case 6:  itemWidget = new Switch(ctx);
 				 ((Switch)itemWidget).setId(controls.getJavaNewId());
 
-				 ((Switch)itemWidget).setTextColor(controls.activity.getResources().getColor(R.color.primary_text));
+				 ((Switch)itemWidget).setTextColor(controls.activity.getResources().getColor(android.R.color.primary_text_light));
 				
 				 ((Switch)itemWidget).setPadding(0, mItemPaddingTop, 0, mItemPaddingBottom);
 
@@ -1222,7 +1239,7 @@ class jArrayAdapter extends ArrayAdapter {
 				switch(items.get(position).textAlign) {  //alLeft, alRight, alCenter    --layWidgetTextImage				
 				  case 0: {					  
 					  
-					  if( mWordWrap ) // by tr3e
+					  if( mWordWrap ) // by ADiV
 					   switch(flagItemRight) {
 					     case 0: txtParam.addRule(RelativeLayout.LEFT_OF, itemImage.getId()); break;
 					     case 1: txtParam.addRule(RelativeLayout.LEFT_OF, itemTextRight.getId()); break;					     	 
@@ -1238,7 +1255,7 @@ class jArrayAdapter extends ArrayAdapter {
 				  }						  
 				  case 1: {
 					  
-					  if( mWordWrap ) // by tr3e 
+					  if( mWordWrap ) // by ADiV 
 					   switch(flagItemLeft) {
 					     case 0: txtParam.addRule(RelativeLayout.RIGHT_OF, itemWidget.getId()); break;
 					     case 1: txtParam.addRule(RelativeLayout.RIGHT_OF, itemTextLeft.getId()); break;					     	 
@@ -1344,14 +1361,14 @@ class jArrayAdapter extends ArrayAdapter {
 			   itemLayout.addView(txtLayout, txtParam);								
 			}
 			
-			// tr3e add background color to cells
+			// ADiV add background color to cells
 			int drawItemBackColor = controls.pOnListViewDrawItemBackgroundColor(PasObj, (int)position);
 
 			if (drawItemBackColor != Color.TRANSPARENT){
 				//itemLayout.setBackgroundColor(drawItemBackColor-mDrawAlphaBackground);
                 listLayout.setBackgroundColor(drawItemBackColor-mDrawAlphaBackground);  // <<--- Fixed by jmpessoa!!!
 			}
-			// tr3e            
+			// ADiV            
             			
 			if (items.get(position).highLightColor != Color.TRANSPARENT)
 				itemLayout.setBackgroundColor(items.get(position).highLightColor);
@@ -1462,7 +1479,7 @@ class jArrayAdapter extends ArrayAdapter {
 	    					
 	    					for (int i=0; i < items.size(); i++) {
 	    						RadioButton rb = (RadioButton)items.get(i).jWidget;
-	    						// by tr3e fix bug
+	    						// by ADiV fix bug
 	    						if( rb != null ){
 	    						 rb.setChecked(false);
 	    						 items.get(i).checked = false;
@@ -1471,7 +1488,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 	    					items.get(position).checked = true;
 	    					((RadioButton)v).setChecked(true);
-	    					// by tr3e, only one call is necessary
+	    					// by ADiV, only one call is necessary
 	    					thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015
 	    					
 	    					controls.pOnClickWidgetItem(PasObj, position, true);
@@ -1527,7 +1544,7 @@ class jArrayAdapter extends ArrayAdapter {
 					
 					for (int i=0; i < items.size(); i++) {
 						RadioButton rb = (RadioButton)items.get(i).jWidget;
-						// by tr3e fix bug
+						// by ADiV fix bug
 						if( rb != null ){
 						 rb.setChecked(false);
 						 items.get(i).checked = false;
@@ -1536,7 +1553,7 @@ class jArrayAdapter extends ArrayAdapter {
 
 					items.get(position).checked = doCheck;
 					((RadioButton)items.get(position).jWidget).setChecked(doCheck);
-					// by tr3e, only one call is necessary
+					// by ADiV, only one call is necessary
 					thisAdapter.notifyDataSetChanged(); //fix 16-febr-2015
 					
 					controls.pOnClickWidgetItem(PasObj, position, doCheck);
@@ -1619,9 +1636,11 @@ public class jListView extends ListView {
     int mCurrentFirstVisibleItem;
     int mCurrentVisibleItemCount;
     int mTotalItem;
-    
+
     boolean mDisableScroll = false;
-    
+
+	//Typeface mCustomfont = null;  //TODO
+
     final ListView mListView = this;
 
 	//Constructor
@@ -1653,7 +1672,7 @@ public class jListView extends ListView {
 		typeFace = Typeface.DEFAULT;
 		
 		setBackgroundColor(0x00000000);
-		setCacheColorHint(0);		
+		setCacheColorHint(0);
 
 		alist = new ArrayList<jListItemRow>();
 		orig_alist = new ArrayList<jListItemRow>();
@@ -1779,6 +1798,10 @@ public class jListView extends ListView {
 	public void SetFastScrollEnabled(boolean _enable){
 		this.setFastScrollEnabled(_enable); 
 	}
+	
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( controls.GetDrawableResourceId(_imgResIdentifier) );			
+	}
 
 	//thanks to @renabor
 	public static boolean isEmpty(ArrayList<?> coll) {
@@ -1831,19 +1854,22 @@ public class jListView extends ListView {
 	//
 	public  void clear() {
 		lastSelectedItem = -1;
-		alist.clear();			
+		alist.clear();
+		orig_alist.clear();  //thanks to JKannes!
 		aadapter.notifyDataSetChanged();
 	}
 	
-	// by tr3e
+	// by ADiV
 	public void ClearChecked(){
-		for( int i = 0; i < alist.size(); i++ )			
-			this.setItemChecked(i, false);		
+		for( int i = 0; i < alist.size(); i++ ){
+			alist.get(i).checked = false;
+			this.setItemChecked(i, false);
+		}
 		
 		aadapter.notifyDataSetChanged();
 	}
 	
-	// by tr3e
+	// by ADiV
 	public int GetItemsChecked(){
 		int count = 0;
 		
@@ -1866,7 +1892,7 @@ public class jListView extends ListView {
 		return alist.get(index).label;        
 	}
 	
-	// by tr3e
+	// by ADiV
 	public void setItemTextByIndex( String _fullItemCaption, int index ) {
 		if( (index < 0) || (index >= alist.size()) ) return;
 		
@@ -1886,6 +1912,7 @@ public class jListView extends ListView {
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {
 		alist.clear();
+		orig_alist.clear(); //thanks to JKannes!
 		genericBmp = null;
 		alist    = null;
 		setAdapter(null);
@@ -2021,7 +2048,6 @@ public class jListView extends ListView {
 
 		alist.add(info);
 		aadapter.notifyDataSetChanged();
-
 	}
 
 	public  void add3(String item, String _delimiter, int fontColor, int fontSize, int widgetItem, String wgtText, Bitmap img) {
@@ -2184,7 +2210,7 @@ public class jListView extends ListView {
 		alist.get(index).textAlign = value;
 		aadapter.notifyDataSetChanged();
 	}
-	//by tr3e
+	//by ADiV
 	public void setTextPosition(int value, int index){
 		if( (index < 0) || (index >= alist.size()) ) return;
 		
@@ -2207,7 +2233,7 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 	
-	// tr3e add getChecker for widget
+	// ADiV add getChecker for widget
 	public boolean getWidgetCheck( int index ){
 		if( (index < 0) || (index >= alist.size()) ) return false;
 		
@@ -2247,7 +2273,7 @@ public class jListView extends ListView {
 		aadapter.notifyDataSetChanged();
 	}
 	
-	// tr3e add refresh
+	// ADiV add refresh
 	public void Refresh() {			
 		aadapter.notifyDataSetChanged();
 	}
@@ -2280,6 +2306,10 @@ public class jListView extends ListView {
 
 	public void DispatchOnDrawItemTextColor(boolean _value) {
 		aadapter.SetDispatchOnDrawItemTextColor(_value);
+	}
+
+	public void DispatchOnDrawItemTextCustomFont(boolean _value) {
+		aadapter.SetDispatchOnDrawItemTextCustomFont(_value);
 	}
 
 	public void DispatchOnDrawItemBitmap(boolean _value) {
@@ -2449,7 +2479,7 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 		aadapter.notifyDataSetChanged();
 	}
 	
-	// by tr3e	
+	// by ADiV	
 	public void SetItemPaddingLeft(int _left) { 
 		aadapter.SetItemPaddingLeft( _left);
 		aadapter.notifyDataSetChanged();
@@ -2491,7 +2521,7 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 	 aadapter.mDrawAlphaBackground = 16777216*tmpAlpha;
 	 aadapter.notifyDataSetChanged();
 	}
-	// by tr3e end
+	// by ADiV end
 
 	public void SetDrawItemBackColorAlpha(int _alpha) {
 		SetDrawAlphaBackground(_alpha);
@@ -2521,19 +2551,19 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 		aadapter.SetDispatchOnDrawItemWidgetImage(_value);
 	}
 	
-	public void SetItemCenterWordWrap(boolean _value) { // by tr3e
+	public void SetItemCenterWordWrap(boolean _value) { // by ADiV
 		aadapter.SetItemCenterWordWrap2(_value);
 	}
 	
-	public void SetEnableOnClickTextLeft(boolean _value) { // by tr3e
+	public void SetEnableOnClickTextLeft(boolean _value) { // by ADiV
 		aadapter.SetEnableOnClickTextLeft2(_value);
 	}
 	
-	public void SetEnableOnClickTextCenter(boolean _value) { // by tr3e
+	public void SetEnableOnClickTextCenter(boolean _value) { // by ADiV
 		aadapter.SetEnableOnClickTextCenter2(_value);
 	}
 	
-	public void SetEnableOnClickTextRight(boolean _value) { // by tr3e
+	public void SetEnableOnClickTextRight(boolean _value) { // by ADiV
 		aadapter.SetEnableOnClickTextRight2(_value);
 	}
 	
@@ -2613,23 +2643,31 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 		LAMWCommon.setVisibilityGone();
 	}
 
+   private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <=  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
 	//TODO
 	public String GetEnvironmentDirectoryPath(int _directory) {
 		
 		File filePath= null;
 		String absPath="";   //fail!
 		  
-		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+		//getMyEnvDir(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
 		if (_directory != 8) {		  	   	 
 		  switch(_directory) {	                       
-		    case 0:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); break;	   
-		    case 1:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); break;
-		    case 2:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC); break;
-		    case 3:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); break;
-		    case 4:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS); break;
-		    case 5:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES); break;
-		    case 6:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS); break;
-		    case 7:  filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES); break;
+		    case 0:  filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS); break;	   
+		    case 1:  filePath = getMyEnvDir(Environment.DIRECTORY_DCIM); break;
+		    case 2:  filePath = getMyEnvDir(Environment.DIRECTORY_MUSIC); break;
+		    case 3:  filePath = getMyEnvDir(Environment.DIRECTORY_PICTURES); break;
+		    case 4:  filePath = getMyEnvDir(Environment.DIRECTORY_NOTIFICATIONS); break;
+		    case 5:  filePath = getMyEnvDir(Environment.DIRECTORY_MOVIES); break;
+		    case 6:  filePath = getMyEnvDir(Environment.DIRECTORY_PODCASTS); break;
+		    case 7:  filePath = getMyEnvDir(Environment.DIRECTORY_RINGTONES); break;
 		    
 		    case 9: absPath  = this.controls.activity.getFilesDir().getAbsolutePath(); break;      //Result : /data/data/com/MyApp/files	    	    
 		    case 10: absPath = this.controls.activity.getFilesDir().getPath();
@@ -2738,5 +2776,12 @@ public String GetLeftItemCaption(String _fullItemCaption) {
         }
 	}
 
+	//TODO
+	/*
+	public void SetFontFromAssets(String _fontName) {   //   "fonts/font1.ttf"  or  "font1.ttf"
+		 mCustomfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);
+		//this.setTypeface(customfont);
+	}
+	*/
 
 }

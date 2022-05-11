@@ -37,7 +37,7 @@ jBluetoothLowEnergy = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -123,21 +123,21 @@ begin
   inherited Destroy;
 end;
 
-procedure jBluetoothLowEnergy.Init(refApp: jApp);
+procedure jBluetoothLowEnergy.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
   if FjObject = nil then exit;
 
   if FScanMode <> smLowPower then
-    jBluetoothLowEnergy_SetScanMode(FjEnv, FjObject, ord(FScanMode));
+    jBluetoothLowEnergy_SetScanMode(gApp.jni.jEnv, FjObject, ord(FScanMode));
 
   if FScanPeriod <> 5000 then
-     jBluetoothLowEnergy_SetScanPeriod(FjEnv, FjObject, FScanPeriod);
+     jBluetoothLowEnergy_SetScanPeriod(gApp.jni.jEnv, FjObject, FScanPeriod);
 
   FInitialized:= True;
 end;
@@ -145,56 +145,56 @@ end;
 
 function jBluetoothLowEnergy.jCreate(): jObject;
 begin
-   Result:= jBluetoothLowEnergy_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jBluetoothLowEnergy_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jBluetoothLowEnergy.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_jFree(FjEnv, FjObject);
+     jBluetoothLowEnergy_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetoothLowEnergy.HasSystemFeature(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothLowEnergy_HasSystemFeature(FjEnv, FjObject);
+   Result:= jBluetoothLowEnergy_HasSystemFeature(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothLowEnergy.DisconnectGattServer();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_disconnectGattServer(FjEnv, FjObject);
+     jBluetoothLowEnergy_disconnectGattServer(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothLowEnergy.StartScan();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_StartScan(FjEnv, FjObject);
+     jBluetoothLowEnergy_StartScan(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothLowEnergy.StopScan();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_StopScan(FjEnv, FjObject);
+     jBluetoothLowEnergy_StopScan(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jBluetoothLowEnergy.ConnectDevice(_deviceAddress: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_ConnectDevice(FjEnv, FjObject, _deviceAddress);
+     jBluetoothLowEnergy_ConnectDevice(gApp.jni.jEnv, FjObject, _deviceAddress);
 end;
 
 procedure jBluetoothLowEnergy.StartScan(_filterServiceUUID: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_StartScan(FjEnv, FjObject, _filterServiceUUID);
+     jBluetoothLowEnergy_StartScan(gApp.jni.jEnv, FjObject, _filterServiceUUID);
 end;
 
 procedure jBluetoothLowEnergy.SetScanPeriod(_milliSeconds: int64);
@@ -202,7 +202,7 @@ begin
   //in designing component state: set value here...
   FScanPeriod:= _milliSeconds;
   if FInitialized then
-     jBluetoothLowEnergy_SetScanPeriod(FjEnv, FjObject, _milliSeconds);
+     jBluetoothLowEnergy_SetScanPeriod(gApp.jni.jEnv, FjObject, _milliSeconds);
 end;
 
 procedure jBluetoothLowEnergy.SetScanMode(_mode: TBLEScanMode);
@@ -210,42 +210,42 @@ begin
   //in designing component state: set value here...
   FScanMode:= _mode;
   if FInitialized then
-     jBluetoothLowEnergy_SetScanMode(FjEnv, FjObject, ord(_mode));
+     jBluetoothLowEnergy_SetScanMode(gApp.jni.jEnv, FjObject, ord(_mode));
 end;
 
 procedure jBluetoothLowEnergy.DiscoverServices();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_DiscoverServices(FjEnv, FjObject);
+     jBluetoothLowEnergy_DiscoverServices(gApp.jni.jEnv, FjObject);
 end;
 
 function jBluetoothLowEnergy.GetCharacteristics(_serviceIndex: integer): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothLowEnergy_GetCharacteristics(FjEnv, FjObject, _serviceIndex);
+   Result:= jBluetoothLowEnergy_GetCharacteristics(gApp.jni.jEnv, FjObject, _serviceIndex);
 end;
 
 function jBluetoothLowEnergy.GetCharacteristicProperties(_serviceIndex: integer; _characteristicIndex: integer): TBLECharacteristicProperty;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= TBLECharacteristicProperty(jBluetoothLowEnergy_GetCharacteristicProperties(FjEnv, FjObject, _serviceIndex ,_characteristicIndex));
+   Result:= TBLECharacteristicProperty(jBluetoothLowEnergy_GetCharacteristicProperties(gApp.jni.jEnv, FjObject, _serviceIndex ,_characteristicIndex));
 end;
 
 function jBluetoothLowEnergy.GetDescriptors(_serviceIndex: integer; _characteristicIndex: integer): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jBluetoothLowEnergy_GetDescriptors(FjEnv, FjObject, _serviceIndex ,_characteristicIndex);
+   Result:= jBluetoothLowEnergy_GetDescriptors(gApp.jni.jEnv, FjObject, _serviceIndex ,_characteristicIndex);
 end;
 
 procedure jBluetoothLowEnergy.ReadCharacteristic(_serviceIndex: integer; _characteristicIndex: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jBluetoothLowEnergy_ReadCharacteristic(FjEnv, FjObject, _serviceIndex ,_characteristicIndex);
+     jBluetoothLowEnergy_ReadCharacteristic(gApp.jni.jEnv, FjObject, _serviceIndex ,_characteristicIndex);
 end;
 
 procedure jBluetoothLowEnergy.GenEvent_OnBluetoothLEConnected(Sender:TObject;deviceName:string;deviceAddress:string;bondState: integer);

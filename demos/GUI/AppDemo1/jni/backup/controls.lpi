@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <LRSInOutputDirectory Value="False"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
+      <Title Value="controls"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <CustomData Count="11">
+      <Item0 Name="BuildSystem" Value="Gradle"/>
+      <Item1 Name="LAMW" Value="GUI"/>
+      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
+      <Item3 Name="MinSdk" Value="14"/>
+      <Item4 Name="NdkApi" Value="android-22"/>
+      <Item5 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r22\"/>
+      <Item6 Name="Package" Value="com.example.appdemo1"/>
+      <Item7 Name="SdkPath" Value="C:\Users\sotrafa\AppData\Local\Android\Sdk\"/>
+      <Item8 Name="StartModule" Value="AndroidModule1"/>
+      <Item9 Name="Support" Value="FALSE"/>
+      <Item10 Name="Theme" Value="DeviceDefault"/>
+    </CustomData>
+    <BuildModes Count="1">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="tfpandroidbridge_pack"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="16">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jForm;jImageList;jImageView;jTextView;jTimer"/>
+        </CustomData>
+      </Unit1>
+      <Unit2>
+        <Filename Value="unit2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule2"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jImageList;jImageView;jTextView"/>
+        </CustomData>
+      </Unit2>
+      <Unit3>
+        <Filename Value="unit3.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule3"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCheckBox;jDialogProgress;jDialogYN;jEditText;jImageList;jImageView;jProgressBar;jRadioButton;jTextView;jTimer"/>
+        </CustomData>
+      </Unit3>
+      <Unit4>
+        <Filename Value="unit4.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule4"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jEditText;jScrollView;jTextView"/>
+        </CustomData>
+      </Unit4>
+      <Unit5>
+        <Filename Value="unit5.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule5"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jEditText;jPanel;jTextView;jWebView"/>
+        </CustomData>
+      </Unit5>
+      <Unit6>
+        <Filename Value="unit6.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule6"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jBitmap;jButton;jEditText;jImageList;jListView;jTextView"/>
+        </CustomData>
+      </Unit6>
+      <Unit7>
+        <Filename Value="unit7.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule7"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jImageBtn;jImageList;jImageView;jScrollView;jTextView"/>
+        </CustomData>
+      </Unit7>
+      <Unit8>
+        <Filename Value="unit8.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule8"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jImageView;jTextView;jView"/>
+        </CustomData>
+      </Unit8>
+      <Unit9>
+        <Filename Value="unit9.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule9"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jBitmap;jButton;jCanvas;jImageList;jTextView;jView"/>
+        </CustomData>
+      </Unit9>
+      <Unit10>
+        <Filename Value="unit10.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule10"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jForm"/>
+        </CustomData>
+      </Unit10>
+      <Unit11>
+        <Filename Value="unit11.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule11"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCanvasES2;jImageList;jTextView;jTimer"/>
+        </CustomData>
+      </Unit11>
+      <Unit12>
+        <Filename Value="unit12.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule12"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCanvasES1;jImageList;jTextView"/>
+        </CustomData>
+      </Unit12>
+      <Unit13>
+        <Filename Value="unit13.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule13"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCanvasES2;jTextView;jTimer"/>
+        </CustomData>
+      </Unit13>
+      <Unit14>
+        <Filename Value="unit14.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule14"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCheckBox;jEditText;jHttpClient;jProgressBar;jScrollView;jTextView;jTimer"/>
+        </CustomData>
+      </Unit14>
+      <Unit15>
+        <Filename Value="unitglobal.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit15>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="..\libs\x86\libcontrols"/>
+    </Target>
+    <SearchPaths>
+      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\i686-linux-android\22\;C:\laztoapk\downloads\android-ndk-r22\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\x86-linux-android\4.9.x\"/>
+      <UnitOutputDirectory Value="..\obj\controls"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <SyntaxMode Value="Delphi"/>
+        <CStyleMacros Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <TargetCPU Value="i386"/>
+      <TargetOS Value="android"/>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="False"/>
+        <StripSymbols Value="True"/>
+      </Debugging>
+      <LinkSmart Value="True"/>
+      <Options>
+        <ExecutableType Value="Library"/>
+      </Options>
+    </Linking>
+    <Other>
+      <CustomOptions Value="-Xd -XPi686-linux-android- -FDC:\laztoapk\downloads\android-ndk-r22\toolchains\x86-4.9\prebuilt\windows-x86_64\bin"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

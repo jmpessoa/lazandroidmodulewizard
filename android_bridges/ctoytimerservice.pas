@@ -22,7 +22,7 @@ jcToyTimerService = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure Stop();
@@ -77,11 +77,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcToyTimerService.Init(refApp: jApp);
+procedure jcToyTimerService.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -93,70 +93,70 @@ end;
 
 function jcToyTimerService.jCreate(): jObject;
 begin
-   Result:= jcToyTimerService_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcToyTimerService_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcToyTimerService.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_jFree(FjEnv, FjObject);
+     jcToyTimerService_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.Stop();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_Stop(FjEnv, FjObject);
+     jcToyTimerService_Stop(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.TimerOff();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_TimerOff(FjEnv, FjObject);
+     jcToyTimerService_TimerOff(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.TimerOn();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_TimerOn(FjEnv, FjObject);
+     jcToyTimerService_TimerOn(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.Start();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_Start(FjEnv, FjObject);
+     jcToyTimerService_Start(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.Bind();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_Bind(FjEnv, FjObject);
+     jcToyTimerService_Bind(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.UnBind();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_UnBind(FjEnv, FjObject);
+     jcToyTimerService_UnBind(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.RunForeground();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcToyTimerService_RunForeground(FjEnv, FjObject);
+     jcToyTimerService_RunForeground(gApp.jni.jEnv, FjObject);
 end;
 
 function jcToyTimerService.IsTimerRunning(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcToyTimerService_IsTimerRunning(FjEnv, FjObject);
+   Result:= jcToyTimerService_IsTimerRunning(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcToyTimerService.GenEvent_OnToyTimerServicePullElapsedTime(Sender:TObject;elapsedTime:int64);

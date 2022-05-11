@@ -40,7 +40,7 @@ jTCPSocketClient = class(jControl)
 
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -110,10 +110,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jTCPSocketClient.Init(refApp: jApp);
+procedure jTCPSocketClient.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -122,14 +122,14 @@ end;
 
 function jTCPSocketClient.jCreate(): jObject;
 begin
-   Result:= jTCPSocketClient_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jTCPSocketClient_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jTCPSocketClient.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'jFree');
+     jni_proc(gApp.jni.jEnv, FjObject, 'jFree');
 end;
 
 function jTCPSocketClient.SendMessage(message: string) : boolean;
@@ -137,7 +137,7 @@ begin
 
   //in designing component state: set value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'SendMessage', message);
+   Result:= jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'SendMessage', message);
 
 end;
 
@@ -145,70 +145,70 @@ function jTCPSocketClient.SendFile(fullPath: string) : boolean;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     Result := jni_func_t_out_z(FjEnv, FjObject, 'SendFile', fullPath);
+     Result := jni_func_t_out_z(gApp.jni.jEnv, FjObject, 'SendFile', fullPath);
 end;
 
 function jTCPSocketClient.SetGetFile(fullPath: string; fileSize: integer) : boolean;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     Result := jni_func_ti_out_z(FjEnv, FjObject, 'SetGetFile', fullPath, fileSize);
+     Result := jni_func_ti_out_z(gApp.jni.jEnv, FjObject, 'SetGetFile', fullPath, fileSize);
 end;
 
 procedure jTCPSocketClient.CloseConnection();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'CloseConnection');
+     jni_proc(gApp.jni.jEnv, FjObject, 'CloseConnection');
 end;
 
 function jTCPSocketClient.ConnectAsync(_serverIP: string; _serverPort: integer): boolean; overload;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ti_out_z(FjEnv, FjObject, 'Connect', _serverIP ,_serverPort);
+   Result:= jni_func_ti_out_z(gApp.jni.jEnv, FjObject, 'Connect', _serverIP ,_serverPort);
 end;
 
 function jTCPSocketClient.ConnectAsyncTimeOut(_serverIP: string; _serverPort: integer; _timeOut: integer): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tii_out_z(FjEnv, FjObject, 'Connect', _serverIP ,_serverPort ,_timeOut);
+   Result:= jni_func_tii_out_z(gApp.jni.jEnv, FjObject, 'Connect', _serverIP ,_serverPort ,_timeOut);
 end;
 
 function jTCPSocketClient.IsConnected(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'isConnected');
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'isConnected');
 end;
 
 procedure jTCPSocketClient.SetSendFileProgressStep(_bytes: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSendFileProgressStep', _bytes);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetSendFileProgressStep', _bytes);
 end;
 
 procedure jTCPSocketClient.SetTimeOut(_millisecondsTimeOut: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetTimeOut', _millisecondsTimeOut);
+     jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTimeOut', _millisecondsTimeOut);
 end;
 
 function jTCPSocketClient.SendBytes(var _jbyteArray: TDynArrayOfJByte; _writeLength: boolean): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_dab_z_out_z(FjEnv, FjObject, 'SendBytes', _jbyteArray ,_writeLength);
+   Result:= jni_func_dab_z_out_z(gApp.jni.jEnv, FjObject, 'SendBytes', _jbyteArray ,_writeLength);
 end;
 
 function jTCPSocketClient.SetDataTransferMode(_dataTransferMode: TDataTransferMode) : boolean;
 begin
   //in designing component state: set value here...
   if FInitialized then
-     Result := jni_func_i_out_z(FjEnv, FjObject, 'SetDataTransferMode', Ord(_dataTransferMode));
+     Result := jni_func_i_out_z(gApp.jni.jEnv, FjObject, 'SetDataTransferMode', Ord(_dataTransferMode));
 end;
 
 procedure jTCPSocketClient.GenEvent_OnTCPSocketClientMessagesReceived(Sender: TObject; messageReceived: string);

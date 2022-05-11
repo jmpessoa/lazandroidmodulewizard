@@ -25,7 +25,7 @@ jZoomableImageView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -123,7 +123,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jZoomableImageView.Init(refApp: jApp);
+procedure jZoomableImageView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -131,25 +131,25 @@ begin
 
  if not FInitialized then
  begin
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
   if FjObject = nil then exit;
 
   if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
   FjPRLayoutHome:= FjPRLayout;
 
 
-  jZoomableImageView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jZoomableImageView_SetId(FjEnv, FjObject, Self.Id);
+  jZoomableImageView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+  jZoomableImageView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
 
-  jZoomableImageView_SetMaxZoom(FjEnv, FjObject, FMaxZoom);
+  jZoomableImageView_SetMaxZoom(gApp.jni.jEnv, FjObject, FMaxZoom);
  end;
 
-  jZoomableImageView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  jZoomableImageView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                         sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -158,30 +158,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jZoomableImageView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jZoomableImageView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jZoomableImageView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jZoomableImageView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jZoomableImageView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jZoomableImageView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
  if not FInitialized then
  begin
   FInitialized := true;
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+  View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
  end;
 end;
 
@@ -189,13 +189,13 @@ procedure jZoomableImageView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jZoomableImageView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jZoomableImageView.UpdateLayout;
@@ -207,14 +207,14 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 
 end;
 
 procedure jZoomableImageView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.ClearLayout;
@@ -225,15 +225,15 @@ begin
 
    if not FInitialized then Exit;
 
-  jZoomableImageView_ClearLayoutAll(FjEnv, FjObject );
+  jZoomableImageView_ClearLayoutAll(gApp.jni.jEnv, FjObject );
 
    for rToP := rpBottom to rpCenterVertical do
       if rToP in FPositionRelativeToParent then
-        jZoomableImageView_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+        jZoomableImageView_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
    for rToA := raAbove to raAlignRight do
      if rToA in FPositionRelativeToAnchor then
-       jZoomableImageView_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       jZoomableImageView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 
 end;
 
@@ -245,126 +245,126 @@ end;
 
 function jZoomableImageView.jCreate(): jObject;
 begin
-   Result:= jZoomableImageView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jZoomableImageView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jZoomableImageView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_jFree(FjEnv, FjObject);
+     jZoomableImageView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jZoomableImageView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jZoomableImageView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jZoomableImageView_GetParent(FjEnv, FjObject);
+   Result:= jZoomableImageView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_RemoveFromViewParent(FjEnv, FjObject);
+     jZoomableImageView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jZoomableImageView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jZoomableImageView_GetView(FjEnv, FjObject);
+   Result:= jZoomableImageView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetLParamWidth(FjEnv, FjObject, _w);
+     jZoomableImageView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jZoomableImageView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetLParamHeight(FjEnv, FjObject, _h);
+     jZoomableImageView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jZoomableImageView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jZoomableImageView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jZoomableImageView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jZoomableImageView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jZoomableImageView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jZoomableImageView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetLGravity(FjEnv, FjObject, _g);
+     jZoomableImageView_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jZoomableImageView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetLWeight(FjEnv, FjObject, _w);
+     jZoomableImageView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jZoomableImageView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jZoomableImageView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jZoomableImageView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jZoomableImageView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jZoomableImageView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jZoomableImageView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jZoomableImageView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jZoomableImageView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jZoomableImageView.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_ClearLayoutAll(FjEnv, FjObject);
+     jZoomableImageView_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.SetImage(_bitmap: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jZoomableImageView_SetImage(FjEnv, FjObject, _bitmap);
+     jZoomableImageView_SetImage(gApp.jni.jEnv, FjObject, _bitmap);
 end;
 
 procedure jZoomableImageView.SetMaxZoom(_maxZoom: single);
@@ -374,7 +374,7 @@ begin
 
   FMaxZoom:= _maxZoom;
   if FInitialized then
-     jZoomableImageView_SetMaxZoom(FjEnv, FjObject, _maxZoom);
+     jZoomableImageView_SetMaxZoom(gApp.jni.jEnv, FjObject, _maxZoom);
 end;
 
 function jZoomableImageView.GetMaxZoom(): single;
@@ -382,14 +382,14 @@ begin
   //in designing component state: result value here...
   Result:= FMaxZoom;
   if FInitialized then
-   Result:= jZoomableImageView_GetMaxZoom(FjEnv, FjObject);
+   Result:= jZoomableImageView_GetMaxZoom(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jZoomableImageView.SetImageByResIdentifier(_imageResIdentifier: string);
 begin
   FimageIdentifier:= _imageResIdentifier;
   if FInitialized then
-     jZoomableImageView_SetImageByResIdentifier(FjEnv, FjObject , _imageResIdentifier);
+     jZoomableImageView_SetImageByResIdentifier(gApp.jni.jEnv, FjObject , _imageResIdentifier);
 end;
 
 {-------- jZoomableImageView_JNI_Bridge ----------}

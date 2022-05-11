@@ -64,7 +64,7 @@ jcBluetoothSPP = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -192,11 +192,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcBluetoothSPP.Init(refApp: jApp);
+procedure jcBluetoothSPP.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
@@ -208,119 +208,119 @@ end;
 
 function jcBluetoothSPP.jCreate(): jObject;
 begin
-   Result:= jcBluetoothSPP_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcBluetoothSPP_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcBluetoothSPP.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_jFree(FjEnv, FjObject);
+     jcBluetoothSPP_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.IsBluetoothEnabled(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_IsBluetoothEnabled(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_IsBluetoothEnabled(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.Enable();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_Enable(FjEnv, FjObject);
+     jcBluetoothSPP_Enable(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.IsBluetoothAvailable(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_IsBluetoothAvailable(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_IsBluetoothAvailable(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.IsServiceAvailable(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_IsServiceAvailable(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_IsServiceAvailable(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.SetupAndStartService(_isAndroid: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_StartService(FjEnv, FjObject, _isAndroid);
+     jcBluetoothSPP_StartService(gApp.jni.jEnv, FjObject, _isAndroid);
 end;
 
 procedure jcBluetoothSPP.StopService();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_StopService(FjEnv, FjObject);
+     jcBluetoothSPP_StopService(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.Send(_messageData: string; _CrLf: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_Send(FjEnv, FjObject, _messageData ,_CrLf);
+     jcBluetoothSPP_Send(gApp.jni.jEnv, FjObject, _messageData ,_CrLf);
 end;
 
 procedure jcBluetoothSPP.Send(var _jbyteArrayData: TDynArrayOfJByte; _CrLf: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_Send(FjEnv, FjObject, _jbyteArrayData ,_CrLf);
+     jcBluetoothSPP_Send(gApp.jni.jEnv, FjObject, _jbyteArrayData ,_CrLf);
 end;
 
 procedure jcBluetoothSPP.AutoConnect(_keywordForFilterPairedDevice: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_AutoConnect(FjEnv, FjObject, _keywordForFilterPairedDevice);
+     jcBluetoothSPP_AutoConnect(gApp.jni.jEnv, FjObject, _keywordForFilterPairedDevice);
 end;
 
 function jcBluetoothSPP.GetActivityDeviceListClass(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_GetActivityDeviceListClass(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_GetActivityDeviceListClass(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.StartActivityDeviceListForResult();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_StartActivityDeviceListForResult(FjEnv, FjObject);
+     jcBluetoothSPP_StartActivityDeviceListForResult(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.Connect(_intentData: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_Connect(FjEnv, FjObject, _intentData);
+     jcBluetoothSPP_Connect(gApp.jni.jEnv, FjObject, _intentData);
 end;
 
 procedure jcBluetoothSPP.Connect(_address: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_Connect(FjEnv, FjObject, _address);
+     jcBluetoothSPP_Connect(gApp.jni.jEnv, FjObject, _address);
 end;
 
 function jcBluetoothSPP.GetConnectedDeviceAddress(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_GetConnectedDeviceAddress(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_GetConnectedDeviceAddress(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.GetConnectedDeviceName(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_GetConnectedDeviceName(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_GetConnectedDeviceName(gApp.jni.jEnv, FjObject);
 end;
 
 
@@ -328,77 +328,77 @@ function jcBluetoothSPP.GetPairedDeviceAddress(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_GetPairedDeviceAddress(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_GetPairedDeviceAddress(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.GetPairedDeviceName(): TDynArrayOfString;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_GetPairedDeviceName(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_GetPairedDeviceName(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.Disconnect();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_Disconnect(FjEnv, FjObject);
+     jcBluetoothSPP_Disconnect(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.IsAutoConnecting(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_IsAutoConnecting(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_IsAutoConnecting(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.CancelDiscovery();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_CancelDiscovery(FjEnv, FjObject);
+     jcBluetoothSPP_CancelDiscovery(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.IsDiscovering(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_IsDiscovery(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_IsDiscovery(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.GetIntentActionEnableBluetooth(): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcBluetoothSPP_GetIntentActionEnableBluetooth(FjEnv, FjObject);
+   Result:= jcBluetoothSPP_GetIntentActionEnableBluetooth(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcBluetoothSPP.StartActivityEnableBluetoothForResult();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_StartActivityEnableBluetoothForResult(FjEnv, FjObject);
+     jcBluetoothSPP_StartActivityEnableBluetoothForResult(gApp.jni.jEnv, FjObject);
 end;
 
 function jcBluetoothSPP.GetConnectionState(): TBluetoothSPPConnectionState;
 begin
   //in designing component state: result value here...
   if FInitialized then
-     Result:= TBluetoothSPPConnectionState( jcBluetoothSPP_GetConnectionState(FjEnv, FjObject) );
+     Result:= TBluetoothSPPConnectionState( jcBluetoothSPP_GetConnectionState(gApp.jni.jEnv, FjObject) );
 end;
 
 function jcBluetoothSPP.GetConnectionStateAutoExtra(): TBluetoothSPPConnectionState;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= TBluetoothSPPConnectionState(jcBluetoothSPP_GetConnectionStateAutoExtra(FjEnv, FjObject));
+   Result:= TBluetoothSPPConnectionState(jcBluetoothSPP_GetConnectionStateAutoExtra(gApp.jni.jEnv, FjObject));
 end;
 
 procedure jcBluetoothSPP.SetDeviceTarget(_deviceTargetIsAndroid: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcBluetoothSPP_SetDeviceTarget(FjEnv, FjObject, _deviceTargetIsAndroid);
+     jcBluetoothSPP_SetDeviceTarget(gApp.jni.jEnv, FjObject, _deviceTargetIsAndroid);
 end;
 
 function jcBluetoothSPP.ToSignedByte(b: byte): shortint;

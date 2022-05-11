@@ -38,7 +38,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function GetDeviceInfo(Kind: TDeviceInfoKind): string;
@@ -258,29 +258,29 @@ begin
   inherited Destroy;
 end;
 
-procedure jMidiManager.Init(refApp: jApp);
+procedure jMidiManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp);
+  inherited Init;
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
 end;
 
 function jMidiManager.jCreate(): jObject;
 begin
-  Result:= jMidiManager_jCreate(FjEnv, FjThis , int64(Self));
+  Result:= jMidiManager_jCreate(gApp.jni.jEnv, gApp.jni.jThis , int64(Self));
 end;
 
 procedure jMidiManager.jFree();
 begin
   if FInitialized then
-     jMidiManager_jFree(FjEnv, FjObject);
+     jMidiManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jMidiManager.GetDeviceInfo(Kind: TDeviceInfoKind): string;
 begin
   if FInitialized then
-    result := jMidiManager_GetDeviceInfo(FjEnv, FjObject, ord(Kind))
+    result := jMidiManager_GetDeviceInfo(gApp.jni.jEnv, FjObject, ord(Kind))
   else
     result := '';
 end;
@@ -288,7 +288,7 @@ end;
 function jMidiManager.GetDebug: string;
 begin
   if FInitialized then
-    result := jMidiManager_GetDebug(FjEnv, FjObject)
+    result := jMidiManager_GetDebug(gApp.jni.jEnv, FjObject)
   else
     result := '';
 end;
@@ -318,7 +318,7 @@ end;
 function jMidiManager.SendMidiMessage(b1, b2, b3: integer; timestamp: int64): integer;
 begin
   if FInitialized then
-    result := jMidiManager_SendMidiMessage(FjEnv, FjObject, b1, b2, b3, timestamp)
+    result := jMidiManager_SendMidiMessage(gApp.jni.jEnv, FjObject, b1, b2, b3, timestamp)
   else
     result := -1;
 end;
@@ -360,7 +360,7 @@ end;
 function jMidiManager.DoAction(_cmd: integer; _param: int64): integer;
 begin
   if FInitialized then
-    result := jMidiManager_DoAction(FjEnv, FjObject, _cmd, _param)
+    result := jMidiManager_DoAction(gApp.jni.jEnv, FjObject, _cmd, _param)
   else
     result := -1;
 end;
@@ -418,7 +418,7 @@ function jMidiManager.OpenIO(InputOutput: AnsiString; DeviceId, PortNumber: inte
 var T: Int64; NewStatus: integer;
 begin
   if FInitialized and (DeviceId>=0) and (PortNumber>=0) then begin
-    result := jMidiManager_MidiOpen(FjEnv, FjObject,
+    result := jMidiManager_MidiOpen(gApp.jni.jEnv, FjObject,
       PChar('midiOpen'+InputOutput), DeviceId, PortNumber);
     T := GetTickCount64 + 500; // let's take half a second to check if port is opened
     repeat

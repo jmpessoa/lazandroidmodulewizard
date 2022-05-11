@@ -517,5 +517,36 @@ public class jCanvas {
 		return mCanvas;
 	}
 
+	public float GetTextHeight(String _text) {
+		Rect rect = new Rect();
+		mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+		return rect.height();
+	}
+
+	public float GetTextWidth(String _text) {
+		Rect rect = new Rect();
+		mTextPaint.getTextBounds(_text, 0, _text.length(), rect);
+		return rect.width();
+	}
+
+	public void SetFontAndTextTypeFace(int fontFace, int fontStyle) {
+		Typeface t = null;
+		switch (fontFace) {
+			case 0: {
+				t = Typeface.DEFAULT;
+				break;}
+			case 1: {
+				t = Typeface.SANS_SERIF;
+				break;}
+			case 2: {
+				t = Typeface.SERIF;
+				break;}
+			case 3:{
+				t = Typeface.MONOSPACE;
+				break;}
+		}  //fontStyle = (tfNormal/0, tfBold/1, tfItalic/2, tfBoldItalic/3); //Typeface.BOLD_ITALIC
+		mTextPaint.setTypeface(Typeface.create(t, fontStyle));
+	}
+
 }
 

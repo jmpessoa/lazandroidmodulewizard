@@ -142,6 +142,10 @@ public class jHttpClient /*extends ...*/ {
         if (client3 != null) client3.disconnect();
     }
 
+    public void Free() {
+        jFree();
+    }
+
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
@@ -206,12 +210,12 @@ public class jHttpClient /*extends ...*/ {
     }
 
     //by renabor
-    public void AddValueForPost2(String Name, String Value) {  //Pascal: AddPostNameValueData
+    public void AddNameValueData(String Name, String Value) {  //Pascal: AddValueForPost2
         ValuesForPost.put(Name, Value);
     }
 
     //by renabor
-    public void ClearPost2Values() { // Pascal: ClearPostNameValueData
+    public void ClearNameValueData() {
         ValuesForPost.clear();
     }
 
@@ -1181,7 +1185,8 @@ public class jHttpClient /*extends ...*/ {
 	 	        //Match the pattern string in provided string
 	 	        Matcher matcher = pattern.matcher(inputString);
 	 	        
-	 	        if ((null != matcher) && matcher.find())
+	 	        if (matcher != null)
+	 	         if (matcher.find())
 	 	            return matcher.group(1);	 	        
 
 	 	    }catch (PatternSyntaxException ex) {
@@ -1203,6 +1208,8 @@ public class jHttpClient /*extends ...*/ {
 	     	    URLConnection uc = null;
 	     	    StringBuilder urlData = new StringBuilder();
 	     	    
+	     	    if (urlData == null) return "";
+	     	    
 	     	    URL url;
 	     	   
 	     	    try{
@@ -1210,6 +1217,8 @@ public class jHttpClient /*extends ...*/ {
 	     	    } catch (MalformedURLException e) {
 	     	     return "";
 	     	    }
+	     	    
+	     	    if(url == null) return "";
 	     	    
 	     	    try{
 	     	     uc = url.openConnection();
@@ -1220,7 +1229,7 @@ public class jHttpClient /*extends ...*/ {
 	     	     
 	     	     inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
 	     	     
-	     	     if (null != inReader) {
+	     	     if (inReader != null) {
 	     	        String str = "";
 	     	        while ((str = inReader.readLine()) != null) {
 	     	                       urlData.append(str);
@@ -1417,7 +1426,7 @@ public class jHttpClient /*extends ...*/ {
                 }
                 if (conn != null) conn.disconnect();
             }
-            return null;
+            return "";
         }
 
         @Override
@@ -1475,7 +1484,7 @@ public class jHttpClient /*extends ...*/ {
         boolean saveEncodeState = encodeValue;
         unvaluedName = disregard;
         encodeValue =false;                               //not encode ValueData
-        AddValueForPost2(disregard,_SOAPData);
+        AddNameValueData(disregard,_SOAPData);
         PostNameValueDataAsync(_stringUrl); //http://192.168.1.3/soap/IOSW
         encodeValue = saveEncodeState;                 //not encode ValueData
         unvaluedName = "SOAPBODY";

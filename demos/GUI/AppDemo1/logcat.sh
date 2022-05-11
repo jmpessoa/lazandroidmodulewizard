@@ -1,1 +1,1 @@
-/laztoapk/downloads/android-sdk-windows/platform-tools/adb logcat &
+/Users/sotrafa/AppData/Local/Android/Sdk/platform-tools/adb logcat &

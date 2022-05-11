@@ -23,7 +23,7 @@ jsCollapsingToolbarLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -127,27 +127,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jsCollapsingToolbarLayout.Init(refApp: jApp);
+procedure jsCollapsingToolbarLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jsCollapsingToolbarLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsCollapsingToolbarLayout_SetId(FjEnv, FjObject, Self.Id);
+   jsCollapsingToolbarLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsCollapsingToolbarLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsCollapsingToolbarLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsCollapsingToolbarLayout_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -156,33 +156,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsCollapsingToolbarLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsCollapsingToolbarLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsCollapsingToolbarLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsCollapsingToolbarLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsCollapsingToolbarLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsCollapsingToolbarLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsCollapsingToolbarLayout_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsCollapsingToolbarLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -190,13 +190,13 @@ procedure jsCollapsingToolbarLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsCollapsingToolbarLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsCollapsingToolbarLayout.UpdateLayout;
@@ -207,13 +207,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsCollapsingToolbarLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -224,56 +224,56 @@ end;
 
 function jsCollapsingToolbarLayout.jCreate(): jObject;
 begin
-   Result:= jsCollapsingToolbarLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsCollapsingToolbarLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsCollapsingToolbarLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_jFree(FjEnv, FjObject);
+     jsCollapsingToolbarLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCollapsingToolbarLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsCollapsingToolbarLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsCollapsingToolbarLayout.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsCollapsingToolbarLayout_GetParent(FjEnv, FjObject);
+   Result:= jsCollapsingToolbarLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCollapsingToolbarLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jsCollapsingToolbarLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsCollapsingToolbarLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsCollapsingToolbarLayout_GetView(FjEnv, FjObject);
+   Result:= jsCollapsingToolbarLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCollapsingToolbarLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jsCollapsingToolbarLayout_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsCollapsingToolbarLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jsCollapsingToolbarLayout_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsCollapsingToolbarLayout.GetWidth(): integer;
@@ -284,7 +284,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jsCollapsingToolbarLayout_getLParamWidth(FjEnv, FjObject );
+   Result:= jsCollapsingToolbarLayout_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jsCollapsingToolbarLayout.GetHeight(): integer;
@@ -295,49 +295,49 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jsCollapsingToolbarLayout_getLParamHeight(FjEnv, FjObject );
+   Result:= jsCollapsingToolbarLayout_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jsCollapsingToolbarLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetLGravity(FjEnv, FjObject, _g);
+     jsCollapsingToolbarLayout_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jsCollapsingToolbarLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetLWeight(FjEnv, FjObject, _w);
+     jsCollapsingToolbarLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsCollapsingToolbarLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsCollapsingToolbarLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsCollapsingToolbarLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsCollapsingToolbarLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsCollapsingToolbarLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsCollapsingToolbarLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsCollapsingToolbarLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsCollapsingToolbarLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsCollapsingToolbarLayout.ClearLayout();
@@ -348,15 +348,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsCollapsingToolbarLayout_clearLayoutAll(FjEnv, FjObject);
+     jsCollapsingToolbarLayout_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsCollapsingToolbarLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsCollapsingToolbarLayout_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsCollapsingToolbarLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsCollapsingToolbarLayout_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -364,63 +364,63 @@ procedure jsCollapsingToolbarLayout.SetScrollFlag(_collapsingScrollFlag: TCollap
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetScrollFlag(FjEnv, FjObject, Ord(_collapsingScrollFlag) );
+     jsCollapsingToolbarLayout_SetScrollFlag(gApp.jni.jEnv, FjObject, Ord(_collapsingScrollFlag) );
 end;
 
 procedure jsCollapsingToolbarLayout.SetCollapseMode(_collapsemode: TCollapsingMode);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetCollapseMode(FjEnv, FjObject, Ord(_collapsemode));
+     jsCollapsingToolbarLayout_SetCollapseMode(gApp.jni.jEnv, FjObject, Ord(_collapsemode));
 end;
 
 procedure jsCollapsingToolbarLayout.SetExpandedTitleColorTransparent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetExpandedTitleColorTransparent(FjEnv, FjObject);
+     jsCollapsingToolbarLayout_SetExpandedTitleColorTransparent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCollapsingToolbarLayout.SetExpandedTitleColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetExpandedTitleColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsCollapsingToolbarLayout_SetExpandedTitleColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsCollapsingToolbarLayout.SetExpandedTitleGravity(_gravity: TLayoutGravity);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetExpandedTitleGravity(FjEnv, FjObject, Ord(_gravity));
+     jsCollapsingToolbarLayout_SetExpandedTitleGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jsCollapsingToolbarLayout.SetCollapsedTitleTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetCollapsedTitleTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsCollapsingToolbarLayout_SetCollapsedTitleTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsCollapsingToolbarLayout.SetCollapsedTitleGravity(_gravity: TLayoutGravity);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetCollapsedTitleGravity(FjEnv, FjObject, Ord(_gravity));
+     jsCollapsingToolbarLayout_SetCollapsedTitleGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jsCollapsingToolbarLayout.SetContentScrimColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetContentScrimColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsCollapsingToolbarLayout_SetContentScrimColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsCollapsingToolbarLayout.SetContentScrimColor(_color: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCollapsingToolbarLayout_SetContentScrimColor(FjEnv, FjObject, _color);
+     jsCollapsingToolbarLayout_SetContentScrimColor(gApp.jni.jEnv, FjObject, _color);
 end;
 
 procedure jsCollapsingToolbarLayout.SetFitsSystemWindows(_value: boolean);
@@ -428,7 +428,7 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsCollapsingToolbarLayout_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsCollapsingToolbarLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 {-------- jsCollapsingToolbarLayout_JNI_Bridge ----------}

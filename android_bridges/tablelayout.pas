@@ -22,7 +22,7 @@ jTableLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -128,7 +128,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jTableLayout.Init(refApp: jApp);
+procedure jTableLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -136,22 +136,22 @@ begin
 
  if not FInitialized then
  begin
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); //jSelf !
 
   if FjObject = nil then exit;
 
   if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
   FjPRLayoutHome:= FjPRLayout;
 
-  jTableLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-  jTableLayout_SetId(FjEnv, FjObject, Self.Id);
+  jTableLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+  jTableLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
  end;
 
-  jTableLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject,
+  jTableLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                         sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -160,30 +160,30 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jTableLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jTableLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jTableLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jTableLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jTableLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jTableLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
  if not FInitialized then
  begin
   FInitialized := true;
 
   if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  View_SetVisible(FjEnv, FjObject, FVisible);
+  View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
  end;
 end;
 
@@ -191,13 +191,13 @@ procedure jTableLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jTableLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jTableLayout.UpdateLayout;
@@ -209,14 +209,14 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 
 end;
 
 procedure jTableLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTableLayout.ClearLayout;
@@ -227,15 +227,15 @@ begin
 
    if not FInitialized then Exit;
 
-  jTableLayout_ClearLayoutAll(FjEnv, FjObject );
+  jTableLayout_ClearLayoutAll(gApp.jni.jEnv, FjObject );
 
    for rToP := rpBottom to rpCenterVertical do
       if rToP in FPositionRelativeToParent then
-        jTableLayout_AddLParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+        jTableLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
    for rToA := raAbove to raAlignRight do
      if rToA in FPositionRelativeToAnchor then
-       jTableLayout_AddLParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+       jTableLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
 
 end;
 
@@ -247,175 +247,175 @@ end;
 
 function jTableLayout.jCreate(): jObject;
 begin
-   Result:= jTableLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jTableLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jTableLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_jFree(FjEnv, FjObject);
+     jTableLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTableLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jTableLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jTableLayout.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTableLayout_GetParent(FjEnv, FjObject);
+   Result:= jTableLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTableLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jTableLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jTableLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTableLayout_GetView(FjEnv, FjObject);
+   Result:= jTableLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTableLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jTableLayout_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jTableLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jTableLayout_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jTableLayout.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTableLayout_GetLParamWidth(FjEnv, FjObject);
+   Result:= jTableLayout_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jTableLayout.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jTableLayout_GetLParamHeight(FjEnv, FjObject);
+   Result:= jTableLayout_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTableLayout.SetLGravity(_g: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetLGravity(FjEnv, FjObject, _g);
+     jTableLayout_SetLGravity(gApp.jni.jEnv, FjObject, _g);
 end;
 
 procedure jTableLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetLWeight(FjEnv, FjObject, _w);
+     jTableLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jTableLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jTableLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jTableLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jTableLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jTableLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jTableLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jTableLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jTableLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jTableLayout.ClearLayoutAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_ClearLayoutAll(FjEnv, FjObject);
+     jTableLayout_ClearLayoutAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jTableLayout.SetId(_id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetId(FjEnv, FjObject, _id);
+     jTableLayout_SetId(gApp.jni.jEnv, FjObject, _id);
 end;
 
 procedure jTableLayout.AddTextRow(_delimitedTextRow: string; _columnDelimiter: string; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_AddTextRow(FjEnv, FjObject, _delimitedTextRow ,_columnDelimiter , GetARGB(FCustomColor, _color));
+     jTableLayout_AddTextRow(gApp.jni.jEnv, FjObject, _delimitedTextRow ,_columnDelimiter , GetARGB(FCustomColor, _color));
 end;
 
 procedure jTableLayout.SetRowTextColor(_textColor: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetRowTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _textColor));
+     jTableLayout_SetRowTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _textColor));
 end;
 
 procedure jTableLayout.SeInnerTextContentDelimiter(_delimiter: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SeInnerTextContentDelimiter(FjEnv, FjObject, _delimiter);
+     jTableLayout_SeInnerTextContentDelimiter(gApp.jni.jEnv, FjObject, _delimiter);
 end;
 
 procedure jTableLayout.SetStretchAllColumns(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetStretchAllColumns(FjEnv, FjObject, _value);
+     jTableLayout_SetStretchAllColumns(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jTableLayout.SetColumnStretchable(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetColumnStretchable(FjEnv, FjObject, _index);
+     jTableLayout_SetColumnStretchable(gApp.jni.jEnv, FjObject, _index);
 end;
 
 procedure jTableLayout.SetShrinkAllColumns(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetShrinkAllColumns(FjEnv, FjObject, _value);
+     jTableLayout_SetShrinkAllColumns(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jTableLayout.SetColumnShrinkable(_index: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jTableLayout_SetColumnShrinkable(FjEnv, FjObject, _index);
+     jTableLayout_SetColumnShrinkable(gApp.jni.jEnv, FjObject, _index);
 end;
 
 {-------- jTableLayout_JNI_Bridge ----------}

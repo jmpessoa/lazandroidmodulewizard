@@ -23,7 +23,7 @@ jsCoordinatorLayout = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -113,30 +113,30 @@ begin
   inherited Destroy;
 end;
 
-procedure jsCoordinatorLayout.Init(refApp: jApp);
+procedure jsCoordinatorLayout.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jsCoordinatorLayout_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+    jsCoordinatorLayout_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   jsCoordinatorLayout_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsCoordinatorLayout_SetId(FjEnv, FjObject, Self.Id);
+   jsCoordinatorLayout_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsCoordinatorLayout_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsCoordinatorLayout_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsCoordinatorLayout_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -145,33 +145,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsCoordinatorLayout_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsCoordinatorLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsCoordinatorLayout_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsCoordinatorLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsCoordinatorLayout_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsCoordinatorLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsCoordinatorLayout_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsCoordinatorLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -179,13 +179,13 @@ procedure jsCoordinatorLayout.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsCoordinatorLayout.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsCoordinatorLayout.UpdateLayout;
@@ -196,13 +196,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsCoordinatorLayout.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -215,56 +215,56 @@ end;
 
 function jsCoordinatorLayout.jCreate(): jObject;
 begin
-   Result:= jsCoordinatorLayout_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsCoordinatorLayout_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsCoordinatorLayout.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_jFree(FjEnv, FjObject);
+     jsCoordinatorLayout_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCoordinatorLayout.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsCoordinatorLayout_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsCoordinatorLayout.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsCoordinatorLayout_GetParent(FjEnv, FjObject);
+   Result:= jsCoordinatorLayout_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCoordinatorLayout.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_RemoveFromViewParent(FjEnv, FjObject);
+     jsCoordinatorLayout_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsCoordinatorLayout.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsCoordinatorLayout_GetView(FjEnv, FjObject);
+   Result:= jsCoordinatorLayout_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsCoordinatorLayout.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_SetLParamWidth(FjEnv, FjObject, _w);
+     jsCoordinatorLayout_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsCoordinatorLayout.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_SetLParamHeight(FjEnv, FjObject, _h);
+     jsCoordinatorLayout_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsCoordinatorLayout.GetWidth(): integer;
@@ -275,7 +275,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jsCoordinatorLayout_getLParamWidth(FjEnv, FjObject );
+   Result:= jsCoordinatorLayout_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jsCoordinatorLayout.GetHeight(): integer;
@@ -286,7 +286,7 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jsCoordinatorLayout_getLParamHeight(FjEnv, FjObject );
+   Result:= jsCoordinatorLayout_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jsCoordinatorLayout.SetLGravity(_gravity: TLayoutGravity);
@@ -294,42 +294,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jsCoordinatorLayout_SetLGravity(FjEnv, FjObject, Ord(_gravity) );
+     jsCoordinatorLayout_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity) );
 end;
 
 procedure jsCoordinatorLayout.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_SetLWeight(FjEnv, FjObject, _w);
+     jsCoordinatorLayout_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsCoordinatorLayout.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsCoordinatorLayout_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsCoordinatorLayout.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsCoordinatorLayout_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsCoordinatorLayout.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsCoordinatorLayout_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsCoordinatorLayout.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsCoordinatorLayout_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsCoordinatorLayout_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsCoordinatorLayout.ClearLayout();
@@ -340,15 +340,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsCoordinatorLayout_clearLayoutAll(FjEnv, FjObject);
+     jsCoordinatorLayout_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsCoordinatorLayout_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsCoordinatorLayout_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsCoordinatorLayout_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsCoordinatorLayout_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -357,7 +357,7 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsCoordinatorLayout_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsCoordinatorLayout_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 {-------- jsCoordinatorLayout_JNI_Bridge ----------}

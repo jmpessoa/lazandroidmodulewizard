@@ -23,7 +23,7 @@ jsNestedScrollView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -114,27 +114,27 @@ begin
   inherited Destroy;
 end;
 
-procedure jsNestedScrollView.Init(refApp: jApp);
+procedure jsNestedScrollView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
-   jsNestedScrollView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsNestedScrollView_SetId(FjEnv, FjObject, Self.Id);
+   jsNestedScrollView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsNestedScrollView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsNestedScrollView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsNestedScrollView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -143,33 +143,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsNestedScrollView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsNestedScrollView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsNestedScrollView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsNestedScrollView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsNestedScrollView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsNestedScrollView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
    if FFitsSystemWindows  then
-     jsNestedScrollView_SetFitsSystemWindows(FjEnv, FjObject, FFitsSystemWindows);
+     jsNestedScrollView_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, FFitsSystemWindows);
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -177,13 +177,13 @@ procedure jsNestedScrollView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsNestedScrollView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsNestedScrollView.UpdateLayout;
@@ -194,13 +194,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsNestedScrollView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -213,56 +213,56 @@ end;
 
 function jsNestedScrollView.jCreate(): jObject;
 begin
-   Result:= jsNestedScrollView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsNestedScrollView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsNestedScrollView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_jFree(FjEnv, FjObject);
+     jsNestedScrollView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNestedScrollView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsNestedScrollView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsNestedScrollView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNestedScrollView_GetParent(FjEnv, FjObject);
+   Result:= jsNestedScrollView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNestedScrollView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_RemoveFromViewParent(FjEnv, FjObject);
+     jsNestedScrollView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsNestedScrollView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsNestedScrollView_GetView(FjEnv, FjObject);
+   Result:= jsNestedScrollView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNestedScrollView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetLParamWidth(FjEnv, FjObject, _w);
+     jsNestedScrollView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsNestedScrollView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetLParamHeight(FjEnv, FjObject, _h);
+     jsNestedScrollView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsNestedScrollView.GetWidth(): integer;
@@ -273,7 +273,7 @@ begin
   if sysIsWidthExactToParent(Self) then
    Result := sysGetWidthOfParent(FParent)
   else
-   Result:= jsNestedScrollView_getLParamWidth(FjEnv, FjObject );
+   Result:= jsNestedScrollView_getLParamWidth(gApp.jni.jEnv, FjObject );
 end;
 
 function jsNestedScrollView.GetHeight(): integer;
@@ -284,49 +284,49 @@ begin
   if sysIsHeightExactToParent(Self) then
    Result := sysGetHeightOfParent(FParent)
   else
-   Result:= jsNestedScrollView_getLParamHeight(FjEnv, FjObject );
+   Result:= jsNestedScrollView_getLParamHeight(gApp.jni.jEnv, FjObject );
 end;
 
 procedure jsNestedScrollView.SetLGravity(_gravity: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetLGravity(FjEnv, FjObject, _gravity);
+     jsNestedScrollView_SetLGravity(gApp.jni.jEnv, FjObject, _gravity);
 end;
 
 procedure jsNestedScrollView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetLWeight(FjEnv, FjObject, _w);
+     jsNestedScrollView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsNestedScrollView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsNestedScrollView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsNestedScrollView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsNestedScrollView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsNestedScrollView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsNestedScrollView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsNestedScrollView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsNestedScrollView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsNestedScrollView.ClearLayout();
@@ -337,15 +337,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsNestedScrollView_clearLayoutAll(FjEnv, FjObject);
+     jsNestedScrollView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsNestedScrollView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsNestedScrollView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsNestedScrollView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsNestedScrollView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -353,7 +353,7 @@ procedure jsNestedScrollView.SetAppBarLayoutScrollingViewBehavior();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetAppBarLayoutScrollingViewBehavior(FjEnv, FjObject);
+     jsNestedScrollView_SetAppBarLayoutScrollingViewBehavior(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsNestedScrollView.SetFitsSystemWindows(_value: boolean);
@@ -361,14 +361,14 @@ begin
   //in designing component state: set value here...
   FFitsSystemWindows:= _value;
   if FInitialized then
-     jsNestedScrollView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsNestedScrollView_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsNestedScrollView.SetNestedScrollingEnabled(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsNestedScrollView_SetNestedScrollingEnabled(FjEnv, FjObject, _view);
+     jsNestedScrollView_SetNestedScrollingEnabled(gApp.jni.jEnv, FjObject, _view);
 end;
 
 {-------- jsNestedScrollView_JNI_Bridge ----------}

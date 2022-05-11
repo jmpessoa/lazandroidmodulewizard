@@ -20,7 +20,7 @@ jGdxTexture = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     //function GetNew(_assetsImageFile: string): jObject;
@@ -65,10 +65,10 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxTexture.Init(refApp: jApp);
+procedure jGdxTexture.Init;
 begin
   if FInitialized then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -76,14 +76,14 @@ end;
 
 function jGdxTexture.jCreate(): jObject;
 begin
-  Result:= jGdxTexture_jCreate(FjEnv, int64(Self), FjThis);
+  Result:= jGdxTexture_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxTexture.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized and (FjObject <> nil) then
-     jGdxTexture_jFree(FjEnv, FjObject);
+     jGdxTexture_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 (*
@@ -91,7 +91,7 @@ function jGdxTexture.GetNew(_assetsImageFile: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTexture_GetNew(FjEnv, FjObject, _assetsImageFile);
+   Result:= jGdxTexture_GetNew(gApp.jni.jEnv, FjObject, _assetsImageFile);
 end;
 *)
 
@@ -99,28 +99,28 @@ function jGdxTexture.GetJInstance(_assetsFileName: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTexture_GetJInstance(FjEnv, FjObject, _assetsFileName);
+   Result:= jGdxTexture_GetJInstance(gApp.jni.jEnv, FjObject, _assetsFileName);
 end;
 
 function jGdxTexture.GetJInstance(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTexture_GetJInstance(FjEnv, FjObject);
+   Result:= jGdxTexture_GetJInstance(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxTexture.LoadFromAssets(_assetsFilename: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTexture_LoadFromAssets(FjEnv, FjObject, _assetsFilename);
+   Result:= jGdxTexture_LoadFromAssets(gApp.jni.jEnv, FjObject, _assetsFilename);
 end;
 
 procedure jGdxTexture.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxTexture_Dispose(FjEnv, FjObject);
+     jGdxTexture_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- gdxTexture_JNI_Bridge ----------}

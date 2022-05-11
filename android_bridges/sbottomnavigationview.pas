@@ -23,7 +23,7 @@ jsBottomNavigationView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     
@@ -144,30 +144,30 @@ begin
   inherited Destroy;
 end;
 
-procedure jsBottomNavigationView.Init(refApp: jApp);
+procedure jsBottomNavigationView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
 begin
   if not FInitialized  then
   begin
-   inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+   inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
    //your code here: set/initialize create params....
    FjObject := jCreate(); if FjObject = nil then exit;
 
    if FParent <> nil then
-    sysTryNewParent( FjPRLayout, FParent, FjEnv, refApp);
+    sysTryNewParent( FjPRLayout, FParent);
 
    FjPRLayoutHome:= FjPRLayout;
 
    if FGravityInParent <> lgNone then
-    jsBottomNavigationView_SetLGravity(FjEnv, FjObject, Ord(FGravityInParent) );
+    jsBottomNavigationView_SetLGravity(gApp.jni.jEnv, FjObject, Ord(FGravityInParent) );
 
-   jsBottomNavigationView_SetViewParent(FjEnv, FjObject, FjPRLayout);
-   jsBottomNavigationView_SetId(FjEnv, FjObject, Self.Id);
+   jsBottomNavigationView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
+   jsBottomNavigationView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
   end;
 
-  jsBottomNavigationView_setLeftTopRightBottomWidthHeight(FjEnv, FjObject ,
+  jsBottomNavigationView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                                            FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                                            sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
                                            sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
@@ -176,33 +176,33 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      jsBottomNavigationView_AddLParamsAnchorRule(FjEnv, FjObject, GetPositionRelativeToAnchor(rToA));
+      jsBottomNavigationView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
   for rToP := rpBottom to rpCenterVertical do
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      jsBottomNavigationView_AddLParamsParentRule(FjEnv, FjObject, GetPositionRelativeToParent(rToP));
+      jsBottomNavigationView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
 
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  jsBottomNavigationView_SetLayoutAll(FjEnv, FjObject, Self.AnchorId);
+  jsBottomNavigationView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
   if not FInitialized then
   begin
    FInitialized:= True;
 
    if FFontColor <> colbrDefault then
-     jsBottomNavigationView_SetItemTextColor(FjEnv, FjObject, GetARGB(FCustomColor, FFontColor));
+     jsBottomNavigationView_SetItemTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FFontColor));
 
    if  FColor <> colbrDefault then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-   View_SetVisible(FjEnv, FjObject, FVisible);
+   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   end;
 end;
 
@@ -210,13 +210,13 @@ procedure jsBottomNavigationView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-    View_SetBackGroundColor(FjEnv, FjObject, GetARGB(FCustomColor, FColor));
+    View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jsBottomNavigationView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    View_SetVisible(FjEnv, FjObject, FVisible);
+    View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
 procedure jsBottomNavigationView.UpdateLayout;
@@ -227,13 +227,13 @@ begin
 
   inherited UpdateLayout;
 
-  init(gApp);
+  init;
 end;
 
 procedure jsBottomNavigationView.Refresh;
 begin
   if FInitialized then
-    View_Invalidate(FjEnv, FjObject);
+    View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
 //Event : Java -> Pascal
@@ -244,70 +244,70 @@ end;
 
 function jsBottomNavigationView.jCreate(): jObject;
 begin
-   Result:= jsBottomNavigationView_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jsBottomNavigationView_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jsBottomNavigationView.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_jFree(FjEnv, FjObject);
+     jsBottomNavigationView_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.SetViewParent(_viewgroup: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetViewParent(FjEnv, FjObject, _viewgroup);
+     jsBottomNavigationView_SetViewParent(gApp.jni.jEnv, FjObject, _viewgroup);
 end;
 
 function jsBottomNavigationView.GetParent(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsBottomNavigationView_GetParent(FjEnv, FjObject);
+   Result:= jsBottomNavigationView_GetParent(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.RemoveFromViewParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_RemoveFromViewParent(FjEnv, FjObject);
+     jsBottomNavigationView_RemoveFromViewParent(gApp.jni.jEnv, FjObject);
 end;
 
 function jsBottomNavigationView.GetView(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsBottomNavigationView_GetView(FjEnv, FjObject);
+   Result:= jsBottomNavigationView_GetView(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.SetLParamWidth(_w: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetLParamWidth(FjEnv, FjObject, _w);
+     jsBottomNavigationView_SetLParamWidth(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsBottomNavigationView.SetLParamHeight(_h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetLParamHeight(FjEnv, FjObject, _h);
+     jsBottomNavigationView_SetLParamHeight(gApp.jni.jEnv, FjObject, _h);
 end;
 
 function jsBottomNavigationView.GetLParamWidth(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsBottomNavigationView_GetLParamWidth(FjEnv, FjObject);
+   Result:= jsBottomNavigationView_GetLParamWidth(gApp.jni.jEnv, FjObject);
 end;
 
 function jsBottomNavigationView.GetLParamHeight(): integer;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsBottomNavigationView_GetLParamHeight(FjEnv, FjObject);
+   Result:= jsBottomNavigationView_GetLParamHeight(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.SetLGravity(_gravity: TLayoutGravity);
@@ -315,42 +315,42 @@ begin
   //in designing component state: set value here...
   FGravityInParent:= _gravity;
   if FInitialized then
-     jsBottomNavigationView_SetLGravity(FjEnv, FjObject, Ord(_gravity));
+     jsBottomNavigationView_SetLGravity(gApp.jni.jEnv, FjObject, Ord(_gravity));
 end;
 
 procedure jsBottomNavigationView.SetLWeight(_w: single);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetLWeight(FjEnv, FjObject, _w);
+     jsBottomNavigationView_SetLWeight(gApp.jni.jEnv, FjObject, _w);
 end;
 
 procedure jsBottomNavigationView.SetLeftTopRightBottomWidthHeight(_left: integer; _top: integer; _right: integer; _bottom: integer; _w: integer; _h: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetLeftTopRightBottomWidthHeight(FjEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
+     jsBottomNavigationView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject, _left ,_top ,_right ,_bottom ,_w ,_h);
 end;
 
 procedure jsBottomNavigationView.AddLParamsAnchorRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_AddLParamsAnchorRule(FjEnv, FjObject, _rule);
+     jsBottomNavigationView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsBottomNavigationView.AddLParamsParentRule(_rule: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_AddLParamsParentRule(FjEnv, FjObject, _rule);
+     jsBottomNavigationView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, _rule);
 end;
 
 procedure jsBottomNavigationView.SetLayoutAll(_idAnchor: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetLayoutAll(FjEnv, FjObject, _idAnchor);
+     jsBottomNavigationView_SetLayoutAll(gApp.jni.jEnv, FjObject, _idAnchor);
 end;
 
 procedure jsBottomNavigationView.ClearLayout();
@@ -361,15 +361,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
   begin
-     jsBottomNavigationView_clearLayoutAll(FjEnv, FjObject);
+     jsBottomNavigationView_clearLayoutAll(gApp.jni.jEnv, FjObject);
 
      for rToP := rpBottom to rpCenterVertical do
         if rToP in FPositionRelativeToParent then
-          jsBottomNavigationView_addlParamsParentRule(FjEnv, FjObject , GetPositionRelativeToParent(rToP));
+          jsBottomNavigationView_addlParamsParentRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToParent(rToP));
 
      for rToA := raAbove to raAlignRight do
        if rToA in FPositionRelativeToAnchor then
-         jsBottomNavigationView_addlParamsAnchorRule(FjEnv, FjObject , GetPositionRelativeToAnchor(rToA));
+         jsBottomNavigationView_addlParamsAnchorRule(gApp.jni.jEnv, FjObject , GetPositionRelativeToAnchor(rToA));
   end;
 end;
 
@@ -377,35 +377,35 @@ function jsBottomNavigationView.GetMenu(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsBottomNavigationView_GetMenu(FjEnv, FjObject);
+   Result:= jsBottomNavigationView_GetMenu(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.ClearMenu();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_ClearMenu(FjEnv, FjObject);
+     jsBottomNavigationView_ClearMenu(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.SetItemTextColor(_menuItem: jObject; _color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetItemTextColor(FjEnv, FjObject, _menuItem ,GetARGB(FCustomColor, _color));
+     jsBottomNavigationView_SetItemTextColor(gApp.jni.jEnv, FjObject, _menuItem ,GetARGB(FCustomColor, _color));
 end;
 
 procedure jsBottomNavigationView.SetAllItemsTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetAllItemsTextColor(FjEnv, FjObject, GetARGB(FCustomColor, _color));
+     jsBottomNavigationView_SetAllItemsTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, _color));
 end;
 
 procedure jsBottomNavigationView.ResetAllItemsTextColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_ResetAllItemsTextColor(FjEnv, FjObject);
+     jsBottomNavigationView_ResetAllItemsTextColor(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.SetFontColor(_color: TARGBColorBridge);
@@ -413,56 +413,56 @@ begin
   //in designing component state: set value here...
   FFontColor:=  _color;
   if FInitialized then
-     jsBottomNavigationView_SetItemTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, FFontColor));
+     jsBottomNavigationView_SetItemTextColor(gApp.jni.jEnv, FjObject,  GetARGB(FCustomColor, FFontColor));
 end;
 
 procedure jsBottomNavigationView.SetSelectedItemTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetSelectedItemTextColor(FjEnv, FjObject,  GetARGB(FCustomColor, _color));
+     jsBottomNavigationView_SetSelectedItemTextColor(gApp.jni.jEnv, FjObject,  GetARGB(FCustomColor, _color));
 end;
 
 function jsBottomNavigationView.AddItem(_menu: jObject; _itemId: integer; _itemCaption: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jsBottomNavigationView_AddItem(FjEnv, FjObject, _menu ,_itemId ,_itemCaption);
+   Result:= jsBottomNavigationView_AddItem(gApp.jni.jEnv, FjObject, _menu ,_itemId ,_itemCaption);
 end;
 
 procedure jsBottomNavigationView.AddItem(_menu: jObject; _itemId: integer; _itemCaption: string; _drawableIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_AddItem(FjEnv, FjObject, _menu ,_itemId ,_itemCaption ,_drawableIdentifier);
+     jsBottomNavigationView_AddItem(gApp.jni.jEnv, FjObject, _menu ,_itemId ,_itemCaption ,_drawableIdentifier);
 end;
 
 procedure jsBottomNavigationView.AddItemIcon(_menuItem: jObject; _drawableIdentifier: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_AddItemIcon(FjEnv, FjObject, _menuItem ,_drawableIdentifier);
+     jsBottomNavigationView_AddItemIcon(gApp.jni.jEnv, FjObject, _menuItem ,_drawableIdentifier);
 end;
 
 procedure jsBottomNavigationView.SetFitsSystemWindows(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetFitsSystemWindows(FjEnv, FjObject, _value);
+     jsBottomNavigationView_SetFitsSystemWindows(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jsBottomNavigationView.SetBackgroundToPrimaryColor();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_SetBackgroundToPrimaryColor(FjEnv, FjObject);
+     jsBottomNavigationView_SetBackgroundToPrimaryColor(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jsBottomNavigationView.BringToFront();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsBottomNavigationView_BringToFront(FjEnv, FjObject);
+     jsBottomNavigationView_BringToFront(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jsBottomNavigationView_JNI_Bridge ----------}

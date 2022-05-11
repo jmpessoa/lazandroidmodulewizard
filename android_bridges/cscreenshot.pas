@@ -20,7 +20,7 @@ jcScreenShot = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     function TakeScene(_referenceView: jObject): jObject;
@@ -60,11 +60,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcScreenShot.Init(refApp: jApp);
+procedure jcScreenShot.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -73,28 +73,28 @@ end;
 
 function jcScreenShot.jCreate(): jObject;
 begin
-   Result:= jcScreenShot_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcScreenShot_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcScreenShot.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcScreenShot_jFree(FjEnv, FjObject);
+     jcScreenShot_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 function jcScreenShot.TakeScene(_referenceView: jObject): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcScreenShot_TakeScene(FjEnv, FjObject, _referenceView);
+   Result:= jcScreenShot_TakeScene(gApp.jni.jEnv, FjObject, _referenceView);
 end;
 
 function jcScreenShot.SaveToFile(_fileName: string): string;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcScreenShot_SaveToFile(FjEnv, FjObject, _fileName);
+   Result:= jcScreenShot_SaveToFile(gApp.jni.jEnv, FjObject, _fileName);
 end;
 
 {-------- jcScreenShot_JNI_Bridge ----------}

@@ -20,7 +20,7 @@ jGdxTextureAtlas = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -67,11 +67,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jGdxTextureAtlas.Init(refApp: jApp);
+procedure jGdxTextureAtlas.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject:= jCreate(); //jSelf !
   FInitialized:= True;
@@ -80,49 +80,49 @@ end;
 
 function jGdxTextureAtlas.jCreate(): jObject;
 begin
-   Result:= jGdxTextureAtlas_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jGdxTextureAtlas_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jGdxTextureAtlas.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized and (FjObject <> nil) then
-     jGdxTextureAtlas_jFree(FjEnv, FjObject);
+     jGdxTextureAtlas_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jGdxTextureAtlas.LoadPackFromAssets(_packFilename: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxTextureAtlas_LoadPackFromAssets(FjEnv, FjObject, _packFilename);
+     jGdxTextureAtlas_LoadPackFromAssets(gApp.jni.jEnv, FjObject, _packFilename);
 end;
 
 function jGdxTextureAtlas.GetTextureRegion(_region: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTextureAtlas_GetTextureRegion(FjEnv, FjObject, _region);
+   Result:= jGdxTextureAtlas_GetTextureRegion(gApp.jni.jEnv, FjObject, _region);
 end;
 
 function jGdxTextureAtlas.GetJInstance(): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTextureAtlas_GetJInstance(FjEnv, FjObject);
+   Result:= jGdxTextureAtlas_GetJInstance(gApp.jni.jEnv, FjObject);
 end;
 
 function jGdxTextureAtlas.CreateSprite(_region: string): jObject;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jGdxTextureAtlas_CreateSprite(FjEnv, FjObject, _region);
+   Result:= jGdxTextureAtlas_CreateSprite(gApp.jni.jEnv, FjObject, _region);
 end;
 
 procedure jGdxTextureAtlas.Dispose();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jGdxTextureAtlas_Dispose(FjEnv, FjObject);
+     jGdxTextureAtlas_Dispose(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jGdxTextureAtlas_JNI_Bridge ----------}

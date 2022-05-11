@@ -947,18 +947,15 @@ type
     FClassPath: string; //need by new pure jni model! -->> initialized by widget.Create
     FjObject     : jObject; //jSelf - java object
     FInitialized : boolean;
-    FjEnv: PJNIEnv;
-    FjThis: jObject;  //java class Controls\libcontrols
     FCustomColor: DWord;
   protected
     FEnabled     : boolean;
     procedure SetEnabled(Value: boolean); virtual;
   public
-    procedure UpdateJNI(refApp: jApp); virtual;
     property Initialized : boolean read FInitialized write FInitialized;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); virtual;
+    procedure Init; virtual;
     procedure AttachCurrentThread();  overload;
     procedure AttachCurrentThread(env: PJNIEnv); overload;
     property jSelf: jObject read FjObject;
@@ -1008,7 +1005,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     function ChildCount: integer;
     property Children[Index: integer]: TAndroidWidget read GetChilds;
@@ -1080,7 +1077,7 @@ type
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
 
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
@@ -1184,16 +1181,14 @@ type
     constructor CreateNew(AOwner: TComponent);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Init(refApp: jApp); override;
-    procedure InitShowing(refApp: jApp);
-    procedure ReInitShowing(refApp: jApp);
+    procedure Init; override;
+    procedure InitShowing;
+    procedure ReInitShowing;
 
     procedure Finish;
 
     Procedure Show; overload;
     Procedure Show(jniPrompt: boolean); overload;
-
-    procedure Show(refApp: jApp); overload; //call ReInit to force the form to recreate the layout...
 
     Procedure DoJNIPrompt;
     procedure DoOnShow; //by ADiV
@@ -1225,7 +1220,6 @@ type
     //Procedure GenEvent_OnViewClick(jObjView: jObject; Id: integer);
     //Procedure GenEvent_OnListItemClick(jObjAdapterView: jObject; jObjView: jObject; position: integer; Id: integer);
 
-    procedure UpdateJNI(refApp: jApp); override;
     Procedure UpdateLayout;
 
     function SetWifiEnabled(_status: boolean): boolean;
@@ -1370,7 +1364,7 @@ type
     function UriEncode(_message: string): string;
     function ParseHtmlFontAwesome(_htmlString: string): string;
 
-    procedure ReInit(refApp: jApp); //force the form to recreate the layout...
+    procedure ReInit; //force the form to recreate the layout...
     procedure SetLayoutParent(_viewgroup: jObject);   //FjPRLayout
     function GetLayoutParent: jObject;
     procedure RemoveFromLayoutParent();
@@ -1633,7 +1627,7 @@ type
     destructor Destroy; override;
     procedure SetParentComponent(Value: TComponent); override;
 
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     procedure UpdateLayout(); virtual;
 
     function GetWidth: integer;  override;
@@ -2456,10 +2450,8 @@ begin
   inherited Destroy;
 end;
 
-procedure jControl.Init(refApp: jApp);
+procedure jControl.Init;
 begin
-  FjEnv:= refApp.Jni.jEnv;
-  FjThis:= refApp.Jni.jThis;
   if  FClassPath <> '' then
      FjClass:= Get_jClassLocalRef(FClassPath);  //needed by new direct jni component model...
 end;
@@ -2469,15 +2461,9 @@ begin
   FEnabled:= Value;
 end;
 
-procedure jControl.UpdateJNI(refApp: jApp);
-begin
-  FjEnv:= refApp.Jni.jEnv;
-  FjThis:= refApp.Jni.jThis;;
-end;
-
 procedure jControl.AttachCurrentThread();
 begin
-  gVM^.AttachCurrentThread(gVm,@FjEnv,nil);
+  gVM^.AttachCurrentThread(gVm,@(gapp.Jni.jEnv),nil);
 end;
 
 procedure jControl.AttachCurrentThread(env: PJNIEnv);
@@ -2512,9 +2498,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidWidget.Init(refApp: jApp);
+procedure TAndroidWidget.Init;
 begin
-   Inherited Init(refApp);
+   Inherited Init;
 end;
 
 function TAndroidWidget.GetChilds(Index: integer): TAndroidWidget;
@@ -2752,9 +2738,9 @@ begin
   inherited Destroy;
 end;
 
-procedure jVisualControl.Init(refApp: jApp);
+procedure jVisualControl.Init;
 begin
-  inherited Init(refApp);
+  inherited Init;
   FjPRLayout := jForm(Owner).View;  //set default ViewParent/FjPRLayout as jForm.View!
   FjPRLayoutHome:= FjPRLayout;      //save origin
   FScreenStyle := jForm(Owner).ScreenStyle;
@@ -2905,13 +2891,13 @@ begin
   FVisible:= Value;
 
   if FInitialized then
-     View_SetVisible(FjEnv, FjObject, FVisible);
+     View_SetVisible(gapp.Jni.jEnv, FjObject, FVisible);
 end;
 
 function jVisualControl.GetVisible(): boolean;
 begin
   if FInitialized then
-     FVisible:= View_GetVisible(FjEnv, FjObject);
+     FVisible:= View_GetVisible(gapp.Jni.jEnv, FjObject);
 
   Result:= FVisible;
 end;
@@ -2972,9 +2958,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TAndroidForm.Init(refApp: jApp);
+procedure TAndroidForm.Init;
 begin
-   Inherited Init(refApp);
+   Inherited Init;
 end;
 
 procedure TAndroidForm.AfterConstruction;
@@ -3099,9 +3085,9 @@ begin
   begin
     if FInitialized and (not Finished) then
     begin
-      jForm_FreeLayout(FjEnv, FjRLayout);      //free jni jForm Layout global reference
-      jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni jForm Layout global reference
-      jForm_Free2(FjEnv, FjObject);
+      jForm_FreeLayout(gapp.Jni.jEnv, FjRLayout);      //free jni jForm Layout global reference
+      jForm_FreeLayout(gapp.Jni.jEnv, FjPRLayoutHome); //free jni jForm Layout global reference
+      jForm_Free2(gapp.Jni.jEnv, FjObject);
     end;
   end;
   inherited Destroy;
@@ -3111,24 +3097,22 @@ procedure jForm.Finish;
 begin
   if FInitialized and (not Finished)  then
   begin
-    jForm_FreeLayout(FjEnv, FjRLayout);      //free jni jForm Layout global reference
-    jForm_FreeLayout(FjEnv, FjPRLayoutHome); //free jni [saved copy] jForm Layout global reference
-    jForm_Free2(FjEnv, FjObject);
+    jForm_FreeLayout(gapp.Jni.jEnv, FjRLayout);      //free jni jForm Layout global reference
+    jForm_FreeLayout(gapp.Jni.jEnv, FjPRLayoutHome); //free jni [saved copy] jForm Layout global reference
+    jForm_Free2(gapp.Jni.jEnv, FjObject);
     Finished:= True;
   end;
 end;
 
-procedure jForm.Init(refApp: jApp);
+procedure jForm.Init;
 var
   i: integer;
 begin
-  if refApp = nil then Exit;
-  if not refApp.Initialized then Exit;
 
   // For Reinit if calling 2 times or more [need split-screen] by ADiV
-  if FInitialized then begin Reinit(refApp); Exit; end;
+  if FInitialized then begin Reinit; Exit; end;
 
-  Inherited Init(refApp);
+  Inherited Init;
 
   //gdx
   if not (csDesigning in ComponentState) then
@@ -3143,29 +3127,29 @@ begin
     if FActivityMode = actMain then
        Randomize; //thanks to Gerrit
 
-    FScreenStyle:= refApp.Orientation;
-    FScreenWH:= refApp.Screen.WH;   //sAved on start!
+    FScreenStyle:= gApp.Orientation;
+    FScreenWH:= gApp.Screen.WH;   //sAved on start!
 
-    FWidth   := refApp.Screen.WH.Width;
-    FHeight  := refApp.Screen.WH.Height;
+    FWidth   := gApp.Screen.WH.Width;
+    FHeight  := gApp.Screen.WH.Height;
 
-    FPackageName:= refApp.AppName;
+    FPackageName:= gApp.AppName;
     ScreenStyleAtStart:= FScreenStyle;   //saved on start!
 
-    FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self); {jSef}
+    FjObject:=  jForm_Create(gApp.Jni.jEnv, gApp.Jni.jThis, Self); {jSef}
 
     if FjObject = nil then exit;
 
-    FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {View}    //jni grobal ref
+    FjRLayout:=  jForm_Getlayout2(gApp.Jni.jEnv, FjObject);  {View}    //jni grobal ref
 
     if FjRLayout = nil then exit;
 
-    FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin  //jni grobal ref
+    FjPRLayoutHome:= jForm_GetParent(gApp.Jni.jEnv, FjObject); //save origin  //jni grobal ref
     FjPRLayout:= FjPRLayoutHome; //base appLayout
 
     //thierrydijoux - if backgroundColor is set to black, no theme ...
     if FColor <> colbrDefault then
-       View_SetBackGroundColor(refApp.Jni.jEnv, refApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
+       View_SetBackGroundColor(gApp.Jni.jEnv, gApp.Jni.jThis, FjRLayout, GetARGB(FCustomColor, FColor));
 
     FInitialized:= True;    //need here...
 
@@ -3186,11 +3170,11 @@ begin
     begin
       if (Self.Components[i] is jControl) then
       begin
-         (Self.Components[i] as jControl).Init(refApp);
+         (Self.Components[i] as jControl).Init;
       end;
     end;
 
-    jForm_SetEnabled2(refApp.Jni.jEnv, FjObject, FEnabled);
+    jForm_SetEnabled2(gApp.Jni.jEnv, FjObject, FEnabled);
 
     if gApp.GetCurrentFormsIndex = (cjFormsMax-1) then Exit; //no more form is possible!
 
@@ -3229,7 +3213,7 @@ begin
       FVisible := True;
     end;
 
-    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, refApp.Jni.jIntent);
+    if Assigned(FOnActivityCreate) then FOnActivityCreate(Self, gApp.Jni.jIntent);
 
     // Detect AppActivityRecreate, launch this event only in the main process or splash
     if gapp.IsAppActivityRecreate then
@@ -3244,7 +3228,7 @@ begin
     if FVisible then
     begin
        gApp.TopIndex:= FormIndex;
-       jForm_Show2(refApp.Jni.jEnv, FjObject, FAnimation.In_);
+       jForm_Show2(gApp.Jni.jEnv, FjObject, FAnimation.In_);
        DoOnShow; //by ADiV
     end;
 
@@ -3256,24 +3240,24 @@ begin
   end
   else    //actEasel ...
   begin
-    FScreenStyle:= refApp.Orientation;
-    FScreenWH:= refApp.Screen.WH;   //sAved on start!
+    FScreenStyle:= gApp.Orientation;
+    FScreenWH:= gApp.Screen.WH;   //sAved on start!
 
-    FWidth   := refApp.Screen.WH.Width;
-    FHeight  := refApp.Screen.WH.Height;
+    FWidth   := gApp.Screen.WH.Width;
+    FHeight  := gApp.Screen.WH.Height;
 
-    FPackageName:= refApp.AppName;
+    FPackageName:= gApp.AppName;
     ScreenStyleAtStart:= FScreenStyle;   //saved on start!
 
-    FjObject:=  jForm_Create(refApp.Jni.jEnv, refApp.Jni.jThis, Self);
+    FjObject:=  jForm_Create(gApp.Jni.jEnv, gApp.Jni.jThis, Self);
 
     if FjObject = nil then exit;
 
-    FjRLayout:=  jForm_Getlayout2(refApp.Jni.jEnv, FjObject);  {form view/RelativeLayout} //GetView
+    FjRLayout:=  jForm_Getlayout2(gApp.Jni.jEnv, FjObject);  {form view/RelativeLayout} //GetView
 
     if FjRLayout = nil then exit;
 
-    FjPRLayoutHome:= jForm_GetParent(refApp.Jni.jEnv, FjObject); //save origin
+    FjPRLayoutHome:= jForm_GetParent(gApp.Jni.jEnv, FjObject); //save origin
     FjPRLayout:= FjPRLayoutHome;  //base appLayout
 
     FInitialized:= True;  //need here
@@ -3292,7 +3276,7 @@ begin
     begin
       if (Self.Components[i] is jControl) then
       begin
-         (Self.Components[i] as jControl).Init(refApp);
+         (Self.Components[i] as jControl).Init;
       end;
     end;
 
@@ -3305,20 +3289,20 @@ begin
 
 end;
 
-procedure jForm.InitShowing(refApp: jApp);
+procedure jForm.InitShowing;
 begin
-   Init(refApp);
+   Init;
    Show(False);
 end;
 
-procedure jForm.ReInit(refApp: jApp);
+procedure jForm.ReInit;
 var
   i: integer;
 begin
 
   if not FInitialized then
   begin
-     Self.Init(refApp);
+     Self.Init;
      Exit;
   end;
 
@@ -3330,18 +3314,12 @@ begin
     end;
   end;
   self.Initialized:= False;
-  Self.Init(refApp);
+  Self.Init;
 end;
 
-procedure jForm.Show(refApp: jApp);
+procedure jForm.ReInitShowing;
 begin
-   ReInit(refApp);
-   Show(False);
-end;
-
-procedure jForm.ReInitShowing(refApp: jApp);
-begin
-  ReInit(refApp);
+  ReInit;
   Show(False);
 end;
 
@@ -3359,28 +3337,28 @@ end;
 procedure jForm.ShowMessage(msg: string);
 begin
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'ShowMessage', msg);
+     jni_proc_t(gapp.Jni.jEnv, FjObject, 'ShowMessage', msg);
 end;
 
 procedure jForm.ShowMessage(_msg: string; _gravity: TGravity; _timeLength: TShowLength);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tii(FjEnv, FjObject, 'ShowMessage', _msg , Ord(_gravity) ,Ord(_timeLength));
+     jni_proc_tii(gapp.Jni.jEnv, FjObject, 'ShowMessage', _msg , Ord(_gravity) ,Ord(_timeLength));
 end;
 
 function jForm.GetDateTime: String;
 begin
   Result := '';
   if not FInitialized then Exit;
-  Result:= jni_func_out_t(FjEnv,FjObject, 'GetDateTime');
+  Result:= jni_func_out_t(gapp.Jni.jEnv,FjObject, 'GetDateTime');
 end;
 
 function jForm.GetDateTime( millisDateTime : int64 ) : string;
 begin
   Result := '';
   if not FInitialized then Exit;
-  Result := jni_func_j_out_t( FjEnv, FjObject, 'GetDateTime', millisDateTime);
+  Result := jni_func_j_out_t( gapp.Jni.jEnv, FjObject, 'GetDateTime', millisDateTime);
 end;
 
 // BY ADiV
@@ -3388,14 +3366,14 @@ function jForm.GetBatteryPercent: integer;
 begin
   Result := 0;
   if not FInitialized then Exit;
-  Result:= jni_func_out_i(FjEnv, FjObject, 'GetBatteryPercent');
+  Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetBatteryPercent');
 end;
 
 function jForm.GetStatusBarHeight: integer;
 begin
   Result := 0;
   if not FInitialized then Exit;
-  Result:= jni_func_out_i(FjEnv, FjObject, 'GetStatusBarHeight');
+  Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetStatusBarHeight');
 end;
 
 function jForm.GetActionBarHeight: integer;
@@ -3411,14 +3389,14 @@ function jForm.GetContextTop: integer;
 begin
   Result := 0;
   if not FInitialized then Exit;
-  Result:= jni_func_out_i(FjEnv, FjObject, 'GetContextTop');
+  Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetContextTop');
 end;
 
 function jForm.GetNavigationHeight : integer;
 begin
   Result := 0;
   if not FInitialized then Exit;
-  Result:= jni_func_out_i(FjEnv, FjObject, 'GetNavigationHeight');
+  Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetNavigationHeight');
 end;
 
 //by ADiV
@@ -3426,7 +3404,7 @@ function jForm.GetJavaLastId(): integer;
 begin
   Result := 0;
   if not FInitialized then Exit;
-  Result:= jni_func_out_i(FjEnv, FjObject, 'GetJavaLastId');
+  Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetJavaLastId');
 end;
 
 //by ADiV
@@ -3434,7 +3412,7 @@ procedure jForm.SetDensityAssets( _value : TDensityAssets );
 
 begin
   if not FInitialized then Exit;
-  jni_proc_i(FjEnv, FjObject, 'SetDensityAssets', ord(_value));
+  jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetDensityAssets', ord(_value));
 end;
 
 // BY ADiV
@@ -3442,7 +3420,7 @@ function jForm.GetTimeInMilliseconds: int64;
 begin
   Result := 0;
   if not FInitialized then Exit;
-  Result:= jni_func_out_j(FjEnv,FjObject, 'GetTimeInMilliseconds');
+  Result:= jni_func_out_j(gapp.Jni.jEnv,FjObject, 'GetTimeInMilliseconds');
 end;
 
 // BY ADiV
@@ -3450,7 +3428,7 @@ function jForm.GetTimeHHssSS( millisTime : int64 ) : string;
 begin
   Result := '';
   if not FInitialized then Exit;
-  Result:= jni_func_j_out_t(FjEnv,FjObject, 'GetTimeHHssSS', millisTime);
+  Result:= jni_func_j_out_t(gapp.Jni.jEnv,FjObject, 'GetTimeHHssSS', millisTime);
 end;
 
 // BY ADiV
@@ -3458,7 +3436,7 @@ function jForm.GetDateTimeToMillis( _dateTime: string; _zone: boolean ) : int64;
 begin
  Result := 0;
  if not FInitialized then Exit;
- Result:= jni_func_tz_out_j(FjEnv, FjObject, 'GetDateTimeToMillis', _dateTime, _zone);
+ Result:= jni_func_tz_out_j(gapp.Jni.jEnv, FjObject, 'GetDateTimeToMillis', _dateTime, _zone);
 end;
 
 // BY ADiV
@@ -3466,7 +3444,7 @@ function jForm.GetDateTimeUTC( _dateTime: string ) : string;
 begin
  Result := '';
  if not FInitialized then Exit;
- Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetDateTimeUTC', _dateTime);
+ Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetDateTimeUTC', _dateTime);
 end;
 
 procedure jForm.SetEnabled(Value: Boolean);
@@ -3474,14 +3452,14 @@ begin
   if FActivityMode = actEasel then Exit;
   FEnabled:= Value;
   if FInitialized then
-    jForm_SetEnabled2(FjEnv, FjObject, FEnabled);
+    jForm_SetEnabled2(gapp.Jni.jEnv, FjObject, FEnabled);
 end;
 
 procedure jForm.SetVisible(Value: Boolean);
 begin
  FVisible:= Value;
  if FInitialized then
-   jni_proc_z(FjEnv, FjObject, 'SetVisible', FVisible);
+   jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetVisible', FVisible);
 end;
 
 procedure jForm.SetColor(Value: TARGBColorBridge);
@@ -3489,7 +3467,7 @@ begin
   //if FActivityMode = actEasel then Exit;
   FColor:= Value;
   if FInitialized then
-      View_SetBackGroundColor(FjEnv, FjRLayout,GetARGB(FCustomColor, FColor));
+      View_SetBackGroundColor(gapp.Jni.jEnv, FjRLayout,GetARGB(FCustomColor, FColor));
 end;
 
 procedure jForm.UpdateLayout;
@@ -3517,14 +3495,14 @@ begin
   //If AppRecreateActivity [by ADiV]
   if FormIndex = -1 then
   begin
-    ReInit(gapp);
+    ReInit;
     if FVisible then exit;
   end;
 
   FormState := fsFormWork;
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
-  jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+  jForm_Show2(gapp.Jni.jEnv,FjObject,FAnimation.In_);
   FVisible:= True;
 
   if DoJNIPromptOnShow then
@@ -3544,7 +3522,7 @@ begin
   // If AppRecreateActivity [by ADiV]
   if FormIndex = -1 then
   begin
-    ReInit(gapp);
+    ReInit;
     if FVisible then exit;
   end;
 
@@ -3552,7 +3530,7 @@ begin
   FVisible:= True;
   FormBaseIndex:= gApp.TopIndex;
   gApp.TopIndex:= Self.FormIndex;
-  jForm_Show2(FjEnv,FjObject,FAnimation.In_);
+  jForm_Show2(gapp.Jni.jEnv,FjObject,FAnimation.In_);
   if jniPrompt then
   begin
     if Assigned(FOnJNIPrompt) then FOnJNIPrompt(Self);
@@ -3588,7 +3566,7 @@ end;
 procedure jForm.FormChangeSize;
 begin
  if self.Initialized then
-  jni_proc( FjEnv, FjObject, 'FormChangeSize');
+  jni_proc( gapp.Jni.jEnv, FjObject, 'FormChangeSize');
 end;
 
 {events sequences after user click the "back key"
@@ -3608,7 +3586,7 @@ begin
  // --------------------------------------------------------------------------
  // Java           Java          Java-> Pascal
  // jForm_Close -> RemoveView -> Java_Event_pOnClose
-  jni_proc(FjEnv, FjObject, 'Close2');  //close java form...  remove view layout ....
+  jni_proc(gapp.Jni.jEnv, FjObject, 'Close2');  //close java form...  remove view layout ....
 end;
 
 //[2] after java form close......
@@ -3619,11 +3597,9 @@ var
 begin
 
   gApp.Jni.jEnv:= env;
-  gApp.Jni.jThis:= this;
+  if this <> nil then gApp.Jni.jThis := this;
 
   if not Assigned(Form) then exit; //just precaution...
-
-  jForm(Form).UpdateJNI(gApp);
 
   if jForm(Form).ActivityMode = actEasel then Exit;
 
@@ -3692,7 +3668,7 @@ procedure jForm.Refresh;
 begin
   if FActivityMode = actEasel then Exit;
   if FInitialized then
-    View_Invalidate(FjEnv, Self.View);
+    View_Invalidate(gapp.Jni.jEnv, Self.View);
 end;
 
 procedure jForm.SetCloseCallBack(Func: TOnNotify; Sender: TObject);
@@ -3726,14 +3702,14 @@ function  jForm.GetOnViewClickListener(jObjForm: jObject): jObject;
 begin
   result := nil;
   if FInitialized then
-    Result:= jForm_GetOnViewClickListener(FjEnv, jObjForm);
+    Result:= jForm_GetOnViewClickListener(gapp.Jni.jEnv, jObjForm);
 end;
 
 function  jForm.GetOnListItemClickListener(jObjForm: jObject): jObject;
 begin
   result := nil;
   if FInitialized then
-    Result:= jForm_GetOnListItemClickListener(FjEnv, jObjForm);
+    Result:= jForm_GetOnListItemClickListener(gapp.Jni.jEnv, jObjForm);
 end;
 
 procedure jForm.GenEvent_OnListItemClick(jObjAdapterView: jObject; //gdx
@@ -3754,21 +3730,21 @@ function jForm.GetStringExtra(intentData: jObject; extraName: string): string;
 begin
    result := '';
    if FInitialized then
-     Result:= jForm_GetStringExtra(FjEnv, FjObject, intentData ,extraName);
+     Result:= jForm_GetStringExtra(gapp.Jni.jEnv, FjObject, intentData ,extraName);
 end;
 
 function jForm.GetIntExtra(intentData: jObject; extraName: string; defaultValue: integer): integer;
 begin
   result := 0;
   if FInitialized then
-    Result:= jForm_GetIntExtra(FjEnv, FjObject, intentData ,extraName ,defaultValue);
+    Result:= jForm_GetIntExtra(gapp.Jni.jEnv, FjObject, intentData ,extraName ,defaultValue);
 end;
 
 function jForm.GetDoubleExtra(intentData: jObject; extraName: string; defaultValue: double): double;
 begin
   result := 0;
   if FInitialized then
-    Result:= jForm_GetDoubleExtra(FjEnv, FjObject, intentData ,extraName ,defaultValue);
+    Result:= jForm_GetDoubleExtra(gapp.Jni.jEnv, FjObject, intentData ,extraName ,defaultValue);
 end;
 
 function jForm.SetWifiEnabled(_status: boolean): boolean;
@@ -3777,63 +3753,63 @@ begin
 
   if not FInitialized then Exit;
 
-  Result:= jni_func_z_out_z(FjEnv, FjObject, 'SetWifiEnabled', _status);
+  Result:= jni_func_z_out_z(gapp.Jni.jEnv, FjObject, 'SetWifiEnabled', _status);
 end;
 
 function jForm.IsWifiEnabled(): boolean;
 begin
    result := false;
    if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsWifiEnabled');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsWifiEnabled');
 end;
 
 function jForm.IsConnected(): boolean; // by renabor
 begin
    result := false;
    if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsConnected');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsConnected');
 end;
 
 function jForm.IsConnectedWifi(): boolean; // by renabor
 begin
   result := false;
   if FInitialized then
-     Result:= jni_func_out_z(FjEnv, FjObject, 'IsConnectedWifi');
+     Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsConnectedWifi');
 end;
 
 function jForm.IsScreenLocked(): boolean;
 begin
    result := false;
    if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsScreenLocked');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsScreenLocked');
 end;
 
 function jForm.IsSleepMode(): boolean;
 begin
    result := false;
    if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsSleepMode');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsSleepMode');
 end;
 
 function jForm.GetEnvironmentDirectoryPath(_directory: TEnvDirectory): string;
 begin
   Result:='';
   if FInitialized then
-    Result:= jni_func_i_out_t(FjEnv, FjObject, 'GetEnvironmentDirectoryPath', Ord(_directory))
+    Result:= jni_func_i_out_t(gapp.Jni.jEnv, FjObject, 'GetEnvironmentDirectoryPath', Ord(_directory))
 end;
 
 function jForm.GetInternalAppStoragePath: string;
 begin
   Result:='';
   if FInitialized then
-    Result:= jni_func_out_t(FjEnv, FjObject, 'GetInternalAppStoragePath');
+    Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetInternalAppStoragePath');
 end;
 
 function jForm.CopyFile(srcFullFilename: string; destFullFilename: string): boolean;
 begin
   Result:= False;
   if FInitialized then
-    Result:= jni_func_tt_out_z(FjEnv, FjObject, 'CopyFile', srcFullFilename, destFullFilename);
+    Result:= jni_func_tt_out_z(gapp.Jni.jEnv, FjObject, 'CopyFile', srcFullFilename, destFullFilename);
 end;
 
 //by Tomash
@@ -3841,81 +3817,81 @@ function jForm.CopyFileFromUri(srcUri: jObject; destDir: string): string; //tk+
 begin
  Result:= '';
  if FInitialized then
-   Result:= jForm_CopyFileFromUri(FjEnv, FjObject, srcUri, destDir);
+   Result:= jForm_CopyFileFromUri(gapp.Jni.jEnv, FjObject, srcUri, destDir);
 end;
 
 function jForm.LoadFromAssets(fileName: string): string;
 begin
   Result:= '';
   if FInitialized then
-    Result:= jni_func_t_out_t(FjEnv, FjObject, 'LoadFromAssets', fileName);
+    Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'LoadFromAssets', fileName);
 end;
 
 function jForm.IsSdCardMounted: boolean;
 begin
   Result:= False;
   if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsSdCardMounted');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsSdCardMounted');
 end;
 
 procedure jForm.DeleteFile(_filename: string);
 begin
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'DeleteFile', _filename);
+     jni_proc_t(gapp.Jni.jEnv, FjObject, 'DeleteFile', _filename);
 end;
 
 procedure jForm.DeleteFile(_fullPath: string; _filename: string);
 begin
   if FInitialized then
-     jni_proc_tt(FjEnv,FjObject, 'DeleteFile', _fullPath ,_filename);
+     jni_proc_tt(gapp.Jni.jEnv,FjObject, 'DeleteFile', _fullPath ,_filename);
 end;
 
 procedure jForm.DeleteFile(_environmentDir: TEnvDirectory; _filename: string);
 begin
   if FInitialized then
-     jni_proc_it(FjEnv, FjObject, 'DeleteFile', Ord(_environmentDir) ,_filename);
+     jni_proc_it(gapp.Jni.jEnv, FjObject, 'DeleteFile', Ord(_environmentDir) ,_filename);
 end;
 
 function jForm.CreateDir(_dirName: string): string;
 begin
   result := '';
   if FInitialized then
-    Result:= jni_func_t_out_t(FjEnv,FjObject, 'CreateDir', _dirName);
+    Result:= jni_func_t_out_t(gapp.Jni.jEnv,FjObject, 'CreateDir', _dirName);
 end;
 
 function jForm.CreateDir(_environmentDir: TEnvDirectory; _dirName: string): string;
 begin
   result := '';
   if FInitialized then
-    Result:= jni_func_it_out_t(FjEnv, FjObject, 'CreateDir', Ord(_environmentDir) ,_dirName);
+    Result:= jni_func_it_out_t(gapp.Jni.jEnv, FjObject, 'CreateDir', Ord(_environmentDir) ,_dirName);
 end;
 
 function jForm.CreateDir(_fullPath: string; _dirName: string): string;
 begin
   result := '';
   if FInitialized then
-    Result:= jni_func_tt_out_t(FjEnv, FjObject, 'CreateDir', _fullPath ,_dirName);
+    Result:= jni_func_tt_out_t(gapp.Jni.jEnv, FjObject, 'CreateDir', _fullPath ,_dirName);
 end;
 
 function jForm.IsExternalStorageEmulated(): boolean;
 begin
   result := false;
   if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageEmulated');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsExternalStorageEmulated');
 end;
 
 function jForm.IsExternalStorageRemovable(): boolean;
 begin
   result := false;
   if FInitialized then
-    Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageRemovable');
+    Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsExternalStorageRemovable');
 end;
 
 function jForm.GetjFormVersionFeatures(): string;
 begin
   result := '';
   if FInitialized then
-    Result:= jni_func_out_t(FjEnv, FjObject, 'GetjFormVersionFeatures');
+    Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetjFormVersionFeatures');
 end;
 
 function jForm.GetActionBar(): jObject;
@@ -3925,7 +3901,7 @@ begin
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-       Result:= jForm_GetActionBar(FjEnv, FjObject);
+       Result:= jForm_GetActionBar(gapp.Jni.jEnv, FjObject);
   end;
 end;
 
@@ -3935,7 +3911,7 @@ begin
 
 
   if FActionBarTitle <> abtNone then
-   jni_proc(FjEnv, FjObject, 'HideActionBar');
+   jni_proc(gapp.Jni.jEnv, FjObject, 'HideActionBar');
 
 end;
 
@@ -3944,7 +3920,7 @@ begin
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-       jni_proc(FjEnv, FjObject, 'ShowActionBar');
+       jni_proc(gapp.Jni.jEnv, FjObject, 'ShowActionBar');
   end;
 end;
 
@@ -3953,7 +3929,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jni_proc_z(FjEnv, FjObject, 'ShowTitleActionBar', _value);
+       jni_proc_z(gapp.Jni.jEnv, FjObject, 'ShowTitleActionBar', _value);
   end;
 end;
 
@@ -3962,7 +3938,7 @@ begin
   if FjObject = nil then exit;
 
   if FActionBarTitle <> abtNone then
-     jni_proc_z(FjEnv, FjObject, 'ShowLogoActionBar', _value);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'ShowLogoActionBar', _value);
 end;
 
 procedure jForm.SetTitleActionBar(_title: string);
@@ -3970,7 +3946,7 @@ begin
   if FjObject = nil then exit;
 
   if FActionBarTitle <> abtNone then
-    jni_proc_t(FjEnv, FjObject, 'SetTitleActionBar', _title);
+    jni_proc_t(gapp.Jni.jEnv, FjObject, 'SetTitleActionBar', _title);
 
 end;
 
@@ -3979,7 +3955,7 @@ begin
  if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jni_proc_z(FjEnv, FjObject, 'SetActionBarShowHome', showHome);
+       jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetActionBarShowHome', showHome);
   end;
 end;
 
@@ -3988,7 +3964,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jni_proc_i(FjEnv, FjObject, 'SetActionBarColor', GetARGB(FCustomColor, color));
+       jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetActionBarColor', GetARGB(FCustomColor, color));
   end;
 end;
 
@@ -3997,7 +3973,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jni_proc_i(FjEnv, FjObject, 'SetNavigationColor', GetARGB(FCustomColor, color));
+       jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetNavigationColor', GetARGB(FCustomColor, color));
   end;
 end;
 
@@ -4008,7 +3984,7 @@ begin
     FColor:= color;
 
      if FActionBarTitle <> abtNone then
-       jni_proc_i(FjEnv, FjObject, 'SetStatusColor', GetARGB(FCustomColor, FColor));
+       jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetStatusColor', GetARGB(FCustomColor, FColor));
   end;
 end;
 
@@ -4017,7 +3993,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-        jni_proc_t(FjEnv, FjObject, 'SetSubTitleActionBar', _subtitle);
+        jni_proc_t(gapp.Jni.jEnv, FjObject, 'SetSubTitleActionBar', _subtitle);
   end;
 end;
 
@@ -4026,7 +4002,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jni_proc_t(FjEnv, FjObject, 'SetIconActionBar', _iconIdentifier);
+       jni_proc_t(gapp.Jni.jEnv, FjObject, 'SetIconActionBar', _iconIdentifier);
   end;
 end;
 
@@ -4035,7 +4011,7 @@ begin
   if FInitialized then
   begin
     if FActionBarTitle <> abtNone then
-      jni_proc(FjEnv, FjObject, 'SetTabNavigationModeActionBar');
+      jni_proc(gapp.Jni.jEnv, FjObject, 'SetTabNavigationModeActionBar');
   end;
 end;
 
@@ -4044,7 +4020,7 @@ begin
   if FInitialized then
   begin
      if FActionBarTitle <> abtNone then
-       jni_proc(FjEnv, FjObject, 'RemoveAllTabsActionBar');
+       jni_proc(gapp.Jni.jEnv, FjObject, 'RemoveAllTabsActionBar');
   end;
 end;
 
@@ -4053,7 +4029,7 @@ begin
   result := 0;
 
   if FInitialized then
-   result:= jni_func_t_out_i(FjEnv, FjObject, 'GetStringResourceId', _resName);
+   result:= jni_func_t_out_i(gapp.Jni.jEnv, FjObject, 'GetStringResourceId', _resName);
 end;
 
 function jForm.GetStringReplace(_strIn, _strFind, _strReplace: string): string;
@@ -4061,7 +4037,7 @@ begin
   result := '';
 
   if FInitialized then
-   result:= jni_func_ttt_out_t(FjEnv, FjObject, 'GetStringReplace', _strIn, _strFind, _strReplace);
+   result:= jni_func_ttt_out_t(gapp.Jni.jEnv, FjObject, 'GetStringReplace', _strIn, _strFind, _strReplace);
 end;
 
 function jForm.GetStringResourceById(_resID: integer): string;
@@ -4069,7 +4045,7 @@ begin
   result := '';
 
   if FInitialized then
-   result:= jni_func_i_out_t(FjEnv, FjObject, 'GetStringResourceById', _resID);
+   result:= jni_func_i_out_t(gapp.Jni.jEnv, FjObject, 'GetStringResourceById', _resID);
 end;
 
 function jForm.GetDrawableResourceId(_resName: string): integer;
@@ -4077,7 +4053,7 @@ begin
   result := 0;
 
   if FInitialized then
-    result:= jni_func_t_out_i(FjEnv, FjObject, 'GetDrawableResourceId', _resName);
+    result:= jni_func_t_out_i(gapp.Jni.jEnv, FjObject, 'GetDrawableResourceId', _resName);
 end;
 
 function jForm.GetDrawableResourceById(_resID: integer): jObject;
@@ -4085,7 +4061,7 @@ begin
   result := nil;
 
   if FInitialized then
-   result:= jForm_GetDrawableResourceById(FjEnv, FjObject, _resID);
+   result:= jForm_GetDrawableResourceById(gapp.Jni.jEnv, FjObject, _resID);
 end;
 
 function jForm.GetQuantityStringByName(_resName: string; _quantity: integer): string;
@@ -4093,7 +4069,7 @@ begin
   result := '';
 
   if FInitialized then
-   result:= jni_func_ti_out_t(FjEnv, FjObject, 'GetQuantityStringByName', _resName ,_quantity);
+   result:= jni_func_ti_out_t(gapp.Jni.jEnv, FjObject, 'GetQuantityStringByName', _resName ,_quantity);
 end;
 
 function jForm.GetStringResourceByName(_resName: string): string;
@@ -4101,7 +4077,7 @@ begin
   result := '';
 
   if FInitialized then
-   result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStringResourceByName', _resName);
+   result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetStringResourceByName', _resName);
 end;
 
 function jForm.GetSystemVersion: Integer;
@@ -4109,7 +4085,7 @@ begin
   result := 0;
 
   if(FInitialized) then
-    result:= jni_func_out_i(FjEnv, FjObject, 'GetSystemVersion');
+    result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetSystemVersion');
 end;
 
 function jForm.GetDevicePhoneNumber: String;
@@ -4117,7 +4093,7 @@ begin
    result := '';
 
    if FInitialized then
-    result:= jni_func_out_t(FjEnv, FjObject, 'GetDevPhoneNumber');
+    result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetDevPhoneNumber');
 end;
 
 function jForm.GetDeviceID: String;
@@ -4125,7 +4101,7 @@ begin
    result := '';
 
    if FInitialized then
-   result:=jni_func_out_t(FjEnv, FjObject, 'GetDevDeviceID');
+   result:=jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetDevDeviceID');
 end;
 
 function jForm.IsPackageInstalled(_packagename: string): boolean;
@@ -4134,21 +4110,21 @@ begin
 
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsPackageInstalled', _packagename);
+   Result:= jni_func_t_out_z(gapp.Jni.jEnv, FjObject, 'IsPackageInstalled', _packagename);
 end;
 
 procedure jForm.ShowCustomMessage(_panel: jObject; _gravity: TGravity);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowCustomMessage(FjEnv, FjObject, _panel, GetGravity(_gravity) );
+     jForm_ShowCustomMessage(gapp.Jni.jEnv, FjObject, _panel, GetGravity(_gravity) );
 end;
 
 procedure jForm.CancelShowCustomMessage();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'CancelShowCustomMessage');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'CancelShowCustomMessage');
 end;
 
 procedure jForm.SetScreenOrientationStyle(_orientation: TScreenStyle);
@@ -4156,7 +4132,7 @@ begin
   //in designing component state: set value here...
   FScreenStyle:= _orientation;
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetScreenOrientation', Ord(_orientation));
+     jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetScreenOrientation', Ord(_orientation));
 end;
 
 function jForm.GetScreenOrientationStyle(): TScreenStyle;
@@ -4164,7 +4140,7 @@ begin
   //in designing component state: result value here...
   Result:= FScreenStyle;
   if FInitialized then
-   Result:= TScreenStyle(jni_func_out_i(FjEnv, FjObject, 'GetScreenOrientation'));
+   Result:= TScreenStyle(jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetScreenOrientation'));
 end;
 
 function jForm.GetScreenDpi(): integer;
@@ -4172,7 +4148,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenDpi');
+   Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetScreenDpi');
 end;
 
 function jForm.GetScreenDensity(): string;
@@ -4180,7 +4156,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetScreenDensity');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetScreenDensity');
 end;
 
 //SplitStr(var theString: string; delimiter: string): string;
@@ -4197,57 +4173,42 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetScreenSize');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetScreenSize');
 end;
 
 procedure jForm.LogDebug(_tag: string; _msg: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'LogDebug', _tag ,_msg);
+     jni_proc_tt(gapp.Jni.jEnv, FjObject, 'LogDebug', _tag ,_msg);
 end;
 
 procedure jForm.ShowCustomMessage(_layout: jObject; _gravity: TGravity; _lenghTimeSecond: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_ShowCustomMessage(FjEnv, FjObject, _layout ,GetGravity(_gravity) ,_lenghTimeSecond);
+     jForm_ShowCustomMessage(gapp.Jni.jEnv, FjObject, _layout ,GetGravity(_gravity) ,_lenghTimeSecond);
 end;
 
 procedure jForm.Vibrate(_milliseconds: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Vibrate', _milliseconds);
+     jni_proc_i(gapp.Jni.jEnv, FjObject, 'Vibrate', _milliseconds);
 end;
 
 procedure jForm.Vibrate(var _millisecondsPattern: TDynArrayOfInt64);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_Vibrate(FjEnv, FjObject, _millisecondsPattern);
+     jForm_Vibrate(gapp.Jni.jEnv, FjObject, _millisecondsPattern);
 end;
 
 procedure jForm.TakeScreenshot(_savePath: string; _saveFileNameJPG: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'TakeScreenshot', _savePath ,_saveFileNameJPG);
-end;
-
-procedure jForm.UpdateJNI(refApp: jApp);
-var
-  i, count: integer;
-begin
-  inherited UpdateJNI(refApp);
-  count:= Self.ComponentCount;
-  for i:= (count-1) downto 0 do
-  begin
-    if (Self.Components[i] is jControl) then
-    begin
-       (Self.Components[i] as jControl).UpdateJNI(refApp);
-    end;
-  end;
+     jni_proc_tt(gapp.Jni.jEnv, FjObject, 'TakeScreenshot', _savePath ,_saveFileNameJPG);
 end;
 
 function jForm.GetTitleActionBar(): string;
@@ -4256,7 +4217,7 @@ begin
   //in designing component state: result value here...
   if FInitialized then
     if FActionBarTitle <> abtNone then
-       Result:= jni_func_out_t(FjEnv, FjObject, 'GetTitleActionBar');
+       Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetTitleActionBar');
 
 end;
 
@@ -4267,7 +4228,7 @@ begin
 
   if FInitialized then
     if FActionBarTitle <> abtNone then
-      Result:= jni_func_out_t(FjEnv, FjObject, 'GetSubTitleActionBar');
+      Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetSubTitleActionBar');
 
 end;
 
@@ -4276,21 +4237,21 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-    Result:= jni_func_t_out_t(FjEnv, FjObject, 'CopyFromAssetsToInternalAppStorage', _filename);
+    Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'CopyFromAssetsToInternalAppStorage', _filename);
 end;
 
 procedure jForm.CopyFromInternalAppStorageToEnvironmentDir(_filename: string; _environmentDirPath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'CopyFromInternalAppStorageToEnvironmentDir', _filename ,_environmentDirPath);
+     jni_proc_tt(gapp.Jni.jEnv, FjObject, 'CopyFromInternalAppStorageToEnvironmentDir', _filename ,_environmentDirPath);
 end;
 
 procedure jForm.CopyFromAssetsToEnvironmentDir(_filename: string; _environmentDirPath: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'CopyFromAssetsToEnvironmentDir', _filename ,_environmentDirPath);
+     jni_proc_tt(gapp.Jni.jEnv, FjObject, 'CopyFromAssetsToEnvironmentDir', _filename ,_environmentDirPath);
 end;
 
 function jForm.DumpExceptionCallStack(E: Exception): string; //by Euller and Oswaldo
@@ -4312,7 +4273,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetRealPathFromURI(FjEnv, FjObject, _Uri);
+   Result:= jForm_GetRealPathFromURI(gapp.Jni.jEnv, FjObject, _Uri);
 end;
 
 function jForm.ToSignedByte(b: byte): shortint;
@@ -4324,7 +4285,7 @@ end;
 procedure jForm.StartDefaultActivityForFile(_filePath, _mimeType: string);
 begin
   if FInitialized then
-     jni_proc_tt(FjEnv, FjObject, 'StartDefaultActivityForFile', _filePath, _mimeType);
+     jni_proc_tt(gapp.Jni.jEnv, FjObject, 'StartDefaultActivityForFile', _filePath, _mimeType);
 end;
 
 function jForm.ActionBarIsShowing(): boolean;
@@ -4333,7 +4294,7 @@ begin
   //in designing component state: result value here...
   if FInitialized then
     if FActionBarTitle <> abtNone then
-      Result:= jni_func_out_z(FjEnv, FjObject, 'ActionBarIsShowing');
+      Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'ActionBarIsShowing');
 
 end;
 
@@ -4341,7 +4302,7 @@ procedure jForm.ToggleSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ToggleSoftInput');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'ToggleSoftInput');
 end;
 
 function jForm.GetDeviceModel(): string;
@@ -4349,7 +4310,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceModel');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetDeviceModel');
 end;
 
 function jForm.GetDeviceManufacturer(): string;
@@ -4357,7 +4318,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceManufacturer');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetDeviceManufacturer');
 end;
 
 procedure jForm.SetActivityMode(Value: TActivityMode);
@@ -4370,28 +4331,28 @@ procedure jForm.SetKeepScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetKeepScreenOn', _value);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetKeepScreenOn', _value);
 end;
 
 procedure jForm.SetTurnScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetTurnScreenOn', _value);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetTurnScreenOn', _value);
 end;
 
 procedure jForm.SetAllowLockWhileScreenOn(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetAllowLockWhileScreenOn', _value);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetAllowLockWhileScreenOn', _value);
 end;
 
 procedure jForm.SetShowWhenLocked(_value: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetShowWhenLocked', _value);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetShowWhenLocked', _value);
 end;
 
 function jForm.ParseUri(_uriAsString: string): jObject;
@@ -4399,7 +4360,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_ParseUri(FjEnv, FjObject, _uriAsString);
+   Result:= jForm_ParseUri(gapp.Jni.jEnv, FjObject, _uriAsString);
 end;
 
 function jForm.UriToString(_uri: jObject): string;
@@ -4407,7 +4368,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_UriToString(FjEnv, FjObject, _uri);
+   Result:= jForm_UriToString(gapp.Jni.jEnv, FjObject, _uri);
 end;
 
 function jForm.IsConnectedTo(_connectionType: TConnectionType): boolean;
@@ -4415,7 +4376,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_i_out_z(FjEnv, FjObject, 'IsConnectedTo', Ord(_connectionType));
+   Result:= jni_func_i_out_z(gapp.Jni.jEnv, FjObject, 'IsConnectedTo', Ord(_connectionType));
 end;
 
 function jForm.IsMobileDataEnabled(): boolean;
@@ -4423,35 +4384,35 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsMobileDataEnabled');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsMobileDataEnabled');
 end;
 
 procedure jForm.HideSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'HideSoftInput');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'HideSoftInput');
 end;
 
 procedure jForm.ShowSoftInput();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'ShowSoftInput');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'ShowSoftInput');
 end;
 
 procedure jForm.SetSoftInputModeAdjust( _inputMode : TInputModeAdjust );
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'SetSoftInputMode', Ord(_inputMode));
+     jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetSoftInputMode', Ord(_inputMode));
 end;
 
 function jForm.GetNetworkStatus(): TNetworkStatus;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= TNetworkStatus(jni_func_out_i(FjEnv, FjObject, 'GetNetworkStatus'));
+   Result:= TNetworkStatus(jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetNetworkStatus'));
 end;
 
 function jForm.GetDeviceDataMobileIPAddress(): string;
@@ -4459,7 +4420,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceDataMobileIPAddress');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetDeviceDataMobileIPAddress');
 end;
 
 function jForm.GetDeviceWifiIPAddress(): string;
@@ -4467,7 +4428,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetDeviceWifiIPAddress');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetDeviceWifiIPAddress');
 end;
 
 function jForm.GetWifiBroadcastIPAddress(): string;
@@ -4475,7 +4436,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetWifiBroadcastIPAddress');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetWifiBroadcastIPAddress');
 end;
 
 function jForm.LoadFromAssetsTextContent(_filename: string): string;
@@ -4483,7 +4444,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'LoadFromAssetsTextContent', _filename);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'LoadFromAssetsTextContent', _filename);
 end;
 
 function jForm.RGBA(color: string): TSimpleRGBAColor;
@@ -4544,7 +4505,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetStripAccents', _str);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetStripAccents', _str);
 end;
 
 function jForm.GetPathFromAssetsFile(_assetsFileName: string): string;
@@ -4552,7 +4513,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetPathFromAssetsFile', _assetsFileName);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetPathFromAssetsFile', _assetsFileName);
 end;
 
 function jForm.GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
@@ -4560,7 +4521,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetImageFromAssetsFile', _assetsImageFileName);
+   Result:= jni_func_t_out_bmp(gapp.Jni.jEnv, FjObject, 'GetImageFromAssetsFile', _assetsImageFileName);
 end;
 
 function jForm.GetAssetContentList(_path: string): TDynArrayOfString;
@@ -4568,7 +4529,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetAssetContentList(FjEnv, FjObject, _path);
+   Result:= jForm_GetAssetContentList(gapp.Jni.jEnv, FjObject, _path);
 end;
 
 function jForm.GetDriverList(): TDynArrayOfString;
@@ -4576,7 +4537,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetDriverList(FjEnv, FjObject);
+   Result:= jForm_GetDriverList(gapp.Jni.jEnv, FjObject);
 end;
 
 function jForm.GetFolderList(_envPath: string): TDynArrayOfString;
@@ -4584,7 +4545,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetFolderList(FjEnv, FjObject, _envPath);
+   Result:= jForm_GetFolderList(gapp.Jni.jEnv, FjObject, _envPath);
 end;
 
 function jForm.GetFileList(_envPath: string): TDynArrayOfString;
@@ -4592,7 +4553,7 @@ begin
   Result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetFileList(FjEnv, FjObject, _envPath);
+   Result:= jForm_GetFileList(gapp.Jni.jEnv, FjObject, _envPath);
 end;
 
 function jForm.ToStringList(_dynArrayOfString: TDynArrayOfString; _delimiter: char): TStringList;
@@ -4617,7 +4578,7 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'FileExists', _fullFileName);
+   Result:= jni_func_t_out_z(gapp.Jni.jEnv, FjObject, 'FileExists', _fullFileName);
 end;
 
 function jForm.DirectoryExists(_fullDirectoryName: string): boolean;
@@ -4625,35 +4586,35 @@ begin
   //in designing component state: result value here...
   Result:= False;
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'DirectoryExists', _fullDirectoryName);
+   Result:= jni_func_t_out_z(gapp.Jni.jEnv, FjObject, 'DirectoryExists', _fullDirectoryName);
 end;
 
 procedure jForm.Minimize();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'Minimize');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'Minimize');
 end;
 
 procedure jForm.MoveToBack();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'MoveToBack');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'MoveToBack');
 end;
 
 procedure jForm.MoveTaskToBack(_nonRoot: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'MoveTaskToBack', _nonRoot);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'MoveTaskToBack', _nonRoot);
 end;
 
 procedure jForm.MoveTaskToFront();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'MoveTaskToFront');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'MoveTaskToFront');
 end;
 
 function jForm.isUsageStatsAllowed(): boolean;
@@ -4661,14 +4622,14 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'isUsageStatsAllowed');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'isUsageStatsAllowed');
 end;
 
 procedure jForm.RequestUsageStatsPermission();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc(FjEnv, FjObject, 'RequestUsageStatsPermission');
+     jni_proc(gapp.Jni.jEnv, FjObject, 'RequestUsageStatsPermission');
 end;
 
 function jForm.GetTaskInFront(): string;
@@ -4676,7 +4637,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetTaskInFront');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetTaskInFront');
 end;
 
 function jForm.GetApplicationIcon(_package:string): jObject;
@@ -4684,7 +4645,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_bmp(FjEnv, FjObject, 'GetApplicationIcon', _package);
+   Result:= jni_func_t_out_bmp(gapp.Jni.jEnv, FjObject, 'GetApplicationIcon', _package);
 end;
 
 function jForm.GetApplicationName(_package:string): string;
@@ -4692,7 +4653,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetApplicationName', _package);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetApplicationName', _package);
 end;
 
 function jForm.GetInstalledAppList(): TDynArrayOfString;
@@ -4700,21 +4661,21 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetInstalledAppList(FjEnv, FjObject);
+   Result:= jForm_GetInstalledAppList(gapp.Jni.jEnv, FjObject);
 end;
 
 procedure jForm.Restart(_delay: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'Restart', _delay);
+     jni_proc_i(gapp.Jni.jEnv, FjObject, 'Restart', _delay);
 end;
 
 procedure jForm.HideSoftInput(_view: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_HideSoftInput(FjEnv, FjObject, _view);
+     jForm_HideSoftInput(gapp.Jni.jEnv, FjObject, _view);
 end;
 
 function jForm.UriEncode(_message: string): string;
@@ -4722,7 +4683,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'UriEncode', _message);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'UriEncode', _message);
 end;
 
 function jForm.ParseHtmlFontAwesome(_htmlString: string): string;
@@ -4730,7 +4691,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'ParseHtmlFontAwesome', _htmlString);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'ParseHtmlFontAwesome', _htmlString);
 end;
 
 procedure jForm.SetLayoutParent(_viewgroup: jObject);
@@ -4738,28 +4699,28 @@ begin
   //in designing component state: set value here...
   FjPRLayout:= _viewgroup;
   if FInitialized then
-     jForm_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     jForm_SetViewParent(gapp.Jni.jEnv, FjObject, FjPRLayout);
 end;
 
 procedure jForm.ResetLayoutParent();
 begin
   FjPRLayout:= FjPRLayoutHome;
   if FInitialized then
-     jForm_SetViewParent(FjEnv, FjObject, FjPRLayout);
+     jForm_SetViewParent(gapp.Jni.jEnv, FjObject, FjPRLayout);
 end;
 
 function jForm.GetLayoutParent: jObject;
 begin
   Result:= FjPRLayout;
   if FInitialized then
-    Result:= jForm_GetParent(FjEnv, FjObject);
+    Result:= jForm_GetParent(gapp.Jni.jEnv, FjObject);
 end;
 
 procedure jForm.RemoveFromLayoutParent();
 begin
   //in designing component state: set value here...
   if FInitialized then
-    jni_proc(FjEnv, FjObject, 'RemoveFromViewParent');
+    jni_proc(gapp.Jni.jEnv, FjObject, 'RemoveFromViewParent');
 end;
 
 
@@ -4768,7 +4729,7 @@ begin
   //in designing component state: set value here...
   FLayoutVisibility:= _value;
   if FInitialized then
-     jni_proc_z(FjEnv, FjObject, 'SetLayoutVisibility', _value);
+     jni_proc_z(gapp.Jni.jEnv, FjObject, 'SetLayoutVisibility', _value);
 end;
 
 function jForm.GetSettingsSystemInt(_strKey: string): integer;
@@ -4776,7 +4737,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_i(FjEnv, FjObject, 'GetSettingsSystemInt', _strKey);
+   Result:= jni_func_t_out_i(gapp.Jni.jEnv, FjObject, 'GetSettingsSystemInt', _strKey);
 end;
 
 function jForm.GetSettingsSystemString(_strKey: string): string;
@@ -4784,7 +4745,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetSettingsSystemString', _strKey);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetSettingsSystemString', _strKey);
 end;
 
 function jForm.GetSettingsSystemFloat(_strKey: string): single;
@@ -4792,7 +4753,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_f(FjEnv, FjObject, 'GetSettingsSystemFloat', _strKey);
+   Result:= jni_func_t_out_f(gapp.Jni.jEnv, FjObject, 'GetSettingsSystemFloat', _strKey);
 end;
 
 function jForm.GetSettingsSystemLong(_strKey: string): int64;
@@ -4800,7 +4761,7 @@ begin
   result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_j(FjEnv, FjObject, 'GetSettingsSystemLong', _strKey);
+   Result:= jni_func_t_out_j(gapp.Jni.jEnv, FjObject, 'GetSettingsSystemLong', _strKey);
 end;
 
 function jForm.PutSettingsSystemInt(_strKey: string; _value: integer): boolean;
@@ -4808,7 +4769,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_ti_out_z(FjEnv, FjObject, 'PutSettingsSystemInt', _strKey ,_value);
+   Result:= jni_func_ti_out_z(gapp.Jni.jEnv, FjObject, 'PutSettingsSystemInt', _strKey ,_value);
 end;
 
 function jForm.PutSettingsSystemLong(_strKey: string; _value: int64): boolean;
@@ -4816,7 +4777,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tj_out_z(FjEnv, FjObject, 'PutSettingsSystemLong', _strKey ,_value);
+   Result:= jni_func_tj_out_z(gapp.Jni.jEnv, FjObject, 'PutSettingsSystemLong', _strKey ,_value);
 end;
 
 function jForm.PutSettingsSystemFloat(_strKey: string; _value: single): boolean;
@@ -4824,7 +4785,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tf_out_z(FjEnv, FjObject, 'PutSettingsSystemFloat', _strKey ,_value);
+   Result:= jni_func_tf_out_z(gapp.Jni.jEnv, FjObject, 'PutSettingsSystemFloat', _strKey ,_value);
 end;
 
 function jForm.PutSettingsSystemString(_strKey: string; _strValue: string): boolean;
@@ -4832,7 +4793,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_tt_out_z(FjEnv, FjObject, 'PutSettingsSystemString', _strKey ,_strValue);
+   Result:= jni_func_tt_out_z(gapp.Jni.jEnv, FjObject, 'PutSettingsSystemString', _strKey ,_strValue);
 end;
 
 function jForm.IsRuntimePermissionNeed(): boolean;
@@ -4840,7 +4801,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsRuntimePermissionNeed');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsRuntimePermissionNeed');
 end;
 
 function jForm.IsRuntimePermissionGranted(_manifestPermission: string): boolean;
@@ -4848,28 +4809,28 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_t_out_z(FjEnv, FjObject, 'IsRuntimePermissionGranted', _manifestPermission);
+   Result:= jni_func_t_out_z(gapp.Jni.jEnv, FjObject, 'IsRuntimePermissionGranted', _manifestPermission);
 end;
 
 procedure jForm.RequestRuntimePermission(_manifestPermission: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'RequestRuntimePermission', _manifestPermission ,_requestCode);
+     jni_proc_ti(gapp.Jni.jEnv, FjObject, 'RequestRuntimePermission', _manifestPermission ,_requestCode);
 end;
 
 procedure jForm.RequestRuntimePermission(var _androidPermissions: TDynArrayOfString; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestRuntimePermission(FjEnv, FjObject, _androidPermissions ,_requestCode);
+     jForm_RequestRuntimePermission(gapp.Jni.jEnv, FjObject, _androidPermissions ,_requestCode);
 end;
 
 procedure jForm.RequestRuntimePermission(_androidPermissions: array of string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_RequestRuntimePermission(FjEnv, FjObject, _androidPermissions ,_requestCode);
+     jForm_RequestRuntimePermission(gapp.Jni.jEnv, FjObject, _androidPermissions ,_requestCode);
 end;
 
 function jForm.HasActionBar(): boolean;
@@ -4877,7 +4838,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'HasActionBar');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'HasActionBar');
 end;
 
 function jForm.IsAppCompatProject(): boolean;
@@ -4885,7 +4846,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsAppCompatProject');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsAppCompatProject');
 end;
 
 function jForm.GetVersionCode() : integer;
@@ -4893,7 +4854,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetVersionCode');
+   Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetVersionCode');
 end;
 
 function jForm.GetVersionName() : string;
@@ -4901,7 +4862,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetVersionName');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetVersionName');
 end;
 
 function jForm.GetVersionPlayStore( appUrlString : string ) : string;
@@ -4909,7 +4870,7 @@ begin
   Result := '';
 
   if FInitialized then
-   Result:= jni_func_t_out_t(FjEnv, FjObject, 'GetVersionPlayStore', appUrlString);
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetVersionPlayStore', appUrlString);
 end;
 
 function jForm.GetScreenWidth(): integer;
@@ -4917,7 +4878,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenWidth');
+   Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetScreenWidth');
 end;
 
 function jForm.GetScreenHeight(): integer;
@@ -4925,7 +4886,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetScreenHeight');
+   Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetScreenHeight');
 end;
 
 function jForm.GetRealScreenWidth(): integer;
@@ -4933,7 +4894,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRealScreenWidth');
+   Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetRealScreenWidth');
 end;
 
 function jForm.GetRealScreenHeight(): integer;
@@ -4941,7 +4902,7 @@ begin
   Result := 0;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_i(FjEnv, FjObject, 'GetRealScreenHeight');
+   Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetRealScreenHeight');
 end;
 
 function jForm.IsInMultiWindowMode(): boolean;
@@ -4949,7 +4910,7 @@ begin
   Result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsInMultiWindowMode');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsInMultiWindowMode');
 end;
 
 function jForm.GetSystemVersionString(): string;
@@ -4957,7 +4918,7 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'GetSystemVersionString');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetSystemVersionString');
 end;
 
 function jForm.GetDateTimeDecode(
@@ -4990,7 +4951,7 @@ begin
 
  if FjObject = nil then exit;
 
- jni_proc_t(FjEnv, FjObject, 'SetBackgroundImage', _imageIdentifier);
+ jni_proc_t(gapp.Jni.jEnv, FjObject, 'SetBackgroundImage', _imageIdentifier);
 end;
 
 // BY ADiV
@@ -4999,7 +4960,7 @@ begin
   //in designing component state: set value here...
  FBackgroundImageIdentifier:= _imageIdentifier;
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'SetBackgroundImage', _imageIdentifier, _scaleType);
+     jni_proc_ti(gapp.Jni.jEnv, FjObject, 'SetBackgroundImage', _imageIdentifier, _scaleType);
 end;
 
 // BY ADiV
@@ -5008,7 +4969,7 @@ procedure jForm.SetBackgroundImageMatrix(_scaleX, _scaleY, _degress,
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SetBackgroundImageMatrix(FjEnv, FjObject, _scaleX, _scaleY, _degress,
+     jForm_SetBackgroundImageMatrix(gapp.Jni.jEnv, FjObject, _scaleX, _scaleY, _degress,
                                     _dx, _dy, _centerX, _centerY );
 end;
 
@@ -5017,12 +4978,12 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetJByteBuffer(FjEnv, FjObject, _width ,_height);
+   Result:= jForm_GetJByteBuffer(gapp.Jni.jEnv, FjObject, _width ,_height);
 end;
 
 function jForm.GetJByteBufferAddress(jbyteBuffer: jObject): PJByte;
 begin
-   Result:= PJByte((FjEnv^).GetDirectBufferAddress(FjEnv,jbyteBuffer));
+   Result:= PJByte((gapp.Jni.jEnv^).GetDirectBufferAddress(gapp.Jni.jEnv,jbyteBuffer));
 end;
 
 function jForm.GetJByteBufferFromImage(_bitmap: jObject): jObject;
@@ -5030,12 +4991,12 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetByteBufferFromImage(FjEnv, FjObject, _bitmap);
+   Result:= jForm_GetByteBufferFromImage(gapp.Jni.jEnv, FjObject, _bitmap);
 end;
 
 function jForm.GetJGlobalRef(jObj: jObject): jObject;
 begin
-  Result := FjEnv^.NewGlobalRef(FjEnv,jObj);
+  Result := gapp.Jni.jEnv^.NewGlobalRef(gapp.Jni.jEnv,jObj);
 end;
 
 procedure jForm.SetAnimationDurationIn(_animationDurationIn: integer);
@@ -5043,7 +5004,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationIn:= _animationDurationIn;
   if FjObject = nil then exit;
-  jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
+  jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetAnimationDurationIn', _animationDurationIn);
 end;
 
 procedure jForm.SetAnimationDurationOut(_animationDurationOut: integer);
@@ -5051,7 +5012,7 @@ begin
   //in designing component state: set value here...
   FAnimationDurationOut:= _animationDurationOut;
   if FjObject = nil then exit;
-  jni_proc_i(FjEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
+  jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetAnimationDurationOut', _animationDurationOut);
 end;
 
 procedure jForm.SetAnimationMode(_animationMode: TAnimationMode);
@@ -5059,21 +5020,21 @@ begin
   //in designing component state: set value here...
   FAnimationMode:= _animationMode;
   if FjObject = nil then exit;
-  jni_proc_i(FjEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
+  jni_proc_i(gapp.Jni.jEnv, FjObject, 'SetAnimationMode', Ord(_animationMode));
 end;
 
 procedure jForm.RunOnUiThread(_tag: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_i(FjEnv, FjObject, 'RunOnUiThread', _tag);
+     jni_proc_i(gapp.Jni.jEnv, FjObject, 'RunOnUiThread', _tag);
 end;
 
 procedure jForm.CopyStringToClipboard(_txt: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_t(FjEnv, FjObject, 'CopyStringToClipboard', _txt);
+     jni_proc_t(gapp.Jni.jEnv, FjObject, 'CopyStringToClipboard', _txt);
 end;
 
 function jForm.PasteStringFromClipboard(): string;
@@ -5081,28 +5042,28 @@ begin
   Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_t(FjEnv, FjObject, 'PasteStringFromClipboard');
+   Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'PasteStringFromClipboard');
 end;
 
 procedure jForm.RequestCreateFile(_envPath: string; _fileMimeType: string; _fileName: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ttti(FjEnv, FjObject, 'RequestCreateFile', _envPath ,_fileMimeType ,_fileName ,_requestCode);
+     jni_proc_ttti(gapp.Jni.jEnv, FjObject, 'RequestCreateFile', _envPath ,_fileMimeType ,_fileName ,_requestCode);
 end;
 
 procedure jForm.RequestOpenFile(_envPath: string; _fileMimeType: string;  _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_tti(FjEnv, FjObject, 'RequestOpenFile', _envPath ,_fileMimeType ,_requestCode);
+     jni_proc_tti(gapp.Jni.jEnv, FjObject, 'RequestOpenFile', _envPath ,_fileMimeType ,_requestCode);
 end;
 
 procedure jForm.RequestOpenDirectory(_envPath: string; _requestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jni_proc_ti(FjEnv, FjObject, 'RequestOpenDirectory', _envPath ,_requestCode);
+     jni_proc_ti(gapp.Jni.jEnv, FjObject, 'RequestOpenDirectory', _envPath ,_requestCode);
 end;
 
 function jForm.GetBitmapFromUri(_treeUri: jObject): jObject;
@@ -5110,7 +5071,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetBitmapFromUri(FjEnv, FjObject, _treeUri);
+   Result:= jForm_GetBitmapFromUri(gapp.Jni.jEnv, FjObject, _treeUri);
 end;
 
 function jForm.LoadBytesFromUri(_treeUri: jObject): TDynArrayOfJByte;
@@ -5118,7 +5079,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_LoadBytesFromUri(FjEnv, FjObject, _treeUri);
+   Result:= jForm_LoadBytesFromUri(gapp.Jni.jEnv, FjObject, _treeUri);
 end;
 
 function jForm.GetFileNameByUri(_treeUri: jObject): string;
@@ -5126,7 +5087,7 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetFileNameByUri(FjEnv, FjObject, _treeUri);
+   Result:= jForm_GetFileNameByUri(gapp.Jni.jEnv, FjObject, _treeUri);
 end;
 
 function jForm.GetTextFromUri(_treeUri: jObject): string;
@@ -5134,21 +5095,21 @@ begin
   result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetTextFromUri(FjEnv, FjObject, _treeUri);
+   Result:= jForm_GetTextFromUri(gapp.Jni.jEnv, FjObject, _treeUri);
 end;
 
 procedure jForm.TakePersistableUriPermission(_treeUri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_TakePersistableUriPermission(FjEnv, FjObject, _treeUri);
+     jForm_TakePersistableUriPermission(gapp.Jni.jEnv, FjObject, _treeUri);
 end;
 
 procedure jForm.SaveImageToUri(_bitmap: jObject; _toTreeUri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SaveImageToUri(FjEnv, FjObject, _bitmap ,_toTreeUri);
+     jForm_SaveImageToUri(gapp.Jni.jEnv, FjObject, _bitmap ,_toTreeUri);
 end;
 
 
@@ -5156,14 +5117,14 @@ procedure jForm.SaveImageTypeToUri(_bitmap: jObject; _toTreeUri: jObject; _type:
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SaveImageTypeToUri(FjEnv, FjObject, _bitmap ,_toTreeUri, _type);
+     jForm_SaveImageTypeToUri(gapp.Jni.jEnv, FjObject, _bitmap ,_toTreeUri, _type);
 end;
 
 procedure jForm.SaveBytesToUri(_bytes: TDynArrayOfJByte; _toTreeUri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SaveBytesToUri(FjEnv, FjObject, _bytes ,_toTreeUri);
+     jForm_SaveBytesToUri(gapp.Jni.jEnv, FjObject, _bytes ,_toTreeUri);
 end;
 
 
@@ -5171,7 +5132,7 @@ procedure jForm.SaveTextToUri(_text: string; _toTreeUri: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jForm_SaveTextToUri(FjEnv, FjObject, _text ,_toTreeUri);
+     jForm_SaveTextToUri(gapp.Jni.jEnv, FjObject, _text ,_toTreeUri);
 end;
 
 function jForm.GetFileList(_treeUri: jObject): TDynArrayOfString;
@@ -5179,7 +5140,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetFileList(FjEnv, FjObject, _treeUri);
+   Result:= jForm_GetFileList(gapp.Jni.jEnv, FjObject, _treeUri);
 end;
 
 
@@ -5188,7 +5149,7 @@ begin
   result := nil;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jForm_GetFileList(FjEnv, FjObject, _treeUri ,_fileExtension);
+   Result:= jForm_GetFileList(gapp.Jni.jEnv, FjObject, _treeUri ,_fileExtension);
 end;
 
 {-------- jForm_JNI_Bridge ----------}
@@ -5550,7 +5511,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageReadWriteAvailable');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsExternalStorageReadWriteAvailable');
 end;
 
 function jForm.IsExternalStorageReadable(): boolean;
@@ -5558,7 +5519,7 @@ begin
   result := false;
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jni_func_out_z(FjEnv, FjObject, 'IsExternalStorageReadable');
+   Result:= jni_func_out_z(gapp.Jni.jEnv, FjObject, 'IsExternalStorageReadable');
 end;
 
 procedure jForm.GenEvent_OnRunOnUiThread(Sender:TObject;tag:integer);
@@ -8328,6 +8289,7 @@ var
 label
   _exceptionOcurred;
 begin
+
  if (env = nil) or (view = nil) then exit;
 
  cls:= env^.GetObjectClass(env, view);

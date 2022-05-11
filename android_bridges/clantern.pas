@@ -20,7 +20,7 @@ jcLantern = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
     procedure LightOn(); overload;
@@ -64,11 +64,11 @@ begin
   inherited Destroy;
 end;
 
-procedure jcLantern.Init(refApp: jApp);
+procedure jcLantern.Init;
 begin
 
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   FInitialized:= True;
@@ -77,42 +77,42 @@ end;
 
 function jcLantern.jCreate(): jObject;
 begin
-   Result:= jcLantern_jCreate(FjEnv, int64(Self), FjThis);
+   Result:= jcLantern_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jcLantern.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcLantern_jFree(FjEnv, FjObject);
+     jcLantern_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcLantern.LightOn();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcLantern_LightOn(FjEnv, FjObject);
+     jcLantern_LightOn(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jcLantern.LightOn(_pulse: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcLantern_LightOn(FjEnv, FjObject, _pulse);
+     jcLantern_LightOn(gApp.jni.jEnv, FjObject, _pulse);
 end;
 
 procedure jcLantern.LightOff();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jcLantern_LightOff(FjEnv, FjObject);
+     jcLantern_LightOff(gApp.jni.jEnv, FjObject);
 end;
 
 function jcLantern.InitTorch(): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jcLantern_InitTorch(FjEnv, FjObject);
+   Result:= jcLantern_InitTorch(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jcLantern_JNI_Bridge ----------}

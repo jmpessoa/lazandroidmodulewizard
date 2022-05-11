@@ -34,7 +34,7 @@ jNotificationManager = class(jControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init(refApp: jApp); override;
+    procedure Init; override;
     function jCreate(): jObject;
     procedure jFree();
 
@@ -124,38 +124,38 @@ begin
   inherited Destroy;
 end;
 
-procedure jNotificationManager.Init(refApp: jApp);
+procedure jNotificationManager.Init;
 begin
   if FInitialized  then Exit;
-  inherited Init(refApp); //set default ViewParent/FjPRLayout as jForm.View!
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
 
-  jNotificationManager_SetId(FjEnv, FjObject, FId);
+  jNotificationManager_SetId(gApp.jni.jEnv, FjObject, FId);
 
   if FAutoCancel <> False then
-     jNotificationManager_SetAutoCancel(FjEnv, FjObject, FAutoCancel);
+     jNotificationManager_SetAutoCancel(gApp.jni.jEnv, FjObject, FAutoCancel);
 
   if FTitle <>  '' then
-     jNotificationManager_SetTitle(FjEnv, FjObject,FTitle);
+     jNotificationManager_SetTitle(gApp.jni.jEnv, FjObject,FTitle);
 
   if FSubject <>  '' then
-     jNotificationManager_SetSubject(FjEnv, FjObject, FSubject);
+     jNotificationManager_SetSubject(gApp.jni.jEnv, FjObject, FSubject);
 
   if FBody <>  '' then
-     jNotificationManager_SetBody(FjEnv, FjObject, FBody);
+     jNotificationManager_SetBody(gApp.jni.jEnv, FjObject, FBody);
 
   if FIconIdentifier <>  '' then
-     jNotificationManager_SetIconIdentifier(FjEnv, FjObject, FIconIdentifier);
+     jNotificationManager_SetIconIdentifier(gApp.jni.jEnv, FjObject, FIconIdentifier);
 
   if FLightsColor <>  colbrDefault then
-    jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, FLightsColor) ,-1 ,-1);
+    jNotificationManager_SetLightsColorAndTime(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FLightsColor) ,-1 ,-1);
 
   if FOngoing <>  False then
-     jNotificationManager_SetOngoing(FjEnv, FjObject, FOngoing);
+     jNotificationManager_SetOngoing(gApp.jni.jEnv, FjObject, FOngoing);
 
   if FPendingFlag <>  pfUpdateCurrent then
-     jNotificationManager_SetPendingFlag(FjEnv, FjObject, Ord(FPendingFlag));
+     jNotificationManager_SetPendingFlag(gApp.jni.jEnv, FjObject, Ord(FPendingFlag));
 
   FInitialized:= True;
 
@@ -163,28 +163,28 @@ end;
 
 function jNotificationManager.jCreate(): jObject;
 begin
-  Result:= jNotificationManager_jCreate(FjEnv, int64(Self), FjThis);
+  Result:= jNotificationManager_jCreate(gApp.jni.jEnv, int64(Self), gApp.jni.jThis);
 end;
 
 procedure jNotificationManager.jFree();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_jFree(FjEnv, FjObject);
+     jNotificationManager_jFree(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNotificationManager.Cancel(_id: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_Cancel(FjEnv, FjObject, _id);
+     jNotificationManager_Cancel(gApp.jni.jEnv, FjObject, _id);
 end;
 
 procedure jNotificationManager.CancelAll();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_CancelAll(FjEnv, FjObject);
+     jNotificationManager_CancelAll(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNotificationManager.SetLightsColorAndTimes(_color: TARGBColorBridge; _onMills: integer; _offMills: integer);
@@ -197,7 +197,7 @@ begin
   begin
     tempColor:= _color;
     if  tempColor = colbrDefault then  tempColor:= colbrBlue;
-     jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, tempColor) ,_onMills ,_offMills);
+     jNotificationManager_SetLightsColorAndTime(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, tempColor) ,_onMills ,_offMills);
   end;
 end;
 
@@ -211,7 +211,7 @@ begin
  begin
    tempColor:= _lightsColor;
    if  tempColor = colbrDefault then  tempColor:= colbrBlue;
-   jNotificationManager_SetLightsColorAndTime(FjEnv, FjObject, GetARGB(FCustomColor, tempColor), -1 , -1);
+   jNotificationManager_SetLightsColorAndTime(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, tempColor), -1 , -1);
  end;
 end;
 
@@ -219,7 +219,7 @@ procedure jNotificationManager.SetLightsEnable(_enable: boolean);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_SetLightsEnable(FjEnv, FjObject, _enable);
+     jNotificationManager_SetLightsEnable(gApp.jni.jEnv, FjObject, _enable);
 end;
 
 procedure jNotificationManager.SetOngoing(_value: boolean);
@@ -227,35 +227,35 @@ begin
   //in designing component state: set value here...
   FOngoing:= _value;
   if FInitialized then
-     jNotificationManager_SetOngoing(FjEnv, FjObject, _value);
+     jNotificationManager_SetOngoing(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jNotificationManager.SetContentIntent(_intent: jObject);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_SetContentIntent(FjEnv, FjObject, _intent);
+     jNotificationManager_SetContentIntent(gApp.jni.jEnv, FjObject, _intent);
 end;
 
 procedure jNotificationManager.SetContentIntent(_intent: jObject; _broadcastRequestCode: integer);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_SetContentIntent(FjEnv, FjObject, _intent ,_broadcastRequestCode);
+     jNotificationManager_SetContentIntent(gApp.jni.jEnv, FjObject, _intent ,_broadcastRequestCode);
 end;
 
 procedure jNotificationManager.SetContentIntent(_packageName: string; _activityClassName: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_SetContentIntent(FjEnv, FjObject, _packageName ,_activityClassName);
+     jNotificationManager_SetContentIntent(gApp.jni.jEnv, FjObject, _packageName ,_activityClassName);
 end;
 
 procedure jNotificationManager.SetContentIntent(_packageName: string; _activityClassName: string; dataName: string; dataValue: string);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_SetContentIntent(FjEnv, FjObject, _packageName ,_activityClassName ,dataName ,dataValue);
+     jNotificationManager_SetContentIntent(gApp.jni.jEnv, FjObject, _packageName ,_activityClassName ,dataName ,dataValue);
 end;
 
 procedure jNotificationManager.SetIconIdentifier(_iconIdentifier: string);
@@ -263,7 +263,7 @@ begin
   //in designing component state: set value here...
   FIconIdentifier:= _iconIdentifier;
   if FInitialized then
-     jNotificationManager_SetIconIdentifier(FjEnv, FjObject, _iconIdentifier);
+     jNotificationManager_SetIconIdentifier(gApp.jni.jEnv, FjObject, _iconIdentifier);
 end;
 
 procedure jNotificationManager.SetTitle(_title: string);
@@ -271,7 +271,7 @@ begin
   //in designing component state: set value here...
   FTitle:= _title;
   if FInitialized then
-     jNotificationManager_SetTitle(FjEnv, FjObject, _title);
+     jNotificationManager_SetTitle(gApp.jni.jEnv, FjObject, _title);
 end;
 
 procedure jNotificationManager.SetSubject(_subject: string);
@@ -279,7 +279,7 @@ begin
   //in designing component state: set value here...
   FSubject:= _subject;
   if FInitialized then
-     jNotificationManager_SetSubject(FjEnv, FjObject, _subject);
+     jNotificationManager_SetSubject(gApp.jni.jEnv, FjObject, _subject);
 end;
 
 procedure jNotificationManager.SetBody(_body: string);
@@ -287,7 +287,7 @@ begin
   //in designing component state: set value here...
   FBody:= _body;
   if FInitialized then
-     jNotificationManager_SetBody(FjEnv, FjObject, _body);
+     jNotificationManager_SetBody(gApp.jni.jEnv, FjObject, _body);
 end;
 
 procedure jNotificationManager.SetId(_id: integer);
@@ -295,14 +295,14 @@ begin
   //in designing component state: set value here...
   FId:= _id;
   if FInitialized then
-     jNotificationManager_SetId(FjEnv, FjObject, _id);
+     jNotificationManager_SetId(gApp.jni.jEnv, FjObject, _id);
 end;
 
 procedure jNotificationManager.Notify();
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_Notify(FjEnv, FjObject);
+     jNotificationManager_Notify(gApp.jni.jEnv, FjObject);
 end;
 
 procedure jNotificationManager.SetAutoCancel(_value: boolean);
@@ -310,7 +310,7 @@ begin
   //in designing component state: set value here...
   FAutoCancel:= _value;
   if FInitialized then
-     jNotificationManager_SetAutoCancel(FjEnv, FjObject, _value);
+     jNotificationManager_SetAutoCancel(gApp.jni.jEnv, FjObject, _value);
 end;
 
 procedure jNotificationManager.SetPendingFlag(_flag: TPendingFlag);
@@ -318,14 +318,14 @@ begin
   //in designing component state: set value here...
   FPendingFlag:= _flag;
   if FInitialized then
-     jNotificationManager_SetPendingFlag(FjEnv, FjObject, Ord(_flag));
+     jNotificationManager_SetPendingFlag(gApp.jni.jEnv, FjObject, Ord(_flag));
 end;
 
 procedure jNotificationManager.SetPriority(_priority: TNotificationPriority);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jNotificationManager_SetPriority(FjEnv, FjObject, Ord(_priority) );
+     jNotificationManager_SetPriority(gApp.jni.jEnv, FjObject, Ord(_priority) );
 end;
 
 {-------- jNotificationManager_JNI_Bridge ----------}
