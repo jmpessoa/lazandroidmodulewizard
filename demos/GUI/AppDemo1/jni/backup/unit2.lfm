@@ -365,9 +365,9 @@ object AndroidModule2: TAndroidModule2
     MarginBottom = 5
     Enabled = True
     Left = 5
-    Top = 463
+    Top = 462
     Width = 290
-    Height = 132
+    Height = 133
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpBottom, rpCenterHorizontal]
@@ -380,7 +380,6 @@ object AndroidModule2: TAndroidModule2
     GravityInParent = lgNone
     RoundedShape = False
     AnimationDurationIn = 1500
-    AnimationDurationOut = 1500
     AnimationMode = animNone
   end
   object jImageList1: jImageList

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+//import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,7 +103,14 @@ public class jCommons {
 		if ( (parent != null) && (aOwnerView != null) ) { parent.removeView(aOwnerView); }
 		parent = _viewgroup;
 		if ( (parent != null) && (aOwnerView != null) ) {
-			parent.addView(aOwnerView, newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+
+			if (parent instanceof LinearLayout) {
+				parent.addView(aOwnerView, 0, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+			else {
+				parent.addView(aOwnerView, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+
 			lparams = null;
 			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
 			aOwnerView.setVisibility(android.view.View.VISIBLE);			
@@ -539,8 +547,8 @@ public class jCommons {
 	
 	public static void StatusSetColor(Controls controls, int color){
 			
-			if (Build.VERSION.SDK_INT >= 21) {								
-					controls.activity.getWindow().setStatusBarColor(color);								
+			if (Build.VERSION.SDK_INT >= 21) {
+				    controls.activity.getWindow().setStatusBarColor(color);								
 		    }
 					
 	}

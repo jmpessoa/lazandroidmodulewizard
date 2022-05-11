@@ -18,18 +18,17 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <CustomData Count="11">
-      <Item0 Name="BuildSystem" Value="Gradle"/>
+    <CustomData Count="10">
+      <Item0 Name="BuildSystem" Value="Ant"/>
       <Item1 Name="LAMW" Value="GUI"/>
       <Item2 Name="LamwVersion" Value="0.8.6.1"/>
-      <Item3 Name="MinSdk" Value="14"/>
-      <Item4 Name="NdkApi" Value="android-22"/>
-      <Item5 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r22\"/>
-      <Item6 Name="Package" Value="com.example.appdemo1"/>
-      <Item7 Name="SdkPath" Value="C:\Users\sotrafa\AppData\Local\Android\Sdk\"/>
-      <Item8 Name="StartModule" Value="AndroidModule1"/>
-      <Item9 Name="Support" Value="FALSE"/>
-      <Item10 Name="Theme" Value="DeviceDefault"/>
+      <Item3 Name="NdkApi" Value="android-21"/>
+      <Item4 Name="NdkPath" Value="C:\laztoapk\downloads\android-ndk-r22\"/>
+      <Item5 Name="Package" Value="com.example.appdemo1"/>
+      <Item6 Name="SdkPath" Value="c:\laztoapk\downloads\android-sdk-windows\"/>
+      <Item7 Name="StartModule" Value="AndroidModule1"/>
+      <Item8 Name="Support" Value="FALSE"/>
+      <Item9 Name="Theme" Value="DeviceDefault"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -203,10 +202,10 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="..\libs\x86\libcontrols"/>
+      <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\i686-linux-android\22\;C:\laztoapk\downloads\android-ndk-r22\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\i686-linux-android\4.9.x\"/>
+      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\platforms\android-21\arch-arm\usr\lib\;C:\laztoapk\downloads\android-ndk-r22\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -216,7 +215,7 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
-      <TargetCPU Value="i386"/>
+      <TargetCPU Value="arm"/>
       <TargetOS Value="android"/>
     </CodeGeneration>
     <Linking>
@@ -230,7 +229,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -XPi686-linux-android- -FDC:\laztoapk\downloads\android-ndk-r22\toolchains\x86-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\laztoapk\downloads\android-ndk-r22\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

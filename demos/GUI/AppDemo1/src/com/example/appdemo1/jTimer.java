@@ -9,7 +9,6 @@ import android.os.Handler;
 //http://lsit81.tistory.com/entry/ActivityrunOnUiThread%EC%99%80-post%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90
 //
 // 2020/04/16
-// TR3E Software https://sites.google.com/view/tr3esoftware/start
 // Fix the error of could start 2 timers, if the deactivated one was still on time, 
 // when activating the same one again.
 //-------------------------------------------------------------------------
@@ -43,7 +42,7 @@ public class jTimer {
         
     	controls.pOnTimer(PasObj); // Pascal Event
     	
-        if ((mHandler != null) && isEnabled)
+        if ((mHandler != null) && isEnabled)        	
         	mHandler.postDelayed(mRunnable, mInterval);
            
     }

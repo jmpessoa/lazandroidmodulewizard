@@ -24,14 +24,18 @@ android {
         abi {
             enable true
             reset()
-            include 'armeabi-v7a'
+            include 'x86'
             universalApk false
         }
     }
-    compileSdkVersion 29
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    compileSdkVersion 30
     defaultConfig {
             minSdkVersion 16
-            targetSdkVersion 29
+            targetSdkVersion 30
             versionCode 1
             versionName "1.0"
     }

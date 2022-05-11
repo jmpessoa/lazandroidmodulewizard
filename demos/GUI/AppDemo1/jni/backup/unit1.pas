@@ -67,7 +67,7 @@ end;
 
 procedure TAndroidModule1.AndroidModule1Init(Sender: TObject);
 begin
- self.SetDensityAssets(daHIGH);
+ gapp.SetDensityAssets(daHIGH);
 end;
 
 procedure TAndroidModule1.AndroidModule1RequestPermissionResult(

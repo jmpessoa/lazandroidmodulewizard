@@ -85,12 +85,14 @@ public class jScrollView extends ScrollView {
 		this.bringToFront();
 		
 		LAMWCommon.BringToFront();
+		
+		this.setVisibility(android.view.View.VISIBLE);
     }
 
     public void setScrollSize(int _size) {
         scrollxywh.height = _size;
-        scrollxywh.width = LAMWCommon.getLParamWidth(); //lparams.width;
-        scrollview.setLayoutParams(scrollxywh);
+        scrollxywh.width  = LAMWCommon.getLParamWidth(); //lparams.width;
+        scrollview.setLayoutParams(scrollxywh);        
     }
 
     public ViewGroup GetView() {

@@ -33,7 +33,7 @@ import android.util.Log;
 
 //-------------------------------------------------------------------------
 // jBitmap
-// Reviewed by TR3E on 10/10/2019
+// Reviewed by ADiV on 10/10/2019
 //-------------------------------------------------------------------------
 
 public class jBitmap {
@@ -685,7 +685,7 @@ public class jBitmap {
         return bmp;
     }
 
-    // by TR3E
+    // by ADiV
     public void LoadFromBuffer(byte[] buffer) {
         if (buffer == null) return;
 

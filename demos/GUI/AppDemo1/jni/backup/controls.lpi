@@ -206,7 +206,7 @@
       <Filename Value="..\libs\x86\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\i686-linux-android\22\;C:\laztoapk\downloads\android-ndk-r22\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\i686-linux-android\4.9.x\"/>
+      <Libraries Value="C:\laztoapk\downloads\android-ndk-r22\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\i686-linux-android\22\;C:\laztoapk\downloads\android-ndk-r22\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\x86-linux-android\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
