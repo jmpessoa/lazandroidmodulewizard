@@ -355,7 +355,7 @@ begin
   my_jObj.LayoutParamWidth:= lpMatchParent; //lpHalfOfParent;   //try this!
   my_jObj.LayoutParamHeight:= lpWrapContent;
 
-  my_jObj.Init(gApp);
+  my_jObj.Init;
 
   jStringListAdapter:= my_jObj.GetStringListAdapter(arrayStringsItems);
 

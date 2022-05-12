@@ -39,7 +39,7 @@ begin
   begin
     gApp.CreateForm(TAndroidModule4, AndroidModule4);
     AndroidModule4.TryBacktrackOnClose:= True;
-    AndroidModule4.InitShowing(gApp); // call/fire OnJNIPrompt in form4
+    AndroidModule4.InitShowing; // call/fire OnJNIPrompt in form4
   end
   else
   begin

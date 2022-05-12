@@ -78,7 +78,7 @@ begin
   //----menu
   jsRecyclerView2.SetItemContentLayout(MenuView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView2.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView2.AddItemContentFormat(cfImage);
   jsRecyclerView2.AddItemContentFormat(cfText);   // one text
@@ -128,7 +128,7 @@ begin
   //----button
   jsRecyclerView1.SetItemContentLayout(btnView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView1.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView1.AddItemContentFormat(cfImage);
   jsRecyclerView1.AddItemContentFormat(cfText);   // one text

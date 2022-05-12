@@ -275,7 +275,7 @@ function Test(F: jForm; WV: jWebView; InApps, Subs: string): jcBillingClient;
 begin
   if TestBC = nil then begin
     TestBC := jcBillingClient.Create(F);
-    TestBC.Init(gApp);
+    TestBC.Init;
   end;
   TestBC.InappSkus := InApps;
   TestBC.SubsSkus  := Subs;

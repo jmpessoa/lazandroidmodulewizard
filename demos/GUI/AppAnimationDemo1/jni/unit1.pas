@@ -50,7 +50,7 @@ begin
   if AndroidModule2 = nil then //hint: property "ActiveMode = actEasel" dont "show"  form
   begin
     gApp.CreateForm(TAndroidModule2, AndroidModule2);
-    AndroidModule2.Init(gApp);
+    AndroidModule2.Init;
     AndroidModule2.jPanel1.Parent:= Self;   // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
     AndroidModule2.jPanel1.SetViewParent(Self.View); //add scene 2  to Self
   end;

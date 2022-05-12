@@ -53,7 +53,7 @@ begin
   if GdxModule2 = nil then
   begin
     gApp.CreateForm(TGdxModule2, GdxModule2);
-    GdxModule2.Init(gApp);
+    GdxModule2.Init;
   end;
 
 end;

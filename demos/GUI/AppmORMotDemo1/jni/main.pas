@@ -55,7 +55,7 @@ begin
   if AndroidModule2 = nil then
   begin
     gApp.CreateForm(TAndroidModule2, AndroidModule2);
-    AndroidModule2.InitShowing(gApp); // call/fire OnJNIPrompt in form2
+    AndroidModule2.InitShowing; // call/fire OnJNIPrompt in form2
   end
   else
   begin

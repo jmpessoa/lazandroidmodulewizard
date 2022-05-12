@@ -119,7 +119,7 @@ begin
     if AndroidModule2 = nil then
     begin
        gApp.CreateForm(TAndroidModule2, AndroidModule2); //hint: property "ActiveMode = actEasel" dont "show"  form
-       AndroidModule2.Init(gApp);   //fire OnJNIPrompt ...
+       AndroidModule2.Init;   //fire OnJNIPrompt ...
        AndroidModule2.jPanel1.Parent:= Self.jPanel2;   // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
        AndroidModule2.jPanel1.SetViewParent(Self.jPanel2.View); //add scene 2  to Self.jPanel2
     end;
@@ -136,7 +136,7 @@ begin
     if AndroidModule3 = nil then  //hint: property "ActiveMode = actEasel" dont "show" form
     begin
       gApp.CreateForm(TAndroidModule3, AndroidModule3);
-      AndroidModule3.Init(gApp); //fire OnJNIPrompt ...
+      AndroidModule3.Init; //fire OnJNIPrompt ...
       AndroidModule3.jPanel1.Parent:= Self.jPanel2;  // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
       AndroidModule3.jPanel1.SetViewParent(Self.jPanel2.View); //add scene 3 to Self.jPanel2
     end;
@@ -153,7 +153,7 @@ begin
     if AndroidModule4 = nil then
     begin
       gApp.CreateForm(TAndroidModule4, AndroidModule4); //property "ActiveMode = actEasel" dont "show" form
-      AndroidModule4.Init(gApp); //fire OnJNIPrompt ...
+      AndroidModule4.Init; //fire OnJNIPrompt ...
       AndroidModule4.jPanel1.Parent:= Self.jPanel2; // <<-------- need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
       AndroidModule4.jPanel1.SetViewParent(Self.jPanel2.View); //add scene 4 to Self.jPanel2
     end;
