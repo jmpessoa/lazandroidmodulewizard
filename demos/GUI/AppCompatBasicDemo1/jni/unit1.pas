@@ -108,7 +108,7 @@ begin
 
          if not AndroidModule2.Initialized then     //AndroidModule2 "ActiveMode = actEasel" dont "show" !
          begin
-           AndroidModule2.Init(gApp);
+           AndroidModule2.Init;
            AndroidModule2.jPanel1.Parent:= Self.jPanel1;   // <--need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
            AndroidModule2.jPanel1.SetViewParent(Self.jPanel1.View); //add scene1  to [container] Self.jPanel1
          end;
@@ -125,7 +125,7 @@ begin
 
          if not AndroidModule3.Initialized then     //AndroidModule3 "ActiveMode = actEasel" dont "show" !
          begin
-          AndroidModule3.Init(gApp);
+          AndroidModule3.Init;
           AndroidModule3.jPanel1.Parent:= Self.jPanel1;   // <--need to handle LayoutParamWidth/LayoutParamHeight "OnRotate"
           AndroidModule3.jPanel1.SetViewParent(Self.jPanel1.View); //add scene3  to [container] Self.jPanel1
          end;

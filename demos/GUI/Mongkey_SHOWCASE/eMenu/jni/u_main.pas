@@ -160,7 +160,7 @@ begin
   //----menu
   jsRecyclerView2.SetItemContentLayout(MenuView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView2.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView2.AddItemContentFormat(cfImage);
   jsRecyclerView2.AddItemContentFormat(cfText);   // one text
@@ -218,7 +218,7 @@ begin
   //----button
   jsRecyclerView1.SetItemContentLayout(btnView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView1.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView1.AddItemContentFormat(cfImage);
   jsRecyclerView1.AddItemContentFormat(cfText);   // one text
@@ -283,7 +283,7 @@ begin
       f_menu_view.panelMenu.LayoutParamWidth := lpMatchParent;
       f_menu_view.panelMenu.UpdateLayout;
       f_menu_view.panelMenu.Width := self.GetScreenWidth();
-      searchText.Init(gApp);
+      searchText.Init;
     end;
   end;
 end;
@@ -444,7 +444,7 @@ end;
 procedure Tf_main.searchtextClick(Sender: TObject);
 begin
   //jimageview3.ImageIdentifier := 'searchitem1';
-  //jimageview3.Init(gApp);
+  //jimageview3.Init;
 end;
 
 procedure Tf_main.jSearchView1Click(Sender: TObject);
@@ -469,7 +469,7 @@ begin
   //f_menu_view.panelMenu.LayoutParamWidth := lpMatchParent;
   f_menu_view.panelMenu.Width := panelMenu.Width * 2;
 
-  f_menu_view.panelMenu.Init(gApp);
+  f_menu_view.panelMenu.Init;
   //f_menu_view.panelMenu.UpdateLayout;
 end;
 
@@ -521,7 +521,7 @@ begin
   begin
     gApp.CreateForm(Tf_menu_view, f_menu_view);
     //f_landing.TryBacktrackOnClose := True;
-    f_menu_view.Init(gApp);
+    f_menu_view.Init;
   end;
   //inherited Create(False);
 end;

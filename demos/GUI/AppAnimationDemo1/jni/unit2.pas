@@ -52,7 +52,7 @@ begin
   if AndroidModule3 = nil then  //jForm3
   begin
     gApp.CreateForm(TAndroidModule3, AndroidModule3);
-    AndroidModule3.InitShowing(gApp);  //do the jForm animation....
+    AndroidModule3.InitShowing;  //do the jForm animation....
   end
   else
   begin

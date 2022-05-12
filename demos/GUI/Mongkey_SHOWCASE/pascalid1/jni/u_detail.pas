@@ -124,7 +124,7 @@ begin
   //----- menu
   jsRecyclerView1.SetItemContentLayout(cardView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView1.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView1.AddItemContentFormat(cfPanel);
   jsRecyclerView1.AddItemContentFormat(cfImage);

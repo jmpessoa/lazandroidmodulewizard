@@ -56,7 +56,7 @@ begin
  // jEditTemp.FontSize:=18;
   jEditTemp.PosRelativeToParent:=[rpCenterInParent];
 
-  jEditTemp.Init(gApp);
+  jEditTemp.Init;
 
  {jButtonTemp := jButton.Create(Self);
   jButtonTemp.Parent:=jPanel1;

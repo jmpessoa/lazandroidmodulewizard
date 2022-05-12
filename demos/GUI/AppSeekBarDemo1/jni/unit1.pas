@@ -60,7 +60,7 @@ begin
     if AndroidModule2 = nil then 
     begin
       gApp.CreateForm(TAndroidModule2, AndroidModule2);
-      AndroidModule2.InitShowing(gApp); // call/fire OnJNIPrompt in form2
+      AndroidModule2.InitShowing; // call/fire OnJNIPrompt in form2
    end
    else
    begin
@@ -73,7 +73,7 @@ begin
   if AndroidModule3 = nil then 
   begin
      gApp.CreateForm(TAndroidModule3, AndroidModule3);
-     AndroidModule3.InitShowing(gApp); // call/fire OnJNIPrompt in form2
+     AndroidModule3.InitShowing; // call/fire OnJNIPrompt in form2
   end
   else
   begin
@@ -85,7 +85,7 @@ procedure TAndroidModule1.jButton3Click(Sender: TObject);
 begin
    if AndroidModule5 = nil then begin
      gApp.CreateForm(TAndroidModule5, AndroidModule5);
-     AndroidModule5.InitShowing(gApp); // call/fire OnJNIPrompt in form2
+     AndroidModule5.InitShowing; // call/fire OnJNIPrompt in form2
    end
    else
    begin

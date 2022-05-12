@@ -54,7 +54,7 @@ begin
   if AndroidModule2 = nil then
   begin
     gapp.CreateForm(TAndroidModule2, AndroidModule2);
-    AndroidModule2.Init(gapp);
+    AndroidModule2.Init;
   end;
 
   AndroidModule2.Show;

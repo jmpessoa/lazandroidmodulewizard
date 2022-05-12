@@ -250,7 +250,7 @@ begin
       gApp.CreateForm(TAndroidModule2, AndroidModule2);
       AndroidModule2.SetCloseCallBack(CallBackNotify_Form2Closed, Self);
       //AndroidModule2.SetCloseCallBack(CallBackData, Self);
-      AndroidModule2.InitShowing(gApp); // call/fire OnJNIPrompt in form2
+      AndroidModule2.InitShowing; // call/fire OnJNIPrompt in form2
   end
   else
   begin

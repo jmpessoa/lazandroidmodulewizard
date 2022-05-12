@@ -94,7 +94,7 @@ begin
   if AndroidModule2 = nil then   //NOTE: "ActivityMode = actEasel" --> dont show!!
   begin
     gApp.CreateForm(TAndroidModule2, AndroidModule2);
-    AndroidModule2.Init(gApp);  //dispatch "OnJNIPrompt" in  AndroidModule2
+    AndroidModule2.Init;  //dispatch "OnJNIPrompt" in  AndroidModule2
   end;
 
   //jsCoordinatorLayout1.SetFitsSystemWindows(True);   //**   need this???

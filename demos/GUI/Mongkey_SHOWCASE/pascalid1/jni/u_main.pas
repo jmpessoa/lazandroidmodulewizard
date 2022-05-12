@@ -99,7 +99,7 @@ begin
 
   jsRecyclerView1.SetItemContentLayout(MenuView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView1.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView1.AddItemContentFormat(cfPanel);
   jsRecyclerView1.AddItemContentFormat(cfImage);
@@ -118,7 +118,7 @@ begin
 
   jsRecyclerView2.SetItemContentLayout(MenuView.View,
     False {cardview});   //custom item view!
-  //jsRecyclerView2.Init(gapp);
+  //jsRecyclerView2.Init;
   jsRecyclerView2.ClearItemContentFormat; // Need for reinit activity
   jsRecyclerView2.AddItemContentFormat(cfPanel);
   jsRecyclerView2.AddItemContentFormat(cfImage);
@@ -206,7 +206,7 @@ begin
   begin
     gApp.CreateForm(Tf_detail, f_detail);
     //f_main.TryBacktrackOnClose := True;
-    f_detail.Init(gApp);
+    f_detail.Init;
   end;
 end;
 
@@ -239,7 +239,7 @@ begin
     ShowMessage('colbrgold');
     Exit;
   end;
-  menutext1.Init(gApp);
+  menutext1.Init;
 end;
 
 procedure Tf_main.menutextClick(Sender: TObject);
