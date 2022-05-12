@@ -2538,39 +2538,6 @@ begin
   end;
 end;
 
-{
-procedure Java_Event_pOnZBarcodeScannerViewPictureTaken(env: PJNIEnv; this: jobject; Obj: TObject; picture: JObject; fullPath: JString);
-var
-  pasfullPath: string;
-  _jBoolean: JBoolean;
-begin
-  gApp.Jni.jEnv := env;
-  if this <> nil then gApp.Jni.jThis := this;
-
-  if Obj is jZBarcodeScannerView then
-  begin
-    pasfullPath := '';
-    if fullPath <> nil then
-    begin
-      _jBoolean:= JNI_False;
-      pasfullPath:= string( env^.GetStringUTFChars(env,fullPath,@_jBoolean) );
-    end;
-    jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewPictureTaken(Obj, picture, pasfullPath);
-  end;
-end;
-
-procedure Java_Event_pOnZBarcodeScannerViewPictureMake(env: PJNIEnv; this: jobject; Obj: TObject);
-begin
-  gApp.Jni.jEnv := env;
-  if this <> nil then gApp.Jni.jThis := this;
-
-  if Obj is jZBarcodeScannerView then
-  begin
-    jZBarcodeScannerView(Obj).GenEvent_OnZBarcodeScannerViewPictureMake(Obj);
-  end;
-end;
-}
-
 procedure Java_Event_pOnMidiManagerDeviceAdded(env:PJNIEnv;this:JObject;Sender:TObject;deviceId:integer;deviceName:jString;productId:jString;manufacture:jString);
 begin
   gApp.Jni.jEnv := env;

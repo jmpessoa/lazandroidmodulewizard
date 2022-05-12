@@ -46,7 +46,7 @@ jZBarcodeScannerView = class(jVisualControl)
  public
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
-    procedure Init; override;   //Init(refApp: jApp); override;
+    procedure Init; override;
     procedure Refresh;
     procedure UpdateLayout; override;
     procedure ClearLayout;
@@ -147,7 +147,7 @@ begin
   inherited Destroy;
 end;
 
-procedure jZBarcodeScannerView.Init;   //Init(refApp: jApp)
+procedure jZBarcodeScannerView.Init;
 var
   rToP: TPositionRelativeToParent;
   rToA: TPositionRelativeToAnchorID;
@@ -155,27 +155,19 @@ begin
 
  if not FInitialized then
  begin
-  inherited Init; //set default ViewParent/FjPRLayout as jForm.View! //inherited Init(refApp);
+  inherited Init; //set default ViewParent/FjPRLayout as jForm.View!
   //your code here: set/initialize create params....
   FjObject := jCreate(); if FjObject = nil then exit;
   if FParent <> nil then
-   sysTryNewParent( FjPRLayout, FParent);    //sysTryNewParent( FjPRLayout, FParent, gApp.jni.jEnv, refApp);
+   sysTryNewParent( FjPRLayout, FParent);
 
   FjPRLayoutHome:= FjPRLayout;
-
-  //jZBarcodeScannerView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
-  //jZBarcodeScannerView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
 
   jZBarcodeScannerView_SetViewParent(gApp.jni.jEnv, FjObject, FjPRLayout);
   jZBarcodeScannerView_SetId(gApp.jni.jEnv, FjObject, Self.Id);
 
  end;
-  {
-  jZBarcodeScannerView_SetLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject,
-                        FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
-                        sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
-                        sysGetLayoutParams( FHeight, FLParamHeight, Self.Parent, sdH, fMargintop + fMarginbottom ));
-   }
+
   jZBarcodeScannerView_setLeftTopRightBottomWidthHeight(gApp.jni.jEnv, FjObject ,
                         FMarginLeft,FMarginTop,FMarginRight,FMarginBottom,
                         sysGetLayoutParams( FWidth, FLParamWidth, Self.Parent, sdW, fmarginLeft + fmarginRight ),
@@ -185,7 +177,6 @@ begin
   begin
     if rToA in FPositionRelativeToAnchor then
     begin
-      //jZBarcodeScannerView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
       jZBarcodeScannerView_AddLParamsAnchorRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToAnchor(rToA));
     end;
   end;
@@ -193,7 +184,6 @@ begin
   begin
     if rToP in FPositionRelativeToParent then
     begin
-      //jZBarcodeScannerView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
       jZBarcodeScannerView_AddLParamsParentRule(gApp.jni.jEnv, FjObject, GetPositionRelativeToParent(rToP));
     end;
   end;
@@ -201,7 +191,6 @@ begin
   if Self.Anchor <> nil then Self.AnchorId:= Self.Anchor.Id
   else Self.AnchorId:= -1; //dummy
 
-  //jZBarcodeScannerView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
   jZBarcodeScannerView_SetLayoutAll(gApp.jni.jEnv, FjObject, Self.AnchorId);
 
  if not FInitialized then
@@ -209,14 +198,11 @@ begin
   FInitialized := true;
 
   if  FColor <> colbrDefault then
-    //View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
       View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 
-  //View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
   View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 
   if FFlashlightMode = fmON then
-       //jZBarcodeScannerView_SetFlashlight(gApp.jni.jEnv, FjObject, True);
        jZBarcodeScannerView_SetFlashlight(gApp.jni.jEnv, FjObject, True);
 
  end;
@@ -226,14 +212,12 @@ procedure jZBarcodeScannerView.SetColor(Value: TARGBColorBridge);
 begin
   FColor:= Value;
   if (FInitialized = True) and (FColor <> colbrDefault)  then
-     //View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
      View_SetBackGroundColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FColor));
 end;
 procedure jZBarcodeScannerView.SetVisible(Value : Boolean);
 begin
   FVisible:= Value;
   if FInitialized then
-    //View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
     View_SetVisible(gApp.jni.jEnv, FjObject, FVisible);
 end;
 
@@ -246,14 +230,13 @@ begin
 
   inherited UpdateLayout;
 
-  init; //init(gApp);
+  init;
 
 end;
 
 procedure jZBarcodeScannerView.Refresh;
 begin
   if FInitialized then
-    //View_Invalidate(gApp.jni.jEnv, FjObject);
       View_Invalidate(gApp.jni.jEnv, FjObject);
 end;
 
