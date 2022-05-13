@@ -751,6 +751,7 @@ var
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
   innerSupported: boolean;
+  isGradle : boolean;
 begin
 
   strList:= TStringList.Create;
@@ -805,8 +806,10 @@ begin
 
   end;
 
+  isGradle:= (LazarusIDE.ActiveProject.CustomData.Values['BuildSystem']='Gradle');
+
   if Pos('AppCompat',  FAndroidTheme) > 0 then
-     minsdkApi:= 18
+     minsdkApi:= 16
   else
      minsdkApi:= 14;
 
@@ -826,7 +829,10 @@ begin
   if  minsdkApi < FMinSdkControl then
       minsdkApi:= FMinSdkControl;
 
-  sdkManifMinApi:= GetMinSDKFromManifest();
+  if isGradle then
+   sdkManifMinApi := IntToStr(minsdkApi)
+  else
+   sdkManifMinApi := GetMinSDKFromManifest();
 
   if sdkManifMinApi <> '' then
     sdkManifMInApiNumber:= StrToInt(sdkManifMinApi)
@@ -896,8 +902,8 @@ begin
     end
     else //re-introduce it!
     begin
-       if Pos('AppCompat', FAndroidTheme) > 0 then
-          manifestApis:= '<uses-sdk android:minSdkVersion="18" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>'
+       if isGradle then // Gradle not need minSdkVersion in manifest
+          manifestApis:= '<uses-sdk android:targetSdkVersion="'+IntToStr(targetApi)+'"/>'
        else
           manifestApis:= '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>';
 
@@ -2391,6 +2397,7 @@ var
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
+  isGradle : boolean;
 begin
    nativeAdded:= False;
    Result:= False;
@@ -2453,6 +2460,8 @@ begin
 
    end;
 
+   isGradle := (LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle');
+
    //updated manifest minAdkApi
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
    begin
@@ -2484,7 +2493,10 @@ begin
         auxList.Clear;
         auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
         tempStr:= auxList.Text;
-        tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+
+        if not isGradle then // Gradle not need minSdkVersion on manifest
+           tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+
         auxList.Text:= tempStr;
         auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
 
@@ -2501,7 +2513,7 @@ begin
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
    begin
-      if LazarusIDE.ActiveProject.CustomData['BuildSystem'] <> 'Gradle' then
+      if not isGradle then
       begin
          ShowMessage(jclassname+'.java require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
          LazarusIDE.ActiveProject.Modified:= True;
@@ -2510,7 +2522,7 @@ begin
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission') and (not isGradle) then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission');
      if auxList.Count > 0 then
@@ -2548,7 +2560,7 @@ begin
      end;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') and (not isGradle) then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature');
      if auxList.Count > 0 then

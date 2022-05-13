@@ -195,11 +195,12 @@ public class jForm {
 
         layout = new RelativeLayout(controls.activity);
 
-        if (layout == null) return;
-        
+        if (layout == null) {
+            return;
+        }
+
         layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.MATCH_PARENT);
-        
+                ViewGroup.LayoutParams.MATCH_PARENT);
         layout.setLayoutParams(layparam);
 
         mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -1298,19 +1299,18 @@ public class jForm {
 
             if (telephony == null) return "";            
 
-            devid = telephony.getDeviceId();
+            // Need system app - android.permission.READ_PRIVILIGED_PHONE_STATE
+            //devid = telephony.getDeviceId();
 
-            if (devid == null) return "";            
+            if (devid == "") return "";            
 
-            if (devid == "") 
-                devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);            
+            if (devid == "")             
+        	 devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);            
 
         } catch (SecurityException e) //ExceptionExceptionException
         {
             e.printStackTrace();
-        }
-
-        if (devid == null) return "";
+        }        
 
         return devid;
     }
@@ -2219,7 +2219,8 @@ public class jForm {
 
         //if (recentTask.get(i).baseActivity.toShortString().indexOf(this.controls.activity.getPackageName()) > -1) {
 
-        am.moveTaskToFront(controls.activity.getTaskId(), 0);
+        // Need system app - android.permission.REORDER_TASKS
+        //am.moveTaskToFront(controls.activity.getTaskId(), 0);
 
         //}
         //}
@@ -2827,7 +2828,10 @@ public class jForm {
 
                            // Note it's called "Display Name". This is
                            // provider-specific, and might not necessarily be the file name.
-                           String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                           String displayName = "";
+                           
+                           int iColum = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                           if(iColum >= 0) displayName = cursor.getString(iColum);
 
                            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
                             // If the size is unknown, the value stored is null. But because an
@@ -3193,7 +3197,7 @@ public class jForm {
 
     //Android 11:
     public String GetFileNameByUri(Uri uri) {
-        String result = null;
+        String result = "";
         
         final ContentResolver resolver = controls.activity.getContentResolver();
         
@@ -3203,7 +3207,8 @@ public class jForm {
             Cursor cursor = resolver.query(uri, null, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                	int iColum = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                    if(iColum >= 0) result = cursor.getString(iColum);                    
                 }
             } finally {
                 if (cursor != null) {

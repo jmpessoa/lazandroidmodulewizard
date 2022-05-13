@@ -1889,7 +1889,8 @@ begin
                strList.Add('    package="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'"');
                strList.Add('    android:versionCode="1"');
                strList.Add('    android:versionName="1.0" >');
-               strList.Add('    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>');
+               // Gradle not need minSdkVersion
+               strList.Add('    <uses-sdk android:targetSdkVersion="29"/>');
                strList.Add('    <application');
                strList.Add('        android:allowBackup="true"');
                strList.Add('        android:icon="@drawable/ic_launcher"');
