@@ -47,7 +47,7 @@ type
     destructor Destroy; override;
 
     procedure Load(AFileName: string);
-    procedure Save;
+    procedure Save(isGradle : boolean);
 
     //function GetThemeName(API: integer): string;
 
@@ -155,6 +155,7 @@ private
    CSize: TSize;
  end;
 
+ FMinSdk : string;
  FBuildSystem: string;
  FProjectPath: string;
  FDefaultTheme: string;
@@ -805,7 +806,7 @@ begin
   end;
 end;
 
-procedure TLamwAndroidManifestOptions.Save;
+procedure TLamwAndroidManifestOptions.Save(isGradle : boolean);
 var
   i: integer;
   r: TDOMNode;
@@ -858,7 +859,9 @@ begin
   end;
   with FUsesSDKNode do
   begin
-    AttribStrings['android:minSdkVersion'] := IntToStr(FMinSdkVersion);
+    if not isGradle then // Gradle not need minSdkVersion
+     AttribStrings['android:minSdkVersion'] := IntToStr(FMinSdkVersion);
+
     AttribStrings['android:targetSdkVersion'] := IntToStr(FTargetSdkVersion);
   end;
 
@@ -1768,7 +1771,9 @@ begin
 
   CheckBoxSupport.Checked:=(LazarusIDE.ActiveProject.CustomData['Support']='TRUE');
 
+  FMinSdk := proj.CustomData['MinSdk'];
   FBuildSystem := proj.CustomData['BuildSystem'];
+
   i := cbBuildSystem.Items.IndexOf(FBuildSystem);
   if i >= 0 then
     cbBuildSystem.ItemIndex := i;
@@ -1793,7 +1798,12 @@ begin
     begin
       Load(fn);
       FillPermissionGrid(Permissions, PermNames);
-      seMinSdkVersion.Value := MinSDKVersion;
+
+      if FMinSdk <> '' then
+       seMinSdkVersion.Value := StrToInt(FMinSdk)
+      else
+       seMinSdkVersion.Value := MinSDKVersion;
+
       seTargetSdkVersion.Text := IntToStr(TargetSDKVersion);
       seVersionCode.Value := VersionCode;
       edVersionName.Text := VersionName;
@@ -1851,6 +1861,7 @@ begin
   else
     LazarusIDE.ActiveProject.CustomData['Support']:='FALSE';
 
+  LazarusIDE.ActiveProject.CustomData['MinSdk'] := intToStr(seMinSdkVersion.Value);
 
   with FManifest do
   begin
@@ -1863,7 +1874,7 @@ begin
     VersionCode := seVersionCode.Value;
     VersionName := edVersionName.Text;
     AppLabel := edLabel.Text;
-    Save;
+    Save(cbBuildSystem.Text = 'Gradle');
   end;
 
   s := GetCurrentAppScreenStyle;

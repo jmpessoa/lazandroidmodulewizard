@@ -1047,13 +1047,27 @@ public  int Image_getWH (String filename ) {
 
     Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
     
-    if (phones == null) return "";    
+    if (phones == null) return "";
+    
+    String name = "";
+    String phoneNumber = "";
+    String phoneType = "";
+    int iColum = 0;
 
-    while (phones.moveToNext()) {
-      String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-      String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-      String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-
+    while (phones.moveToNext()) {           
+      name = "";
+      phoneNumber = "";
+      phoneType = "";
+      
+      iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+      if(iColum >= 0) name = phones.getString(iColum);
+      
+      iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+      if(iColum >= 0) phoneNumber = phones.getString(iColum);
+      
+      iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+      if(iColum >= 0) phoneType = phones.getString(iColum);
+           
       name = name.toLowerCase();
 
       if (name.equals(username)) {
@@ -1077,15 +1091,27 @@ public  int Image_getWH (String filename ) {
     
     if (phones == null) return "";
     
+    String name = "";    
+    String phoneType = "";
+    int iColum = 0;
+    
     while (phones.moveToNext()) {
-      String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-      String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+    	name = "";        
+        phoneType = "";
+        
+        iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+        if(iColum >= 0) name = phones.getString(iColum);                
+        
+        iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+        if(iColum >= 0) phoneType = phones.getString(iColum);
 
-      if (phoneType.equals("2")) { //mobile
-        nameList = nameList + delimiter + name;
+        if (phoneType.equals("2")) { //mobile
+         nameList = nameList + delimiter + name;
       }
     }
+    
     phones.close();
+    
     return nameList;
   }
 
