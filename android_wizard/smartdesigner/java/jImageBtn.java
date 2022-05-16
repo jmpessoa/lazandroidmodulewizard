@@ -31,7 +31,9 @@ import android.widget.Toast;
 //Reviewed by ADiV on 2021-09-16
 //-------------------------------------------------------------------------
 
+//public class jImageBtn extends androidx.appcompat.widget.AppCompatImageView {
 public class jImageBtn extends ImageView {
+	
 	private Controls        controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
 	private long           PasObj   = 0;      // Pascal Obj
@@ -96,7 +98,7 @@ public class jImageBtn extends ImageView {
 							if(btnState != 0) {
 							 btnState = 0;
 							 mImage.setImageBitmap(bmpUp);
-							 controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
+							 performClick();							 
 							}
 						}
 					}, mSleep);  //1s = 1000ms
@@ -107,6 +109,17 @@ public class jImageBtn extends ImageView {
 			
 			return true;
 	}
+	
+	// Because we call this from onTouchEvent, this code will be executed for both
+    // normal touch events and for when the system calls this using Accessibility 
+    @Override
+    public boolean performClick() {
+        super.performClick();
+
+        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default); 
+
+        return true;
+    }
 
 	public void setButton(String fileup, String filedn) {
 		setButtonUp(fileup);

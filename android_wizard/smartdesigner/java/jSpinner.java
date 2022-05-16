@@ -17,7 +17,7 @@ import android.view.Gravity;
 
 //-------------------------------------------------------------------------
 // jSpinner
-// Reviewed by TR3E on 23/11/2019
+// Reviewed by ADiV on 2022/03/28
 //-------------------------------------------------------------------------
 
 class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
@@ -162,7 +162,8 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl template*/
 
-public class jSpinner extends Spinner /*dummy*/ { //please, fix what GUI object will be extended!
+//public class jSpinner extends androidx.appcompat.widget.AppCompatSpinner {
+public class jSpinner extends Spinner { //please, fix what GUI object will be extended!
 
     private long       pascalObj = 0;    // Pascal Object
     private Controls   controls  = null; // Control Class for events

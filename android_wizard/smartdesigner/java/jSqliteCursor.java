@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.util.Locale;
+
 //http://android-codes-examples.blogspot.com.br/2011/09/using-sqlite-to-populate-listview-in.html <<----------
 //http://www.coderzheaven.com/2012/12/23/store-image-android-sqlite-retrieve-it/  <<---------------
 	
@@ -218,7 +220,7 @@ public class jSqliteCursor {
         switch (mCursor.getType(columnIndex)) {                
      	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(mCursor.getInt(columnIndex));        break;
      	      case Cursor.FIELD_TYPE_STRING : colValue = mCursor.getString(columnIndex);                       break;
-     	      case Cursor.FIELD_TYPE_FLOAT  : colValue = String.format("%.2f", mCursor.getFloat(columnIndex)); break;
+     	      case Cursor.FIELD_TYPE_FLOAT  : colValue = String.format(Locale.US, "%.2f", mCursor.getFloat(columnIndex)); break;
      	      case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
      	      case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
      	      default:                        colValue = "UNKNOW";                              

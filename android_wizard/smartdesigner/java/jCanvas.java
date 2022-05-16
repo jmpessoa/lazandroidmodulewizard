@@ -18,6 +18,7 @@ import android.util.TypedValue;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Locale;
 
 //-------------------------------------------------------------------------
 // jCanvas
@@ -495,7 +496,7 @@ public class jCanvas {
 
 		File file;
 
-		String f = _fullPathFileName.toLowerCase();
+		String f = _fullPathFileName.toLowerCase(Locale.US);
 		if (f.contains(".jpg"))
 		    file = new File(_fullPathFileName);
 		else

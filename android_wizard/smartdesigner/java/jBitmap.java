@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.util.Locale;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -33,7 +34,7 @@ import android.util.Log;
 
 //-------------------------------------------------------------------------
 // jBitmap
-// Reviewed by TR3E on 10/10/2019
+// Reviewed by ADiV on 10/10/2019
 //-------------------------------------------------------------------------
 
 public class jBitmap {
@@ -622,7 +623,7 @@ public class jBitmap {
         if (bmp == null) return;
         File file;
 
-        String f = _fullPathFileName.toLowerCase();
+        String f = _fullPathFileName.toLowerCase(Locale.US);
         if (f.contains(".jpg"))
             file = new File(_fullPathFileName);
         else
@@ -646,7 +647,7 @@ public class jBitmap {
         if (_bitmapImage == null) return;
         File file;
 
-        String f = _Path.toLowerCase();
+        String f = _Path.toLowerCase(Locale.US);
         if (f.contains(".jpg"))
             file = new File(_Path);
         else
@@ -685,7 +686,7 @@ public class jBitmap {
         return bmp;
     }
 
-    // by TR3E
+    // by ADiV
     public void LoadFromBuffer(byte[] buffer) {
         if (buffer == null) return;
 

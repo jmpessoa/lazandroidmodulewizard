@@ -138,6 +138,17 @@ public class jPanel extends RelativeLayout {
 		this.scaleGestureDetector.onTouchEvent(e);
 		return true;
 	}
+	
+	// Because we call this from onTouchEvent, this code will be executed for both
+    // normal touch events and for when the system calls this using Accessibility 
+    @Override
+    public boolean performClick() {
+        super.performClick();
+
+        controls.pOnClick(PasObj, Const.Click_Default); 
+
+        return true;
+    }
 
 	//ref1. http://code.tutsplus.com/tutorials/android-sdk-detecting-gestures--mobile-21161
 	//ref2. http://stackoverflow.com/questions/9313607/simpleongesturelistener-never-goes-in-to-the-onfling-method

@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.Intent;
@@ -76,8 +77,8 @@ public class jImageFileManager /*extends ...*/ {
 	    try {
 	       FileOutputStream out = new FileOutputStream(mImageFile);	           	           	         
 	     
-           if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	       if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);	       
+           if ( _filename.toLowerCase(Locale.US).contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	       if ( _filename.toLowerCase(Locale.US).contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);	       
 	       
 	       out.flush();
 	       out.close();
@@ -333,8 +334,8 @@ public class jImageFileManager /*extends ...*/ {
 	    try {
 	        FileOutputStream out = new FileOutputStream(mImageFile);	  
 	        
-	        if ( _filename.toLowerCase().contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
-	        if ( _filename.toLowerCase().contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);
+	        if ( _filename.toLowerCase(Locale.US).contains(".jpg") ) _image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+	        if ( _filename.toLowerCase(Locale.US).contains(".png") ) _image.compress(Bitmap.CompressFormat.PNG, 100, out);
 	        
 	         out.flush();
 	         out.close();
@@ -367,8 +368,8 @@ public class jImageFileManager /*extends ...*/ {
 	    try {
 	    	outStream = new FileOutputStream(mImageFile);	  
 	        
-	        if ( _filename.toLowerCase().contains(".jpg") ) _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
-	        if ( _filename.toLowerCase().contains(".png") ) _bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+	        if ( _filename.toLowerCase(Locale.US).contains(".jpg") ) _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outStream);
+	        if ( _filename.toLowerCase(Locale.US).contains(".png") ) _bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
 	        
 	        outStream.flush();
 	        outStream.close();	      
@@ -397,8 +398,8 @@ public class jImageFileManager /*extends ...*/ {
      OutputStream fos;
      boolean isPng  = true;
      
-     if ( fileName.toLowerCase().contains(".jpg") ) isPng = false;
-     else if ( !(fileName.toLowerCase().contains(".png")) ) fileName = fileName + ".png";
+     if ( fileName.toLowerCase(Locale.US).contains(".jpg") ) isPng = false;
+     else if ( !(fileName.toLowerCase(Locale.US).contains(".png")) ) fileName = fileName + ".png";
      
      if (android.os.Build.VERSION.SDK_INT >= 29) {
 		 //[ifdef_api29up]
@@ -554,7 +555,7 @@ public class jImageFileManager /*extends ...*/ {
 		if( _bitmap == null ) return null; // by tr3e
 	     
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		String strUpper = _compressFormat.toUpperCase();		
+		String strUpper = _compressFormat.toUpperCase(Locale.US);		
 	     
 	     if (  strUpper.equals("WEBP") ) { 
 	        _bitmap.compress(CompressFormat.WEBP, 0, stream); //O: PNG will ignore the quality setting...
@@ -660,6 +661,7 @@ public class jImageFileManager /*extends ...*/ {
 	public int GetOrientation(Uri photoUri) 
 	{
 	    Cursor cursor = context.getContentResolver().query(photoUri,
+	    		//Field requires API level 29
 	            new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
 
 	    if (cursor.getCount() != 1) {
