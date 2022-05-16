@@ -45,7 +45,7 @@ public class jWifiManager /*extends ...*/ {
 
         locationServicesRequested = false;
         
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);         
+        wifiManager = (WifiManager) _ctrls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);         
         
         // Better to start the app with the wifi deactivated to be able to use it for more purposes.
         /*if (wifiManager!= null) {
@@ -196,9 +196,9 @@ public class jWifiManager /*extends ...*/ {
 
     //https://stackoverflow.com/questions/29574730/how-to-connect-to-wifi-programmatically
     public boolean ConnectWEP( String _networkSSID, String _password ) {
-        if (!wifiManager.isWifiEnabled()) {
+        if (!wifiManager.isWifiEnabled()) 
             wifiManager.setWifiEnabled(true);
-        }
+        
         try {
             WifiConfiguration conf = new WifiConfiguration();
             conf.SSID = "\"" + _networkSSID + "\"";   // Please note the quotes. String should contain SSID in quotes
@@ -220,6 +220,8 @@ public class jWifiManager /*extends ...*/ {
             }
             //WiFi Connection success, return true
             return true;
+        }catch (SecurityException e) {
+            return false;         
         } catch (Exception ex) {
             //System.out.println(Arrays.toString(ex.getStackTrace()));
             return false;
@@ -227,9 +229,8 @@ public class jWifiManager /*extends ...*/ {
     }
 
     public boolean ConnectWPA( String _networkSSID, String _password ) {
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        }
+        if (!wifiManager.isWifiEnabled()) 
+            wifiManager.setWifiEnabled(true);        
         
         try {
             WifiConfiguration conf = new WifiConfiguration();
@@ -258,7 +259,9 @@ public class jWifiManager /*extends ...*/ {
             }
             //WiFi Connection success, return true
             return true;
-        } catch (Exception ex) {
+        }catch (SecurityException e) {
+            return false;         
+        }catch (Exception ex) {
             //System.out.println(Arrays.toString(ex.getStackTrace()));
             return false;
         }
@@ -343,7 +346,9 @@ public class jWifiManager /*extends ...*/ {
         WifiConfiguration wificonfiguration = null;
         try {
             Method method = wifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
-            method.invoke(wifiManager, wificonfiguration, true);
+            
+            if(method != null)
+             method.invoke(wifiManager, wificonfiguration, true);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -356,7 +361,10 @@ public class jWifiManager /*extends ...*/ {
         WifiConfiguration wificonfiguration = null;
         try {
             Method method = wifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
-            method.invoke(wifiManager, wificonfiguration, false);
+            
+            if(method != null)
+             method.invoke(wifiManager, wificonfiguration, false);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }

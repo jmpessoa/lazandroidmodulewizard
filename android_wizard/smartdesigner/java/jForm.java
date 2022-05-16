@@ -539,7 +539,7 @@ public class jForm {
     }
 
     public String GetDateTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         
         if (formatter == null) return "";        
 
@@ -553,7 +553,7 @@ public class jForm {
 
       // by ADiV
       public String GetDateTime(long millisDateTime) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         
         if (formatter == null) return "";        
 
@@ -571,7 +571,7 @@ public class jForm {
 
   //by ADiV
   public String GetTimeHHssSS(long millisTime) {
-    SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS");
+    SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS", Locale.US);
     
     if (formatter == null) return "";
     
@@ -598,7 +598,7 @@ public class jForm {
       }
     }
 
-    DateFormat formatter = new SimpleDateFormat(sPattern);
+    DateFormat formatter = new SimpleDateFormat(sPattern, Locale.US);
 
     if (formatter == null) {
       return 0;
@@ -625,7 +625,7 @@ public class jForm {
       public String GetDateTimeUTC(String _dateTime) {
         String sPattern = "yyyy-MM-dd HH:mm:ss";
 
-        SimpleDateFormat formatter = new SimpleDateFormat(sPattern);
+        SimpleDateFormat formatter = new SimpleDateFormat(sPattern, Locale.US);
 
         if (formatter == null) return "";
 
@@ -2726,6 +2726,7 @@ public class jForm {
 
         Uri pickerInitialUri = Uri.parse(_uriAsString);
 
+        // Requires API level 19
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(_fileMimeType); //"application/pdf"
@@ -2748,6 +2749,7 @@ public class jForm {
 
         Uri pickerInitialUri = Uri.parse(_uriAsString);
 
+        //Requires API level 19
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(_fileMimeType); //"application/pdf"
@@ -2777,7 +2779,7 @@ public class jForm {
 
         Uri uriToLoad = Uri.parse(_uriAsString);
 
-        // Choose a directory using the system's file picker.
+        // Choose a directory using the system's file picker. Requires API level 21
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
         // Provide read access to files and sub-directories in the user-selected
@@ -2895,8 +2897,10 @@ public class jForm {
         try {
 
             ParcelFileDescriptor pfd = controls.activity.getContentResolver().openFileDescriptor(_toTreeUri, "r");
-            assert pfd != null;
-            assert pfd.getStatSize() <= Integer.MAX_VALUE;
+            
+            if(pfd == null) return null;            
+            if(pfd.getStatSize() > Integer.MAX_VALUE) return null;
+            
             FileDescriptor fd = pfd.getFileDescriptor();
             FileInputStream input_file_stream = new FileInputStream(fd);
             bytes = new byte[input_file_stream.available()];
@@ -3128,6 +3132,7 @@ public class jForm {
                 // Log.w(TAG, "Failed query: " + e);
             } finally {
                 // closeQuietly(c);
+            	c.close();
             }
         }
         return results.toArray(new String[results.size()]);
@@ -3169,6 +3174,7 @@ public class jForm {
                 // Log.w(TAG, "Failed query: " + e);
             } finally {
                 // closeQuietly(c);
+            	c.close();
             }
         }
         return results.toArray(new String[results.size()]);

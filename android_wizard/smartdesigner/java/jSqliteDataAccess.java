@@ -77,7 +77,7 @@ import android.net.Uri;
  */
 class SQLiteAssetHelper extends SQLiteOpenHelper {
 
-    private static SQLiteAssetHelper instance;
+    //private static SQLiteAssetHelper instance;
 
     private static final String TAG = SQLiteAssetHelper.class.getSimpleName();
     public static String ASSET_DB_PATH = "databases";
@@ -161,7 +161,7 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
            mUpgradePathFormat =  name + "_upgrade_%s-%s.sql";
     }
    
-   public synchronized static SQLiteAssetHelper getInstance(Context context) {
+   /*public synchronized static SQLiteAssetHelper getInstance(Context context) {
 	return instance;
     }
 
@@ -1059,7 +1059,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
               colValue = mCursor.getString(i);
         break;
         case Cursor.FIELD_TYPE_FLOAT:
-              colValue = String.format("%.3f", mCursor.getFloat(i));
+              colValue = String.format(Locale.US, "%.3f", mCursor.getFloat(i));
         break;
         case Cursor.FIELD_TYPE_BLOB:
               colValue = "BLOB";

@@ -1,4 +1,4 @@
-package org.lamw.appimageviewrippledemo1;
+package org.lamw.appcompatcollapsingtoolbardemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,13 +43,16 @@ import android.widget.PopupMenu;
 
 import java.io.FileOutputStream;
 import java.io.File;
+import java.util.Locale;
 
 //-------------------------------------------------------------------------
 // jImageView
 // Reviewed by ADiV on 2021-09-16
 //-------------------------------------------------------------------------
 
+//public class jImageView extends androidx.appcompat.widget.AppCompatImageView {
 public class jImageView extends ImageView {
+	
 	//Pascal Interface
 	private long           PasObj   = 0;      // Pascal Obj
 	private Controls        controls = null;   // Control Cass for Event
@@ -121,8 +124,8 @@ public class jImageView extends ImageView {
 				}
 				break;}
 			case MotionEvent.ACTION_UP: {
-				
-				controls.pOnClick(PasObj,Const.Click_Default);
+								
+				performClick();
 				
 				switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
@@ -143,7 +146,7 @@ public class jImageView extends ImageView {
 				break;}
 			case MotionEvent.ACTION_POINTER_UP  : {
 				
-				controls.pOnClick(PasObj,Const.Click_Default);
+				performClick();
 				
 				switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
@@ -156,6 +159,17 @@ public class jImageView extends ImageView {
 		}
 		return true;
 	}
+	
+	// Because we call this from onTouchEvent, this code will be executed for both
+    // normal touch events and for when the system calls this using Accessibility 
+    @Override
+    public boolean performClick() {
+        super.performClick();
+
+        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default); 
+
+        return true;
+    }
 
 	public void SetLeftTopRightBottomWidthHeight(int _left, int _top, int _right, int _bottom, int _w, int _h) {
 		 String tag = ""+_left+"|"+_top+"|"+_right+"|"+_bottom;
@@ -871,9 +885,9 @@ public class jImageView extends ImageView {
 		try {
 			fos = new FileOutputStream(_filename);
 			if (fos != null) {
-				if (_filename.toLowerCase().contains(".jpg"))
+				if (_filename.toLowerCase(Locale.US).contains(".jpg"))
 					image.compress(Bitmap.CompressFormat.JPEG, 90, fos);
-				if (_filename.toLowerCase().contains(".png"))
+				if (_filename.toLowerCase(Locale.US).contains(".png"))
 					image.compress(Bitmap.CompressFormat.PNG, 100, fos);
 
 				fos.close();
@@ -976,10 +990,10 @@ public class jImageView extends ImageView {
 	public void ApplyDrawableXML(String _xmlIdentifier) {
 		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
     }
-
-    //https://forum.lazarus.freepascal.org/index.php/topic,59281.0.html
+	
+	//https://forum.lazarus.freepascal.org/index.php/topic,59281.0.html
 	public void SetClipToOutline(boolean _value) {   //thanks to Agmcz !
-		this.setClipToOutline(_value);
+			this.setClipToOutline(_value);
 	}
 
 }

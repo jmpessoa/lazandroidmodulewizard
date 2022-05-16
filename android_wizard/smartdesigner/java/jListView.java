@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.Locale;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -165,11 +166,11 @@ class jArrayAdapter extends ArrayAdapter {
 				ArrayList<jListItemRow> filteredList = new ArrayList<jListItemRow>();
 				for (jListItemRow p : items) {
 					if (mFilterMode == 0) {
-						if (p.label.toUpperCase().startsWith(constraint.toString().toUpperCase())) {
+						if (p.label.toUpperCase(Locale.US).startsWith(constraint.toString().toUpperCase(Locale.US))) {
 							filteredList.add(p);
 						}
 					} else {
-						if (p.label.toUpperCase().contains(constraint.toString().toUpperCase())) {
+						if (p.label.toUpperCase(Locale.US).contains(constraint.toString().toUpperCase(Locale.US))) {
 							filteredList.add(p);
 						}
 					}
@@ -1398,7 +1399,7 @@ class jArrayAdapter extends ArrayAdapter {
         public boolean onTouch(View v, MotionEvent event) {
             switch (event.getAction()) {
              case MotionEvent.ACTION_DOWN:{
-            	handler.postDelayed(runClick, 1000);
+            	handler.postDelayed(runClick, 300);
                 mRunning = true;
                 
                 break;
@@ -1419,6 +1420,7 @@ class jArrayAdapter extends ArrayAdapter {
             }		                  
             return true;
         }
+                
      };
 	}
 	

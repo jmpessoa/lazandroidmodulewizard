@@ -93,7 +93,7 @@ public class jDialogProgress {
 	  public void Show(RelativeLayout _layout) {	
 		if (dialog != null) dialog.dismiss();
 		dialog = null;		
-	    if(_layout.getVisibility()==0) { //visible   
+	    if(_layout.getVisibility()==android.view.View.VISIBLE) { //visible   
 		  _layout.setVisibility(android.view.View.INVISIBLE); //4
 	    }                  
 	    if ( _layout.getParent().getClass().getName().equals("android.widget.RelativeLayout") ) {    	
@@ -105,7 +105,7 @@ public class jDialogProgress {
 	    	if (par != null) par.removeView(_layout);
 	    }
 	    
-		_layout.setVisibility(0);	
+		_layout.setVisibility(android.view.View.VISIBLE);	
 	    AlertDialog.Builder builder = new AlertDialog.Builder(controls.activity);    
 	    builder.setView(_layout);
 	    builder.setCancelable(true); //back key    
