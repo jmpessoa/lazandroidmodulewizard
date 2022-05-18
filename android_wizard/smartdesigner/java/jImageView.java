@@ -993,6 +993,7 @@ public class jImageView extends ImageView {
 	
 	//https://forum.lazarus.freepascal.org/index.php/topic,59281.0.html
 	public void SetClipToOutline(boolean _value) {   //thanks to Agmcz !
+		if( android.os.Build.VERSION.SDK_INT >= 21 )
 			this.setClipToOutline(_value);
 	}
 

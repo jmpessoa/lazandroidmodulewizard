@@ -586,8 +586,12 @@ Sending Data: Extras vs. URI Parameters
 	    case 22: mIntent.setAction("android.appwidget.action.APPWIDGET_UPDATE"); break;
         case 23: mIntent.setAction("android.intent.ACTION_INSTALL_PACKAGE"); break;
         case 24: mIntent.setAction("android.intent.action.DELETE"); break;
-        case 25: mIntent.setAction(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES); break;
-        case 26: mIntent.setAction(Settings.ACTION_MANAGE_OVERLAY_PERMISSION); break;
+        case 25: // Requires API level 26
+        	     if( android.os.Build.VERSION.SDK_INT >= 26 )
+        	      mIntent.setAction(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES); break;
+        case 26: // Requires API level 23
+   	             if( android.os.Build.VERSION.SDK_INT >= 23 )
+        	      mIntent.setAction(Settings.ACTION_MANAGE_OVERLAY_PERMISSION); break;
 	  }
 	  
    }
@@ -803,7 +807,9 @@ Sending Data: Extras vs. URI Parameters
 	   	 case 1: mIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT); break;
 	   	 case 2: mIntent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME); break;
 	   	 case 3: mIntent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT); break;
-	  	 case 4: mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); break; // Depreciaded 21+  mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);  
+	  	 case 4: // Requires API level 21
+    	         if( android.os.Build.VERSION.SDK_INT >= 21 )
+	  		      mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); break; // Depreciaded 21+  mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);  
          case 5: mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); break;
          case 6: mIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); break;
          case 7: mIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION); break;         
@@ -816,7 +822,9 @@ Sending Data: Extras vs. URI Parameters
 	   	 case 1: mIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT); break;
 	   	 case 2: mIntent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME); break;
 	   	 case 3: mIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT); break;
-	  	 case 4: mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); break; // Depreciaded 21+  mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+	  	 case 4: // Requires API level 21
+	             if( android.os.Build.VERSION.SDK_INT >= 21 )
+	  		      mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); break; // Depreciaded 21+  mIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
          case 5: mIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); break;
          case 6: mIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); break;
          case 7: mIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION); break;

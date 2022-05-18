@@ -39,6 +39,7 @@ import android.telephony.SubscriptionManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
+import android.provider.Settings.Secure;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -213,7 +214,9 @@ public class jTelephonyManager /*extends ...*/ {
             if (Build.VERSION.SDK_INT >=  26) {
                 sImei = mTelephonyManager.getImei();
             }else //[endif_api26up]   */
-            sImei = mTelephonyManager.getDeviceId();
+        	// Need system app - android.permission.READ_PRIVILIGED_PHONE_STATE
+            //sImei = mTelephonyManager.getDeviceId();
+        	sImei = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID); 
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_IMEI", "Sorry... Not Permission granted!!");
         }
@@ -296,15 +299,13 @@ public class jTelephonyManager /*extends ...*/ {
 
     //By Segator
     public String GetNetworkType() {
-        int networkType = -1;
+        
         if (isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        
         try {
-            networkType = Objects.requireNonNull(mTelephonyManager).getNetworkType();
-        } catch (SecurityException securityException) {
-            Log.d("jTelephonyManager", "Sorry... Not Permission granted!!");
-        }
-        switch (networkType) {
+        	
+           switch (mTelephonyManager.getNetworkType()) {
             case TelephonyManager.NETWORK_TYPE_GPRS:
                 return "GPRS";
             case TelephonyManager.NETWORK_TYPE_EDGE:
@@ -342,9 +343,13 @@ public class jTelephonyManager /*extends ...*/ {
                 return "NR";
             // "5G"
             default:
-                return String.valueOf(networkType);
+                return "";
+           }
+        } catch (SecurityException securityException) {
+            Log.d("jTelephonyManager", "Sorry... Not Permission granted!!");
+            return "";
         }
-
+                
     }
 
     public long GetTotalRxBytes() {
@@ -619,6 +624,9 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public String GetSubscriberId() {
+    	// Requires API level 21
+        if( android.os.Build.VERSION.SDK_INT < 21 ) return "";
+        	
         String data = "";
         List<String> subscriberIds;
         subscriberIds = getSubscriberIds(controls.activity, TRANSPORT_CELLULAR);
@@ -632,10 +640,23 @@ public class jTelephonyManager /*extends ...*/ {
     public boolean IsWifiEnabled() {
         if (isListenerRemoved)
             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        
+        try{
+        	int iType = mTelephonyManager.getNetworkType();
+            if ((iType == TelephonyManager.NETWORK_TYPE_GSM) || // 2G
+            	(iType == TelephonyManager.NETWORK_TYPE_TD_SCDMA) || // 3G
+            	(iType == TelephonyManager.NETWORK_TYPE_IWLAN) || // 4G
+            	(iType == TelephonyManager.NETWORK_TYPE_NR)) return true; // 5G
+        }catch (SecurityException e) {
+        	e.printStackTrace();
+        }
+        
         ConnectivityManager mgrConn = (ConnectivityManager) controls.activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        if(mgrConn == null) return false;
+        
         return (mgrConn.getActiveNetworkInfo() != null &&
-                mgrConn.getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED) ||
-                mTelephonyManager.getNetworkType() == 3;
+                mgrConn.getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED);
     }
 
     //https://github.com/MuntashirAkon/AppManager
@@ -663,13 +684,13 @@ public class jTelephonyManager /*extends ...*/ {
                         String subscriberId = (String) getSubscriberId.invoke(tm, subscriptionId);
                         subscriberIds.add(subscriberId);
                     } catch (Exception e) {
-                        try {
+                        /*try {
                             if (Build.VERSION.SDK_INT >= 24) {
                                 subscriberIds.add(tm.createForSubscriptionId(subscriptionId).getSubscriberId());
                             }
                         } catch (Exception e2) {
                             subscriberIds.add(tm.getSubscriberId());
-                        }
+                        }*/
                     }
                 }
 
