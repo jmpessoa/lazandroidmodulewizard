@@ -122,7 +122,7 @@ public class jEditText extends EditText {
 		//Event
 		onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
-				performClick();
+				controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
 			};
 		};
 		
@@ -276,17 +276,6 @@ public class jEditText extends EditText {
 		});
 
 	}
-	
-	// Because we call this from onTouchEvent, this code will be executed for both
-    // normal touch events and for when the system calls this using Accessibility 
-    @Override
-    public boolean performClick() {
-        super.performClick();
-
-        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default); 
-
-        return true;
-    }
 
 	//Free object except Self, Pascal Code Free the class.
 	public  void Free() {

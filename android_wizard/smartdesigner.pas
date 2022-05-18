@@ -45,6 +45,7 @@ type
     FMaxNdk: integer;
     FNDKVersion: integer;
     FMinSdkControl: integer;
+    FTargetSdkControl: integer;
     FNdkApi: string;
     FAndroidTheme: string;
 
@@ -67,8 +68,6 @@ type
     //function IsChipSetDefault(var projectChipSet: string): boolean;
     //procedure TryChangeChipSetConfigs(projectChipSet: string);
 
-    function GetTargetFromManifest(): string;
-    function GetMinSDKFromManifest(): string;
     function GetMaxNdkPlatform(ndkVer: integer): integer;
 
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -311,48 +310,6 @@ begin
     Result := xml.DocumentElement.AttribStrings['package'];
   finally
     xml.Free
-  end;
-end;
-
-function TLamwSmartDesigner.GetTargetFromManifest(): string;
-var
-  ManifestXML: TXMLDocument;
-  n: TDOMNode;
-begin
-  Result := '';
-  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
-  try
-    ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
-    try
-      n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-      if not (n is TDOMElement) then Exit;
-      Result := TDOMElement(n).AttribStrings['android:targetSdkVersion'];
-    finally
-      ManifestXML.Free
-    end;
-  except
-    Exit;
-  end;
-end;
-
-function TLamwSmartDesigner.GetMinSDKFromManifest(): string;
-var
-  ManifestXML: TXMLDocument;
-  n: TDOMNode;
-begin
-  Result := '';
-  if not FileExists(FPathToAndroidProject + 'AndroidManifest.xml') then Exit;
-  try
-    ReadXMLFile(ManifestXML, FPathToAndroidProject + 'AndroidManifest.xml');
-    try
-      n := ManifestXML.DocumentElement.FindNode('uses-sdk');
-      if not (n is TDOMElement) then Exit;
-      Result := TDOMElement(n).AttribStrings['android:minSdkVersion'];
-    finally
-      ManifestXML.Free
-    end;
-  except
-    Exit;
   end;
 end;
 
@@ -640,7 +597,7 @@ begin
   else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
   else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
   else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.0.0'
-  else Result:= '3.4.3'; //gradleVersNumber >= 5110)
+  else Result:= '4.1.3'; //gradleVersNumber >= 5110)
 end;
 
 //https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
@@ -726,8 +683,8 @@ end;
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
   strList, providerList: TStringList;
-  i, minsdkApi, sdkManifMinApiNumber: integer;
-  strTargetApi, auxStr, tempStr, sdkManifestTarqet, sdkManifMinApi: string;
+  i, minsdkApi : integer;
+  strTargetApi, auxStr, tempStr : string;
   aSupportLib:TSupportLib;
   aAppCompatLib:TAppCompatLib;
   androidPluginNumber: integer;
@@ -751,7 +708,6 @@ var
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
   innerSupported: boolean;
-  isGradle : boolean;
 begin
 
   strList:= TStringList.Create;
@@ -806,8 +762,6 @@ begin
 
   end;
 
-  isGradle:= (LazarusIDE.ActiveProject.CustomData.Values['BuildSystem']='Gradle');
-
   if Pos('AppCompat',  FAndroidTheme) > 0 then
      minsdkApi:= 16
   else
@@ -829,16 +783,6 @@ begin
   if  minsdkApi < FMinSdkControl then
       minsdkApi:= FMinSdkControl;
 
-  if isGradle then
-   sdkManifMinApi := IntToStr(minsdkApi)
-  else
-   sdkManifMinApi := GetMinSDKFromManifest();
-
-  if sdkManifMinApi <> '' then
-    sdkManifMInApiNumber:= StrToInt(sdkManifMinApi)
-  else
-    sdkManifMInApiNumber:= 0; //minSdk was removed from manisfest ... so we need re-introduce it!
-
   sourcepath:=LamwGlobalSettings.PathToJavaTemplates+'androidmanifest.txt';
   targetpath:=FPathToAndroidProject+'AndroidManifest.xml';
 
@@ -848,12 +792,22 @@ begin
     auxStr:=FPackageName + '.' + LowerCase(FSmallProjName);
     tempStr  := StringReplace(Text, 'dummyPackage',auxStr, [rfReplaceAll, rfIgnoreCase]);
     tempStr  := StringReplace(tempStr, 'dummyAppName','.App', [rfReplaceAll, rfIgnoreCase]);
-    tempStr  := StringReplace(tempStr, 'dummySdkApi', '0', [rfReplaceAll, rfIgnoreCase]);
-    tempStr  := StringReplace(tempStr, 'dummyTargetApi', '0', [rfReplaceAll, rfIgnoreCase]);
     Clear;
     Text:= tempStr;
     SaveToFile(targetpath);
   end;
+
+  // Delete <uses-sdk
+  strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+
+  for i := 0 to strList.Count - 1 do
+   if pos('<uses-sdk', strList.Strings[i]) <> 0 then
+   begin
+     strList.Delete(i);
+     strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+     break;
+   end;
 
   if (FSupport) or (Pos('AppCompat', FAndroidTheme) > 0) then
   begin
@@ -891,7 +845,7 @@ begin
     end;
   end;
 
-  if sdkManifMinApiNumber < minsdkApi  then
+  (*if sdkManifMinApiNumber < minsdkApi  then
   begin
     strList.Clear;
     strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
@@ -923,7 +877,7 @@ begin
     end;
     strList.Text:= tempStr;
     strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-  end;
+  end;*)
 
   //Apply to "smartdesigner.pas" improvement by LongDirtyAnimAlf in "AndroidWizard_intf"
   strList.Clear;
@@ -937,7 +891,7 @@ begin
   end;
   strList.Clear;
 
-  sdkManifestTarqet:= GetTargetFromManifest();
+  (*sdkManifestTarqet:= GetTargetFromManifest();
 
   if sdkManifestTarqet <> '' then
   begin
@@ -947,7 +901,7 @@ begin
        tempStr:= StringReplace(tempStr, 'android:targetSdkVersion="'+sdkManifestTarqet+'"' , 'android:targetSdkVersion="'+IntToStr(targetApi)+'"', [rfReplaceAll,rfIgnoreCase]);
        strList.Text:= tempStr;
        strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-  end;
+  end;*)
 
   strTargetApi:= IntTostr(targetApi);
 
@@ -1238,10 +1192,7 @@ begin
 
          strList.Add('    defaultConfig {');
 
-         if sdkManifMInApiNumber >= minsdkApi then
-            strList.Add('            minSdkVersion ' + sdkManifMInApi)
-         else
-            strList.Add('            minSdkVersion '+IntToStr(minsdkApi));
+         strList.Add('            minSdkVersion '+IntToStr(minsdkApi));
 
          if targetApi <= StrToInt(buildToolApi) then
             strList.Add('            targetSdkVersion '+IntToStr(targetApi))
@@ -1267,6 +1218,7 @@ begin
 
          strList.Add('            versionCode ' + versionCode);
          strList.Add('            versionName "'+ versionName+'"');
+         strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
          strList.Add('    }');
 
          if foundSignature then
@@ -1387,13 +1339,8 @@ begin
          begin
            strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
 
-           if Pos('AppCompat', FAndroidTheme) > 0 then
-           begin
-             if Pos(Uppercase('android.useAndroidX'), Uppercase(strList.Text) ) <= 0 then
-             begin
-                strList.Add('android.useAndroidX=true');
-             end;
-           end;
+           if pos('android.useAndroidX', strList.text) = 0 then
+             strList.Add('android.useAndroidX=true');
 
            //apply change suggested by DonAlfred
            if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
@@ -1714,8 +1661,8 @@ var
   p: integer;
   outMaxBuildTool: string;
   isProjectImported: boolean;
-  sdkManifestTargetApi, buildTool: string;
-  manifestTargetApi: integer;
+  sdkTargetApi, buildTool: string;
+  iSdkTargetApi : integer;
   queryValue : String;
   isBrandNew: boolean;
   projectTarget, projectCustom, alertMsg: string;
@@ -1848,15 +1795,23 @@ begin
         AProject.Modified:= True;
       end;
 
-      sdkManifestTargetApi:= GetTargetFromManifest();
+      sdkTargetApi := AProject.CustomData['TargetSdk'];
 
-      if IsAllCharNumber(PChar(sdkManifestTargetApi))  then
-          manifestTargetApi:= StrToInt(sdkManifestTargetApi)
-      else manifestTargetApi:= 30;
+      if length(sdkTargetApi) <= 0 then
+      begin
+       sdkTargetApi:= intToStr(cMaxApi);
 
-      buildTool:=  GetBuildTool(manifestTargetApi);
+       AProject.CustomData['TargetSdk']:= sdkTargetApi;
+       AProject.Modified:= True;
+      end;
 
-      if manifestTargetApi < 30 then
+      if IsAllCharNumber(PChar(sdkTargetApi))  then
+          iSdkTargetApi:= StrToInt(sdkTargetApi)
+      else iSdkTargetApi:= cMaxApi;
+
+      buildTool:=  GetBuildTool(iSdkTargetApi);
+
+      if iSdkTargetApi < 30 then
       begin
 
          updateTargetApi:= GetMaxSdkPlatform(updateBuildTool);
@@ -1865,21 +1820,24 @@ begin
          begin
            queryValue:= '30';
 
-           if InputQuery('Warning. Manifest Target Api ['+sdkManifestTargetApi+ '] < 30',
+           if InputQuery('Warning. Manifest Target Api ['+sdkTargetApi+ '] < 30',
                          '[Suggestion] Change Target API to 30'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
            begin
              if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '30') ) then
              begin
-                   manifestTargetApi:= StrToInt(queryValue);
-                   buildTool:= GetBuildTool(manifestTargetApi);
+                   iSdkTargetApi:= StrToInt(queryValue);
+                   buildTool:= GetBuildTool(iSdkTargetApi);
              end
              else
              begin
-               manifestTargetApi:= 30;
+               iSdkTargetApi:= 30;
                buildTool:= GetBuildTool(30);
-             end;  ;
+             end;;
            end; //if InputQuery
 
+           iSdkTargetApi:= StrToInt(sdkTargetApi);
+           AProject.CustomData['TargetSdk']:= sdkTargetApi;
+           AProject.Modified:= True;
          end
          else
          begin
@@ -1901,11 +1859,11 @@ begin
         end
         else
         begin
-           buildTool:= GetBuildTool(manifestTargetApi);
+           buildTool:= GetBuildTool(iSdkTargetApi);
         end
       end;
 
-      KeepBuildUpdated(manifestTargetApi, buildTool);
+      KeepBuildUpdated(iSdkTargetApi, buildTool);
 
       if Self.IsLaz4Android() then
       begin
@@ -2466,7 +2424,7 @@ begin
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
    begin
 
-     minSdkManifestStr:= GetMinSDKFromManifest();
+     minSdkManifestStr:= LazarusIDE.ActiveProject.CustomData['MinSdk'];
 
      if minSdkManifestStr <> '' then
          minSdkManifest:= StrToInt(minSdkManifestStr)
@@ -2908,7 +2866,7 @@ begin
         gradleList:=TStringList.Create;
         gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
         aux:= gradleList.Text;
-        insertRef:= 'classpath ''com.android.tools.build:gradle:3.4.3''';
+        insertRef:= 'classpath ''com.android.tools.build:gradle:4.1.3''';
         for i:= 0 to auxList.Count-1 do
         begin
            auxStr:=auxList.Strings[i];

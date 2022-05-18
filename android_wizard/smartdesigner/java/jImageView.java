@@ -146,7 +146,7 @@ public class jImageView extends ImageView {
 				break;}
 			case MotionEvent.ACTION_POINTER_UP  : {
 				
-				performClick();
+				performClick(); 
 				
 				switch (event.getPointerCount()) {
 					case 1 : { controls.pOnTouch (PasObj,Const.TouchUp  ,1,
@@ -165,8 +165,8 @@ public class jImageView extends ImageView {
     @Override
     public boolean performClick() {
         super.performClick();
-
-        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default); 
+        
+        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
 
         return true;
     }

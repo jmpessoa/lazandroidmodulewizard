@@ -1342,7 +1342,7 @@ begin
   else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
   else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
   else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.0.0'
-  else Result:= '3.4.3'; //gradleVersNumber >= 5110)
+  else Result:= '4.1.3'; //gradleVersNumber >= 5110)
 end;
 
 //https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
@@ -1889,8 +1889,6 @@ begin
                strList.Add('    package="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'"');
                strList.Add('    android:versionCode="1"');
                strList.Add('    android:versionName="1.0" >');
-               // Gradle not need minSdkVersion
-               strList.Add('    <uses-sdk android:targetSdkVersion="29"/>');
                strList.Add('    <application');
                strList.Add('        android:allowBackup="true"');
                strList.Add('        android:icon="@drawable/ic_launcher"');
@@ -2647,6 +2645,7 @@ begin
                 if FVersionName = '' then  FVersionName:= '1.0';
                 strList.Add('            versionCode ' + intToStr(FVersionCode));
                 strList.Add('            versionName "' + FVersionName + '"');
+                strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
                 strList.Add('    }');
                 strList.Add('    sourceSets {');
                 strList.Add('        main {');
