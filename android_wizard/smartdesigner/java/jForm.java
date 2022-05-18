@@ -1181,6 +1181,24 @@ public class jForm {
     	
     	return _strIn.replace(_strFind, _strReplace);
     }
+    
+    public int GetStringPosUpperCase( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return 0;
+    	
+    	return _strFind.toUpperCase(Locale.US).indexOf(_strData.toUpperCase(Locale.US)); 
+    }
+    
+    public String GetStringCopy( String _strData, int _startIndex, int _endIndex ){
+    	if(_strData == null) return "";
+    	
+    	return _strData.substring(_startIndex, _endIndex);
+    }
+    
+    public int GetStringLength( String _strData ){
+        if(_strData == null) return 0;
+    	
+    	return _strData.length();
+    }
 
     // BY ADiV
     public int GetBatteryPercent() {
@@ -2723,9 +2741,12 @@ public class jForm {
 
     //Android 11: creating a document.
     public void RequestCreateFile(String _uriAsString, String _fileMimeType, String _fileName, int _requestCode) {
+    	
+    	// Requires API level 19
+    	if( android.os.Build.VERSION.SDK_INT < 19 ) return;
 
         Uri pickerInitialUri = Uri.parse(_uriAsString);
-
+        
         // Requires API level 19
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -2746,6 +2767,9 @@ public class jForm {
 
     //Android 11:  Request code for selecting  document.
     public void RequestOpenFile(String _uriAsString, String _fileMimeType, int _requestCode) {
+    	
+    	// Requires API level 19
+    	if( android.os.Build.VERSION.SDK_INT < 19 ) return;
 
         Uri pickerInitialUri = Uri.parse(_uriAsString);
 
@@ -2777,6 +2801,9 @@ public class jForm {
     //Android 11:
     public void RequestOpenDirectory(String _uriAsString, int _requestCode) {
 
+    	// Requires API level 21
+    	if( android.os.Build.VERSION.SDK_INT < 21 ) return;
+    	
         Uri uriToLoad = Uri.parse(_uriAsString);
 
         // Choose a directory using the system's file picker. Requires API level 21

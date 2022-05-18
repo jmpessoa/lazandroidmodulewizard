@@ -660,6 +660,9 @@ public class jImageFileManager /*extends ...*/ {
 	
 	public int GetOrientation(Uri photoUri) 
 	{
+		// Requires API level 29
+    	if( android.os.Build.VERSION.SDK_INT < 29 ) return -1;
+    	
 	    Cursor cursor = context.getContentResolver().query(photoUri,
 	    		//Field requires API level 29
 	            new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);

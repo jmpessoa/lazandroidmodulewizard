@@ -201,23 +201,20 @@ public class jCustomDialog extends RelativeLayout {
 	}
 
 	public void ClearLayoutAll() {
+				
 		if (lparams instanceof RelativeLayout.LayoutParams) {
 			for (int i = 0; i < countAnchorRule; i++) {   
- //[ifdef_api17up]
+			  if( android.os.Build.VERSION.SDK_INT >= 17 )
 				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsAnchorRule[i]);
- //[endif_api17up]
-	/* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
- //[ifdef_api17up] */
+			  else
+ 			    ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[i], 0);
 			}
 
 			for (int j = 0; j < countParentRule; j++) {
- //[ifdef_api17up]
+			   if( android.os.Build.VERSION.SDK_INT >= 17 )
 				((RelativeLayout.LayoutParams)lparams).removeRule(lparamsParentRule[j]);
- //[endif_api17up]
- /* //[endif_api17up]
- 			((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);
-	//[ifdef_api17up] */
+			   else
+ 			    ((RelativeLayout.LayoutParams)lparams).addRule(lparamsAnchorRule[j], 0);	
 			}
 		}
 		countAnchorRule = 0;
@@ -271,7 +268,7 @@ public class jCustomDialog extends RelativeLayout {
 			mDialog.show();						
 		}
 		else {
-			if (this.getVisibility()==0) { //visible
+			if (this.getVisibility()==android.view.View.VISIBLE) { //visible
 				this.setVisibility(android.view.View.INVISIBLE); //4
 			}
 			

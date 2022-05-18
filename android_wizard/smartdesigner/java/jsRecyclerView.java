@@ -214,7 +214,7 @@ class ItemObject {
 
     public ItemObject(String content, String format,  String delimiter, int pos, IdObjects idObjects) {
 		//position = pos;
-    	String upperFormat = format.toUpperCase();
+    	String upperFormat = format.toUpperCase(Locale.US);
 
 		countlabel = countSubString(upperFormat, "TEXT");
 		label = new String[countlabel];
@@ -1595,6 +1595,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 					final String[] nameVal = words[i].split(Pattern.quote(delimiter)); //jSwitchButton:9
 					final int idSwitch = Integer.valueOf(nameVal[1]);
 					switchbtn[indexSwitchbtn] = (Switch)itemLayoutView.findViewById(idSwitch);
+					
 					switchbtn[indexSwitchbtn].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 						@Override
 						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -1604,7 +1605,7 @@ class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.Recyc
 							if  ( ((Switch)buttonView).isChecked() ) status = 1;
 							controls.pOnRecyclerViewItemWidgetClick(pascalObject, getAdapterPosition(),4, idSwitch, status );
 						}
-					});
+					});										
 
 					indexSwitchbtn++;
 				}

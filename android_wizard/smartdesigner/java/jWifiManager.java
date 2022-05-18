@@ -330,9 +330,13 @@ public class jWifiManager /*extends ...*/ {
 
     //https://developer.android.com/reference/android/Manifest.permission#WRITE_SETTINGS
     public void RequestWriteSettingsPermission() { //by software_developer
+    	
+    	// Requires API level 23
+        if( android.os.Build.VERSION.SDK_INT < 23 ) return;
 
         if (!NeedWriteSettingsPermission()) return;
 
+        // Requires API level 23
         Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
         intent.setData(Uri.parse("package:" + this.context.getPackageName()));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
