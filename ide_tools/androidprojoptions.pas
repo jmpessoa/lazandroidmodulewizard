@@ -156,6 +156,8 @@ private
  end;
 
  FMinSdk : string;
+ FTargetSdk : string;
+ FAndroidTheme : string;
  FBuildSystem: string;
  FProjectPath: string;
  FDefaultTheme: string;
@@ -860,9 +862,10 @@ begin
   with FUsesSDKNode do
   begin
     if not isGradle then // Gradle not need minSdkVersion
+    begin
      AttribStrings['android:minSdkVersion'] := IntToStr(FMinSdkVersion);
-
-    AttribStrings['android:targetSdkVersion'] := IntToStr(FTargetSdkVersion);
+     AttribStrings['android:targetSdkVersion'] := IntToStr(FTargetSdkVersion);
+    end;
   end;
 
   // permissions
@@ -1771,8 +1774,19 @@ begin
 
   CheckBoxSupport.Checked:=(LazarusIDE.ActiveProject.CustomData['Support']='TRUE');
 
-  FMinSdk := proj.CustomData['MinSdk'];
-  FBuildSystem := proj.CustomData['BuildSystem'];
+  FMinSdk       := proj.CustomData['MinSdk'];
+  FTargetSdk    := proj.CustomData['TargetSdk'];
+  FAndroidTheme := proj.CustomData['Theme'];
+  FBuildSystem  := proj.CustomData['BuildSystem'];
+
+  if FMinSdk = '' then
+   if Pos('AppCompat',  FAndroidTheme) > 0 then
+     FMinSdk := '16'
+   else
+     FMinSdk := '14';
+
+  if FTargetSdk = '' then
+   FTargetSdk := intToStr(cMaxAPI);
 
   i := cbBuildSystem.Items.IndexOf(FBuildSystem);
   if i >= 0 then
@@ -1799,14 +1813,18 @@ begin
       Load(fn);
       FillPermissionGrid(Permissions, PermNames);
 
-      if FMinSdk <> '' then
+      seMinSdkVersion.Value   := StrToInt(FMinSdk);
+      seTargetSdkVersion.Text := FTargetSdk;
+
+      (*if FMinSdk <> '' then
        seMinSdkVersion.Value := StrToInt(FMinSdk)
       else
        seMinSdkVersion.Value := MinSDKVersion;
 
-      seTargetSdkVersion.Text := IntToStr(TargetSDKVersion);
+      seTargetSdkVersion.Text := IntToStr(TargetSDKVersion);*)
+
       seVersionCode.Value := VersionCode;
-      edVersionName.Text := VersionName;
+      edVersionName.Text  := VersionName;
       edLabel.Text := AppLabel;
     end;
   except
@@ -1861,7 +1879,8 @@ begin
   else
     LazarusIDE.ActiveProject.CustomData['Support']:='FALSE';
 
-  LazarusIDE.ActiveProject.CustomData['MinSdk'] := intToStr(seMinSdkVersion.Value);
+  LazarusIDE.ActiveProject.CustomData['MinSdk']    := intToStr(seMinSdkVersion.Value);
+  LazarusIDE.ActiveProject.CustomData['TargetSdk'] := seTargetSdkVersion.Text;
 
   with FManifest do
   begin
