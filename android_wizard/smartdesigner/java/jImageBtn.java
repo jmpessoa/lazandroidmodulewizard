@@ -97,8 +97,8 @@ public class jImageBtn extends ImageView {
 							// Do something after: 1s = 1000ms
 							if(btnState != 0) {
 							 btnState = 0;
-							 mImage.setImageBitmap(bmpUp);
-							 performClick();							 
+							 mImage.setImageBitmap(bmpUp);							 
+							 performClick();
 							}
 						}
 					}, mSleep);  //1s = 1000ms
@@ -116,8 +116,8 @@ public class jImageBtn extends ImageView {
     public boolean performClick() {
         super.performClick();
 
-        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default); 
-
+        controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
+        
         return true;
     }
 
