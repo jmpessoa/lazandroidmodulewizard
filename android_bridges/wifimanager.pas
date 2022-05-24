@@ -21,11 +21,19 @@ jWifiManager = class(jControl)
     constructor Create(AOwner: TComponent); override;
     destructor  Destroy; override;
     procedure Init; override;
+
+    function  IsWifiEnabled() : boolean;
     procedure SetWifiEnabled(_value: boolean);
+
     function Scan(): TDynArrayOfString;
-    function Connect(_networkSSID: string; _password: string): boolean;
-    function ConnectWEP(_networkSSID: string; _password: string): boolean;
-    function ConnectWPA(_networkSSID: string; _password: string): boolean;
+
+    function Connect(_networkSSID, _password: string): boolean;
+    function ConnectWEP(_networkSSID, _password: string): boolean;
+    function ConnectWPA(_networkSSID, _password: string): boolean;
+    function AddSuggestionOpen( _networkSSID, _password: string): boolean;
+    function AddSuggestionWPA2( _networkSSID, _password: string): boolean;
+    function AddSuggestionWPA3( _networkSSID, _password: string): boolean;
+
     function GetSSID(_scanResultIndex: integer): string;
     function GetCapabilities(_scanResultIndex: integer): string;
     procedure RequestLocationServices();
@@ -87,6 +95,14 @@ begin
   FInitialized:= True;
 end;
 
+function jWifiManager.IsWifiEnabled() : boolean;
+begin
+  Result := false;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsWifiEnabled');
+end;
+
 procedure jWifiManager.SetWifiEnabled(_value: boolean);
 begin
   //in designing component state: set value here...
@@ -96,34 +112,62 @@ end;
 
 function jWifiManager.Scan(): TDynArrayOfString;
 begin
+  Result := nil;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jWifiManager_Scan(gApp.jni.jEnv, FjObject);
 end;
 
-function jWifiManager.Connect(_networkSSID: string; _password: string): boolean;
+function jWifiManager.Connect(_networkSSID, _password: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'Connect', _networkSSID ,_password);
 end;
 
-function jWifiManager.ConnectWEP(_networkSSID: string; _password: string): boolean;
+function jWifiManager.ConnectWEP(_networkSSID, _password: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'ConnectWEP', _networkSSID ,_password);
 end;
 
-function jWifiManager.ConnectWPA(_networkSSID: string; _password: string): boolean;
+function jWifiManager.ConnectWPA(_networkSSID, _password: string): boolean;
 begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'ConnectWPA', _networkSSID ,_password);
 end;
 
+function jWifiManager.AddSuggestionOpen( _networkSSID, _password: string): boolean;
+begin
+  Result := false;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'AddSuggestionOpen', _networkSSID ,_password);
+end;
+
+function jWifiManager.AddSuggestionWPA2( _networkSSID, _password: string): boolean;
+begin
+  Result := false;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'AddSuggestionWPA2', _networkSSID ,_password);
+end;
+
+function jWifiManager.AddSuggestionWPA3( _networkSSID, _password: string): boolean;
+begin
+  Result := false;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'AddSuggestionWPA3', _networkSSID ,_password);
+end;
+
 function jWifiManager.GetSSID(_scanResultIndex: integer): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetSSID', _scanResultIndex);
@@ -131,6 +175,7 @@ end;
 
 function jWifiManager.GetCapabilities(_scanResultIndex: integer): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetCapabilities', _scanResultIndex);
@@ -145,6 +190,7 @@ end;
 
 function jWifiManager.IsLocationServicesON(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsLocationServicesON');
@@ -152,6 +198,7 @@ end;
 
 function jWifiManager.IsLocationServicesNeed(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsLocationServicesNeed');
@@ -159,6 +206,7 @@ end;
 
 function jWifiManager.RequestLocationServicesDenied(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'RequestLocationServicesDenied');
@@ -166,6 +214,7 @@ end;
 
 function jWifiManager.NeedWriteSettingsPermission(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'NeedWriteSettingsPermission');
@@ -194,6 +243,7 @@ end;
 
 function jWifiManager.IsWifiHotspotEnable(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'IsWifiHotspotEnable');
@@ -201,6 +251,7 @@ end;
 
 function jWifiManager.CreateNewWifiNetwork(): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_z(gApp.jni.jEnv, FjObject, 'CreateNewWifiNetwork');
@@ -208,6 +259,7 @@ end;
 
 function jWifiManager.CreateNewWifiNetwork(_ssid: string; _password: string): boolean;
 begin
+  Result := false;
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_tt_out_z(gApp.jni.jEnv, FjObject, 'CreateNewWifiNetwork', _ssid ,_password);
@@ -215,6 +267,7 @@ end;
 
 function jWifiManager.GetCurrentHotspotSSID(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetCurrentHotspotSSID');
@@ -222,6 +275,7 @@ end;
 
 function jWifiManager.GetCurrentHotspotPassword(): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(gApp.jni.jEnv, FjObject, 'GetCurrentHotspotPassword');

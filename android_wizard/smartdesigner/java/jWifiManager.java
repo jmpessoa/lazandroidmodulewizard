@@ -2,12 +2,25 @@ package org.lamw.appwifimanagerdemo2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.BroadcastReceiver;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.net.wifi.WifiNetworkSpecifier;
+import android.net.wifi.WifiNetworkSpecifier.Builder;
+import android.net.wifi.WifiNetworkSuggestion;
+import android.net.wifi.WifiInfo;
+import android.net.NetworkRequest;
+import android.net.NetworkSpecifier;
+import android.net.Network;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.RemoteException;
 import android.provider.Settings;
 //import android.util.Log;
 
@@ -16,6 +29,9 @@ import java.lang.reflect.Method;
 //import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.Locale;
+import java.util.Formatter;
+import java.util.ArrayList;
 
 /*Draft java code by "Lazarus Android Module Wizard" [7/26/2019 1:29:49]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
@@ -26,14 +42,17 @@ public class jWifiManager /*extends ...*/ {
     private long pascalObj = 0;        //Pascal Object
     private Controls controls = null; //Java/Pascal [events] Interface ...
     private Context context = null;
-    private WifiManager wifiManager;
+    
+    private WifiManager wifiManager = null;
 
     private String[] wifisResults = null;
     private String delimiter = "|";
 
-    private boolean locationServicesRequested;
+    private boolean locationServicesRequested = false;
 
-    private boolean hotSpotEnable;  
+    private boolean hotSpotEnable = false; 
+    
+    private String wifiSSID = "";
 
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
 
@@ -45,15 +64,7 @@ public class jWifiManager /*extends ...*/ {
 
         locationServicesRequested = false;
         
-        wifiManager = (WifiManager) _ctrls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);         
-        
-        // Better to start the app with the wifi deactivated to be able to use it for more purposes.
-        /*if (wifiManager!= null) {
-            if (!wifiManager.isWifiEnabled()) {
-                //Toast.makeText(getApplicationContext(), "Turning WiFi ON...", Toast.LENGTH_LONG).show();
-                wifiManager.setWifiEnabled(true);
-            }
-        }*/
+        wifiManager = (WifiManager) _ctrls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);                        
     }
 
     public void jFree() {
@@ -62,21 +73,28 @@ public class jWifiManager /*extends ...*/ {
 
     //write others [public] methods code here......
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
+    
+    public boolean IsWifiEnabled(){
+    	if (wifiManager == null) return false;
+    	
+    	return wifiManager.isWifiEnabled();
+    }
 
     public void SetWifiEnabled(boolean _value) {
     	
-    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {    	        		
-    		controls.activity.startActivityForResult(new Intent(Settings.Panel.ACTION_WIFI), 0);    		
+    	if (Build.VERSION.SDK_INT >= 29) {    	        		
+    		controls.activity.startActivityForResult(new Intent(android.provider.Settings.Panel.ACTION_WIFI), 0);    		
     	} else {
-    		if (wifiManager!= null) 
-                wifiManager.setWifiEnabled(_value);            
+    		if (wifiManager!= null)    		 
+                wifiManager.setWifiEnabled(_value);    		
     	}     	
         
     }
 
     public String[] Scan() {
         if (wifiManager == null) return null;
-        if (!IsLocationServicesNeed()) {
+        
+        if ((Build.VERSION.SDK_INT < 23) || IsGPSEnabled())  {
             List<ScanResult> scanResults = wifiManager.getScanResults();
             if (scanResults.size() > 0) {
                 wifisResults = new String[scanResults.size()];
@@ -87,23 +105,11 @@ public class jWifiManager /*extends ...*/ {
                     wifisResults[i] = scanResult.SSID + delimiter + scanResult.capabilities;
                 }
             }
-        }
-        else {
-           if (IsLocationServicesON()) {
-               List<ScanResult> scanResults = wifiManager.getScanResults();
-               if (scanResults.size() > 0) {
-                   wifisResults = new String[scanResults.size()];
-                   // Get Each network detail
-                   for (int i = 0; i < scanResults.size(); i++) {
-                       ScanResult scanResult = scanResults.get(i);
-                       //wifis[i] = scanResults.get(i).toString();
-                       wifisResults[i] = scanResult.SSID + delimiter + scanResult.capabilities;
-                   }
-               }
-           } else {
+        } else {
                //LocationServices
-           }
+           
         }
+        
         return wifisResults;
     }
 
@@ -115,69 +121,13 @@ public class jWifiManager /*extends ...*/ {
     public String GetCapabilities(int _scanResultIndex){
         String s = wifisResults[_scanResultIndex];
         return s.split(Pattern.quote(delimiter))[1];
-    }
-
-    /**
-     * https://gist.github.com/JosiasSena/100de74192ca3024da8494c1ca428294?source=post_page---------------------------
-     *
-     * @NonNull
-    public static IntentFilter getIntentFilterForWifiConnectionReceiver() {
-    final IntentFilter randomIntentFilter = new IntentFilter(ACTION_WIFI_ON);
-    randomIntentFilter.addAction(ACTION_WIFI_OFF);
-    randomIntentFilter.addAction(ACTION_CONNECT_TO_WIFI);
-    return randomIntentFilter;
-    }
-
-    public void onReceive(Context c, Intent intent) {
-    Log.d(TAG, "onReceive() called with: intent = [" + intent + "]");
-
-    wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
-
-    final String action = intent.getAction();
-
-    if (!isTextNullOrEmpty(action)) {
-    switch (action) {
-    case ACTION_WIFI_ON:
-    // Turns wifi on
-    wifiManager.setWifiEnabled(true);
-    break;
-    case ACTION_WIFI_OFF:
-    // Turns wifi off
-    wifiManager.setWifiEnabled(false);
-    break;
-    case ACTION_CONNECT_TO_WIFI:
-    // Connects to a specific wifi network
-    final String networkSSID = intent.getStringExtra("ssid");
-    final String networkPassword = intent.getStringExtra("password");
-
-    if (!isTextNullOrEmpty(networkSSID) && !isTextNullOrEmpty(networkPassword)) {
-    connectToWifi(networkSSID, networkPassword);
-    } else {
-    Log.e(TAG, "onReceive: cannot use " + ACTION_CONNECT_TO_WIFI +
-    "without passing in a proper wifi SSID and password.");
-    }
-    break;
-    }
-    }
-     * Notifies the receiver to turn wifi on
-     */
-    private static final String ACTION_WIFI_ON = "android.intent.action.WIFI_ON";
-
-    /**
-     * Notifies the receiver to turn wifi off
-     */
-    private static final String ACTION_WIFI_OFF = "android.intent.action.WIFI_OFF";
-
-    /**
-     * Notifies the receiver to connect to a specified wifi
-     */
-    private static final String ACTION_CONNECT_TO_WIFI = "android.intent.action.CONNECT_TO_WIFI";
-    
+    }    
 
     public boolean Connect(String _networkSSID, String _password) {
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
-        }        
+    	if (wifiManager == null) return false;
+    	
+        if (!wifiManager.isWifiEnabled())         	
+             wifiManager.setWifiEnabled(true);                           
         
         try {
            WifiConfiguration conf = new WifiConfiguration();
@@ -196,6 +146,8 @@ public class jWifiManager /*extends ...*/ {
 
     //https://stackoverflow.com/questions/29574730/how-to-connect-to-wifi-programmatically
     public boolean ConnectWEP( String _networkSSID, String _password ) {
+    	if (wifiManager == null) return false;
+    	
         if (!wifiManager.isWifiEnabled()) 
             wifiManager.setWifiEnabled(true);
         
@@ -226,13 +178,19 @@ public class jWifiManager /*extends ...*/ {
             //System.out.println(Arrays.toString(ex.getStackTrace()));
             return false;
         }
+                
     }
 
     public boolean ConnectWPA( String _networkSSID, String _password ) {
-        if (!wifiManager.isWifiEnabled()) 
-            wifiManager.setWifiEnabled(true);        
+    	 if (wifiManager == null) return false;
+    	
+    	 if( Build.VERSION.SDK_INT > 28) return false;        
         
-        try {
+        
+         if (!wifiManager.isWifiEnabled()) 
+             wifiManager.setWifiEnabled(true);
+        	
+         try {
             WifiConfiguration conf = new WifiConfiguration();
             conf.SSID = "\"" + _networkSSID + "\"";   // Please note the quotes. String should contain SSID in quotes
             conf.preSharedKey = "\"" + _password + "\"";
@@ -259,34 +217,102 @@ public class jWifiManager /*extends ...*/ {
             }
             //WiFi Connection success, return true
             return true;
-        }catch (SecurityException e) {
+         }catch (SecurityException e) {
             return false;         
-        }catch (Exception ex) {
+         }catch (Exception ex) {
             //System.out.println(Arrays.toString(ex.getStackTrace()));
             return false;
-        }
-        
+         }
+                
     }
+    
+    // https://developer.android.com/guide/topics/connectivity/wifi-suggest
+    // for Android >=29
+    public boolean AddSuggestionOpen( String _networkSSID, String _password ){
+    	        if( wifiManager == null ) return false;
+    	        if( Build.VERSION.SDK_INT < 29) return false;
+    	       
+    	        final WifiNetworkSuggestion suggestionNetwork =
+    			  new WifiNetworkSuggestion.Builder()
+    			  .setSsid(_networkSSID)
+    			  //.setIsAppInteractionRequired() // Optional (Needs location permission)
+    			  .build();
+    	        
+    	        if (suggestionNetwork == null) return false;
+    			
+    	        final List<WifiNetworkSuggestion> suggestionsList = new ArrayList<WifiNetworkSuggestion>();
+    	        
+    	        if (suggestionsList == null) return false;
+   			
+   			    suggestionsList.add(suggestionNetwork);
+    			
+    			final int status = wifiManager.addNetworkSuggestions(suggestionsList);
+    			
+    			if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) return false;
+    			
+    			return true;
+    }
+    
+    // for Android >=29
+    public boolean AddSuggestionWPA2( String _networkSSID, String _password ){
+    	
+    			if( wifiManager == null ) return false;
+    			if( Build.VERSION.SDK_INT < 29) return false;
+    	        
+    			final WifiNetworkSuggestion suggestionNetwork =
+    			  new WifiNetworkSuggestion.Builder()
+    			  .setSsid(_networkSSID)
+    			  .setWpa2Passphrase(_password)
+    			  //.setIsAppInteractionRequired() // Optional (Needs location permission)
+    			  .build();
+    			
+    			if (suggestionNetwork == null) return false;
 
-    //https://medium.com/@droidbyme/android-turn-on-gps-programmatically-d585cf29c1ef
-    public void RequestLocationServices() {
-        if (!IsLocationServicesNeed()) return;
-        //String provider = Settings.Secure.getString(controls.activity.getContentResolver(),
-                //Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-        //if null ou length == 0  then GPS is disabled...
-        //if ( (provider == null) || (provider.length() == 0) ) {
-        if (! IsGPSEnabled()) {
-            Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            controls.activity.startActivity(myIntent);
-        }
+    			final List<WifiNetworkSuggestion> suggestionsList = new ArrayList<WifiNetworkSuggestion>();
+    			
+    			if (suggestionNetwork == null) return false;
+    			
+    			suggestionsList.add(suggestionNetwork);    			    
+    			
+    			final int status = wifiManager.addNetworkSuggestions(suggestionsList);
+    			if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) return false;
 
-        locationServicesRequested = true;
+    			return true;
+    }
+    
+    // for Android >=29
+    public boolean AddSuggestionWPA3( String _networkSSID, String _password ){    			
+
+    			if( wifiManager == null ) return false;
+    			if( Build.VERSION.SDK_INT < 29) return false;
+    	
+    			final WifiNetworkSuggestion suggestionNetwork =
+    			  new WifiNetworkSuggestion.Builder()
+    			  .setSsid(_networkSSID)
+    			  .setWpa3Passphrase(_password)
+    			  //.setIsAppInteractionRequired() // Optional (Needs location permission)
+    			  .build();
+    			
+    			if (suggestionNetwork == null) return false;
+
+    			final List<WifiNetworkSuggestion> suggestionsList = new ArrayList<WifiNetworkSuggestion>();
+    			
+    			if (suggestionsList == null) return false;
+    			
+    			suggestionsList.add(suggestionNetwork);
+
+    			final int status = wifiManager.addNetworkSuggestions(suggestionsList);
+    			if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) return false;
+    			
+    			return true;    			
     }
 
     //https://www.android-examples.com/enable-disable-gps-location-service-programmatically-android/
     private boolean IsGPSEnabled(){
         LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        
+        if(locationManager == null) return false;
+        
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
@@ -343,8 +369,29 @@ public class jWifiManager /*extends ...*/ {
         this.context.startActivity(intent);
 
     }
+    
+    /**
+     * retrieve a stored wifi configuration that matches arguments
+     * @param wifiMgr a WiFiManager instance
+     * @param ssid the network SSID to search
+     * @param bssid an optional BSSID, it can be null
+     * @return the found WifiConfiguration on success, null otherwise
+     */
+    /*public WifiConfiguration GetWifiConfiguration(WifiManager wifiMgr, String ssid, String bssid) {
+    	
+      if(wifiManager == null || ssid == null || ssid.isEmpty()) return null;
+      
+      List<WifiConfiguration> configurations = wifiMgr.getConfiguredNetworks();
 
-    // Turn wifiAp hotspot on
+      for(WifiConfiguration config : configurations) {
+        if(ssid.equals(config.SSID) && ( bssid == null || config.BSSID == null || bssid.equals(config.BSSID))) {
+          return config;
+        }
+      }
+      return null;
+    }*/
+    
+ // Turn wifiAp hotspot on
     public void SetWifiHotspotOn() {
         if (wifiManager == null) return;
         WifiConfiguration wificonfiguration = null;

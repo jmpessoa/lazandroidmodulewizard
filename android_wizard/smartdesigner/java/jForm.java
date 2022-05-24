@@ -2350,15 +2350,14 @@ public class jForm {
 
     public void Restart(int _delay) {
         PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
-                new Intent(controls.activity.getIntent()),
-                controls.activity.getIntent().getFlags());
-        if (intent == null) {
-            return;
-        }
+                                new Intent(controls.activity.getIntent()), PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        if (intent == null)   return;
+        
         AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);
-        if (manager == null) {
-            return;
-        }
+        
+        if (manager == null) return;
+        
         manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
         System.exit(2);
     }

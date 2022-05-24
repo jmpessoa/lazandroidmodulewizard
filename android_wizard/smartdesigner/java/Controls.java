@@ -981,7 +981,7 @@ public  int Image_getWH (String filename ) {
   //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
   public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
     String SMS_DELIVERED = packageDeliveredAction;
-    PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+    PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), PendingIntent.FLAG_CANCEL_CURRENT);
     SmsManager sms = SmsManager.getDefault();
     
     if (sms == null)  return 0;
