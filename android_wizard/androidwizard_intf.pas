@@ -1341,7 +1341,7 @@ begin
   else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
   else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
   else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
-  else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.0.0'
+  else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.1.3'
   else Result:= '4.1.3'; //gradleVersNumber >= 5110)
 end;
 
@@ -1895,8 +1895,7 @@ begin
                strList.Add('        android:label="@string/app_name"');
                strList.Add('        android:theme="@style/AppTheme" >');
                strList.Add('        <activity');
-               strList.Add('            android:name="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'.App"');
-               strList.Add('            android:label="@string/app_name" >');
+               strList.Add('            android:name="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'.App">');
                strList.Add('            <intent-filter>');
                strList.Add('                <action android:name="android.intent.action.MAIN" />');
                strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');

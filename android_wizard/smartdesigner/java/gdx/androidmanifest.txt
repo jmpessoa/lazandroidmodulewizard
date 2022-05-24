@@ -55,7 +55,6 @@
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity
             android:name="dummyAppName" 
-            android:label="@string/app_name"
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"
             android:launchMode="standard" android:enabled="true">
             <intent-filter>
