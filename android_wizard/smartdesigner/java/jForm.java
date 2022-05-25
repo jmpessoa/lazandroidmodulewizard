@@ -1182,14 +1182,21 @@ public class jForm {
     	return _strIn.replace(_strFind, _strReplace);
     }
     
-    public int GetStringPosUpperCase( String _strFind, String _strData ){
-    	if((_strFind == null) || (_strData == null)) return 0;
+    public int GetStringPos( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return -1;
     	
-    	return _strFind.toUpperCase(Locale.US).indexOf(_strData.toUpperCase(Locale.US)); 
+    	return _strData.indexOf(_strFind); 
+    }
+    
+    public int GetStringPosUpperCase( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return -1;
+    	
+    	return _strData.toUpperCase(Locale.US).indexOf(_strFind.toUpperCase(Locale.US)); 
     }
     
     public String GetStringCopy( String _strData, int _startIndex, int _endIndex ){
     	if(_strData == null) return "";
+    	if(_startIndex > _endIndex) return "";
     	
     	return _strData.substring(_startIndex, _endIndex);
     }
