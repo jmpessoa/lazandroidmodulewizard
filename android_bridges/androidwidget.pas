@@ -1271,7 +1271,12 @@ type
     function GetDrawableResourceById(_resID: integer): jObject;
     function GetQuantityStringByName(_resName: string; _quantity: integer): string;
     function GetStringResourceByName(_resName: string): string;
+
     function GetStringReplace(_strIn, _strFind, _strReplace: string): string; // By ADiV
+    function GetStringCopy( _strData: string; _startIndex, _endIndex : integer ) : string;
+    function GetStringPos( _strFind, _strData: string ) : integer;
+    function GetStringPosUpperCase( _strFind, _strData: string ) : integer;
+    function GetStringLength( _strData : string ) : integer;
 
     //needed: <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     function GetSystemVersion: Integer;
@@ -2024,6 +2029,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_t_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): single;
   function jni_func_t_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): int64;
   function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
+  function jni_func_tii_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1 : integer): string;
   function jni_func_ttt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1, _str2 : string): string;
   function jni_func_t_out_uri(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str0: string): jObject;
   function jni_func_t_out_z(env: PJNIEnv; _jobject:JObject; javaFuncion : string; _str: string): boolean;
@@ -4038,6 +4044,38 @@ begin
 
   if FInitialized then
    result:= jni_func_ttt_out_t(gapp.Jni.jEnv, FjObject, 'GetStringReplace', _strIn, _strFind, _strReplace);
+end;
+
+function jForm.GetStringCopy( _strData: string; _startIndex, _endIndex : integer ) : string;
+begin
+  result := '';
+
+  if FInitialized then
+   result:= jni_func_tii_out_t(gapp.Jni.jEnv, FjObject, 'GetStringCopy', _strData, _startIndex, _endIndex);
+end;
+
+function jForm.GetStringPos( _strFind, _strData: string ) : integer;
+begin
+  result := -1;
+
+  if FInitialized then
+   result:= jni_func_tt_out_i(gapp.Jni.jEnv, FjObject, 'GetStringPos', _strFind, _strData);
+end;
+
+function jForm.GetStringPosUpperCase( _strFind, _strData: string ) : integer;
+begin
+  result := -1;
+
+  if FInitialized then
+   result:= jni_func_tt_out_i(gapp.Jni.jEnv, FjObject, 'GetStringPosUpperCase', _strFind, _strData);
+end;
+
+function jForm.GetStringLength( _strData : string ) : integer;
+begin
+  result := 0;
+
+  if FInitialized then
+   result:= jni_func_t_out_i(gapp.Jni.jEnv, FjObject, 'GetStringLength', _strData);
 end;
 
 function jForm.GetStringResourceById(_resID: integer): string;
@@ -6800,6 +6838,9 @@ end;
 function GetLayoutParams(App:jApp; lpParam: TLayoutParams; side: TSide): DWord;
 begin
   result := 0;
+
+  if App = nil then exit;
+
   case lpParam of
 
    lpMatchParent:          Result:= TLayoutParamsArray[altMATCHPARENT];
@@ -11787,6 +11828,38 @@ begin
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);     
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_tii_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _str: string; _int0, _int1 : integer): string;
+var
+  jStr: JString;
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  result := ''; if (env = nil) or (_jobject = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;II)Ljava/lang/String;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+  jParams[1].i:= _int0;
+  jParams[2].i:= _int1;
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jStr:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
