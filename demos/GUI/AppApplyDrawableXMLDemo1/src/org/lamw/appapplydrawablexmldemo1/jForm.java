@@ -80,6 +80,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -538,34 +539,28 @@ public class jForm {
     }
 
     public String GetDateTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        if (formatter == null) {
-            return "";
-        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        
+        if (formatter == null) return "";        
 
         String r = formatter.format(new Date());
 
-        if (r == null) {
-            return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
     }
 
 
       // by ADiV
       public String GetDateTime(long millisDateTime) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        if (formatter == null) {
-          return "";
-        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        
+        if (formatter == null) return "";        
 
         String r = formatter.format(millisDateTime);
 
-        if (r == null) {
-          return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
       }
 
@@ -576,17 +571,14 @@ public class jForm {
 
   //by ADiV
   public String GetTimeHHssSS(long millisTime) {
-    SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS");
-    if (formatter == null) {
-      return "";
-    }
-
+    SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS", Locale.US);
+    
+    if (formatter == null) return "";
+    
     String r = formatter.format(new Date(millisTime));
 
-    if (r == null) {
-      return "";
-    }
-
+    if (r == null) return "";
+    
     return r;
   }
 
@@ -606,7 +598,7 @@ public class jForm {
       }
     }
 
-    DateFormat formatter = new SimpleDateFormat(sPattern);
+    DateFormat formatter = new SimpleDateFormat(sPattern, Locale.US);
 
     if (formatter == null) {
       return 0;
@@ -633,11 +625,9 @@ public class jForm {
       public String GetDateTimeUTC(String _dateTime) {
         String sPattern = "yyyy-MM-dd HH:mm:ss";
 
-        SimpleDateFormat formatter = new SimpleDateFormat(sPattern);
+        SimpleDateFormat formatter = new SimpleDateFormat(sPattern, Locale.US);
 
-        if (formatter == null) {
-          return "";
-        }
+        if (formatter == null) return "";
 
         Date dateObject;
 
@@ -649,10 +639,14 @@ public class jForm {
           e.printStackTrace();
           return "";
         }
-
+        
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        return formatter.format(dateObject);
+        String r = formatter.format(dateObject);
+
+        if (r == null) return "";
+        
+        return r;
       }
 
     //Free object except Self, Pascal Code Free the class.
@@ -670,14 +664,11 @@ public class jForm {
     public String GetStringExtra(Intent data, String extraName) {
         String valueStr = "";
 
-        if (data != null) {
+        if (data != null) 
             valueStr = data.getStringExtra(extraName);
-        }
-
-        if (valueStr == null) {
-            return "";
-        }
-
+        
+        if (valueStr == null) return "";
+        
         return valueStr;
     }
 
@@ -836,9 +827,7 @@ public class jForm {
             }
         }
 
-        if (absPath == null) {
-            return "";
-        }
+        if (absPath == null) return "";        
 
         return absPath;
     }
@@ -846,9 +835,7 @@ public class jForm {
     public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath
         String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 
-        if (PathDat == null) {
-            return "";
-        }
+        if (PathDat == null) return "";        
 
         return PathDat;
     }
@@ -908,7 +895,7 @@ public class jForm {
     }
 
     //ref. https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
-//result: path to new storage [Internal App Storage]
+    //result: path to new storage [Internal App Storage]
     public String LoadFromAssets(String _filename) {
 
         String pathRes = "";
@@ -986,8 +973,8 @@ public class jForm {
     public String CreateDir(String _dirName) {
         this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
         String absPath = this.controls.activity.getFilesDir().getPath();
-        if (absPath == null) 
-            return "";
+        
+        if (absPath == null) return "";
         
         absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/" + _dirName;
         return absPath;
@@ -1073,14 +1060,15 @@ public class jForm {
 
         Drawable res = null;
 
-        if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
+        if (Build.VERSION.SDK_INT < 22) {    //for old device < 22
             res = this.controls.activity.getResources().getDrawable(_resID);
         }
 
-        //[ifdef_api21up]
-        if (Build.VERSION.SDK_INT >= 21) {
-            res = this.controls.activity.getResources().getDrawable(_resID, null);
-        }//[endif_api21up]
+        //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
+        //[ifdef_api22up]
+        if (Build.VERSION.SDK_INT >= 22) {
+        	res = this.controls.activity.getResources().getDrawable(_resID, null);
+        }//[endif_api22up]
 
         return res;
     }
@@ -1157,14 +1145,12 @@ public class jForm {
     //by  thierrydijoux
     public String GetQuantityStringByName(String _resName, int _quantity) {
         int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
-        if (id == 0) {
-            return "";
-        }
+        
+        if (id == 0) return "";
+        
         String value = this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
 
-        if (value == null) {
-            return "";
-        }
+        if (value == null) return "";        
 
         return value;
     }
@@ -1172,11 +1158,11 @@ public class jForm {
     //by thierrydijoux
     public String GetStringResourceByName(String _resName) {
         int id = this.controls.activity.getResources().getIdentifier(_resName, "string", this.controls.activity.getPackageName());
-        if (id == 0) {
-            return "";
-        }
+        
+        if (id == 0) return "";        
 
         String value = "" + this.controls.activity.getResources().getText(id);
+        
         return value;
     }
 
@@ -1186,6 +1172,39 @@ public class jForm {
         } else {
             return null;
         }
+    }
+    
+    // By ADiV
+    public String GetStringReplace(String _strIn, String _strFind, String _strReplace){
+    	if(_strIn == null) return "";
+    	if( (_strIn.length() <= 0) || (_strIn.length() < _strFind.length()) ) return "";
+    	
+    	return _strIn.replace(_strFind, _strReplace);
+    }
+    
+    public int GetStringPos( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return -1;
+    	
+    	return _strData.indexOf(_strFind); 
+    }
+    
+    public int GetStringPosUpperCase( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return -1;
+    	
+    	return _strData.toUpperCase(Locale.US).indexOf(_strFind.toUpperCase(Locale.US)); 
+    }
+    
+    public String GetStringCopy( String _strData, int _startIndex, int _endIndex ){
+    	if(_strData == null) return "";
+    	if(_startIndex > _endIndex) return "";
+    	
+    	return _strData.substring(_startIndex, _endIndex);
+    }
+    
+    public int GetStringLength( String _strData ){
+        if(_strData == null) return 0;
+    	
+    	return _strData.length();
     }
 
     // BY ADiV
@@ -1283,9 +1302,7 @@ public class jForm {
             }
         }
 
-        if (f == null) {
-            return "";
-        }
+        if (f == null) return "";        
 
         return f;
     }
@@ -1305,28 +1322,20 @@ public class jForm {
         try {
             TelephonyManager telephony = (TelephonyManager) this.controls.activity.getSystemService(Context.TELEPHONY_SERVICE);
 
-            if (telephony == null) {
-                return "";
-            }
+            if (telephony == null) return "";            
 
-            devid = telephony.getDeviceId();
+            // Need system app - android.permission.READ_PRIVILIGED_PHONE_STATE
+            //devid = telephony.getDeviceId();
 
-            if (devid == null) {
-                return "";
-            }
+            if (devid == "") return "";            
 
-            if (devid == "") {
-                devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);
-            }
+            if (devid == "")             
+        	 devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);            
 
         } catch (SecurityException e) //ExceptionExceptionException
         {
             e.printStackTrace();
-        }
-
-        if (devid == null) {
-            return "";
-        }
+        }        
 
         return devid;
     }
@@ -1453,9 +1462,9 @@ public class jForm {
     //By ADiV
     public String GetVersionName() {
         PackageManager pm = controls.activity.getPackageManager();
-        if (pm == null) {
-            return "";
-        }
+        
+        if (pm == null) return "";
+        
         try {
             PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
             return pinfo.versionName;
@@ -1469,18 +1478,15 @@ public class jForm {
         try {
             //Create a pattern
             Pattern pattern = Pattern.compile(patternString);
-            if (null == pattern) {
-                return "";
-            }
+            
+            if (null == pattern) return "";            
 
             //Match the pattern string in provided string
             Matcher matcher = pattern.matcher(inputString);
             if (null != matcher && matcher.find()) {
                 String r = matcher.group(1);
 
-                if (r == null) {
-                    return "";
-                }
+                if (r == null) return "";                
 
                 return r;
             }
@@ -1510,15 +1516,14 @@ public class jForm {
             return "";
         }
 
-        if (url == null) {
-            return "";
-        }
-
+        if (url == null) return "";
+        
         try {
             uc = url.openConnection();
-            if (uc == null) {
+            
+            if (uc == null) 
                 return "";
-            }
+            
             uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
             inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             if (null != inReader) {
@@ -1535,12 +1540,14 @@ public class jForm {
         // Get the current version pattern sequence
         String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
 
-        if (versionString == "") {
-            return "";
-        }
+        if (versionString == "") return "";        
 
         // get version from "htlgb">X.X.X</span>
-        return GetAppVersion(appVersion_PatternSeq, versionString);
+        versionString = GetAppVersion(appVersion_PatternSeq, versionString);
+        
+        if (versionString == "") return "";
+        
+        return versionString;
     }
 
     public void CancelShowCustomMessage() {
@@ -1641,9 +1648,9 @@ public class jForm {
     public String GetScreenDensity() {
         String r = "";
         DisplayMetrics metrics = new DisplayMetrics();
-        if (metrics == null) {
-            return "";
-        }
+        
+        if (metrics == null) return "";
+        
         controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int density = metrics.densityDpi;
 //[ifdef_api16up]
@@ -1737,17 +1744,19 @@ public class jForm {
 
     public String GetTitleActionBar() {
         ActionBar actionBar = this.controls.activity.getActionBar();
-        if (actionBar == null) {
+        
+        if (actionBar == null) 
             return "";
-        }
+        
         return (String) actionBar.getTitle();
     }
 
     public String GetSubTitleActionBar() {
         ActionBar actionBar = this.controls.activity.getActionBar();
-        if (actionBar == null) {
+        
+        if (actionBar == null) 
             return "";
-        }
+        
         return (String) actionBar.getSubtitle();
     }
 
@@ -1780,9 +1789,7 @@ public class jForm {
             e.printStackTrace();
         }
 
-        if (PathDat == null) {
-            return "";
-        }
+        if (PathDat == null) return "";        
 
         return PathDat + "/" + _filename2;
     }
@@ -1790,18 +1797,18 @@ public class jForm {
     //by ADiV
     public String GetStripAccents(String _str) {
         _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
-        if (_str == null) {
-            return "";
-        }
+        
+        if (_str == null) return "";
+        
         _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
         return _str;
     }
 
     public String GetPathFromAssetsFile(String _assetsFileName) {
         String r = LoadFromAssets(_assetsFileName);
-        if (r == null) {
-            return "";
-        }
+        
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -1942,16 +1949,12 @@ public class jForm {
     }
 
     public String UriToString(Uri _uri) {
-        if (_uri == null) {
-            return "";
-        }
+        if (_uri == null) return "";        
 
         String r = _uri.toString();
 
-        if (r == null) {
-            return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -2031,10 +2034,9 @@ public class jForm {
     public String GetDeviceWifiIPAddress() {
         //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
         WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (mWifi == null) {
-            return "";
-        }
-
+        
+        if (mWifi == null) return "";
+        
         //String ip = Formatter.formatIpAddress(
         int ipAddress = mWifi.getConnectionInfo().getIpAddress();
         String sIP = String.format(Locale.ROOT, "%d.%d.%d.%d",
@@ -2043,10 +2045,8 @@ public class jForm {
                 (ipAddress >> 16 & 0xff),
                 (ipAddress >> 24 & 0xff));
 
-        if (sIP == null) {
-            return "";
-        }
-
+        if (sIP == null) return "";
+        
         return sIP;
     }
 
@@ -2054,18 +2054,16 @@ public class jForm {
      * Calculate the broadcast IP we need to send the packet along. ref. http://www.ece.ncsu.edu/wireless/MadeInWALAN/AndroidTutorial/
      */
     public String GetWifiBroadcastIPAddress() throws IOException {
-        String r = null;
+        String r = "";
         //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
         WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (mWifi == null) {
-            return "";
-        }
+        
+        if (mWifi == null) return "";
+        
         // DhcpInfo  is a simple object for retrieving the results of a DHCP request
         DhcpInfo dhcp = mWifi.getDhcpInfo();
 
-        if (dhcp == null) {
-            return "";
-        }
+        if (dhcp == null) return "";        
 
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
         byte[] quads = new byte[4];
@@ -2076,16 +2074,14 @@ public class jForm {
         // The high order byte is quads[0].
         r = InetAddress.getByAddress(quads).getHostAddress();
 
-        if (r == null) {
-            return "";
-        }
+        if (r == null)  return "";        
 
         return r;
     }
 
     //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
     public String LoadFromAssetsTextContent(String _filename) {
-        String str;
+        String str = "";
         // load text
         try {
             //Log.i("loadFromAssets", "name: "+_filename);
@@ -2102,9 +2098,7 @@ public class jForm {
             // set result to TextView
             str = new String(buffer);
             //Log.i("loadFromAssets", ":: "+ str);
-            if (str == null) {
-                return "";
-            }
+            if (str == null) return "";            
 
             return str.toString();
         } catch (IOException ex) {
@@ -2250,7 +2244,8 @@ public class jForm {
 
         //if (recentTask.get(i).baseActivity.toShortString().indexOf(this.controls.activity.getPackageName()) > -1) {
 
-        am.moveTaskToFront(controls.activity.getTaskId(), 0);
+        // Need system app - android.permission.REORDER_TASKS
+        //am.moveTaskToFront(controls.activity.getTaskId(), 0);
 
         //}
         //}
@@ -2283,10 +2278,8 @@ public class jForm {
             taskid = taskInfo.get(0).topActivity.getPackageName();
         }
 
-        if (taskid == null) {
-            return "";
-        }
-
+        if (taskid == null) return "";
+        
         return taskid;
     }
 
@@ -2297,20 +2290,21 @@ public class jForm {
         } catch (PackageManager.NameNotFoundException e) {
             Log.i("GetApplicationIcon", "NameNotFoundException");
             // Get a default icon
-            if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
+            if (Build.VERSION.SDK_INT < 22) {    //for old device < 22
                 dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher));
             }
 
-            //[ifdef_api21up]
-            if (Build.VERSION.SDK_INT >= 21) {
+            //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
+            //[ifdef_api22up]
+            if (Build.VERSION.SDK_INT >= 22) {
                 dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher, null));
-            }//[endif_api21up]
+            }//[endif_api22up]
         }
         return dw;
     }
 
     public String GetApplicationName(String packageName) {
-        String appname;
+        String appname = "";
         ApplicationInfo ai;
         try {
             PackageManager pm = this.controls.activity.getPackageManager();
@@ -2363,24 +2357,23 @@ public class jForm {
 
     public void Restart(int _delay) {
         PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
-                new Intent(controls.activity.getIntent()),
-                controls.activity.getIntent().getFlags());
-        if (intent == null) {
-            return;
-        }
+                                new Intent(controls.activity.getIntent()), PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        if (intent == null)   return;
+        
         AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);
-        if (manager == null) {
-            return;
-        }
+        
+        if (manager == null) return;
+        
         manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
         System.exit(2);
     }
 
     public String UriEncode(String _message) {
         String r = Uri.encode(_message);
-        if (r == null) {
-            return "";
-        }
+        
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -2407,9 +2400,9 @@ public class jForm {
     //https://developer.android.com/reference/android/provider/Settings.System
     public String GetSettingsSystemString(String _strKey) {
         String r = android.provider.Settings.System.getString(controls.activity.getContentResolver(), _strKey);
-        if (r == null) {
-            r = "";
-        }
+        
+        if (r == null) r = "";
+        
         return r;
     }
 
@@ -2621,9 +2614,7 @@ public class jForm {
     }
 
     public String GetRealPathFromURI(Uri _Uri) {
-        if (_Uri == null) {
-            return "";
-        }
+        if (_Uri == null) return "";        
 
         String path;
 
@@ -2633,10 +2624,8 @@ public class jForm {
             path = getRealPathFromURI_API19(_Uri);
         }
 
-        if (path == null) {
-            return "";
-        }
-
+        if (path == null) return "";
+        
         return path;
     }
 
@@ -2664,24 +2653,18 @@ public class jForm {
     }
 
     public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
-        if (_srcUri == null) {
-            return "";
-        }
-
+        if (_srcUri == null) return "";
+        
         String fileName = "";
         ContentResolver cr = controls.activity.getContentResolver();
 
-        if (cr == null) {
-            return "";
-        }
-
+        if (cr == null) return "";
+        
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
         Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
 
-        if (metaCursor == null) {
-            return "";
-        }
-
+        if (metaCursor == null) return "";
+        
         try {
             if (metaCursor.moveToFirst()) {
                 fileName = metaCursor.getString(0);
@@ -2690,9 +2673,8 @@ public class jForm {
             metaCursor.close();
         }
 
-        if (fileName.equals("")) {  //fixed
-            return "";
-        }
+        if (fileName.equals("")) //fixed
+            return "";        
 
         try {
             InputStream input = cr.openInputStream(_srcUri);
@@ -2745,24 +2727,38 @@ public class jForm {
 
     public void CopyStringToClipboard(String _txt) {
         ClipData cdata = ClipData.newPlainText("text", _txt);
+        
+        if(cdata == null) return;
+        
         mClipBoard.setPrimaryClip(cdata);
     }
 
     public String PasteStringFromClipboard() {
         ClipData cdata = mClipBoard.getPrimaryClip();
+        
+        if(cdata == null) return "";
+        
         ClipData.Item item = cdata.getItemAt(0);
+        
+        if(item == null) return "";
+        
         return item.getText().toString();
     }
 
-
-    //creating a document.
+    //Android 11: creating a document.
     public void RequestCreateFile(String _uriAsString, String _fileMimeType, String _fileName, int _requestCode) {
+    	
+    	// Requires API level 19
+    	if( android.os.Build.VERSION.SDK_INT < 19 ) return;
 
         Uri pickerInitialUri = Uri.parse(_uriAsString);
-
+        
+        // Requires API level 19
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(_fileMimeType); //"application/pdf"
+
+        //For use with ACTION_CREATE_DOCUMENT to specify an initial file name.
         intent.putExtra(Intent.EXTRA_TITLE, _fileName); //"invoice.pdf"
 
         // Optionally, specify a URI for the directory that should be opened in
@@ -2775,14 +2771,25 @@ public class jForm {
         controls.activity.startActivityForResult(intent, _requestCode);
     }
 
-    // Request code for selecting  document.
-    public void RequestOpenFile(String _uriAsString, String _fileMimeType, String _fileName, int _requestCode) {
+    //Android 11:  Request code for selecting  document.
+    public void RequestOpenFile(String _uriAsString, String _fileMimeType, int _requestCode) {
+    	
+    	// Requires API level 19
+    	if( android.os.Build.VERSION.SDK_INT < 19 ) return;
 
         Uri pickerInitialUri = Uri.parse(_uriAsString);
 
+        //Requires API level 19
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(_fileMimeType); //"application/pdf"
+
+        //For use with ACTION_CREATE_DOCUMENT to specify an initial file name.
+        //intent.putExtra(Intent.EXTRA_TITLE, _fileName); //"invoice.pdf"
+
+        if (Build.VERSION.SDK_INT >= 18) {
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+        }
 
         // Optionally, specify a URI for the file that should appear in the
         // system file picker when it loads.
@@ -2791,14 +2798,21 @@ public class jForm {
             intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
             //[endif_api26up]
         }
+
+        //final Intent chooserIntent = Intent.createChooser(intent, "Open File");
+
         controls.activity.startActivityForResult(intent, _requestCode);
     }
 
+    //Android 11:
     public void RequestOpenDirectory(String _uriAsString, int _requestCode) {
 
+    	// Requires API level 21
+    	if( android.os.Build.VERSION.SDK_INT < 21 ) return;
+    	
         Uri uriToLoad = Uri.parse(_uriAsString);
 
-        // Choose a directory using the system's file picker.
+        // Choose a directory using the system's file picker. Requires API level 21
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 
         // Provide read access to files and sub-directories in the user-selected
@@ -2817,13 +2831,15 @@ public class jForm {
 
 
     //https://developer.android.com/training/data-storage/shared/documents-files#java
-    public String[] GetUriMetaData(Uri _uri) {
+    public String[] GetUriMetaData(Uri _treeUri) {
+
+        //listFiles(_treeUri);
 
         Cursor cursor= null;
-        Uri uri = _uri;
+
+        Uri uri = _treeUri;
 
         ArrayList<String> data = new ArrayList<String>();
-        Uri docUriTree = null;
         // The query, because it only applies to a single document, returns only
         // one row. There's no need to filter, sort, or select fields,
         // because we want all fields for one document.
@@ -2831,55 +2847,64 @@ public class jForm {
 
             if (Build.VERSION.SDK_INT >= 21) {
                 //[ifdef_api21up]
-                uri = DocumentsContract.buildDocumentUriUsingTree(_uri, DocumentsContract.getTreeDocumentId(_uri));
+                uri = DocumentsContract.buildDocumentUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
                 //[ifdef_api21up]
             }
 
             try {
-
-                    cursor = controls.activity.getContentResolver().query(uri, null, null, null, null, null);
+                cursor = controls.activity.getContentResolver().query(_treeUri, null, null, null, null, null);
                     // moveToFirst() returns false if the cursor has 0 rows. Very handy for
                     // "if there's anything to look at, look at it" conditionals.
+                if (cursor != null && cursor.moveToFirst()) {
 
-                    if (cursor != null && cursor.moveToFirst()) {
+                        cursor.moveToFirst();
+                        while (!cursor.isAfterLast()) {
+                            //your code to implement
 
-                        // Note it's called "Display Name". This is
-                        // provider-specific, and might not necessarily be the file name.
-                        String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                           // Note it's called "Display Name". This is
+                           // provider-specific, and might not necessarily be the file name.
+                           String displayName = "";
+                           
+                           int iColum = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                           if(iColum >= 0) displayName = cursor.getString(iColum);
 
-                        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                        // If the size is unknown, the value stored is null. But because an
-                        // int can't be null, the behavior is implementation-specific,
-                        // and unpredictable. So as
-                        // a rule, check if it's null before assigning to an int. This will
-                        // happen often: The storage API allows for remote files, whose
-                        // size might not be locally known.
-                        String size = null;
-                        if (!cursor.isNull(sizeIndex)) {
-                            // Technically the column stores an int, but cursor.getString()
-                            // will do the conversion automatically.
-                            size = cursor.getString(sizeIndex);
-                        } else {
-                            size = "Unknown";
+                           int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                            // If the size is unknown, the value stored is null. But because an
+                           // int can't be null, the behavior is implementation-specific,
+                           // and unpredictable. So as
+                           // a rule, check if it's null before assigning to an int. This will
+                            // happen often: The storage API allows for remote files, whose
+                            // size might not be locally known.
+                            String size = null;
+                            if (!cursor.isNull(sizeIndex)) {
+                                // Technically the column stores an int, but cursor.getString()
+                                // will do the conversion automatically.
+                                 size = cursor.getString(sizeIndex);
+                            } else {
+                                 size = "Unknown";
+                            }
+
+                            data.add(displayName);
+                            Log.i("LAMW", "displayName = " + displayName);
+                            cursor.moveToNext();
                         }
-                        //data.add(displayName+"="+size);
-                        data.add(displayName);
+
                     }
-                } finally {
+            } finally {
                     if (cursor != null) cursor.close();
-                }
-
+            }
         }
-
         return data.toArray(new String[data.size()]);
     }
 
-    public Bitmap GetBitmapFromUri(Uri _uri){
+    //Android 11:
+    public Bitmap GetBitmapFromUri(Uri _treeUri){
+       
         Bitmap image=null;
         ParcelFileDescriptor parcelFileDescriptor=null;
         try {
 
-            parcelFileDescriptor = controls.activity.getContentResolver().openFileDescriptor(_uri, "r");
+            parcelFileDescriptor = controls.activity.getContentResolver().openFileDescriptor(_treeUri, "r");
 
             FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
 
@@ -2893,14 +2918,50 @@ public class jForm {
             e.printStackTrace();
         }
         return image;
+        
     }
+    
+    
+    //Android 11:
+    public byte[] LoadBytesFromUri(Uri _toTreeUri) {
 
-    public String GetTextFromUri(Uri _uri) {
+        byte[] bytes = new byte[1];
+
+        try {
+
+            ParcelFileDescriptor pfd = controls.activity.getContentResolver().openFileDescriptor(_toTreeUri, "r");
+            
+            if(pfd == null) return null;            
+            if(pfd.getStatSize() > Integer.MAX_VALUE) return null;
+            
+            FileDescriptor fd = pfd.getFileDescriptor();
+            FileInputStream input_file_stream = new FileInputStream(fd);
+            bytes = new byte[input_file_stream.available()];
+            input_file_stream.read(bytes);
+            input_file_stream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bytes;
+    }    
+    
+    
+
+    //Android 11:
+    public String GetTextFromUri(Uri _treeUri) {
         StringBuilder stringBuilder = new StringBuilder();
+        
+        if(stringBuilder == null) return "";
+        
         InputStream inputStream = null;
         BufferedReader reader = null;
+
         try {
-             inputStream = controls.activity.getContentResolver().openInputStream(_uri);
+             inputStream = controls.activity.getContentResolver().openInputStream(_treeUri);
              reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
              String line;
              while ((line = reader.readLine()) != null) {
@@ -2908,27 +2969,56 @@ public class jForm {
              }
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
+        }
+        
+        return stringBuilder.toString();
+    }
+
+    //Android 11:
+    public String GetTextFromUriAsString(String _treeUriAsString) {
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        if(stringBuilder == null) return "";
+        
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+
+        Uri _treeUri = Uri.parse(_treeUriAsString);
+
+        try {
+            inputStream = controls.activity.getContentResolver().openInputStream(_treeUri);
+            reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
         }
         return stringBuilder.toString();
     }
 
-    public void TakePersistableUriPermission(Uri _uri) {
+    //Android 11:
+    public void TakePersistableUriPermission(Uri _treeUri) {
         final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
 
         // Check for the freshest data.
         if (Build.VERSION.SDK_INT >= 19) {
             //[ifdef_api19up]
-            controls.activity.getContentResolver().takePersistableUriPermission(_uri, takeFlags);
+            controls.activity.getContentResolver().takePersistableUriPermission(_treeUri, takeFlags);
             //[endif_api19up]
         }
     }
 
-    public void CopyFile(Uri _fromUri, Uri _toUri)  {
+    //Android 11:
+    public void CopyFile(Uri _fromTreeUri, Uri _toTreeUri)  {
         InputStream in=null;
         OutputStream out=null;
         try {
-            in = controls.activity.getContentResolver().openInputStream(_fromUri);
-            out = controls.activity.getContentResolver().openOutputStream(_toUri);
+            in  = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri);
                 byte[] buf = new byte[1024];
                 int len;
                 while ((len = in.read(buf)) > 0) {
@@ -2941,10 +3031,11 @@ public class jForm {
         }
     }
 
-    public void SaveImageToUri(Bitmap _bitmap, Uri _toUri) {
+    //Android 11:
+    public void SaveImageToUri(Bitmap _bitmap, Uri _toTreeUri) {
         OutputStream out;
         try {
-            out = controls.activity.getContentResolver().openOutputStream(_toUri, "w");
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
             _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
             out.close();
             out.flush();
@@ -2955,10 +3046,66 @@ public class jForm {
         }
     }
 
-    public void SaveTextToUri(String _text, Uri _toUri) {
+	
+    //Android 11:
+    public void SaveImageTypeToUri(Bitmap _bitmap, Uri _toTreeUri, int _type) {
+        OutputStream out;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+
+
+			if(_type == 1)
+            {_bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);}
+			else if(_type == 2)		
+            {	_bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);}
+			else if(_type == 3)		
+            {
+                //_bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out);
+                if (android.os.Build.VERSION.SDK_INT < 30)
+                {
+                   _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out); // Added in API level 14, Deprecated in API level 30
+                }
+                else // needs targetSdkVersion API 30
+                {
+                    _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);        // comment here for targetSdkVersion API >= 30!
+
+                    //[ifdef_api30up]
+
+                    // _bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 90, out);   //uncomment only here for targetSdkVersion API >= 30!
+
+                     //[endif_api30up]
+                }
+            } 
+				
+            out.close();
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }	
+	
+	
+    //Android 11:
+    public void SaveBytesToUri(byte[] _bytes, Uri _toTreeUri) {
         OutputStream out=null;
         try {
-            out = controls.activity.getContentResolver().openOutputStream(_toUri, "w");
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+            out.write(_bytes);
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }	
+	
+    //Android 11:
+    public void SaveTextToUri(String _text, Uri _toTreeUri) {
+        OutputStream out=null;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
             byte[] bytes = _text.getBytes();
             out.write(bytes);
             out.flush();
@@ -2969,4 +3116,151 @@ public class jForm {
         }
     }
 
+    //Android 11:
+    public Uri CreateDirectory(Uri _treeUri, String _directoryName) {
+        ContentResolver contentResolver = controls.activity.getContentResolver();
+        Uri directoryUri = null;
+        try {
+            Uri docUri = null;
+            if (android.os.Build.VERSION.SDK_INT >= 21) {
+                //[ifdef_api21up]
+                docUri = DocumentsContract.buildDocumentUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+                directoryUri = DocumentsContract.createDocument(contentResolver, docUri, DocumentsContract.Document.MIME_TYPE_DIR, _directoryName);
+                //[endif_api21up]
+            }
+        } catch (IOException e) {
+            //Log.w(TAG, "IOException", e);
+        }
+        if (directoryUri != null) {
+
+        }
+        return directoryUri;
+    }
+
+    //Android 11:
+    public String[] GetFileList(Uri _treeUri) {
+
+        final ContentResolver resolver = controls.activity.getContentResolver();
+        final ArrayList<String> results = new ArrayList<String>();
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+
+            Cursor c = null;
+            try {
+                c = resolver.query(childrenUri, new String[]{DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                                DocumentsContract.Document.COLUMN_MIME_TYPE,
+                                DocumentsContract.Document.COLUMN_DISPLAY_NAME},
+                        null, null, null);
+                while (c.moveToNext()) {
+                    final String documentId = c.getString(0);
+                    final String mimeType = c.getString(1);
+                    final String displayName = c.getString(2);
+                    final Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(childrenUri, documentId);
+                    if (!DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType)) {
+                        results.add(displayName+"="+documentUri.toString());
+                    }
+                }
+            } catch (Exception e) {
+                // Log.w(TAG, "Failed query: " + e);
+            } finally {
+                // closeQuietly(c);
+            	c.close();
+            }
+        }
+        return results.toArray(new String[results.size()]);
+    }
+
+    public String[] GetFileList(Uri _treeUri, String _fileExtension) {
+
+        final ContentResolver resolver = controls.activity.getContentResolver();
+        final ArrayList<String> results = new ArrayList<String>();
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+
+            Cursor c = null;
+            try {
+                c = resolver.query(childrenUri, new String[]{DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                                DocumentsContract.Document.COLUMN_MIME_TYPE,
+                                DocumentsContract.Document.COLUMN_DISPLAY_NAME},
+                        null, null, null);
+                while (c.moveToNext()) {
+                    final String documentId = c.getString(0);
+                    final String mimeType = c.getString(1);
+                    final String displayName = c.getString(2);
+
+                    String ext = displayName.substring(displayName.lastIndexOf("."));
+
+                    String fixedExtension = _fileExtension;
+                    int lastIndex = _fileExtension.lastIndexOf(".");
+                    if (lastIndex < 0) fixedExtension = "." + fixedExtension;
+
+                    final Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(childrenUri, documentId);
+                    if (!DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType)) {
+                        if (ext.equals(fixedExtension)) {
+                            results.add(displayName + "=" + documentUri.toString());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Log.w(TAG, "Failed query: " + e);
+            } finally {
+                // closeQuietly(c);
+            	c.close();
+            }
+        }
+        return results.toArray(new String[results.size()]);
+    }
+
+    //Android 11:
+    public boolean IsTreeUri(Uri _uri) {
+        boolean r = false;
+        if (Build.VERSION.SDK_INT >= 24) {
+            r = DocumentsContract.isTreeUri(_uri);
+        }
+        return r;
+    }
+
+    public String GetMimeTypeFromExtension(String _fileExtension) {
+        MimeTypeMap myMime = MimeTypeMap.getSingleton();
+        
+        if(myMime == null) return "";
+        
+        String r = myMime.getMimeTypeFromExtension(_fileExtension);
+        
+        if(r == null) return "";
+        
+        return r;
+    }
+
+    //Android 11:
+    public String GetFileNameByUri(Uri uri) {
+        String result = "";
+        
+        final ContentResolver resolver = controls.activity.getContentResolver();
+        
+        if(resolver == null) return "";
+        
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = resolver.query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                	int iColum = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                    if(iColum >= 0) result = cursor.getString(iColum);                    
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        
+        if (result == null) 
+            result = uri.getLastPathSegment();
+        
+        if (result == null) return "";
+        	
+        return result;
+    }
 }

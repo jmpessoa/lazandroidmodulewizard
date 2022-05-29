@@ -321,6 +321,18 @@ type
     procedure UpdateLayout; override;
   end;
 
+  { TDraftImageButton }
+
+  TDraftImageButton = class(TDraftWidget)
+  private
+    FImage: TPortableNetworkGraphic;
+    function GetImage: TPortableNetworkGraphic;
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
   { TDraftZoomableImageView }
 
   TDraftZoomableImageView = class(TDraftWidget)
@@ -775,7 +787,8 @@ uses
   sviewpager, scollapsingtoolbarlayout, stablayout, sappbarlayout,
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
   customcamera, sadmob, calendarview, searchview, zbarcodescannerview,
-  scontinuousscrollableimageview, copenmapview, csignaturepad, zoomableimageview, tablelayout;
+  scontinuousscrollableimageview, copenmapview, csignaturepad,
+  zoomableimageview, tablelayout, imagebutton;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -3992,7 +4005,100 @@ begin
   im := GetImage;
   if im <> nil then
   begin
-    with jImageView(FAndroidWidget) do  //jsContinuousScrollableImageView
+    with jImageView(FAndroidWidget) do
+    begin
+
+        if FImage.Width > Self.Width then
+           FMinWidth:= Self.Width
+        else
+           FMinWidth:= FImage.Width;
+
+        aspectratio    := FImage.Width/FImage.Height;
+        adjustedheight := Trunc(FMinWidth/aspectratio);
+
+        FMinHeight:= adjustedheight;
+
+        if FMinWidth < 32 then FMinWidth:= 32;
+        if FMinHeight < 32 then FMinHeight:= 32;
+
+    end;
+  end;
+  inherited UpdateLayout;
+end;
+
+
+{ TDraftImageButton }
+
+
+function TDraftImageButton.GetImage: TPortableNetworkGraphic;
+begin
+  if FImage <> nil then
+    Result := FImage
+  else
+    with jImageButton(FAndroidWidget) do
+    begin
+      if ImageIdentifier <> '' then
+      begin
+        FImage := Designer.ImageCache.GetImageAsPNG(Designer.FindDrawable(ImageIdentifier));
+        Result := FImage;
+      end
+      else
+      Result := nil;
+    end;
+end;
+
+
+constructor TDraftImageButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  inherited;
+
+  Color := jImageButton(AWidget).BackgroundColor;
+  FontColor:= colbrGray;
+  BackGroundColor:= clActiveCaption; //clMenuHighlight;
+
+  if jImageButton(AWidget).BackgroundColor = colbrDefault then
+    Color := GetParentBackgroundColor;
+end;
+
+procedure TDraftImageButton.Draw;
+var
+  r: TRect;
+begin
+
+  if Color <> colbrDefault then
+     Fcanvas.Brush.Color := ToTColor(Color)
+  else
+  begin
+     Fcanvas.Brush.Color:= clNone;
+     Fcanvas.Brush.Style:= bsClear;
+  end;
+
+  if GetImage <> nil then
+  begin
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
+    //r:= Rect(6, 6, Self.Width-6,Self.Height-6);
+    r:= Rect(6, 6, FMinWidth-6, FMinHeight-6);
+    Fcanvas.StretchDraw(r, GetImage);
+  end
+  else
+  begin
+    Fcanvas.Rectangle(0,0,Self.Width,Self.Height);  // outer frame
+    Fcanvas.RoundRect(4, 4, Self.Width-4, Self.Height-4, 12,12);  //inner frame
+  end;
+
+end;
+
+procedure TDraftImageButton.UpdateLayout;
+var
+  im: TPortableNetworkGraphic;
+  aspectratio: single;
+  adjustedheight: integer;
+begin
+  im := GetImage;
+  if im <> nil then
+  begin
+    with jImageButton(FAndroidWidget) do  //jsContinuousScrollableImageView
     begin
 
         if FImage.Width > Self.Width then
@@ -5003,6 +5109,7 @@ initialization
   RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageUpIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jImageBtn, 'ImageDownIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(string), jImageButton, 'ImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jZoomableImageView, 'ImageIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jListView, 'ImageItemIdentifier', TImageIdentifierPropertyEditor);
   RegisterPropertyEditor(TypeInfo(string), jForm, 'BackgroundImageIdentifier', TImageIdentifierPropertyEditor);
@@ -5038,6 +5145,8 @@ initialization
   RegisterAndroidWidgetDraftClass(jImageBtn, TDraftImageBtn);
 
   RegisterAndroidWidgetDraftClass(jImageView, TDraftImageView);
+  RegisterAndroidWidgetDraftClass(jImageButton, TDraftImageButton);
+
   RegisterAndroidWidgetDraftClass(jZoomableImageView, TDraftZoomableImageView);
   RegisterAndroidWidgetDraftClass(jSurfaceView, TDraftSurfaceView);
  // RegisterAndroidWidgetDraftClass(jGL2SurfaceView, TDraftGL2SurfaceView);

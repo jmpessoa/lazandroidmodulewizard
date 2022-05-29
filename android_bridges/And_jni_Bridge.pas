@@ -116,6 +116,7 @@ procedure jEditText_GetCursorPos(env:PJNIEnv; EditText : jObject; Var x,y : Inte
 
 // Button
 function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
+procedure jButton_Append(env: PJNIEnv; _jbutton: JObject; _txt: string);
 
 // CheckBox
 function  jCheckBox_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject ): jObject;
@@ -141,6 +142,7 @@ procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; var _item
 procedure jImageView_ShowPopupMenu(env: PJNIEnv; _jimageview: JObject; _items: array of string); overload;
 
 procedure jImageView_SetImageDrawable(env: PJNIEnv; _jimageview: JObject; _imageAnimation: jObject);
+procedure jImageView_SetRoundCorner(env: PJNIEnv; _jimageview: JObject; _cornersRadius: integer);
 
 // ListView
 Function  jListView_Create2             (env:PJNIEnv;  this:jobject; SelfObj: TObject;
@@ -619,6 +621,32 @@ begin
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
+procedure jButton_Append(env: PJNIEnv; _jbutton: JObject; _txt: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jbutton = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jbutton);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'Append', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_txt));
+
+  env^.CallVoidMethodA(env, _jbutton, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
 //------------------------------------------------------------------------------
 // CheckBox
 //------------------------------------------------------------------------------
@@ -990,6 +1018,30 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+
+procedure jImageView_SetRoundCorner(env: PJNIEnv; _jimageview: JObject; _cornersRadius: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jimageview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jimageview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetRoundCorner', '(I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _cornersRadius;
+
+  env^.CallVoidMethodA(env, _jimageview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 //------------------------------------------------------------------------------
 // ListView

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
+import java.util.Locale;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -44,6 +45,7 @@ import android.widget.TextView;
 
 //Reviewed by TR3E on 08/20/2019
 
+//public class jEditText extends androidx.appcompat.widget.AppCompatEditText {
 public class jEditText extends EditText {
 
 	//Pascal Interface
@@ -120,11 +122,10 @@ public class jEditText extends EditText {
 		//Event
 		onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
-				//if (enabled) {
-				controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
-				//}
+				controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
 			};
 		};
+		
 		setOnClickListener(onClickListener);
 		
 		// Fixed "Go / Next / Done / Ok" command capture [by TR3E]
@@ -201,17 +202,17 @@ public class jEditText extends EditText {
 				  String s=et.toString();
 				  
 				  if(mAllUpperCase)
-			       if(!s.equals(s.toUpperCase()))
+			       if(!s.equals(s.toUpperCase(Locale.getDefault())))
 			       {
-			         s=s.toUpperCase();
+			         s=s.toUpperCase(Locale.getDefault());
 			         mEdit.setText(s);
 			         mEdit.setSelection(mEdit.length()); //fix reverse texting
 			       }
 				  
 				  if(mAllLowerCase)
-				       if(!s.equals(s.toLowerCase()))
+				       if(!s.equals(s.toLowerCase(Locale.getDefault())))
 				       {
-				         s=s.toLowerCase();
+				         s=s.toLowerCase(Locale.getDefault());
 				         mEdit.setText(s);
 				         mEdit.setSelection(mEdit.length()); //fix reverse texting
 				       }
@@ -262,7 +263,7 @@ public class jEditText extends EditText {
 		}
 						if (event.getAction() == MotionEvent.ACTION_UP) {
 							controls.pEditTextOnActionIconTouchUp(LAMWCommon.getPasObj(), mEdit.getText().toString());
-
+							performClick();
 							return true;
 						}
 					} else {

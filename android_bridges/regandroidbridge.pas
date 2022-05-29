@@ -46,7 +46,8 @@ uses
   customcamera,
   searchview,
   zbarcodescannerview,
-  paintshader; // new!;
+  paintshader,
+  imagebutton;
 
 Procedure Register;
   
@@ -90,6 +91,7 @@ begin
   {$I jImageView_icon.lrs}
   {$I jzoomableimageview_icon.lrs}
   {$I jImageList_icon.lrs}
+  {$I jimagebutton_icon.lrs}
   {$I jView_icon.lrs}
   {$I jcanvas_icon.lrs}
   {$I jdrawingview_icon.lrs}
@@ -145,6 +147,7 @@ begin
       jImageView,
       jZoomableImageView,
       jImageList,
+      jImageButton,
       jView,
       jCanvas,
       jDrawingView,

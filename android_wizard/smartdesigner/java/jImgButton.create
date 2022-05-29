@@ -1,0 +1,3 @@
+public java.lang.Object jImgButton_jCreate(long _Self) {
+  return (java.lang.Object)(new jImgButton(this,_Self));
+}

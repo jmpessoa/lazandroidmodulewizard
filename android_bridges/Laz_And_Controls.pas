@@ -1333,6 +1333,8 @@ type
 
     procedure ApplyDrawableXML(_xmlIdentifier: string);
 
+    procedure Append(_txt: string);
+
   published
     property Text: string read GetText write SetText;
     property BackgroundColor     : TARGBColorBridge read FColor     write SetColor;
@@ -1571,7 +1573,7 @@ type
     procedure SetImageFromJByteBuffer(_jbyteBuffer: jObject; _width: integer; _height: integer);
     procedure SetImageFromAssets(_filename: string);
 
-    procedure SetRoundCorner();
+    procedure SetRoundCorner(); overload;
     procedure SetRadiusRoundCorner(_radius: integer);
     procedure SetLGravity(_value: TLayoutGravity);
     procedure SetCollapseMode(_collapsemode: TCollapsingMode);
@@ -1602,6 +1604,9 @@ type
 
     procedure ApplyDrawableXML(_xmlIdentifier: string);
     procedure SetClipToOutline(_value: boolean);
+
+    procedure SetRoundCorner(_cornersRadius: integer); overload;
+    procedure SetRippleEffect();
 
     procedure GenEvent_OnImageViewPopupItemSelected(Sender:TObject; caption:string);
 
@@ -6141,6 +6146,14 @@ begin
      jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
 end;
 
+procedure jButton.Append(_txt: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jButton_Append(gApp.jni.jEnv, FjObject, _txt);
+end;
+
+
 //------------------------------------------------------------------------------
 // jCheckBox
 //------------------------------------------------------------------------------
@@ -7575,7 +7588,6 @@ begin
   //in designing component state: set value here...
   FRoundedShape:= _value;
   if FjObject = nil then exit;
-
   jni_proc_z(gApp.jni.jEnv, FjObject, 'SetRoundedShape', FRoundedShape);
 end;
 
@@ -7714,6 +7726,20 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_z(gApp.jni.jEnv, FjObject, 'SetClipToOutline', _value);
+end;
+
+procedure jImageView.SetRoundCorner(_cornersRadius: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jImageView_SetRoundCorner(gApp.jni.jEnv, FjObject, _cornersRadius);
+end;
+
+procedure jImageView.SetRippleEffect(); //thanks to Agmcz!
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+      jni_proc(gApp.jni.jEnv, FjObject, 'SetRippleEffect');
 end;
 
   { jImageList }

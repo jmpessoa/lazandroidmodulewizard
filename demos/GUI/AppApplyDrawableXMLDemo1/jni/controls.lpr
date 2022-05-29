@@ -19,7 +19,7 @@ procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
   layout: JObject; intent: JObject); cdecl;
 begin
   Java_Event_pAppOnCreate(PEnv, this, context, layout, intent); 
-    AndroidModule1.ReInit(gApp);
+    AndroidModule1.Reinit;
 end;
 
 { Class:     org_lamw_appapplydrawablexmldemo1_Controls

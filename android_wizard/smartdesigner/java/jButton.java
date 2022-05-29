@@ -1,4 +1,4 @@
-package org.lamw.appeq2g;
+package org.lamw.appapplydrawablexmldemo1;
 
 import java.lang.reflect.Field;
 
@@ -431,4 +431,9 @@ public class jButton extends Button {
    public void ApplyDrawableXML(String _xmlIdentifier) {
 	   this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
    }
+
+	public void Append(String _txt) {
+		this.append(_txt);
+	}
+
 }

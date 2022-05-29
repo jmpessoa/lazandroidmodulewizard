@@ -7,7 +7,7 @@ object AndroidModule1: TAndroidModule1
   Left = 491
   Top = 32
   Width = 320
-  Height = 400
+  Height = 484
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
@@ -16,22 +16,22 @@ object AndroidModule1: TAndroidModule1
   AnimationDurationOut = 1500
   AnimationMode = animNone
   OnJNIPrompt = AndroidModule1JNIPrompt
-  object jTextView1: jTextView
+  object TextView1: jTextView
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
     Enabled = True
-    Left = 119
+    Left = 121
     Top = 5
-    Width = 81
+    Width = 77
     Height = 26
     Visible = True
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'jTextView1'
+    Text = 'TextView1'
     Alignment = taLeft
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
@@ -40,7 +40,7 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
   end
-  object jTextView2: jTextView
+  object TextView2: jTextView
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -48,15 +48,15 @@ object AndroidModule1: TAndroidModule1
     Enabled = True
     Left = 5
     Top = 41
-    Width = 81
+    Width = 77
     Height = 26
     Visible = True
-    Anchor = jTextView1
+    Anchor = TextView1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpLeft]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'jTextView2'
+    Text = 'TextView2'
     Alignment = taLeft
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
@@ -65,7 +65,7 @@ object AndroidModule1: TAndroidModule1
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
   end
-  object jEditText1: jEditText
+  object EditText1: jEditText
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
@@ -76,12 +76,12 @@ object AndroidModule1: TAndroidModule1
     Width = 310
     Height = 39
     Visible = True
-    Anchor = jTextView2
+    Anchor = TextView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'jEditText1'
+    Text = 'EditText1'
     Alignment = taLeft
     InputTypeEx = itxText
     MaxTextLength = -1
@@ -101,7 +101,7 @@ object AndroidModule1: TAndroidModule1
     CaptureBackPressed = False
     GravityInParent = lgNone
   end
-  object jImageView1: jImageView
+  object ImageView1: jImageView
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
@@ -112,7 +112,7 @@ object AndroidModule1: TAndroidModule1
     Width = 72
     Height = 72
     Visible = True
-    Anchor = jEditText1
+    Anchor = EditText1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -125,42 +125,93 @@ object AndroidModule1: TAndroidModule1
     AnimationDurationOut = 1500
     AnimationMode = animNone
   end
-  object jButton1: jButton
-    MarginLeft = 5
-    MarginTop = 5
-    MarginRight = 5
-    MarginBottom = 5
+  object ImageView2: jImageView
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
     Enabled = True
-    Left = 40
-    Top = 198
-    Width = 240
-    Height = 57
+    Left = 0
+    Top = 193
+    Width = 72
+    Height = 72
     Visible = True
-    Anchor = jImageView1
+    Anchor = ImageView1
     PosRelativeToAnchor = [raBelow]
-    PosRelativeToParent = [rpCenterHorizontal]
-    LayoutParamWidth = lpThreeQuarterOfParent
+    PosRelativeToParent = [rpLeft]
+    LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
-    Text = 'Apply Drawable to Image'
     BackgroundColor = colbrDefault
-    FontColor = colbrDefault
-    FontSize = 0
-    FontSizeUnit = unitDefault
+    ImageIdentifier = 'ic_lamw_small'
+    ImageScaleType = scaleCenter
     GravityInParent = lgNone
-    OnClick = jButton1Click
+    RoundedShape = True
+    AnimationDurationIn = 1500
+    AnimationDurationOut = 1500
+    AnimationMode = animNone
   end
-  object jImageView2: jImageView
+  object ImageView3: jImageView
     MarginLeft = 0
     MarginTop = 0
     MarginRight = 0
     MarginBottom = 0
     Enabled = True
     Left = 124
-    Top = 260
+    Top = 193
     Width = 72
     Height = 72
     Visible = True
-    Anchor = jButton1
+    Anchor = ImageView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    ImageIdentifier = 'ic_lamw_small'
+    ImageScaleType = scaleCenter
+    GravityInParent = lgNone
+    RoundedShape = False
+    AnimationDurationIn = 1500
+    AnimationDurationOut = 1500
+    AnimationMode = animNone
+  end
+  object ImageView4: jImageView
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Left = 248
+    Top = 193
+    Width = 72
+    Height = 72
+    Visible = True
+    Anchor = ImageView1
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpRight]
+    LayoutParamWidth = lpWrapContent
+    LayoutParamHeight = lpWrapContent
+    BackgroundColor = colbrDefault
+    ImageIdentifier = 'ic_lamw_small'
+    ImageScaleType = scaleCenter
+    GravityInParent = lgNone
+    RoundedShape = False
+    AnimationDurationIn = 1500
+    AnimationDurationOut = 1500
+    AnimationMode = animNone
+  end
+  object ImageView5: jImageView
+    MarginLeft = 0
+    MarginTop = 0
+    MarginRight = 0
+    MarginBottom = 0
+    Enabled = True
+    Left = 124
+    Top = 265
+    Width = 72
+    Height = 72
+    Visible = True
+    Anchor = ImageView2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
@@ -174,21 +225,45 @@ object AndroidModule1: TAndroidModule1
     AnimationDurationOut = 1500
     AnimationMode = animNone
   end
+  object Button1: jButton
+    MarginLeft = 5
+    MarginTop = 5
+    MarginRight = 5
+    MarginBottom = 5
+    Enabled = True
+    Left = 40
+    Top = 342
+    Width = 240
+    Height = 57
+    Visible = True
+    Anchor = ImageView5
+    PosRelativeToAnchor = [raBelow]
+    PosRelativeToParent = [rpCenterHorizontal]
+    LayoutParamWidth = lpThreeQuarterOfParent
+    LayoutParamHeight = lpWrapContent
+    Text = 'Apply XML to Image5'
+    BackgroundColor = colbrDefault
+    FontColor = colbrDefault
+    FontSize = 0
+    FontSizeUnit = unitDefault
+    GravityInParent = lgNone
+    OnClick = jButton1Click
+  end
   object ProgressBar1: jProgressBar
     MarginLeft = 10
     MarginTop = 10
     MarginRight = 10
     MarginBottom = 10
     Enabled = False
-    Left = 10
-    Top = 342
-    Width = 300
+    Left = 40
+    Top = 414
+    Width = 240
     Height = 23
     Visible = True
-    Anchor = jImageView2
+    Anchor = Button1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
-    LayoutParamWidth = lpMatchParent
+    LayoutParamWidth = lpThreeQuarterOfParent
     LayoutParamHeight = lpWrapContent
     Style = cjProgressBarStyleHorizontal
     BackgroundColor = colbrDefault

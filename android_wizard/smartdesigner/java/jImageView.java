@@ -1,4 +1,4 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package org.lamw.appapplydrawablexmldemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,10 +8,12 @@ import java.nio.ByteBuffer;
 import javax.microedition.khronos.opengles.GL10;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -32,9 +34,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 //import android.support.design.widget.CollapsingToolbarLayout;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -63,7 +67,7 @@ public class jImageView extends ImageView {
 	public  int             mAngle   = 0;
 	
 	Matrix mMatrix;
-	int mRadius = 20;
+	int mRadius = 24;
 
 	boolean mRounded = false;
 
@@ -71,6 +75,7 @@ public class jImageView extends ImageView {
 	private int animationDurationOut = 1500;
 	private int animationMode = 0; //none, fade, LeftToRight, RightToLeft, TopToBottom, BottomToTop, MoveCustom
 
+	private boolean mClickEnable = false;
 
 	//Constructor
 	public  jImageView(android.content.Context context, Controls ctrls, long pasobj ) {
@@ -91,18 +96,19 @@ public class jImageView extends ImageView {
 		mMatrix = new Matrix();
 
 		//Init Event
-		/*onClickListener = new OnClickListener() {
+		/*
+		onClickListener = new OnClickListener() {
 			public  void onClick(View view) {
-				controls.pOnClick(PasObj,Const.Click_Default);
+				if (mClickEnable) controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
 			}
 		};
+		*/
 
-		setOnClickListener(onClickListener);*/
+		//setOnClickListener(onClickListener);
 		//this.setWillNotDraw(false); //false = fire OnDraw after Invalited ... true = not fire onDraw... thanks to tintinux			
 	}
 	
 	public  boolean onTouchEvent( MotionEvent event) {
-	      			
 		int act     = event.getAction() & MotionEvent.ACTION_MASK;
 		switch(act) {
 			case MotionEvent.ACTION_DOWN: {
@@ -165,9 +171,7 @@ public class jImageView extends ImageView {
     @Override
     public boolean performClick() {
         super.performClick();
-        
         controls.pOnClick(LAMWCommon.getPasObj(), Const.Click_Default);
-
         return true;
     }
 
@@ -580,10 +584,9 @@ public class jImageView extends ImageView {
 		
 		return b;
 	}
-	
+
 	public void SetRoundCorner() {
-		if (this != null) {  		
-	        PaintDrawable  shape =  new PaintDrawable();
+			PaintDrawable  shape =  new PaintDrawable();
 	        shape.setCornerRadius(mRadius);                
 	        int color = Color.TRANSPARENT;
 	        Drawable background = this.getBackground();        
@@ -592,13 +595,22 @@ public class jImageView extends ImageView {
 		        shape.setColorFilter(color, Mode.SRC_ATOP);
 		        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 		        //[ifdef_api16up]
-		  	    if(Build.VERSION.SDK_INT >= 16) 
-		             this.setBackground((Drawable)shape);
+		  	    if(Build.VERSION.SDK_INT >= 16) this.setBackground((Drawable)shape);
 		        //[endif_api16up]		          
-	        }                		  	  
-        }		
+	        }
+	        else {
+	        	if (mRadius != 0)
+	        	    SetRoundCorner(mRadius);
+	        	else {
+					this.setBackgroundResource(controls.GetDrawableResourceId("image_rounded")); //from ...res/drawable
+                    //[ifdef_api21up]
+					if(Build.VERSION.SDK_INT >= 21) this.setClipToOutline(true);
+                    //[endif_api21up]
+				}
+			}
 	}
-	
+
+
 	public void SetRotation( int angle ){
 		mAngle = angle;
 		this.setRotation(mAngle);
@@ -991,10 +1003,42 @@ public class jImageView extends ImageView {
 		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
     }
 	
-	//https://forum.lazarus.freepascal.org/index.php/topic,59281.0.html
+    //https://forum.lazarus.freepascal.org/index.php/topic,59281.0.html
 	public void SetClipToOutline(boolean _value) {   //thanks to Agmcz !
-		if( android.os.Build.VERSION.SDK_INT >= 21 )
-			this.setClipToOutline(_value);
+		//[ifdef_api21up]
+		if(Build.VERSION.SDK_INT >= 21) this.setClipToOutline(_value);
+		//[endif_api21up]
+	}
+
+	//https://stackoverflow.com/questions/2459916/how-to-make-an-imageview-with-rounded-corners  [7]
+	public void SetRoundCorner(int _cornersRadius) {
+		ViewOutlineProvider provider;
+		if (android.os.Build.VERSION.SDK_INT >= 21) {
+			//[ifdef_api21up]
+			provider = new ViewOutlineProvider() {
+				@Override
+				public void getOutline(View view, Outline outline) {
+					outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight()), _cornersRadius); //+curveRadius
+				}
+			};
+			this.setOutlineProvider(provider);
+			this.setClipToOutline(true);
+			//[endif_api21up]
+		}
+	}
+
+	public void SetRippleEffect() {
+		TypedValue typedValue = new TypedValue();
+		controls.activity.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, typedValue, true);
+		int[] attrs = new int[]{android.R.attr.selectableItemBackground};
+		TypedArray typedArray = controls.activity.obtainStyledAttributes(typedValue.resourceId, attrs);
+		if (Build.VERSION.SDK_INT >= 23) {
+			//[ifdef_api21up]
+			this.setForeground(typedArray.getDrawable(0));
+			//[endif_api21up]
+		}
+		this.setClickable(true);
+		typedArray.recycle();
 	}
 
 }
