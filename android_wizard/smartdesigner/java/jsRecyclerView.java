@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
