@@ -11,7 +11,7 @@ uses
 //tk min and max API versions for build.xml
 const
   cMinAPI = 14;
-  cMaxAPI = 30;
+  cMaxAPI = 31;
 // end tk
 
 type
@@ -1669,9 +1669,11 @@ var
   ndkRelease, aux: string;
   updateTargetApi: integer;
   updateBuildTool: string;
+  outBuildTool: string;
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
+
     FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
     FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
     FPathToJavaJDK:=     LamwGlobalSettings.PathToJavaJDK;    //Included Path Delimiter!
@@ -1700,7 +1702,7 @@ begin
     else if Pos('-xpx86_64', aux) > 0 then FChipArchitecture:= 'x86_64'
     else if Pos('-xpmipsel', aux) > 0 then FChipArchitecture:= 'mips';
 
-    FProjFile := AProject.MainFile;
+    FProjFile := AProject.MainFile; //save ...
 
     FNdkApi:= AProject.CustomData['NdkApi']; //android-22
     tempStr:= SplitStr(FNdkApi, '-');   //now  FNdkApi = 22 !
@@ -1717,6 +1719,8 @@ begin
       UpdateAllJControls(AProject);
     end;
 
+
+    //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
     FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
     FPathToAndroidProject := Copy(FPathToAndroidProject, 1, RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
 
@@ -1724,6 +1728,7 @@ begin
     p:= LastDelimiter(PathDelim, tempStr) + 1;
     FSmallProjName:= Copy(tempStr,  p, Length(tempStr));
     FPackageName := AProject.CustomData['Package'];
+
     if FPackageName = '' then
     begin
       FPackageName := GetPackageNameFromAndroidManifest(FPathToAndroidProject);
@@ -1788,7 +1793,6 @@ begin
            end;
       end;
 
-
       if AProject.CustomData['Theme'] = '' then
       begin
         AProject.CustomData['Theme']:= 'DeviceDefault';
@@ -1799,8 +1803,7 @@ begin
 
       if length(sdkTargetApi) <= 0 then
       begin
-       sdkTargetApi:= intToStr(cMaxApi);
-
+       sdkTargetApi:= IntToStr(GetMaxSdkPlatform(outBuildTool)); //intToStr(cMaxApi);
        AProject.CustomData['TargetSdk']:= sdkTargetApi;
        AProject.Modified:= True;
       end;
@@ -1878,22 +1881,7 @@ begin
          //-FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
          alertMsg:= '';
          if Pos('aarch64', projectTarget) > 0  then
-            alertMsg:= 'WARNING: Target CPU "aarch64" not supported '+sLineBreak+
-                       '[out-of-box] by Laz4Android' +sLineBreak+ sLineBreak+
-                       'Hint1: Fora all: after "prebuild" change to your NDK installed system...'+sLineBreak+ sLineBreak+
-                       'Hint2: "Project" --> "Project Option" -->'+sLineBreak+
-                        '["Path"]'+sLineBreak+
-                        '-Fl' +sLineBreak+
-                        'change arch-arm64 [to] arch-arm'+sLineBreak+
-                        'change aarch64-linux-android [to] arm-linux-androideabi'+sLineBreak+ sLineBreak+
-                        '-o' +sLineBreak+
-                       'change arm64-v8a [to] armeabi-v7a'+sLineBreak+sLineBreak+
-                       '["Config and Target"]'+sLineBreak+
-                       'change Target CPU (-P) [to] arm'+sLineBreak+sLineBreak+
-                       '["Custom Options"]'+sLineBreak+
-                       'expand -Xd [to] -Xd -CfSoft -CpARMV7A'+sLineBreak+
-                       'change aarch64-linux-android [to] arm-linux-androideabi'+sLineBreak+
-                       sLineBreak+ '[Ctrl+c to Copy to Clipboard]';
+            alertMsg:= 'WARNING: Target CPU "aarch64" need "Laz4Android 2.0.12" or up..';
 
          if Pos('VFPV3', projectCustom) > 0  then
             alertMsg:= 'WARNING: Custom Option "-CfVFPV3" not supported '+sLineBreak+
