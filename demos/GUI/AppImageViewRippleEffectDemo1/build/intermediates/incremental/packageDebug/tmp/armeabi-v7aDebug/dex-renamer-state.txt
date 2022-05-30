@@ -1,0 +1,4 @@
+#Mon May 30 02:01:08 BRT 2022
+base.0=C\:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

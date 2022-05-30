@@ -1,0 +1,196 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="org.lamw.appimageviewrippleeffectdemo1"
+4    android:versionCode="2009508665"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+8-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml
+9        android:targetSdkVersion="30" />
+9-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.NFC" />
+11-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:8:5-61
+11-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:8:22-59
+12    <uses-permission android:name="android.permission.CALL_PHONE" />
+12-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:9:5-68
+12-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:9:22-66
+13    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+13-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:10:5-79
+13-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:10:22-77
+14    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+14-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:11:5-74
+14-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:11:22-72
+15    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+15-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:12:5-78
+15-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:12:22-76
+16    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+16-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:13:5-80
+16-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:13:22-78
+17    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+17-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:14:5-75
+17-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:14:22-73
+18    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+18-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:15:5-75
+18-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:15:22-73
+19    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+19-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:16:5-78
+19-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:16:22-76
+20    <uses-permission android:name="android.permission.INTERNET" />
+20-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:17:5-66
+20-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:17:22-64
+21    <uses-permission android:name="android.permission.REORDER_TASKS" />
+21-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:18:5-71
+21-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:18:22-69
+22    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+22-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:19:5-80
+22-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:19:22-78
+23    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+23-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:20:5-79
+23-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:20:22-77
+24    <uses-permission android:name="android.permission.READ_CONTACTS" />
+24-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:21:5-71
+24-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:21:22-69
+25    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+25-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:22:5-72
+25-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:22:22-70
+26    <uses-permission android:name="android.permission.SEND_SMS" />
+26-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:23:5-66
+26-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:23:22-64
+27    <uses-permission android:name="android.permission.READ_SMS" />
+27-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:24:5-66
+27-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:24:22-64
+28    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+28-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:25:5-69
+28-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:25:22-67
+29    <uses-permission android:name="android.permission.CAMERA" />
+29-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:26:5-64
+29-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:26:22-62
+30    <uses-permission android:name="android.permission.ACCESS_BLUETOOTH_SHARE" />
+30-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:27:5-80
+30-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:27:22-78
+31    <uses-permission android:name="android.permission.BLUETOOTH" />
+31-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:28:5-67
+31-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:28:22-65
+32    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+32-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:29:5-73
+32-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:29:22-71
+33    <uses-permission android:name="android.permission.VIBRATE" />
+33-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:30:5-65
+33-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:30:22-63
+34    <uses-permission android:name="android.permission.WAKE_LOCK" />
+34-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:31:5-67
+34-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:31:22-65
+35    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+35-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:32:5-78
+35-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:32:22-76
+36    <uses-permission android:name="android.permission.REORDER_TASKS" />
+36-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:18:5-71
+36-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:18:22-69
+37    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+37-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:34:5-76
+37-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:34:22-74
+38    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+38-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:35:5-70
+38-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:35:22-68
+39    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+39-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:36:5-79
+39-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:36:22-77
+40
+41    <uses-feature
+41-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:38:5-84
+42        android:name="android.hardware.camera"
+42-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:38:19-57
+43        android:required="false" />
+43-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:38:58-82
+44    <uses-feature
+44-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:39:5-90
+45        android:name="android.hardware.camera.flash"
+45-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:39:19-63
+46        android:required="false" />
+46-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:39:64-88
+47    <uses-feature
+47-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:40:5-94
+48        android:name="android.hardware.camera.autofocus"
+48-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:40:19-67
+49        android:required="false" />
+49-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:40:68-92
+50    <uses-feature
+50-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:42:5-77
+51        android:glEsVersion="0x00020000"
+51-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:42:19-51
+52        android:required="true" />
+52-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:42:52-75
+53    <uses-feature
+53-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:43:5-87
+54        android:name="android.hardware.telephony"
+54-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:43:19-60
+55        android:required="false" />
+55-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:43:61-85
+56    <uses-feature
+56-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:44:5-96
+57        android:name="android.hardware.sensor.stepcounter"
+57-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:44:19-69
+58        android:required="false" />
+58-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:44:70-94
+59    <uses-feature
+59-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:45:5-97
+60        android:name="android.hardware.sensor.stepdetector"
+60-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:45:19-70
+61        android:required="false" />
+61-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:45:71-95
+62
+63    <supports-screens
+63-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:47:5-50:46
+64        android:anyDensity="true"
+64-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:50:19-44
+65        android:largeScreens="true"
+65-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:49:19-46
+66        android:normalScreens="true"
+66-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:48:19-47
+67        android:smallScreens="true" />
+67-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:47:23-50
+68
+69    <application
+69-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:52:5-68:19
+70        android:allowBackup="true"
+70-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:55:9-35
+71        android:debuggable="true"
+72        android:icon="@drawable/ic_launcher"
+72-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:56:9-45
+73        android:label="@string/app_name"
+73-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:57:9-41
+74        android:requestLegacyExternalStorage="true"
+74-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:53:9-52
+75        android:testOnly="true"
+76        android:theme="@style/AppTheme"
+76-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:58:9-40
+77        android:usesCleartextTraffic="true" >
+77-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:54:2-37
+78        <activity
+78-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:59:9-67:20
+79            android:name="org.lamw.appimageviewrippleeffectdemo1.App"
+79-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:60:13-70
+80            android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"
+80-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:61:13-97
+81            android:enabled="true"
+81-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:62:36-58
+82            android:exported="true"
+82-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:62:59-82
+83            android:launchMode="standard" >
+83-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:62:6-35
+84            <intent-filter>
+84-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:63:13-66:29
+85                <action android:name="android.intent.action.MAIN" />
+85-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:64:17-68
+85-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:64:25-66
+86
+87                <category android:name="android.intent.category.LAUNCHER" />
+87-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:65:17-76
+87-->C:\android\workspace\AppImageViewRippleEffectDemo1\AndroidManifest.xml:65:27-74
+88            </intent-filter>
+89        </activity>
+90    </application>
+91
+92</manifest>

@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "org.lamw.appimageviewrippleeffectdemo1",
+  "variantName": "processDebugResources",
+  "elements": [
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "versionCode": 2009508665,
+      "versionName": "1.0",
+      "outputFile": "AppImageViewRippleEffectDemo1-armeabi-v7a-debug.apk"
+    }
+  ]
+}

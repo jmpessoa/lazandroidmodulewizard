@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "PACKAGED_MANIFESTS",
+    "kind": "Directory"
+  },
+  "applicationId": "org.lamw.appimageviewrippleeffectdemo1",
+  "variantName": "debug",
+  "elements": [
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "versionCode": 2009508665,
+      "versionName": "1.0",
+      "outputFile": "armeabi-v7a/AndroidManifest.xml"
+    }
+  ]
+}

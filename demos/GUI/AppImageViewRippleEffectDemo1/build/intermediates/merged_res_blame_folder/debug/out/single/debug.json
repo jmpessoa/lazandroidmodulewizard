@@ -1,0 +1,42 @@
+[
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable_ic_lemur_2.png.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable\\ic_lemur_2.png"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable_image_shape_default_rounded_corners.xml.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable\\image_shape_default_rounded_corners.xml"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_ic_launcher.png.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\layout_activity_app.xml.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\layout\\activity_app.xml"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable-xxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi_ic_launcher.png.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable-ldpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi_ic_launcher.png.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable-mdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable_image_ripple_effect.xml.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable\\image_ripple_effect.xml"
+    },
+    {
+        "merged": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\build\\intermediates\\res\\merged\\debug\\drawable_image_shape_rounded_corners_ripple_effect.xml.flat",
+        "source": "C:\\android\\workspace\\AppImageViewRippleEffectDemo1\\res\\drawable\\image_shape_rounded_corners_ripple_effect.xml"
+    }
+]
