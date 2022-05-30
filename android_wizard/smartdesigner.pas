@@ -2473,7 +2473,7 @@ begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission');
      if auxList.Count > 0 then
      begin
-       insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
+       insertRef:= '<uses-permission android';   // <uses-sdk android:minSdkVersion'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
@@ -2511,7 +2511,7 @@ begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature');
      if auxList.Count > 0 then
      begin
-       insertRef:= '<uses-sdk android:minSdkVersion'; //insert reference point
+       insertRef:= '<uses-feature android'; //<uses-sdk android:minSdkVersion'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
