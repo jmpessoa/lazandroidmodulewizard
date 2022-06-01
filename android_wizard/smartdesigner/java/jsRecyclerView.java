@@ -362,11 +362,9 @@ class ItemObject {
 //http://www.viralandroid.com/2015/11/load-image-from-url-internet-in-android.html
 class LoadImageTask extends AsyncTask <String, Void, Bitmap> {
 	
-	//public Listener mListener;
 	public ImageView mImageView;
 	
-    public LoadImageTask(/*Listener listener*/ImageView imageView) {
-        //mListener = listener;
+    public LoadImageTask(/*Listener listener*/ImageView imageView) {        
     	mImageView = imageView;
     }
 

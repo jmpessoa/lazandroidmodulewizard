@@ -28,7 +28,7 @@ public class jSqliteCursor {
 	private long       	PasObj    = 0;      // Pascal Obj
 	private Controls   	controls  = null;   // Control Class for Event
 	
-	private int mCursorPos        = -1;
+	private int mCursorPos         = -1;
 	private int mCursorColumnCount = 0;
 	private int mCursorRowCount    = 0;
 	public Cursor mCursor = null;	
@@ -121,6 +121,17 @@ public class jSqliteCursor {
     	
     	return mCursor.getString(columnIndex);    			
     }
+    
+    public String GetValueAsString(String colName) {
+        if (mCursor == null) return "";
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return "";
+    	
+    	return mCursor.getString(columnIndex);    			
+    }
 
     //Cursor.FIELD_TYPE_BLOB; //4
 	//Cursor.FIELD_TYPE_FLOAT//2
@@ -143,9 +154,35 @@ public class jSqliteCursor {
     	return mCursor.getBlob(columnIndex);    			
     }
     
+    public byte[] GetValueAsBlod(String colName) {
+        if (mCursor == null) return null;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    			
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+    		(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
+    	
+    	return mCursor.getBlob(columnIndex);    			
+    }
+    
     public Bitmap GetValueAsBitmap(int columnIndex) {
     	if ((mCursor == null) || 
         	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
+    	
+    	byte[] image = mCursor.getBlob(columnIndex);
+    	
+    	if( image == null ) return null;
+    	
+    	return BitmapFactory.decodeByteArray(image, 0, image.length);    	
+    }
+    
+    public Bitmap GetValueAsBitmap(String colName) {
+        if (mCursor == null) return null;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
         	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
     	
     	byte[] image = mCursor.getBlob(columnIndex);
@@ -163,9 +200,31 @@ public class jSqliteCursor {
     	return mCursor.getInt(columnIndex);    	
     }
     
+    public int GetValueAsInteger(String colName) {
+        if (mCursor == null) return -1;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+    	
+    	return mCursor.getInt(columnIndex);    	
+    }
+    
     public short GetValueAsShort(int columnIndex) {
     	if ((mCursor == null) || 
            	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+           	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+    	
+    	return mCursor.getShort(columnIndex);    			
+    }
+    
+    public short GetValueAsShort(String colName) {
+        if (mCursor == null) return -1;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
            	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
     	
     	return mCursor.getShort(columnIndex);    			
@@ -178,6 +237,17 @@ public class jSqliteCursor {
     		
     	return mCursor.getLong(columnIndex);    			
     }
+    
+    public long GetValueAsLong(String colName) {
+        if (mCursor == null) return -1;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+            (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+    		
+    	return mCursor.getLong(columnIndex);    			
+    }
 
     public float GetValueAsFloat(int columnIndex) {
     	if ((mCursor == null) || 
@@ -186,10 +256,32 @@ public class jSqliteCursor {
     	
     	return mCursor.getFloat(columnIndex);    			
     }
+    
+    public float GetValueAsFloat(String colName) {
+        if (mCursor == null) return -1;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+           	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+    	
+    	return mCursor.getFloat(columnIndex);    			
+    }
      
     public double GetValueAsDouble(int columnIndex) {
     	if ((mCursor == null) || 
             (columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+            (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+    	
+    	return mCursor.getDouble(columnIndex);    			
+    }
+    
+    public double GetValueAsDouble(String colName) {
+        if (mCursor == null) return -1;
+    	
+    	int columnIndex = mCursor.getColumnIndex(colName);
+    	
+    	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
             (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
     	
     	return mCursor.getDouble(columnIndex);    			
