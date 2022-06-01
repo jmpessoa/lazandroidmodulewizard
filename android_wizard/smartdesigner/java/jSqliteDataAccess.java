@@ -672,6 +672,10 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
  
  private SQLiteDatabase mydb = null;
  
+ private int mCursorPos         = -1;
+ private int mCursorColumnCount = 0;
+ private int mCursorRowCount    = 0;
+ 
  public Cursor mCursor = null;	
  
  public Bitmap bufBmp = null;
@@ -858,7 +862,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 	
 	if( _fromTreeUri == null ) return false;
 	
-	this.Free();
+	Free();
 	
 	File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());
     
@@ -893,7 +897,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
      
 	 // RequestRuntimePermission 'android.permission.WRITE_EXTERNAL_STORAGE'
      try {         
-    	     this.Free();
+    	     Free();
     	     
              File currentDB = new File(controls.activity.getDatabasePath(DATABASE_NAME).getAbsolutePath());                                      
              File backupDB  = new File(dbImportFileFull);
@@ -1010,6 +1014,10 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   int i;
   String allRows = "";
   
+  mCursorColumnCount = 0;
+  mCursorRowCount    = 0;
+  mCursorPos         = -1;
+  
   try {
    if( mCursor != null ){	   
 	   mCursor.close();
@@ -1023,15 +1031,16 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 	   return "";
    }
    
-   int RowCount    = mCursor.getCount();
-   int ColumnCount = mCursor.getColumnCount();
+   mCursorColumnCount = mCursor.getColumnCount();
+   mCursorRowCount    = mCursor.getCount();	
+	
    headerRow = "";
    
-   for (i = 0; i < ColumnCount; i++) {
+   for (i = 0; i < mCursorColumnCount; i++) {
       headerRow = headerRow + mCursor.getColumnName(i) + selectColDelimiter;
    }
    
-   if (RowCount == 0) {
+   if (mCursorRowCount == 0) {
 	 mydb.close();
 	 
 	 if (mReturnHeaderOnSelect)
@@ -1049,7 +1058,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
      row = "";
      colValue = "";
      
-     for (i = 0; i < ColumnCount; i++) {
+     for (i = 0; i < mCursorColumnCount; i++) {
         switch (mCursor.getType(i)) {
         
         case Cursor.FIELD_TYPE_INTEGER:
@@ -1095,8 +1104,10 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
        Log.e(getClass().getSimpleName(), "Could not select:" + selectQuery);
   }
   
-  if(mCursor != null)
+  if(mCursor != null){
    mCursor.moveToFirst();  //reset cursor ...
+   mCursorPos = mCursor.getPosition();
+  }
 
   return allRows;
  }
@@ -1107,8 +1118,9 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   
   if( mydb == null ) return false;
   
-  int RowCount    = 0;
-  int ColumnCount = 0;
+  mCursorColumnCount = 0;
+  mCursorRowCount    = 0;
+  mCursorPos         = -1;
   
   try {
    if( mCursor != null ){	   
@@ -1116,22 +1128,24 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 	   mCursor = null;	   
    }
 	  
-   this.mCursor = mydb.rawQuery(selectQuery, null);
+   mCursor = mydb.rawQuery(selectQuery, null);
    
-   if( this.mCursor != null ){
-	RowCount    = mCursor.getCount();
-	ColumnCount = mCursor.getColumnCount();
+   if( mCursor != null ){
+	mCursorColumnCount = mCursor.getColumnCount();
+	mCursorRowCount    = mCursor.getCount();	
    
-    if (RowCount > 0)
+    if (mCursorRowCount > 0)
     {
      if (!moveToLast)
-      this.mCursor.moveToFirst();
+      mCursor.moveToFirst();
      else
-	  this.mCursor.moveToLast();
+	  mCursor.moveToLast();
+     
+     mCursorPos = mCursor.getPosition();
     }
    }
    
-   return (RowCount > 0);
+   return (mCursorRowCount > 0);
    
   } catch (SQLiteException se) {
    
@@ -1140,38 +1154,380 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
   }
  
  }
+ 
+public int Select(String _tableName, String _sortOrder){
+	 
+	 SQLiteDatabase mydb = getReadableDatabase();
+	  
+	 if( mydb == null ) return 0;
+	 	 		 
+	 if( mCursor != null ){	   
+		   mCursor.close();
+		   mCursor = null;	   
+	 }
+	 
+	 mCursorColumnCount = 0;
+	 mCursorRowCount    = 0;
+	 mCursorPos         = -1;
+	 
+	 try{
+	  mCursor = mydb.query(
+			    _tableName,       // The table to query
+			    null,             // The array of columns to return (pass null to get all)
+			    null,             // The columns for the WHERE clause
+			    null,             // The values for the WHERE clause
+			    null,             // don't group the rows
+			    null,             // don't filter by row groups
+			    _sortOrder        // The sort order
+			    );
+	 } catch (SQLiteException se) {	   
+		   return -1;
+	 }	 	 
+	 
+	 if( mCursor != null ){
+		    mCursorColumnCount = mCursor.getColumnCount();
+			mCursorRowCount    = mCursor.getCount();				
+		   
+		    if (mCursorRowCount > 0){		    
+		     mCursor.moveToFirst();
+		     mCursorPos = mCursor.getPosition();	
+		    }
+     }
+		   
+	return mCursorRowCount;
+ }
+ 
+ public int Select(String _tableName, String _selection, String[] _selectionArgs, String _sortOrder){
+	 
+	 SQLiteDatabase mydb = getReadableDatabase();
+	  
+	 if( mydb == null ) return 0;
+	 	 		 
+	 if( mCursor != null ){	   
+		   mCursor.close();
+		   mCursor = null;	   
+	 }
+	 
+	 mCursorColumnCount = 0;
+	 mCursorRowCount    = 0;
+	 mCursorPos         = -1;
+	 
+	 try{
+	  mCursor = mydb.query(
+			    _tableName,       // The table to query
+			    null,             // The array of columns to return (pass null to get all)
+			    _selection,       // The columns for the WHERE clause
+			    _selectionArgs,   // The values for the WHERE clause
+			    null,             // don't group the rows
+			    null,             // don't filter by row groups
+			    _sortOrder        // The sort order
+			    );
+	 } catch (SQLiteException se) {	   
+		   return -1;
+	 }		
+	 
+	 if( mCursor != null ){
+		    mCursorColumnCount = mCursor.getColumnCount();
+			mCursorRowCount    = mCursor.getCount();				
+		   
+		    if (mCursorRowCount > 0){		    
+		     mCursor.moveToFirst();
+		     mCursorPos = mCursor.getPosition();	
+		    }
+     }
+		   
+	return mCursorRowCount;
+ }
 
  public Cursor GetCursor() {
   
-  if (this.mCursor != null){
-	  return this.mCursor;
+  if (mCursor != null){
+	  return mCursor;
   }
   
   return null;
  }
+ 
+ public int GetRowCount() {
+		return mCursorRowCount;    		    	
+ }
+	
+ public void MoveToFirst() {
+ 	if (mCursor != null){
+ 		mCursor.moveToFirst();
+ 		mCursorPos = mCursor.getPosition();
+ 	}
+ }
+ 
+ public void MoveToNext() {
+ 	if (mCursor != null){
+ 		mCursor.moveToNext();
+ 		mCursorPos = mCursor.getPosition();
+ 	}
+ }
+ 
+ public void MoveToPrev() {
+ 	if (mCursor != null){
+ 		mCursor.moveToPrevious();
+ 		mCursorPos = mCursor.getPosition();
+ 	}
+ }
+ 
+ public void MoveToLast() {
+ 	if (mCursor != null){
+ 		mCursor.moveToLast();
+ 		mCursorPos = mCursor.getPosition();
+ 	}
+ }
+           
+ public void MoveToPosition(int position) {
+ 	if ((mCursor == null) || (position < 0) || (position >= mCursorRowCount)) return;
+ 		
+ 	mCursor.moveToPosition(position);
+ 	mCursorPos = mCursor.getPosition();
+ }
+
+ public int GetPosition() {
+ 	if (mCursor == null) return -1;
+ 		     	
+ 	return mCursor.getPosition();
+ }
+ 
+ public int GetColumnIndex(String colName) {
+ 	if (mCursor == null) return -1;
+ 	
+ 	return mCursor.getColumnIndex(colName);    	
+ }
+  
+ public String GetValueAsString(int columnIndex) {    	
+ 	if ((mCursor == null) || 
+     	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+     	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return "";
+ 	
+ 	return mCursor.getString(columnIndex);    			
+ }
+ 
+ public String GetValueAsString(String colName) {
+    if (mCursor == null) return "";
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	    	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+     	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return "";
+ 	
+ 	return mCursor.getString(columnIndex);    			
+ }
+
+ //Cursor.FIELD_TYPE_BLOB; //4
+	//Cursor.FIELD_TYPE_FLOAT//2
+	//Cursor.FIELD_TYPE_INTEGER//1
+	//Cursor.FIELD_TYPE_STRING//3
+	//Cursor.FIELD_TYPE_NULL //0
+ public int GetColType(int columnIndex) {
+ 	
+ 	if ((mCursor == null) || (columnIndex < 0) || (columnIndex >= mCursorColumnCount)) 
+ 		return Cursor.FIELD_TYPE_NULL;
+ 		
+ 	return mCursor.getType(columnIndex);    			
+ }
+ 
+ public byte[] GetValueAsBlod(int columnIndex) {
+ 	if ((mCursor == null) || 
+ 		(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+ 		(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
+ 	
+ 	return mCursor.getBlob(columnIndex);    			
+ }
+ 
+ public byte[] GetValueAsBlod(String colName) {
+     if (mCursor == null) return null;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 			
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+ 		(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
+ 	
+ 	return mCursor.getBlob(columnIndex);    			
+ }
+ 
+ public Bitmap GetValueAsBitmap(int columnIndex) {
+ 	if ((mCursor == null) || 
+     	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+     	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
+ 	
+ 	byte[] image = mCursor.getBlob(columnIndex);
+ 	
+ 	if( image == null ) return null;
+ 	
+ 	return BitmapFactory.decodeByteArray(image, 0, image.length);    	
+ }
+ 
+ public Bitmap GetValueAsBitmap(String colName) {
+     if (mCursor == null) return null;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+     	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return null;
+ 	
+ 	byte[] image = mCursor.getBlob(columnIndex);
+ 	
+ 	if( image == null ) return null;
+ 	
+ 	return BitmapFactory.decodeByteArray(image, 0, image.length);    	
+ }
+ 
+ public int GetValueAsInteger(int columnIndex) {
+ 	if ((mCursor == null) || 
+     	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+     	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getInt(columnIndex);    	
+ }
+ 
+ public int GetValueAsInteger(String colName) {
+     if (mCursor == null) return -1;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+     	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getInt(columnIndex);    	
+ }
+ 
+ public short GetValueAsShort(int columnIndex) {
+ 	if ((mCursor == null) || 
+        	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getShort(columnIndex);    			
+ }
+ 
+ public short GetValueAsShort(String colName) {
+     if (mCursor == null) return -1;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getShort(columnIndex);    			
+ }
+ 
+ public long GetValueAsLong(int columnIndex) {
+ 	if ((mCursor == null) || 
+         (columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+         (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 		
+ 	return mCursor.getLong(columnIndex);    			
+ }
+ 
+ public long GetValueAsLong(String colName) {
+     if (mCursor == null) return -1;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	    	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+         (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 		
+ 	return mCursor.getLong(columnIndex);    			
+ }
+
+ public float GetValueAsFloat(int columnIndex) {
+ 	if ((mCursor == null) || 
+        	(columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getFloat(columnIndex);    			
+ }
+ 
+ public float GetValueAsFloat(String colName) {
+     if (mCursor == null) return -1;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	    	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+        	(mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getFloat(columnIndex);    			
+ }
+  
+ public double GetValueAsDouble(int columnIndex) {
+ 	if ((mCursor == null) || 
+         (columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+         (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getDouble(columnIndex);    			
+ }
+ 
+ public double GetValueAsDouble(String colName) {
+     if (mCursor == null) return -1;
+ 	
+ 	int columnIndex = mCursor.getColumnIndex(colName);
+ 	
+ 	if ((columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+         (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return -1;
+ 	
+ 	return mCursor.getDouble(columnIndex);    			
+ }
+    
+ public int GetColumnCount() {
+ 	return mCursorColumnCount;    	
+ }
+ 
+ public String GetColumName(int columnIndex) {
+ 	if ((mCursor == null) || (columnIndex < 0) || (columnIndex >= mCursorColumnCount)) return "";
+ 	
+ 	return mCursor.getColumnName(columnIndex);    			
+ }
+      
+ //Cursor.FIELD_TYPE_BLOB; //4
+	//Cursor.FIELD_TYPE_FLOAT//2
+	//Cursor.FIELD_TYPE_INTEGER//1
+	//Cursor.FIELD_TYPE_STRING//3
+	//Cursor.FIELD_TYPE_NULL //0
+ public String GetValueToString(int columnIndex) {
+ 	if ((mCursor == null) || 
+         (columnIndex < 0) || (columnIndex >= mCursorColumnCount) ||
+         (mCursorPos  < 0) || (mCursorPos >= mCursorRowCount)) return "";    	                            
+     
+     String colValue = "";
+         
+     switch (mCursor.getType(columnIndex)) {                
+  	      case Cursor.FIELD_TYPE_INTEGER: colValue = Integer.toString(mCursor.getInt(columnIndex));        break;
+  	      case Cursor.FIELD_TYPE_STRING : colValue = mCursor.getString(columnIndex);                       break;
+  	      case Cursor.FIELD_TYPE_FLOAT  : colValue = String.format(Locale.US, "%.2f", mCursor.getFloat(columnIndex)); break;
+  	      case Cursor.FIELD_TYPE_BLOB   : colValue = "BLOB";                                       break;
+  	      case Cursor.FIELD_TYPE_NULL   : colValue = "NULL";                                       break;
+  	      default:                        colValue = "UNKNOW";                              
+ 	}                                                                       
+     
+     return colValue;        
+ }
 
  public boolean CreateTable(String execQuery) {
-	 return this.ExecSQL(execQuery);      
+	 return ExecSQL(execQuery);      
  }
 
  //ex: "INSERT INTO TABLE1 (NAME, PLACE) VALUES('CODERZHEAVEN','GREAT INDIA')"
  public boolean InsertIntoTable(String query) {
-	return this.ExecSQL(query);
+	return ExecSQL(query);
  }
 
  //ex: "UPDATE TABLE1 SET NAME = 'MAX' WHERE PLACE = 'USA'"
  public boolean UpdateTable(String query) {
-	 return this.ExecSQL(query);
+	 return ExecSQL(query);
  }
 
  //ex: "DELETE FROM TABLE1  WHERE PLACE = 'USA'";
  public boolean DeleteFromTable(String query) {
-	return this.ExecSQL(query);
+	return ExecSQL(query);
  }
 
  //ex:  "TABLE1" 
  public boolean DropTable(String tbName) {
-  return this.ExecSQL("DROP TABLE IF EXISTS " + tbName);
+  return ExecSQL("DROP TABLE IF EXISTS " + tbName);
  }
 
  //Check if the database exist... 
@@ -1576,7 +1932,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
 	      SQLiteDatabase checkDB = null;
 	      
 	      try {
-	    	  String absPath = this.controls.activity.getFilesDir().getPath();
+	    	  String absPath = controls.activity.getFilesDir().getPath();
               absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/databases/"+_dbName;		         
 	          checkDB = SQLiteDatabase.openDatabase(absPath, null, SQLiteDatabase.OPEN_READONLY);
 	      } catch (SQLiteException e) {
@@ -1608,7 +1964,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
     	int i; 
     	int len = _imageResIdentifierDataArray.length;        	
     	for (i=0; i < len; i++) {
-           	this.SplitUpdateImageData(_imageResIdentifierDataArray[i], _delimiter);
+           	SplitUpdateImageData(_imageResIdentifierDataArray[i], _delimiter);
         }
     }
     
@@ -1630,7 +1986,7 @@ public class jSqliteDataAccess extends SQLiteAssetHelper {
         
     // ASSET_DB_PATH = "databases";   //default
     public void SetAssetsSearchFolder(String _folderName) {
-    	this.ASSET_DB_PATH = _folderName;
+    	ASSET_DB_PATH = _folderName;
     }
     
     
@@ -1839,5 +2195,5 @@ class Utils {
     public static String convertStreamToString(InputStream is) {
         return new Scanner(is).useDelimiter("\\A").next();
     }
-
+    
 }

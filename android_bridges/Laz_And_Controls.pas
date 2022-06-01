@@ -800,6 +800,8 @@ type
   TOnSqliteDataAccessAsyncPostExecute=procedure(Sender:TObject;count:integer;msgResult:string) of object;
 
   jSqliteDataAccess = class(jControl)
+  const
+    POSITION_UNKNOWN = -1;
   private
     FjSqliteCursor    : jSqliteCursor;
     FColDelimiter: char;
@@ -815,6 +817,8 @@ type
 
     procedure SetjSqliteCursor(Value: jSqliteCursor);
   protected
+    function GetEOF: Boolean;
+    function GetBOF: Boolean;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -832,6 +836,8 @@ type
 
     function Select(selectQuery: string): string;   overload;  //set cursor and return selected rows
     function Select(selectQuery: string; moveToLast: boolean): boolean;   overload;
+    function Select( _tableName, _sortOrder : string ) : integer; overload;
+    function Select( _tableName, _selection : string; _selectionArgs: array of string; _sortOrder : string ) : integer; overload;
 
     procedure SetSelectDelimiters(coldelim: char; rowdelim: char);
     function  CreateTable(createQuery: string) : boolean;
@@ -842,7 +848,35 @@ type
     function  UpdateImage(tableName: string;imageFieldName: string;keyFieldName: string; imageValue: jObject;keyValue: integer) : boolean; overload;
     function  UpdateImage(_tabName: string; _imageFieldName: string; _keyFieldName: string; _imageResIdentifier: string; _keyValue: integer) : boolean; overload;
     procedure Close;
+
     function  GetCursor: jObject; overload;
+
+    procedure MoveToFirst;
+    procedure MoveToNext;
+    procedure MoveToPrev;
+    procedure MoveToLast;
+    procedure MoveToPosition(position: integer);
+    function GetRowCount: integer;
+
+    function GetColumnCount: integer;
+    function GetColumnIndex(colName: string): integer;
+    function GetColumName(columnIndex: integer): string;
+    function GetColType(columnIndex: integer): TSqliteFieldType;
+
+    function GetValueToString(columnIndex: integer): string; overload;
+    function GetValueToString(colName: string): string; overload;
+    function GetValueAsString(columnIndex: integer): string;   overload;
+    function GetValueAsString(colName: string): string; overload;
+    function GetValueAsBitmap(columnIndex: integer): jObject; overload;
+    function GetValueAsBitmap(colName: string): jObject; overload;
+    function GetValueAsInteger(columnIndex: integer): integer; overload;
+    function GetValueAsInteger(colName: string): integer; overload;
+    function GetValueAsDouble(columnIndex: integer): double; overload;
+    function GetValueAsDouble(colName: string): double; overload;
+    function GetValueAsFloat(columnIndex: integer): real; overload;
+    function GetValueAsFloat(colName: string): real; overload;
+
+    function GetPosition(): integer;   //position = -1 --> Last Row !
 
     procedure SetForeignKeyConstraintsEnabled(_value: boolean);
     procedure SetDefaultLocale();
@@ -898,6 +932,8 @@ type
     property TableName: TStrings read FTableName write FTableName;
     property ReturnHeaderOnSelect: boolean read FReturnHeaderOnSelect write SetReturnHeaderOnSelect;
     property OnAsyncPostExecute: TOnSqliteDataAccessAsyncPostExecute read FOnAsyncPostExecute write FOnAsyncPostExecute;
+    property EOF: boolean read GetEOF;
+    property BOF: boolean read GetBOF;
   end;
   
   TOnClickDBListItem = procedure(Sender: TObject; itemIndex: integer; itemCaption: string) of object;
@@ -14073,7 +14109,7 @@ function jSqliteCursor.GetValueAsString(colName: string): string;
 begin
  result := '';
  if FInitialized  then
-  result := GetValueAsString(GetColumnIndex(colName));
+  result := jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetValueAsString', colName);
 end;
 
 function jSqliteCursor.GetValueAsBitmap(columnIndex: integer): jObject;
@@ -14085,9 +14121,10 @@ end;
 
 function jSqliteCursor.GetValueAsBitmap(colName: string): jObject;
 begin
+
   result := nil;
   if FInitialized  then
-   result := GetValueAsBitmap(GetColumnIndex(colName));
+   result := jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'GetValueAsBitmap', colName);
 end;
 
 function jSqliteCursor.GetValueAsInteger(columnIndex: integer): integer;
@@ -14101,35 +14138,35 @@ function jSqliteCursor.GetValueAsInteger(colName: string): integer;
 begin
   result := -1;
   if FInitialized  then
-   result :=  GetValueAsInteger(GetColumnIndex(colName));
+   result := jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'GetValueAsInteger', colName);
 end;
 
 function jSqliteCursor.GetValueAsDouble(columnIndex: integer): double;
 begin
   result := -1;
   if FInitialized  then
-   result := jSqliteCursor_GetValueAsDouble(gApp.jni.jEnv, FjObject , columnIndex);
+   result := jni_func_i_out_d(gApp.jni.jEnv, FjObject, 'GetValueAsDouble', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsDouble(colName: string): double;
 begin
   result := -1;
   if FInitialized  then
-   Result :=  GetValueAsDouble(GetColumnIndex(colName));
+   Result := jni_func_t_out_d(gApp.jni.jEnv, FjObject, 'GetValueAsDouble', colName);
 end;
 
 function jSqliteCursor.GetValueAsFloat(columnIndex: integer): real;
 begin
   result := -1;
   if FInitialized  then
-   Result := jSqliteCursor_GetValueAsFloat(gApp.jni.jEnv, FjObject , columnIndex);
+   Result := jni_func_i_out_f(gApp.jni.jEnv, FjObject, 'GetValueAsFloat', columnIndex);
 end;
 
 function jSqliteCursor.GetValueAsFloat(colName: string): real;
 begin
   result := -1;
   if FInitialized  then
-   result := GetValueAsFloat(GetColumnIndex(colName));
+   result := jni_func_t_out_f(gApp.jni.jEnv, FjObject, 'GetValueAsFloat', colName);
 end;
 
 function jSqliteCursor.GetValueToString(columnIndex: integer): string;
@@ -14425,6 +14462,22 @@ begin
   if FjSqliteCursor <> nil then FjSqliteCursor.SetCursor(Self.GetCursor);
 end;
 
+function jSqliteDataAccess.Select( _tableName, _sortOrder : string ) : integer; overload;
+begin
+ result := 0;
+
+ if FInitialized then
+    result := jni_func_tt_out_i(gApp.jni.jEnv, FjObject, 'Select', _tableName, _sortOrder);
+end;
+
+function jSqliteDataAccess.Select( _tableName, _selection : string; _selectionArgs: array of string; _sortOrder : string ) : integer;
+begin
+ result := 0;
+
+ if FInitialized then
+    result := jni_func_tt_ars_t_out_i(gApp.jni.jEnv, FjObject, 'Select', _tableName, _selection, _selectionArgs, _sortOrder);
+end;
+
 function jSqliteDataAccess.GetCursor: jObject;
 begin
   Result := nil;
@@ -14670,6 +14723,213 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jSqliteDataAccess_ExecSQLBatchAsync(gApp.jni.jEnv, FjObject, _execSql);
+end;
+
+function jSqliteDataAccess.GetEOF: Boolean;
+var
+  rowCount : integer;
+begin
+  Result := True;
+
+  if (not FInitialized) then exit;
+
+  rowCount := GetRowCount;
+
+  if (rowCount=POSITION_UNKNOWN) or (rowCount =0) then Exit;
+
+  Result := (GetPosition = rowCount);
+end;
+
+function jSqliteDataAccess.GetBOF: Boolean;
+var
+  rowCount : integer;
+begin
+  Result := True;
+
+  if (not FInitialized) then exit;
+
+  rowCount := GetRowCount;
+
+  if (rowCount=POSITION_UNKNOWN) or (rowCount =0) then Exit;
+
+  Result := (GetPosition = -1);
+end;
+
+procedure jSqliteDataAccess.MoveToFirst;
+begin
+   if not FInitialized  then Exit;
+   jni_proc(gApp.jni.jEnv, FjObject, 'MoveToFirst' );
+end;
+
+procedure jSqliteDataAccess.MoveToNext;
+begin
+  if not FInitialized  then Exit;
+  jni_proc(gApp.jni.jEnv, FjObject, 'MoveToNext' );
+end;
+
+procedure jSqliteDataAccess.MoveToPrev;
+begin
+  if not FInitialized  then Exit;
+  jni_proc(gApp.jni.jEnv, FjObject, 'MoveToPrev' );
+end;
+
+procedure jSqliteDataAccess.MoveToLast;
+begin
+  if not FInitialized  then Exit;
+  jni_proc(gApp.jni.jEnv, FjObject, 'MoveToLast' );
+end;
+
+procedure jSqliteDataAccess.MoveToPosition(position: integer);
+begin
+  if not FInitialized  then Exit;
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'MoveToPosition', position);
+end;
+
+function jSqliteDataAccess.GetRowCount: integer;
+begin
+   result := 0;
+   if FInitialized  then
+    result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetRowCount' );
+end;
+
+function jSqliteDataAccess.GetColumnCount: integer;
+begin
+  result := 0;
+  if FInitialized  then
+   Result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetColumnCount' );
+end;
+
+function jSqliteDataAccess.GetColumnIndex(colName: string): integer;
+begin
+   result := -1;
+   if FInitialized  then
+    result:= jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'GetColumnIndex', colName);
+end;
+
+function jSqliteDataAccess.GetColumName(columnIndex: integer): string;
+begin
+   result := '';
+   if FInitialized  then
+    result:= jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetColumName', columnIndex);
+end;
+{
+Cursor.FIELD_TYPE_NULL    //0
+Cursor.FIELD_TYPE_INTEGER //1
+Cursor.FIELD_TYPE_FLOAT   //2
+Cursor.FIELD_TYPE_STRING  //3
+Cursor.FIELD_TYPE_BLOB;   //4
+}
+function jSqliteDataAccess.GetColType(columnIndex: integer): TSqliteFieldType;
+var
+   colType: integer;
+begin
+   Result := ftNull;
+
+   if not FInitialized  then Exit;
+
+   colType:= jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetColType', columnIndex);
+
+   case colType of
+     0: Result:= ftNull;
+     1: Result:= ftInteger;
+     2: Result:= ftFloat;
+     3: Result:= ftString;
+     4: Result:= ftBlob;
+   end;
+end;
+
+function jSqliteDataAccess.GetValueAsString(columnIndex: integer): string;
+begin
+ result := '';
+ if FInitialized  then
+  result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetValueAsString', columnIndex);
+end;
+
+function jSqliteDataAccess.GetValueAsString(colName: string): string;
+begin
+ result := '';
+ if FInitialized  then
+  result := jni_func_t_out_t(gApp.jni.jEnv, FjObject, 'GetValueAsString', colName);
+end;
+
+function jSqliteDataAccess.GetValueAsBitmap(columnIndex: integer): jObject;
+begin
+  result := nil;
+  if FInitialized  then
+   result:= jni_func_i_out_bmp(gApp.jni.jEnv, FjObject, 'GetValueAsBitmap', columnIndex);
+end;
+
+function jSqliteDataAccess.GetValueAsBitmap(colName: string): jObject;
+begin
+
+  result := nil;
+  if FInitialized  then
+   result := jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'GetValueAsBitmap', colName);
+end;
+
+function jSqliteDataAccess.GetValueAsInteger(columnIndex: integer): integer;
+begin
+  result := -1;
+  if FInitialized  then
+   result := jni_func_i_out_i(gApp.jni.jEnv, FjObject, 'GetValueAsInteger', columnIndex);
+end;
+
+function jSqliteDataAccess.GetValueAsInteger(colName: string): integer;
+begin
+  result := -1;
+  if FInitialized  then
+   result := jni_func_t_out_i(gApp.jni.jEnv, FjObject, 'GetValueAsInteger', colName);
+end;
+
+function jSqliteDataAccess.GetValueAsDouble(columnIndex: integer): double;
+begin
+  result := -1;
+  if FInitialized  then
+   result := jni_func_i_out_d(gApp.jni.jEnv, FjObject, 'GetValueAsDouble', columnIndex);
+end;
+
+function jSqliteDataAccess.GetValueAsDouble(colName: string): double;
+begin
+  result := -1;
+  if FInitialized  then
+   Result := jni_func_t_out_d(gApp.jni.jEnv, FjObject, 'GetValueAsDouble', colName);
+end;
+
+function jSqliteDataAccess.GetValueAsFloat(columnIndex: integer): real;
+begin
+  result := -1;
+  if FInitialized  then
+   Result := jni_func_i_out_f(gApp.jni.jEnv, FjObject, 'GetValueAsFloat', columnIndex);
+end;
+
+function jSqliteDataAccess.GetValueAsFloat(colName: string): real;
+begin
+  result := -1;
+  if FInitialized  then
+   result := jni_func_t_out_f(gApp.jni.jEnv, FjObject, 'GetValueAsFloat', colName);
+end;
+
+function jSqliteDataAccess.GetValueToString(columnIndex: integer): string;
+begin
+  result := '';
+  //in designing component state: result value here...
+  if FInitialized then
+   result := jni_func_i_out_t(gApp.jni.jEnv, FjObject, 'GetValueToString', columnIndex);
+end;
+
+function jSqliteDataAccess.GetValueToString(colName: string): string;
+begin
+  result := '';
+  if FInitialized  then
+   Result :=  GetValueToString(GetColumnIndex(colName));
+end;
+
+function jSqliteDataAccess.GetPosition(): integer;
+begin
+  result := -1;
+  //in designing component state: result value here...
+  if FInitialized then
+   result := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetPosition');
 end;
 
 procedure jSqliteDataAccess.GenEvent_OnSqliteDataAccessAsyncPostExecute(Sender:TObject;count:integer;msgResult:string);

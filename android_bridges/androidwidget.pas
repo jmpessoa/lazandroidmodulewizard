@@ -1277,6 +1277,11 @@ type
     function GetStringPos( _strFind, _strData: string ) : integer;
     function GetStringPosUpperCase( _strFind, _strData: string ) : integer;
     function GetStringLength( _strData : string ) : integer;
+    function GetStringCapitalize( _strIn : string ) : string;
+    function GetStringUpperCase(_strIn : string ) : string;
+
+    function GetStripAccents(_str: string): string;
+    function GetStripAccentsUpperCase(_str: string): string;
 
     //needed: <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     function GetSystemVersion: Integer;
@@ -1339,7 +1344,6 @@ type
     function LoadFromAssetsTextContent(_filename: string): string;
 
     function RGBA(color: string): TSimpleRGBAColor;
-    function GetStripAccents(_str: string): string;
     function GetPathFromAssetsFile(_assetsFileName: string): string;
     function GetImageFromAssetsFile(_assetsImageFileName: string): jObject;
 
@@ -2027,6 +2031,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_t_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): jObject;
   function jni_func_t_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): integer;
   function jni_func_t_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): single;
+  function jni_func_t_out_d(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): double;
   function jni_func_t_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): int64;
   function jni_func_t_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string): string;
   function jni_func_tii_out_t( env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int0, _int1 : integer): string;
@@ -2045,6 +2050,8 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_z_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bool: boolean): boolean;
 
   function jni_func_i_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): integer;
+  function jni_func_i_out_d(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): double;
+  function jni_func_i_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): real;
   function jni_func_i_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): boolean;
   function jni_func_i_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int: integer): string;
   function jni_func_i_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int : integer): jObject;
@@ -2068,6 +2075,7 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): boolean;
   function jni_func_tt_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string): string;
   function jni_func_tt_ars_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string; _ars: array of string): integer;
+  function jni_func_tt_ars_t_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str0, _str1: string; _ars: array of string; _str3 : string): integer;
   function jni_func_tz_out_j(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): int64;
   function jni_func_tz_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _bool: boolean): boolean;
   function jni_func_ti_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _str: string; _int: integer): jObject;
@@ -4078,6 +4086,22 @@ begin
    result:= jni_func_t_out_i(gapp.Jni.jEnv, FjObject, 'GetStringLength', _strData);
 end;
 
+function jForm.GetStringCapitalize( _strIn : string ) : string;
+begin
+  result := '';
+
+  if FInitialized then
+   result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetStringCapitalize', _strIn);
+end;
+
+function jForm.GetStringUpperCase(_strIn : string) : string;
+begin
+  result := '';
+
+  if FInitialized then
+   result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetStringUpperCase', _strIn);
+end;
+
 function jForm.GetStringResourceById(_resID: integer): string;
 begin
   result := '';
@@ -4544,6 +4568,14 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetStripAccents', _str);
+end;
+
+function jForm.GetStripAccentsUpperCase(_str: string): string;
+begin
+  Result := '';
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_t_out_t(gapp.Jni.jEnv, FjObject, 'GetStripAccentsUpperCase', _str);
 end;
 
 function jForm.GetPathFromAssetsFile(_assetsFileName: string): string;
@@ -10748,6 +10780,60 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+function jni_func_i_out_d(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _int: integer): double;
+var
+ jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+label
+  _exceptionOcurred;
+begin
+  result := 0;
+
+  if (env = nil) or (_jobject = nil) then exit;
+
+  cls := env^.GetObjectClass(env, _jobject);
+  if cls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, cls, PChar(javaFuncion), '(I)D');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
+
+  _jParam[0].i := _int;
+
+  Result:= env^.CallDoubleMethodA(env,_jobject,jMethod,@_jParam);
+
+  env^.DeleteLocalRef(env, cls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_i_out_f(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _int: integer): real;
+var
+ jMethod : jMethodID = nil;
+ cls: jClass;
+ _jParam: array[0..0] of jValue;
+label
+  _exceptionOcurred;
+begin
+  result := 0;
+
+  if (env = nil) or (_jobject = nil) then exit;
+
+  cls := env^.GetObjectClass(env, _jobject);
+  if cls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, cls, PChar(javaFuncion), '(I)F');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
+
+  _jParam[0].i := _int;
+
+  Result:= env^.CallDoubleMethodA(env,_jobject,jMethod,@_jParam);
+
+  env^.DeleteLocalRef(env, cls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 function jni_func_i_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                           _int: integer): string;
 var
@@ -11514,6 +11600,55 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+function jni_func_tt_ars_t_out_i(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                _str0, _str1: string; _ars: array of string; _str3 : string): integer;
+var
+  jParams: array[0..3] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+  newSize0: integer;
+  jNewArray0: jObject=nil;
+  i: integer;
+label
+  _exceptionOcurred;
+begin
+  result := 0;
+
+  if (env = nil) or (_jobject = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)I');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str0));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_str1));
+  jParams[3].l:= env^.NewStringUTF(env, PChar(_str3));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[1].l = nil then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+  if jParams[3].l = nil then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  newSize0   := Length(_ars);
+  jNewArray0 := env^.NewObjectArray(env, newSize0, env^.FindClass(env,'java/lang/String'),env^.NewStringUTF(env, PChar('')));
+
+  if jNewArray0 = nil then begin env^.DeleteLocalRef(env,jParams[0].l); env^.DeleteLocalRef(env,jParams[1].l); env^.DeleteLocalRef(env,jParams[3].l); env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  for i:= 0 to newSize0 - 1 do
+     env^.SetObjectArrayElement(env,jNewArray0,i,env^.NewStringUTF(env, PChar(_ars[i])));
+
+  jParams[2].l:= jNewArray0;
+
+  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+  env^.DeleteLocalRef(env,jParams[3].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 function jni_func_tii_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
                             _str: string; _int1, _int2: integer): boolean;
 var
@@ -11766,10 +11901,38 @@ begin
 
   if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
 
-  Result:= env^.CallIntMethodA(env, _jobject, jMethod, @jParams);
+  Result:= env^.CallFloatMethodA(env, _jobject, jMethod, @jParams);
 
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);    
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_t_out_d(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                          _str: string): double;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  result := 0; if (env = nil) or (_jobject = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Ljava/lang/String;)D');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_str));
+
+  if jParams[0].l = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  Result:= env^.CallDoubleMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;

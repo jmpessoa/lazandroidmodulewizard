@@ -1206,6 +1206,42 @@ public class jForm {
     	
     	return _strData.length();
     }
+    
+    public String GetStringCapitalize(String _strIn) {
+        String retStr = _strIn;
+        
+        try { // We can face index out of bound exception if the string is null
+            retStr = _strIn.substring(0, 1).toUpperCase(Locale.getDefault()) + _strIn.substring(1);
+        }catch (Exception e){
+        	return _strIn;
+        }
+        
+        return retStr;
+    }
+    
+    public String GetStringUpperCase(String _strIn) {
+    	return _strIn.toUpperCase(Locale.getDefault());
+    }
+    
+    //by ADiV
+    public String GetStripAccents(String _str) {
+        _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
+        
+        if (_str == null) return "";
+        
+        _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return _str;
+    }
+    
+    //by ADiV
+    public String GetStripAccentsUpperCase(String _str) {
+        _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
+        
+        if (_str == null) return "";
+        
+        _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return _str.toUpperCase(Locale.getDefault());
+    }
 
     // BY ADiV
     public int GetBatteryPercent() {
@@ -1792,16 +1828,6 @@ public class jForm {
         if (PathDat == null) return "";        
 
         return PathDat + "/" + _filename2;
-    }
-
-    //by ADiV
-    public String GetStripAccents(String _str) {
-        _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
-        
-        if (_str == null) return "";
-        
-        _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
-        return _str;
     }
 
     public String GetPathFromAssetsFile(String _assetsFileName) {

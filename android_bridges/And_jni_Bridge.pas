@@ -310,9 +310,6 @@ Function  jSqliteCursor_Create(env:PJNIEnv;  this:jobject; SelfObj: TObject): jO
 procedure jSqliteCursor_SetCursor(env:PJNIEnv;  SqliteCursor: jObject; Cursor: jObject);
 Function  jSqliteCursor_GetCursor(env:PJNIEnv;  SqliteCursor: jObject): jObject;
 
-function jSqliteCursor_GetValueAsDouble (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): double; overload;
-function jSqliteCursor_GetValueAsFloat (env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): real; overload;
-
 {jSqliteDataAccess: by jmpessoa}
 
 Function  jSqliteDataAccess_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject;
@@ -3636,58 +3633,6 @@ begin
  env^.DeleteLocalRef(env, cls);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
-end;
-
-function jSqliteCursor_GetValueAsDouble(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): double;
-var
- jMethod : jMethodID = nil;
- cls: jClass;
- _jParam: array[0..0] of jValue;
-label
-  _exceptionOcurred;
-begin
-  result := 0;
-
-  if (env = nil) or (SqliteCursor = nil) then exit;
-
-  cls := env^.GetObjectClass(env, SqliteCursor);
-  if cls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, cls, 'GetValueAsDouble', '(I)D');
-  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
-
-  _jParam[0].i := columnIndex;
-
-  Result:= env^.CallDoubleMethodA(env,SqliteCursor,jMethod,@_jParam);
-
-  env^.DeleteLocalRef(env, cls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
-end;
-
-function jSqliteCursor_GetValueAsFloat(env:PJNIEnv;  SqliteCursor: jObject; columnIndex: integer): real;
-var
- jMethod : jMethodID = nil;
- cls: jClass;
- _jParam: array[0..0] of jValue;
-label
-  _exceptionOcurred;
-begin
-  result := 0;
-
-  if (env = nil) or (SqliteCursor = nil) then exit;
-
-  cls := env^.GetObjectClass(env, SqliteCursor);
-  if cls = nil then goto _exceptionOcurred;
-  jMethod:= env^.GetMethodID(env, cls, 'GetValueAsFloat', '(I)F');
-  if jMethod = nil then begin env^.DeleteLocalRef(env, cls); goto _exceptionOcurred; end;
-
-  _jParam[0].i := columnIndex;
-
-  Result:= env^.CallDoubleMethodA(env,SqliteCursor,jMethod,@_jParam);
-
-  env^.DeleteLocalRef(env, cls);
-
-  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 
