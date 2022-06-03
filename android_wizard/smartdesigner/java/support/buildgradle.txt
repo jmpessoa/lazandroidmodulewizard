@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method
         google()
     }
@@ -11,7 +11,7 @@ buildscript {
 allprojects {
     repositories {
        google()
-       jcenter()
+       mavenCentral()
        maven { url 'https://jitpack.io' }
     }
 }
@@ -50,7 +50,7 @@ android {
         }
         release {
             debuggable false
-            jniDebuggable false            
+            jniDebuggable false
         }
 	}
 }

@@ -186,6 +186,7 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.animation.RotateAnimation;
+
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //**class entrypoint**//please, do not remove/change this line!

@@ -193,7 +193,8 @@ begin
   FormIndex:= -1;      //dummy
 
   //now load the stream
-  InitInheritedComponent(Self, TAndroidWidget {TAndroidForm});
+  //InitInheritedComponent(Self, TAndroidWidget {TAndroidForm});
+  InitInheritedComponent(Self, jGdxForm {Need for Android 12});
 
 end;
 
