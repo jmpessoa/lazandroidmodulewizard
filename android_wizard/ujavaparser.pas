@@ -244,7 +244,7 @@ begin
   FPascalJNI[i] := str;
   FPascalJNI.Add(');');
   FPascalJNI.Add('');
-
+  //https://developer.android.com/training/articles/perf-jni
   str := StringReplace(FRootClass, '.', '/', [rfReplaceAll]);
   FPascalJNI.Add('function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar; methods: PJNINativeMethod; countMethods:integer):integer;');
   FPascalJNI.Add('var');
@@ -253,9 +253,7 @@ begin
   FPascalJNI.Add('  Result:= JNI_FALSE;');
   FPascalJNI.Add('  curClass:= (PEnv^).FindClass(PEnv, className);');
   FPascalJNI.Add('  if curClass <> nil then');
-  FPascalJNI.Add('  begin');
-  FPascalJNI.Add('    if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;');
-  FPascalJNI.Add('  end;');
+  FPascalJNI.Add('    result := (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods);');
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
   FPascalJNI.Add('function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;');
@@ -267,14 +265,22 @@ begin
   FPascalJNI.Add('var');
   FPascalJNI.Add('  PEnv: PPointer;');
   FPascalJNI.Add('  curEnv: PJNIEnv;');
+  FPascalJNI.Add('  rc: integer;');
   FPascalJNI.Add('begin');
   FPascalJNI.Add('  PEnv:= nil;');
   FPascalJNI.Add('  Result:= JNI_VERSION_1_6;');
-  FPascalJNI.Add('  (VM^).GetEnv(VM, @PEnv, Result);');
+  FPascalJNI.Add('  ');
+  FPascalJNI.Add('  if (VM^).GetEnv(VM, @PEnv, Result) <> JNI_OK then');
+  FPascalJNI.Add('  begin');
+  FPascalJNI.Add('   result := JNI_ERR;');
+  FPascalJNI.Add('   exit;');
+  FPascalJNI.Add('  end;');
+  FPascalJNI.Add('  ');
   FPascalJNI.Add('  if PEnv <> nil then');
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('     curEnv:= PJNIEnv(PEnv);');
-  FPascalJNI.Add('     RegisterNativeMethods(curEnv, ''' + str + ''');');
+  FPascalJNI.Add('     rc := RegisterNativeMethods(curEnv, ''' + str + ''');');
+  FPascalJNI.Add('     if (rc <> JNI_OK) then result := rc;');
   FPascalJNI.Add('  end;');
   FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
   FPascalJNI.Add('end;');
@@ -285,7 +291,9 @@ begin
   FPascalJNI.Add('  curEnv: PJNIEnv;');
   FPascalJNI.Add('begin');
   FPascalJNI.Add('  PEnv:= nil;');
-  FPascalJNI.Add('  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);');
+  FPascalJNI.Add('  ');
+  FPascalJNI.Add('  if (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6) <> JNI_OK then exit;');
+  FPascalJNI.Add('  ');
   FPascalJNI.Add('  if PEnv <> nil then');
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('    curEnv:= PJNIEnv(PEnv);');

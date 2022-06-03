@@ -1059,7 +1059,7 @@ begin
          strList.Clear;
          strList.Add('buildscript {');
          strList.Add('    repositories {');
-         strList.Add('        jcenter()');
+         strList.Add('        mavenCentral()');
          strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
          if androidPluginNumber >= 3000 then
             strList.Add('        google()')
@@ -1077,7 +1077,7 @@ begin
          strList.Add('       google()')
          else
          strList.Add('     //google()');
-         strList.Add('       jcenter()');
+         strList.Add('       mavenCentral()');
          strList.Add('       maven { url ''https://jitpack.io'' }');
          strList.Add('    }');
          strList.Add('}');

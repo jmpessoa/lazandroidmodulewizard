@@ -649,9 +649,7 @@ begin
       strOnLoadList.Add('  Result:= JNI_FALSE;');
       strOnLoadList.Add('  curClass:= (PEnv^).FindClass(PEnv, className);');
       strOnLoadList.Add('  if curClass <> nil then');
-      strOnLoadList.Add('  begin');
-      strOnLoadList.Add('    if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 then Result:= JNI_TRUE;');
-      strOnLoadList.Add('  end;');
+      strOnLoadList.Add('    result := (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods);');
       strOnLoadList.Add('end;');
       strOnLoadList.Add(' ');
       PathToClassName:= StringReplace(auxPathJNI, '_', '/',[rfReplaceAll]);
@@ -665,14 +663,22 @@ begin
       strOnLoadList.Add('var');
       strOnLoadList.Add('  PEnv: PPointer;');
       strOnLoadList.Add('  curEnv: PJNIEnv;');
+      strOnLoadList.Add('  rc: integer;');
       strOnLoadList.Add('begin');
       strOnLoadList.Add('  PEnv:= nil;');
       strOnLoadList.Add('  Result:= JNI_VERSION_1_6;');
-      strOnLoadList.Add('  (VM^).GetEnv(VM, @PEnv, Result);');
+      strOnLoadList.Add('  ');
+      strOnLoadList.Add('  if (VM^).GetEnv(VM, @PEnv, Result) <> JNI_OK then');
+      strOnLoadList.Add('  begin');
+      strOnLoadList.Add('   result := JNI_ERR;');
+      strOnLoadList.Add('   exit;');
+      strOnLoadList.Add('  end;');
+      strOnLoadList.Add('  ');
       strOnLoadList.Add('  if PEnv <> nil then');
       strOnLoadList.Add('  begin');
       strOnLoadList.Add('     curEnv:= PJNIEnv(PEnv);');
-      strOnLoadList.Add('     RegisterNativeMethods(curEnv, '''+PathToClassName+''');');
+      strOnLoadList.Add('     rc := RegisterNativeMethods(curEnv, '''+PathToClassName+''');');
+      strOnLoadList.Add('     if (rc <> JNI_OK) then result := rc;');
 
       if FModuleType = 1 then //NoGUI
       begin
@@ -696,7 +702,9 @@ begin
       strOnLoadList.Add('  curEnv: PJNIEnv;');
       strOnLoadList.Add('begin');
       strOnLoadList.Add('  PEnv:= nil;');
-      strOnLoadList.Add('  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);');
+      strOnLoadList.Add('  ');
+      strOnLoadList.Add('  if (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6) <> JNI_OK then exit;');
+      strOnLoadList.Add('  ');
       strOnLoadList.Add('  if PEnv <> nil then');
       strOnLoadList.Add('  begin');
       strOnLoadList.Add('    curEnv:= PJNIEnv(PEnv);');

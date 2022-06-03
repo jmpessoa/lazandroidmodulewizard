@@ -3089,8 +3089,9 @@ begin
 
   FAnimationMode:= animNone;
 
-  //now load the stream
-  InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
+  //now load the stream   ***
+  //InitInheritedComponent(Self, TAndroidWidget {TAndroidForm}); {thanks to  x2nie !!}
+  InitInheritedComponent(Self, jForm {Need for Android 12}); {thanks to  x2nie !!}
 end;
 
 destructor jForm.Destroy;
