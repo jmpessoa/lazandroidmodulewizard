@@ -87,23 +87,6 @@ public class jNotificationManager /*extends ...*/ {
     	mNotificationBuilder = null;
     	mNotification =  null;
     }
-  
-  //write others [public] methods code here......
-  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
-  //by jmpessoa
-    public int GetDrawableResourceId(String _resName) {
-    	  try {
-    	     Class<?> res = R.drawable.class;
-    	     Field field = res.getField(_resName);  //"drawableName"
-    	     int drawableId = field.getInt(null);
-    	     return drawableId;
-    	  }
-    	  catch (Exception e) {
-    	     Log.e("jNotificationManager", "Failure to get drawable id.", e);
-    	     return 0;
-    	  }
-    }
         
     //thanks to freris    
     public void SetLightsColorAndTime(int _color, int _onMills, int _offMills) {
@@ -247,7 +230,7 @@ public class jNotificationManager /*extends ...*/ {
            
    public void SetIconIdentifier(String _iconIdentifier) { 
     //int icon =android.R.drawable.ic_dialog_info;    	
-	   mIconIdentifier = GetDrawableResourceId(_iconIdentifier) ;
+	   mIconIdentifier = controls.GetDrawableResourceId(_iconIdentifier) ;
    }
  	
    public void SetTitle(String _title) {

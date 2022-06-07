@@ -138,21 +138,6 @@ public class jToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object 
    public void ClearLayoutAll() {
 	 LAMWCommon.clearLayoutAll();
    }
-
-   //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-   
-   private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     Log.e("jToolbar", "Failure to get drawable resource id...", e);
-		     return 0;
-		  }
-	}
    
    //this.setNavigationIcon(android.R.drawable.btn_star);
    //this.setTitle("Hello World!");
@@ -168,12 +153,12 @@ public class jToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object 
       
    //Setting navigationIcon
    public void SetNavigationIcon(String _imageIdentifier) {
-     this.setNavigationIcon(GetDrawableResourceId(_imageIdentifier)); //R.drawable.ic_launcher;
+     this.setNavigationIcon(controls.GetDrawableResourceId(_imageIdentifier)); //R.drawable.ic_launcher;
    }
    
   //Setting appIcon
    public void SetLogo(String _imageIdentifier) {
-     this.setLogo(GetDrawableResourceId(_imageIdentifier)); //R.drawable.ic_launcher
+     this.setLogo(controls.GetDrawableResourceId(_imageIdentifier)); //R.drawable.ic_launcher
    }
       
    public void SetAsActionBar(boolean _value) {

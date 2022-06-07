@@ -784,25 +784,13 @@ public class jExpandableListView extends ExpandableListView /*dummy*/ { //please
    public void SetBackgroundChild(int _color) {
 	   backgroundColorChild = _color;	   
    }
-   	
-  private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
 	
 	public void SetImageItemIdentifier(String  _imageResIdentifier) {
-		iconResId = GetDrawableResourceId(_imageResIdentifier);		   
+		iconResId = controls.GetDrawableResourceId(_imageResIdentifier);		   
 	}
 	
 	public void SetImageChildItemIdentifier(String  _imageResIdentifier) {
-		iconResIdChild = GetDrawableResourceId(_imageResIdentifier);		   
+		iconResIdChild = controls.GetDrawableResourceId(_imageResIdentifier);		   
 	}
    	
 	public void SetHighLightSelectedChildItemColor(int _color)  {
