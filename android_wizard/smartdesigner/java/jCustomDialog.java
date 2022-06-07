@@ -221,21 +221,6 @@ public class jCustomDialog extends RelativeLayout {
 		countParentRule = 0;
 	}
 
-	//write others [public] methods code here......
-	//GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-	private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
-		try {
-			Class<?> res = R.drawable.class;
-			Field field = res.getField(_resName);  //"drawableName"
-			int drawableId = field.getInt(null);
-			return drawableId;
-		}
-		catch (Exception e) {
-			Log.e("jCustomDialog", "Failure to get drawable id.", e);
-			return 0;
-		}
-	}
-
 	public void Show() {			
 	    Show(mTitle, mIconIdentifier);
 	}
@@ -260,7 +245,7 @@ public class jCustomDialog extends RelativeLayout {
 			
 			// Update icon if I change [to TR3E]
 			if( mShowTitle ){			
-			 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+			 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, controls.GetDrawableResourceId(mIconIdentifier));
 			
 			 mDialog.setTitle(mTitle);
 			}
@@ -290,7 +275,7 @@ public class jCustomDialog extends RelativeLayout {
 				mDialog.requestWindowFeature(Window.FEATURE_LEFT_ICON);
 				mDialog.setContentView(this);			
 				
-				mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+				mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, controls.GetDrawableResourceId(mIconIdentifier));
 				
 				mDialog.setTitle(mTitle);
 			 //mDialog.getWindow().setTitleColor(0xFF0000FF); 
@@ -372,7 +357,7 @@ public class jCustomDialog extends RelativeLayout {
 		mIconIdentifier = _iconIdentifier;
 		
 		if ((mDialog != null) && mShowTitle)		
-		 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, GetDrawableResourceId(mIconIdentifier));
+		 mDialog.setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, controls.GetDrawableResourceId(mIconIdentifier));
 	}
 
 	public void Close() {

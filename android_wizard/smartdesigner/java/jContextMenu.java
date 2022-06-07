@@ -126,24 +126,11 @@ public class jContextMenu /*extends ...*/ {
   	    return item;
     }
     
-    private int GetDrawableResourceId(String _resName) {
-  	  try {
-  	     Class<?> res = R.drawable.class;
-  	     Field field = res.getField(_resName);  //"drawableName"
-  	     int drawableId = field.getInt(null);
-  	     return drawableId;
-  	  }
-  	  catch (Exception e) {
-  	     Log.e("jContextMenu_error", "Failure to get drawable id.", e);
-  	     return 0;
-  	  }
-    }
-    
     public void SetHeader(ContextMenu _menu, String _title, String _iconIdentifier){
     	mHeaderTitle = _title;
     	mHeaderIconIdentifier = _iconIdentifier;
   	   _menu.setHeaderTitle((CharSequence)_title);  	   
-  	   _menu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));
+  	   _menu.setHeaderIcon(controls.GetDrawableResourceId(_iconIdentifier));
   	   
   	   if (mMenu == null) mMenu = _menu;
     }
@@ -159,7 +146,7 @@ public class jContextMenu /*extends ...*/ {
    	   mHeaderIconIdentifier = _iconIdentifier;
    	   
    	   if (mMenu != null)
-   		   mMenu.setHeaderIcon(GetDrawableResourceId(_iconIdentifier));   	   
+   		   mMenu.setHeaderIcon(controls.GetDrawableResourceId(_iconIdentifier));   	   
      }    
     
     public boolean IsItemChecked(int _itemID) {

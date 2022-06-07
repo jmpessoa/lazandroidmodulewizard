@@ -1042,35 +1042,11 @@ public class jForm {
     }
 
     public int GetDrawableResourceId(String _resName) {
-        try {
-            Class<?> res = R.drawable.class;
-            Field field = res.getField(_resName);  //"drawableName"
-            int drawableId = field.getInt(null);
-            return drawableId;
-        } catch (Exception e) {
-            Log.e("jForm", "Failure to get drawable id.", e);
-            return 0;
-        }
+        return controls.GetDrawableResourceId(_resName);
     }
 
     public Drawable GetDrawableResourceById(int _resID) {
-        if (_resID == 0) {
-            return null; // by ADiV
-        }
-
-        Drawable res = null;
-
-        if (Build.VERSION.SDK_INT < 22) {    //for old device < 22
-            res = this.controls.activity.getResources().getDrawable(_resID);
-        }
-
-        //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
-        //[ifdef_api22up]
-        if (Build.VERSION.SDK_INT >= 22) {
-        	res = this.controls.activity.getResources().getDrawable(_resID, null);
-        }//[endif_api22up]
-
-        return res;
+        return controls.GetDrawableResourceById(_resID);
     }
 
     //BY ADiV
@@ -1080,7 +1056,7 @@ public class jForm {
             return;
         }
 
-        Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+        Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageIdentifier));
 
         switch (_scaleType) {
             case 0:
@@ -1412,7 +1388,7 @@ public class jForm {
 
     public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
-        Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
+        Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier));
 
         if (d != null) // by ADiV
         {
@@ -2311,21 +2287,21 @@ public class jForm {
 
     public Bitmap GetApplicationIcon(String packageName) {
         Bitmap dw = null;
+        
         try {
             dw = drawableToBitmap(this.controls.activity.getPackageManager().getApplicationIcon(packageName));
         } catch (PackageManager.NameNotFoundException e) {
-            Log.i("GetApplicationIcon", "NameNotFoundException");
-            // Get a default icon
-            if (Build.VERSION.SDK_INT < 22) {    //for old device < 22
-                dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher));
-            }
-
-            //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
-            //[ifdef_api22up]
-            if (Build.VERSION.SDK_INT >= 22) {
-                dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher, null));
-            }//[endif_api22up]
+            Log.i("GetApplicationIcon", "NameNotFoundException");            
         }
+        
+        if( dw != null ) return dw;
+        
+        try {
+            dw = drawableToBitmap(this.controls.activity.getPackageManager().getApplicationIcon(this.controls.activity.getPackageName()));
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i("GetApplicationIcon", "DefaultNameNotFoundException");            
+        }
+        
         return dw;
     }
 

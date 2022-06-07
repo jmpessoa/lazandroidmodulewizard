@@ -441,16 +441,26 @@ public class Controls {
       Class<?> res = R.drawable.class;
       Field field = res.getField(_resName);  //"drawableName"
 
-      if (field != null) {
-        int drawableId = field.getInt(null);
-        return drawableId;
-      } else {
-        return 0;
-      }
+      if (field != null) 
+        return field.getInt(null);      
+      
     } catch (Exception e) {
-      //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
-      return 0;
+      //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);      
     }
+    
+    try {
+        Class<?> res = R.mipmap.class;
+        Field field = res.getField(_resName);  //"mipmapName"
+
+        if (field != null) {
+          return field.getInt(null);
+        } else {
+          return 0;
+        }
+      } catch (Exception e) {
+        //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
+    	return 0;
+      }
   }
 
   public Drawable GetDrawableResourceById(int _resID) {

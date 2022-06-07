@@ -364,7 +364,7 @@ public class jHorizontalScrollView extends HorizontalScrollView {
 		ImageView imageView = new ImageView(controls.activity);
 		imageView.setId(imgId);
 		imageView.setPadding(10, 2, 2, 2);
-		//imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+		
 		Bitmap bitmap = LoadFromFile(_path, _filename);
 
 		imageView.setImageBitmap(bitmap);
@@ -406,7 +406,7 @@ public class jHorizontalScrollView extends HorizontalScrollView {
 		ImageView imageView = new ImageView(controls.activity);
 		imageView.setId(imgId);
 		imageView.setPadding(10, 2, 2, 2);
-		//imageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+		
 		Bitmap bitmap = LoadFromAssets(_filename);
 		imageView.setImageBitmap(bitmap);
 		imageView.setScaleType(GetScaleType(_scaleType));

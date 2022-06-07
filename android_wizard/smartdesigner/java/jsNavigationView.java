@@ -50,7 +50,7 @@ public class jsNavigationView extends NavigationView /*dummy*/ { //please, fix w
    TextView headerTextView;
    TextView headerSubTextView;
    
-   int headerImageIdentifier = R.drawable.ic_launcher;
+   int headerImageIdentifier = 0;
 
    String mHeaderBackgroundImageIdentifier = "";
    String mHeaderLogoImageIdentifier = "";

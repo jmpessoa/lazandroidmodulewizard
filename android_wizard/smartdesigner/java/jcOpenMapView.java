@@ -287,18 +287,6 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         this.getOverlays().add(myGroundOverlay);
     }
 
-    public int GetDrawableResourceId(String _resName) {
-        try {
-            Class<?> res = R.drawable.class;
-            Field field = res.getField(_resName);  //"drawableName"
-            int drawableId = field.getInt(null);
-            return drawableId;
-        } catch (Exception e) {
-            Log.e("jcOpenMapView", "Failure to get drawable id.", e);
-            return 0;
-        }
-    }
-
     /**
      * AsyncTask <TypeOfVarArgParams, ProgressValue, ResultValue>
      */

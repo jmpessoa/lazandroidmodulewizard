@@ -146,19 +146,6 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
 
    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
    
-   private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     Log.e("jsToolbar", "Failure to get drawable resource id...", e);
-		     return 0;
-		  }
-	}
-   
    public void SetTitle(String _title) {
 	  if (IsActionBar)
 	       ((AppCompatActivity) controls.activity).getSupportActionBar().setTitle(_title);
@@ -168,12 +155,12 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
       
    //Setting navigationIcon
    public void SetNavigationIcon(String _imageIdentifier) {
-     this.setNavigationIcon(GetDrawableResourceId(_imageIdentifier)); //R.drawable.ic_launcher;
+     this.setNavigationIcon(controls.GetDrawableResourceId(_imageIdentifier)); 
    }
    
   //Setting appIcon
    public void SetLogo(String _imageIdentifier) {
-     this.setLogo(GetDrawableResourceId(_imageIdentifier)); //R.drawable.ic_launcher
+     this.setLogo(controls.GetDrawableResourceId(_imageIdentifier)); 
    }
       
    public void SetAsActionBar(boolean _value) {
