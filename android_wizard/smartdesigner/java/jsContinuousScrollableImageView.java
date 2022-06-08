@@ -420,25 +420,10 @@ public class jsContinuousScrollableImageView extends ContinuousScrollableImageVi
     public void ClearLayoutAll() {
 	 LAMWCommon.clearLayoutAll();
     }
- 
-    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
-
-    public int GetDrawableResourceId(String _resName) {
-        try {
-            Class<?> res = R.drawable.class;
-            Field field = res.getField(_resName);  //"drawableName"
-            int drawableId = field.getInt(null);
-            return drawableId;
-        }
-        catch (Exception e) {
-            //Log.e("jImageView", "Failure to get drawable id.", e);
-            return 0;
-        }
-    }
 
     public void SetImageIdentifier(String _imageIdentifier) {
         mImageIdentifier = _imageIdentifier;
-        int id = GetDrawableResourceId(mImageIdentifier);
+        int id = controls.GetDrawableResourceId(mImageIdentifier);
         this.setResourceId(id); //R.drawable.bg_sample
     }
 

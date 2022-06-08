@@ -131,14 +131,14 @@ class jGridViewCustomAdapter extends ArrayAdapter {
             }
             else {
                 if (! items.get(position).drawableIdentifier.equals("")) {                	
-                    imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));
+                    imageViewItem.setImageResource(controls.GetDrawableResourceId( items.get(position).drawableIdentifier ));
                     itemLayout.addView(imageViewItem, imgParam);
                 }
             }
         }
         else {
             if (! items.get(position).drawableIdentifier.equals("")) {
-                imageViewItem.setImageResource(GetDrawableResourceId( items.get(position).drawableIdentifier ));
+                imageViewItem.setImageResource(controls.GetDrawableResourceId( items.get(position).drawableIdentifier ));
                 itemLayout.addView(imageViewItem, imgParam);
             }
         }
@@ -176,19 +176,6 @@ class jGridViewCustomAdapter extends ArrayAdapter {
         listLayout.addView(itemLayout);
 
         return listLayout;
-    }
-
-    private int GetDrawableResourceId(String _resName) {   //    ../res/drawable
-        try {
-            Class<?> res = R.drawable.class;
-            Field field = res.getField(_resName);  //"drawableName"
-            int drawableId = field.getInt(null);
-            return drawableId;
-        }
-        catch (Exception e) {
-            Log.e("gridViewItem", "Failure to get drawable id.", e);
-            return 0;
-        }
     }
 
     public void SetItemsLayout(int value) {

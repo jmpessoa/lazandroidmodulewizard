@@ -44,7 +44,6 @@ type
 
     function FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
     function FixAntConfig(ForceFixPaths: Boolean): TModalResult;
-    function FixGradleConfig({%H-}ForceFixPaths: Boolean): TModalResult;
 
     function BuildByAnt: Boolean;
     function InstallByAnt: Boolean;
@@ -534,9 +533,7 @@ begin
   if FProj.CustomData['BuildSystem'] = 'Gradle' then
   begin
     if Pos('AppCompat', FProj.CustomData['Theme']) > 0 then
-       Result:= mrNo
-    else
-       Result := FixGradleConfig(ForceFixPaths);
+       Result:= mrNo;
   end
   else
   begin
@@ -684,57 +681,6 @@ begin
       WriteXMLFile(xml, FProjPath + 'build.xml');
   finally
     xml.Free;
-  end;
-end;
-
-function TApkBuilder.FixGradleConfig(ForceFixPaths: Boolean): TModalResult;
-var
-  p:integer;
-  WasChanged: Boolean;
-  strList: TStringList;
-  target, tempStr, findString, oldCompileSdkVersion: string;
-  aSupportLib: TSupportLib;
-begin
-  Result := mrOk;
-  WasChanged := False;
-
-  if GetManifestSdkTarget(target) then
-  begin
-    strList:= TStringList.Create;
-    try
-      strList.LoadFromFile(FProjPath + 'build.gradle');
-
-      p := Pos('compileSdkVersion ', strList.Text);
-      tempStr := Trim(Copy(strList.Text, p, Length('compileSdkVersion ') + 2));
-      p := Pos(' ', tempStr);
-      oldCompileSdkVersion := Trim(Copy(tempStr, p + 1, 2));
-
-      if (oldCompileSdkVersion <> target) and
-         (MessageDlg('build.gradle',
-                     'Change compileSdkVersion to "' + target + '"?',
-                      mtConfirmation, [mbYes, mbNo], 0) = mrYes)
-      then
-      begin
-        tempStr := strList.Text;
-
-        findString:='compileSdkVersion ';
-        if (Pos(findString,tempStr)>0) then
-          tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+target, [rfIgnoreCase]);
-
-        for aSupportLib in SupportLibs do
-        begin
-          if (Pos(aSupportLib.Name,tempStr)>0) then
-            tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name+target, [rfIgnoreCase]);
-        end;
-
-        strList.Text := tempStr;
-        WasChanged := True;
-      end;
-      if WasChanged then
-        strList.SaveToFile(FProjPath + 'build.gradle');
-    finally
-      strList.Free;
-    end;
   end;
 end;
 

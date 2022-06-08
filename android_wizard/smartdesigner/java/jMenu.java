@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Menu;
@@ -80,7 +81,8 @@ public class jMenu /*extends ...*/ {
     	  mMenu = _menu;
           String _resName = "ic_launcher"; //ok       
           MenuItem item = _menu.add(0,_itemID,0 ,(CharSequence)_caption);       
-          item.setIcon(controls.GetDrawableResourceId(_resName));          
+          item.setIcon(controls.GetDrawableResourceId(_resName));
+          item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
        }
     }
     
@@ -113,9 +115,16 @@ public class jMenu /*extends ...*/ {
     	int size = _captions.length;
     	if (_menu != null) {      	   	
      	  if (size > 1) {
+     		 Drawable dw = null;
+     		 try {
+                 dw = this.controls.activity.getPackageManager().getApplicationIcon(this.controls.activity.getPackageName());
+             } catch (PackageManager.NameNotFoundException e) {
+                 Log.i("GetApplicationIcon", "DefaultNameNotFoundException");            
+             } 
+     		  
      		 mMenu = _menu;
     	     mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title      	  
-     	     mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);      	       	   
+     	     if(dw != null) mSubMenus[mCountSubMenu].setHeaderIcon(dw);      	       	   
     	     for(int i=1; i < size; i++) {    	
     		   MenuItem item = mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]); //sub titles...    		       	    
     	     }    	   
@@ -128,10 +137,17 @@ public class jMenu /*extends ...*/ {
     public void AddCheckableSubMenu(Menu _menu, int _startItemID, String[] _captions){
       if (_menu != null) {	    	
     	int size = _captions.length;
-    	if (size > 1) {    	
+    	if (size > 1) {
+    	   Drawable dw = null;
+    		 try {
+                dw = this.controls.activity.getPackageManager().getApplicationIcon(this.controls.activity.getPackageName());
+           } catch (PackageManager.NameNotFoundException e) {
+                Log.i("GetApplicationIcon", "DefaultNameNotFoundException");            
+           }
+    		 
     	   mMenu = _menu;	
     	   mSubMenus[mCountSubMenu] = _menu.addSubMenu((CharSequence)_captions[0]); //main title
-    	   mSubMenus[mCountSubMenu].setHeaderIcon(R.drawable.ic_launcher);       	   
+    	   if(dw != null) mSubMenus[mCountSubMenu].setHeaderIcon(dw);       	   
     	   //Log.i("jMenu_AddCheckableSubMenu", _captions[0]);
     	   for(int i=1; i < size; i++) {    	
     		  mSubMenus[mCountSubMenu].add(0,_startItemID+(i-1),0,(CharSequence)_captions[i]).setCheckable(true); //sub titles...
@@ -355,9 +371,14 @@ public class jMenu /*extends ...*/ {
     }
 
 	public void AddDropDownItem(Menu _menu, View _view){
-    	AddItem(_menu, _view.getId(), "caption", "ic_lancher", 0, 2); //SHOW_AS_ACTION_ALWAYS
+		if((_menu == null) || (_view == null)) return;
+		
+    	AddItem(_menu, _view.getId(), "caption", "ic_launcher", 0, 2); //SHOW_AS_ACTION_ALWAYS
     	MenuItem item = this.FindMenuItemByID(_view.getId());
-    	item.setActionView(_view);
+    	
+    	if(item == null) return;
+    	
+    	item.setActionView(_view);    	
     }
 
 }
