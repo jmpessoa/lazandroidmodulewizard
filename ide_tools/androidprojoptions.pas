@@ -137,7 +137,7 @@ TLamwProjectOptions = class(TAbstractIDEOptionsEditor)
 private
  { private declarations }
 const
- Drawable: array [0..4] of record
+ Drawable: array [0..5] of record
      Size: integer;
      Suffix: string;
    end
@@ -145,11 +145,13 @@ const
    (Size: 48; Suffix: 'mdpi'),
    (Size: 72; Suffix: 'hdpi'),
    (Size: 96; Suffix: 'xhdpi'),
-   (Size: 144; Suffix: 'xxhdpi'));
+   (Size: 144; Suffix: 'xxhdpi'),
+   (Size: 192; Suffix: 'xxxhdpi'));
 private
  IsLamwProject: boolean;
  FManifest: TLamwAndroidManifestOptions;
- FIconsPath: string; // ".../res/drawable-"
+ FIconsPathDrawable: string; // ".../res/drawable-"
+ FIconsPathMipmap  : string; // ".../res/mipmap-"
  FChkBoxDrawData: array [TCheckBoxState] of record
    Details, DetailsHot: TThemedElementDetails;
    CSize: TSize;
@@ -976,10 +978,25 @@ begin
     imLauncherIcon.Picture.Assign(p);
     Exit;
   end;
-  fn := FIconsPath + Drawable[cbLaunchIconSize.ItemIndex].Suffix +
+  fn := FIconsPathDrawable + Drawable[cbLaunchIconSize.ItemIndex].Suffix +
     PathDelim + FManifest.IconFileName + '.png';
+
   if FileExists(fn) then
-    imLauncherIcon.Picture.LoadFromFile(fn)
+  begin
+    imLauncherIcon.Picture.LoadFromFile(fn);
+    exit;
+  end
+  else
+    imLauncherIcon.Picture.Clear;
+
+  fn := FIconsPathMipmap + Drawable[cbLaunchIconSize.ItemIndex].Suffix +
+    PathDelim + FManifest.IconFileName + '.png';
+
+  if FileExists(fn) then
+  begin
+    imLauncherIcon.Picture.LoadFromFile(fn);
+    exit;
+  end
   else
     imLauncherIcon.Picture.Clear;
 end;
@@ -1806,7 +1823,8 @@ begin
   end;
   IsLamwProject := True;
   try
-    FIconsPath := ExtractFilePath(fn) + 'res' + PathDelim + 'drawable-';
+    FIconsPathDrawable := ExtractFilePath(fn) + 'res' + PathDelim + 'drawable-';
+    FIconsPathMipmap   := ExtractFilePath(fn) + 'res' + PathDelim + 'mipmap-';
     ShowLauncherIcon;
     with FManifest do
     begin
@@ -1910,8 +1928,15 @@ begin
   with cbLaunchIconSize.Items do
     for i := 0 to Count - 1 do
       if Assigned(Objects[i]) then
-        TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPath +
-          Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
+      begin
+        if directoryExists(FIconsPathDrawable + Drawable[i].Suffix) then
+         TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPathDrawable +
+           Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
+
+        if directoryExists(FIconsPathMipmap + Drawable[i].Suffix) then
+         TPortableNetworkGraphic(Objects[i]).SaveToFile(FIconsPathMipmap +
+           Drawable[i].Suffix + PathDelim + FManifest.IconFileName + '.png');
+      end;
 
   if cbBuildSystem.Text <> '' then
     LazarusIDE.ActiveProject.CustomData['BuildSystem'] := cbBuildSystem.Text;

@@ -36,7 +36,7 @@ class jGridItem{
 class jGridViewCustomAdapter extends ArrayAdapter {
 	
     Context context;
-    Controls contrls;
+    Controls controls;
     long pascalObj;
         
     boolean mDispatchOnDrawItemTextColor;
@@ -51,7 +51,7 @@ class jGridViewCustomAdapter extends ArrayAdapter {
         super(context, ResourceId, list);  //ResourceId/0 or android.R.layout.simple_list_item_1;
         this.context=context;
 
-        contrls = ctrls;
+        controls = ctrls;
         pascalObj = pasobj;
                 
         items = list;
@@ -124,7 +124,7 @@ class jGridViewCustomAdapter extends ArrayAdapter {
         }
 
         if (mDispatchOnDrawItemBitmap)  {
-            Bitmap  imageBmp = (Bitmap)contrls.pOnGridDrawItemBitmap(pascalObj, (int)position , items.get(position).label);
+            Bitmap  imageBmp = (Bitmap)controls.pOnGridDrawItemBitmap(pascalObj, (int)position , items.get(position).label);
             if (imageBmp != null) {
                 imageViewItem.setImageBitmap(imageBmp);
                 itemLayout.addView(imageViewItem, imgParam);
@@ -154,7 +154,7 @@ class jGridViewCustomAdapter extends ArrayAdapter {
             }
 
             if (mDispatchOnDrawItemTextColor)  {
-                int drawItemCaptionColor = contrls.pOnGridDrawItemCaptionColor(pascalObj, (int)position , items.get(position).label);
+                int drawItemCaptionColor = controls.pOnGridDrawItemCaptionColor(pascalObj, (int)position , items.get(position).label);
                 if (drawItemCaptionColor != 0) {
                     textViewTitle.setTextColor(drawItemCaptionColor);
                 }
