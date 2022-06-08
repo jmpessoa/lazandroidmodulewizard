@@ -401,5 +401,3 @@ public class jSurfaceView  extends SurfaceView  /*dummy*/ { //please, fix what G
     }
 
 } //end class
-
-

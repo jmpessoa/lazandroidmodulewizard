@@ -540,7 +540,7 @@ public class jDrawingView extends View /*dummy*/ { //please, fix what GUI object
         return bm;
     }
 
- // in drawing functions where the rotation, translation or scale matrix is ​​not used, the following function calls are not needed:
+  // in drawing functions where the rotation, translation or scale matrix is not used, the following function calls are not needed:
   // mCanvas.save () ;
   // mCanvas.restore ();
   // example:
