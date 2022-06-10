@@ -99,6 +99,7 @@ type
     function TryGetNDKRelease(pathNDK: string): string;
     function GetNDKVersion(ndkRelease: string): integer;
 
+    procedure TryUpdateMipmap();
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
@@ -327,6 +328,84 @@ begin
       end;
     end
     else Result:= 10; //r10e
+
+end;
+
+procedure TLamwSmartDesigner.TryUpdateMipmap();
+var
+  pathToJavaTemplates: string;
+begin
+
+  pathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'drawable') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable'+DirectorySeparator + 'ic_launcher_background.xml') then
+      CopyFile(pathToJavaTemplates + 'drawable'+ DirectorySeparator + 'ic_launcher_background.xml',
+             FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable'+DirectorySeparator + 'ic_launcher_background.xml');
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'drawable-v24') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable'+DirectorySeparator + 'ic_launcher_foreground.xml') then
+       CopyFile(pathToJavaTemplates +'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml');
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxxhdpi') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    begin
+      CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
+      CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+    end;
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxhdpi') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    begin
+      CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
+      CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+    end;
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xhdpi') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    begin
+       CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
+       CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+    end;
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-hdpi') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    begin
+        CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
+        CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp');
+    end;
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-anydpi-v26') then
+  begin
+    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-anydpi-v26' +DirectorySeparator + 'ic_launcher.xml') then
+    begin
+       CopyFile(pathToJavaTemplates +'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml');
+       CopyFile(pathToJavaTemplates +'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml',
+             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml');
+    end;
+  end;
 
 end;
 
@@ -1770,6 +1849,9 @@ begin
 
     if not isBrandNew then
     begin
+
+      TryUpdateMipmap();
+
       AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
       AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
       AProject.Modified:= True;
@@ -2663,7 +2745,7 @@ begin
        end;
      end;
    end;
-   //-----
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.layout') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.layout');
@@ -2675,7 +2757,7 @@ begin
      auxList.Text:= aux;
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'layout'+DirectorySeparator+LowerCase(jclassname)+'_layout.xml');
    end;
-   //-----
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info');
@@ -2708,7 +2790,6 @@ begin
           FPathToAndroidProject+'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+LowerCase(jclassname)+'_image.jpg');
    end;
 
-   //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.anim');
@@ -3971,7 +4052,7 @@ begin
   strList.Free;
 end;
 
-procedure TLamwSmartDesigner.TryChangeDemoProjecPaths();
+procedure TLamwSmartDesigner.TryChangeDemoProjecPaths;
 var
   strList: TStringList;
   strResult: string;
@@ -4123,7 +4204,7 @@ begin
   strList.Free;
 end;
 
-function TLamwSmartDesigner.IsDemoProject(): boolean;
+function TLamwSmartDesigner.IsDemoProject: boolean;
 var
   pathToDemoNDK: string;
   pathToDemoSDK: string;

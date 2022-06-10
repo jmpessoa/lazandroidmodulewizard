@@ -1706,6 +1706,49 @@ begin
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png');
 
+            //Android Studio compatibility
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable'+DirectorySeparator+'ic_launcher_background.xml',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable'+DirectorySeparator+'ic_launcher_background.xml');
+
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-v24');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml');
+
+
+            //mipmap support
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxxhdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxhdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xhdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+
+
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-hdpi');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp');
+
+
+            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml');
+            CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml',
+                     FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml');
+
+
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
 
@@ -4186,6 +4229,22 @@ begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
             CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-ldpi' + PathDelim + fileName);
+      end;
+    finally
+      templateFiles.Free;
+    end;
+
+
+    // res/drawable-v24   ***
+    templateFiles:= TStringList.Create;
+    try
+      FindAllFiles(templateFiles, pathToTemplate+PathDelim+'res'+ PathDelim + 'drawable-v24', '*.*', False);
+      count:= templateFiles.Count;
+      for i:= 0 to count-1 do
+      begin
+         fileName:= ExtractFileName(templateFiles.Strings[i]);
+         if Pos('ic_launcher',fileName) <= 0 then
+            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-v24' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
