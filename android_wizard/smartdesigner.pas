@@ -338,23 +338,10 @@ begin
 
   pathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
 
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'drawable') then
-  begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable'+DirectorySeparator + 'ic_launcher_background.xml') then
-      CopyFile(pathToJavaTemplates + 'drawable'+ DirectorySeparator + 'ic_launcher_background.xml',
-             FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable'+DirectorySeparator + 'ic_launcher_background.xml');
-  end;
-
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'drawable-v24') then
-  begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'drawable'+DirectorySeparator + 'ic_launcher_foreground.xml') then
-       CopyFile(pathToJavaTemplates +'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml');
-  end;
-
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxxhdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
       CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
              FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -365,7 +352,8 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxhdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
       CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
              FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -376,7 +364,8 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xhdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
        CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
              FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -387,7 +376,8 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-hdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
         CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
                  FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -396,14 +386,15 @@ begin
     end;
   end;
 
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-anydpi-v26') then
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-anydpi-v26' +DirectorySeparator + 'ic_launcher.xml') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
-       CopyFile(pathToJavaTemplates +'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml');
-       CopyFile(pathToJavaTemplates +'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml');
+        CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp');
+        CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp');
     end;
   end;
 
