@@ -880,6 +880,16 @@ begin
       xml.ChildNodes[0].InsertBefore(n, r)
     else
       xml.ChildNodes[0].AppendChild(n);
+
+    if FPermissions[i] = 'android.permission.WRITE_EXTERNAL_STORAGE' then
+    begin
+     n.AttribStrings['android:maxSdkVersion'] := '28';
+
+     if Assigned(r) then
+      xml.ChildNodes[0].InsertBefore(n, r)
+     else
+      xml.ChildNodes[0].AppendChild(n);
+    end;
   end;
 
   UpdateBuildXML;
