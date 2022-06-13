@@ -354,7 +354,8 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxxhdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
       CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
              FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -365,7 +366,8 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxhdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
       CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
              FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -376,7 +378,8 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xhdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
        CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
              FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
@@ -387,12 +390,25 @@ begin
 
   if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-hdpi') then
   begin
-    if not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp') then
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.png'))) then
     begin
         CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
                  FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
         CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp',
                  FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp');
+    end;
+  end;
+
+  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi') then
+  begin
+    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.png'))) then
+    begin
+        CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp');
+        CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp');
     end;
   end;
 
