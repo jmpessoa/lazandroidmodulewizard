@@ -19,7 +19,7 @@ type
   end;
 
   TSupportLibs = array[0..0] of TSupportLib;
-  TAppCompatLibs = array[0..1] of TAppCompatLib;
+  TAppCompatLibs = array[0..2] of TAppCompatLib;
 
   { TLamwGlobalSettings }
 
@@ -102,6 +102,7 @@ const
 
   AppCompatLibs: TAppCompatLibs = (    //renamed by jmpessoa
     (MinAPI:28;Name:'androidx.appcompat:appcompat:1.2.0'),
+    (MinAPI:28;Name:'androidx.multidex:multidex:2.0.1'),
     (MinAPI:28;Name:'com.google.android.material:material:1.0.0') //TODO: update to "1.2.1"
   );
 

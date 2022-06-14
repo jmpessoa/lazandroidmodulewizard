@@ -95,8 +95,8 @@ public  void show(String titleText, String msgText, String yesText, String noTex
      //title.setTextColor(0xFF0000FF);
     
      switch( mTitleAlign ){ 
-      case 0 : title.setGravity(Gravity.LEFT); break;
-      case 1 : title.setGravity(Gravity.RIGHT); break;
+      case 0 : title.setGravity(Gravity.START); break;
+      case 1 : title.setGravity(Gravity.END); break;
       case 2 : title.setGravity(Gravity.CENTER); break;
      }
     
@@ -185,8 +185,8 @@ public  void show(String titleText, String msgText, String yesText, String noTex
      //title.setTextColor(0xFF0000FF);
  
      switch( mTitleAlign ){ 
-      case 0 : title.setGravity(Gravity.LEFT); break;
-      case 1 : title.setGravity(Gravity.RIGHT); break;
+      case 0 : title.setGravity(Gravity.START); break;
+      case 1 : title.setGravity(Gravity.END); break;
       case 2 : title.setGravity(Gravity.CENTER); break;
      }
  
@@ -277,8 +277,8 @@ public void ShowOK(String titleText, String msgText, String _OkText) {
        	  title.setBackgroundColor(mColorBackground);
     
      switch( mTitleAlign ){ 
-      case 0 : title.setGravity(Gravity.LEFT); break;
-      case 1 : title.setGravity(Gravity.RIGHT); break;
+      case 0 : title.setGravity(Gravity.START); break;
+      case 1 : title.setGravity(Gravity.END); break;
       case 2 : title.setGravity(Gravity.CENTER); break;
      }
     

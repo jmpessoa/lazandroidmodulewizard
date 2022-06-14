@@ -14,8 +14,8 @@ uses
    procedure Java_Event_pOnAdMobClosed(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
    procedure Java_Event_pOnAdMobClicked(env: PJNIEnv; this: jobject; Obj: TObject; admobType : integer);
    procedure Java_Event_pOnAdMobInitializationComplete(env: PJNIEnv; this: jobject; Obj: TObject);
+   procedure Java_Event_pOnAdMobFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; admobType, errorCode: integer);
    procedure Java_Event_pOnAdMobRewardedUserEarned(env: PJNIEnv; this: jobject; Obj: TObject);
-   procedure Java_Event_pOnAdMobRewardedFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
 
    procedure Java_Event_pOnBluetoothEnabled(env: PJNIEnv; this: jobject; Obj: TObject);
    procedure Java_Event_pOnBluetoothDisabled(env: PJNIEnv; this: jobject; Obj: TObject);
@@ -819,7 +819,7 @@ begin
   end;
 end;
 
-procedure Java_Event_pOnAdMobRewardedFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; errorCode: integer);
+procedure Java_Event_pOnAdMobFailedToShow(env: PJNIEnv; this: jobject; Obj: TObject; admobType, errorCode: integer);
 begin
   gApp.Jni.jEnv := env;
   if this <> nil then gApp.Jni.jThis := this;
@@ -827,7 +827,7 @@ begin
   if not Assigned(Obj)  then Exit;
   if Obj is jsAdMob then
   begin
-     jsAdMob(Obj).GenEvent_OnAdMobRewardedFailedToShow(Obj, errorCode);
+     jsAdMob(Obj).GenEvent_OnAdMobFailedToShow(Obj, admobType, errorCode);
   end;
 end;
 

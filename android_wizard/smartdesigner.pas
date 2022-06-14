@@ -1288,6 +1288,7 @@ begin
 
          strList.Add('            versionCode ' + versionCode);
          strList.Add('            versionName "'+ versionName+'"');
+         strList.Add('            multiDexEnabled true');
          strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
          strList.Add('    }');
 

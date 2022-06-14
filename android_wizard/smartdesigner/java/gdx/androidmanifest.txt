@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_OWNER_DATA"/>
     <uses-permission android:name="android.permission.READ_OWNER_DATA"/>
@@ -42,17 +42,22 @@
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>
     <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false"/>
 
-    <supports-screens android:smallScreens="true"
-                  android:normalScreens="true"
-                  android:largeScreens="true"
-                  android:anyDensity="true"/>
+    <supports-screens 
+        android:smallScreens="true"
+        android:normalScreens="true"  
+        android:largeScreens="true" 
+        android:xlargeScreens="true"          
+        android:anyDensity="true"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:isGame="true"
         android:appCategory="game"
-        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+        android:name="androidx.multidex.MultiDexApplication">
+
         <activity
             android:name="dummyAppName" 
             android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"

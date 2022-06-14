@@ -20,19 +20,28 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdCallback;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+
+import com.google.android.gms.appset.AppSet;
+import com.google.android.gms.appset.AppSetIdClient;
+import com.google.android.gms.appset.AppSetIdInfo;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 //import android.widget.Toast;
 
 //-------------------------------------------------------------------------
 // jsAdMob
-// Developed by ADiV for LAMW on 2021-03-02
-// Updated for AdMob 19.6.0
+// Developed by ADiV for LAMW on 2022-06-14
+// Updated for AdMob 20.5.0 need SDK 31 or higher
 //-------------------------------------------------------------------------
 
 /* Banner sizes:
@@ -68,7 +77,8 @@ public class jsAdMob extends FrameLayout {
    private int admobBannerWidth         = 0; // Control change of width
    private int admobBannerWidthAdaptive = 0; // Adaptive width
    private boolean admobBannerIsLoading = false;
-   private boolean admobIsInit          = false; 
+   private boolean admobIsInit          = false;
+   private String  admobUUID	 		= "";
 
    //--- Banner ---//
    private AdView     admobBannerView    = null;
@@ -80,7 +90,6 @@ public class jsAdMob extends FrameLayout {
    //--- Interstitial ---//
    private InterstitialAd admobInter   = null;
    private String         admobInterId = "ca-app-pub-3940256099942544/1033173712";
-   private Boolean		  admobInterAutoLoadOnClose = true;
    private Boolean		  admobInterIsLoading = false;
    
    //--- Reward ---//
@@ -162,6 +171,22 @@ public class jsAdMob extends FrameLayout {
 	   if( admobIsInit ) return;
 	   if( controls.activity == null ) return;
 	   
+	   Context context = controls.activity.getApplicationContext();
+	   AppSetIdClient client = AppSet.getClient(context);
+	   Task<AppSetIdInfo> task = client.getAppSetIdInfo();
+
+	   task.addOnSuccessListener(new OnSuccessListener<AppSetIdInfo>() {
+	       @Override
+	       public void onSuccess(AppSetIdInfo info) {
+	           // Determine current scope of app set ID.
+	           int scope = info.getScope();
+
+	           // Read app set ID value, which uses version 4 of the
+	           // universally unique identifier (UUID) format.
+	           admobUUID = info.getId();
+	       }
+	   });
+	   
 	   // Initialize the Mobile Ads SDK.
        MobileAds.initialize(controls.activity, 
     	   new OnInitializationCompleteListener() {    	           
@@ -171,6 +196,10 @@ public class jsAdMob extends FrameLayout {
         	   controls.pOnAdMobInitializationComplete(pascalObj);
            }
        });
+   }
+   
+   public String AdMobGetUUID(){
+	   return admobUUID; 
    }
    
    public void AdMobFree(){
@@ -314,20 +343,13 @@ public class jsAdMob extends FrameLayout {
 	            }
 
 	            @Override
-	            public void onAdFailedToLoad(int errorCode) {
+	            public void onAdFailedToLoad(LoadAdError error) {
 	            	
 	            	admobBannerIsLoading = false;
 	            	
 	            	if (!admobBannerStop){	            			            	 
-	            	 controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_BANNER, errorCode);
-	                 //showToast(String.format("Domain: " + errorDomain + " Message: " + errorMessage + " Error: " + adsError.toString()));
-	                
-	                 /*switch(errorCode){
-	                 	case AdRequest.ERROR_CODE_INTERNAL_ERROR: showToast("INTERNAL ERROR"); break; 
-	                 	case AdRequest.ERROR_CODE_INVALID_REQUEST: showToast("INVALID REQUEST"); break;
-	                 	case AdRequest.ERROR_CODE_NETWORK_ERROR: showToast("NETWORK ERROR"); break;
-	                 	case AdRequest.ERROR_CODE_NO_FILL: showToast("NO FILL"); break;
-	                 }*/	            	
+	            	 controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_BANNER, error.getCode());
+	                 //showToast(String.format("Domain: " + errorDomain + " Message: " + errorMessage + " Error: " + error.toString()));	                	                 	            
 	            	} else{	            		
 	                	AdMobBannerStop();
 	            	}
@@ -426,35 +448,61 @@ public class jsAdMob extends FrameLayout {
    }
    
    //--- Interstitial ---//
-   public void AdMobInterSetAutoLoadOnClose( boolean _admobInterAutoLoadOnClose ){
-	   admobInterAutoLoadOnClose = _admobInterAutoLoadOnClose;
-   }
    
    public void AdMobInterCreateAndLoad(){
-		if(admobInter != null) return;
+	    if (admobInterIsLoading) return;
 		
+	    admobInter = null;
 		admobInterIsLoading = true;
-		admobInter = new InterstitialAd(controls.activity);
+		/*admobInter = new InterstitialAd(controls.activity);
 		admobInter.setAdUnitId(admobInterId);
-		admobInter.loadAd(new AdRequest.Builder().build());
+		admobInter.loadAd(new AdRequest.Builder().build());*/
 
-		admobInter.setAdListener(new AdListener() {	       
+		InterstitialAd.load(controls.activity, admobInterId, new AdRequest.Builder().build(),
+		        new InterstitialAdLoadCallback() { 	       
 			
 			@Override
-	        public void onAdLoaded() {
+	        public void onAdLoaded(InterstitialAd interstitialAd) {
 	            // Code to be executed when an ad finishes loading.
+				admobInter = interstitialAd;
 				admobInterIsLoading = false;
 				controls.pOnAdMobLoaded(pascalObj, ADMOB_INTER);
+				
+				admobInter.setFullScreenContentCallback(new FullScreenContentCallback(){
+					  @Override
+					  public void onAdDismissedFullScreenContent() {
+					    // Called when fullscreen content is dismissed.
+					    //Log.d("TAG", "The ad was dismissed.");
+						admobInter = null;
+					    controls.pOnAdMobClosed(pascalObj, ADMOB_INTER);
+					  }
+
+					  @Override
+					  public void onAdFailedToShowFullScreenContent(AdError adError) {
+					    // Called when fullscreen content failed to show.
+					    //Log.d("TAG", "The ad failed to show.");						
+						controls.pOnAdMobFailedToShow(pascalObj, ADMOB_INTER, adError.getCode());
+					  }
+
+					  @Override
+					  public void onAdShowedFullScreenContent() {
+					    // Called when fullscreen content is shown.
+					    // Make sure to set your reference to null so you don't
+					    // show it a second time.						
+					    //Log.d("TAG", "The ad was shown.");
+					    controls.pOnAdMobOpened(pascalObj, ADMOB_INTER);
+					  }
+			  });
 	        }
 
 	        @Override
-	        public void onAdFailedToLoad(int errorCode) {
+	        public void onAdFailedToLoad(LoadAdError error) {
 	            // Code to be executed when an ad request fails.
 	        	admobInterIsLoading = false;
-	        	controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_INTER, errorCode);
+	        	controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_INTER, error.getCode());
 	        }
 
-	        @Override
+	        /*@Override
 	        public void onAdOpened() {
 	            // Code to be executed when the ad is displayed.
 	        	controls.pOnAdMobOpened(pascalObj, ADMOB_INTER);
@@ -471,11 +519,12 @@ public class jsAdMob extends FrameLayout {
 	        	controls.pOnAdMobClosed(pascalObj, ADMOB_INTER);
 	        	
 	            // Code to be executed when the interstitial ad is closed.
-	        	if(admobInterAutoLoadOnClose){
-	        		admobInterIsLoading = true;
-	        	    admobInter.loadAd(new AdRequest.Builder().build());
+	        	if(admobInterAutoLoadOnClose && (admobInter != null)){	        		
+	              admobInterIsLoading = true;
+	        	  admobInter.loadAd(new AdRequest.Builder().build());
+	              
 	        	}
-	        }
+	        }*/
 	
 
 	    });
@@ -485,69 +534,78 @@ public class jsAdMob extends FrameLayout {
 	   admobInterId = _admobid;      
    }      
    
-   public void AdMobInterLoad(){
-	   if(admobInter == null) return;
-	   
-	   admobInterIsLoading = true;
-	   admobInter.loadAd(new AdRequest.Builder().build());
-   }
-   
    public boolean AdMobInterIsLoading(){
 	   return admobInterIsLoading; 
    }
    
    public boolean AdMobInterIsLoaded(){
-	   if(admobInter == null) return false;
-	   
-	   return admobInter.isLoaded();
+	   return (admobInter != null);	 
    }
    
    public void AdMobInterShow(){
 	   if(admobInter == null) return;
 	   
-	   admobInter.show();
+	   admobInter.show(controls.activity);
    }
    
    //--- Rewarded ---//
    
-   private RewardedAd createAndLoadRewardedAd() {
+   public void AdMobRewardedCreateAndLoad() {
+	   if (admobRewardedIsLoading) return;
+	   
+	   admobRewarded = null;
 	   admobRewardedIsLoading = true;
-       RewardedAd rewardedAd = new RewardedAd(controls.activity, admobRewardedId);
+       //RewardedAd rewardedAd = new RewardedAd(controls.activity, admobRewardedId);
        
-       RewardedAdLoadCallback adLoadCallback = new RewardedAdLoadCallback() {
+       RewardedAd.load(controls.activity, admobRewardedId, new AdRequest.Builder().build(), 
+    		   new RewardedAdLoadCallback() {
            @Override
-           public void onRewardedAdLoaded() {
+           public void onAdLoaded(RewardedAd rewardedAd) {
                // Ad successfully loaded.
+        	   admobRewarded = rewardedAd;
         	   admobRewardedIsLoading = false;
         	   controls.pOnAdMobLoaded(pascalObj, ADMOB_REWARDED);
+        	   
+        	   admobRewarded.setFullScreenContentCallback(new FullScreenContentCallback() {
+        		   @Override
+					  public void onAdDismissedFullScreenContent() {
+					    // Called when fullscreen content is dismissed.
+					    //Log.d("TAG", "The ad was dismissed.");
+        			    admobRewarded = null;
+					    controls.pOnAdMobClosed(pascalObj, ADMOB_REWARDED);
+					  }
+
+					  @Override
+					  public void onAdFailedToShowFullScreenContent(AdError adError) {
+					    // Called when fullscreen content failed to show.
+					    //Log.d("TAG", "The ad failed to show.");
+						controls.pOnAdMobFailedToShow(pascalObj, ADMOB_REWARDED, adError.getCode());
+					  }
+
+					  @Override
+					  public void onAdShowedFullScreenContent() {
+					    // Called when fullscreen content is shown.
+					    // Make sure to set your reference to null so you don't
+					    // show it a second time.						
+					    //Log.d("TAG", "The ad was shown.");
+					    controls.pOnAdMobOpened(pascalObj, ADMOB_REWARDED);
+					  }
+        		 });
            }
 
            @Override
-           public void onRewardedAdFailedToLoad(LoadAdError errorCode) {
+           public void onAdFailedToLoad(LoadAdError errorCode) {
            //public void onRewardedAdFailedToLoad(int errorCode) {
                // Ad failed to load.
         	   admobRewardedIsLoading = false;
         	   controls.pOnAdMobFailedToLoad(pascalObj, ADMOB_REWARDED, errorCode.getCode());
            }
-       };
-       rewardedAd.loadAd(new AdRequest.Builder().build(), adLoadCallback);
-       return rewardedAd;
+       });
+       
    }
    
    public void AdMobRewardedSetId( String _admobid ) {
 	   admobRewardedId = _admobid;      
-   }
-   
-   public void AdMobRewardedCreateAndLoad(){
-	   if (admobRewardedIsLoading) return;
-	   
-	   admobRewarded = createAndLoadRewardedAd();
-   }
-   
-   public void AdMobRewardedLoad(){
-	   if (admobRewardedIsLoading) return;
-	   
-	   admobRewarded = createAndLoadRewardedAd();
    }
    
    public boolean AdMobRewardedIsLoading(){
@@ -555,33 +613,25 @@ public class jsAdMob extends FrameLayout {
    }
    
    public boolean AdMobRewardedIsLoaded(){
-       if( admobRewarded == null ) return false;
-	   
-	   return admobRewarded.isLoaded();
+       return (admobRewarded != null);
    }
    
    public int AdMobRewardedGetAmount(){
 	   if( admobRewarded == null ) return 0;
 	   
-	   if (admobRewarded.isLoaded())
-		   return admobRewarded.getRewardItem().getAmount();
-	   else
-		   return 0;
+	   return admobRewarded.getRewardItem().getAmount();	   
    }
    
    public String AdMobRewardedGetType(){
 	   if( admobRewarded == null ) return "";
 	   
-	   if (admobRewarded.isLoaded())
-		   return admobRewarded.getRewardItem().getType();
-	   else
-		   return "";
+	   return admobRewarded.getRewardItem().getType();	  
    }
    
    public void AdMobRewardedShow(){
 	   if( admobRewarded == null ) return;
 	   
-	   if( !(admobRewarded.isLoaded()) ) return;
+	   /*if( !(admobRewarded.isLoaded()) ) return;
 	   
 	   RewardedAdCallback adCallback = new RewardedAdCallback() {    	  
                @Override
@@ -610,7 +660,16 @@ public class jsAdMob extends FrameLayout {
                }
        };
            
-       admobRewarded.show(controls.activity, adCallback);       
+       admobRewarded.show(controls.activity, adCallback);*/
+       
+	   admobRewarded.show(controls.activity, new OnUserEarnedRewardListener() {
+    	    @Override
+    	    public void onUserEarnedReward(RewardItem rewardItem) {
+    	      // Handle the reward.
+    	      //Log.d(TAG, "The user earned the reward.");    	      
+    	      controls.pOnAdMobRewardedUserEarned(pascalObj);
+    	    }
+    	  });
    }   
 
 }
