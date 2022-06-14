@@ -92,7 +92,12 @@ public class jTelephonyManager /*extends ...*/ {
         //of the TelephonyManager class and the StatePhoneReceiver class
         myPhoneStateListener = new StatePhoneReceiver();
         mTelephonyManager = ((TelephonyManager) controls.activity.getSystemService(Context.TELEPHONY_SERVICE));
-        mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        
+        try{
+         mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        } catch (SecurityException securityException) {         
+         Log.d("jTelephonyManager", "SecurityException: listen");
+        }
 
     }
 
@@ -171,13 +176,14 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public void Call(String _phoneNumber) {
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-
+        
         callFromApp = true;
 
         Intent i = new Intent(android.content.Intent.ACTION_CALL, Uri.parse("tel:" + _phoneNumber)); // Make the call
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+
             controls.activity.startActivity(i);
         } catch (SecurityException securityException) {
             callFromApp = false;
@@ -190,7 +196,11 @@ public class jTelephonyManager /*extends ...*/ {
             audioManager = (AudioManager) controls.activity.getSystemService(Context.AUDIO_SERVICE);
             audioManager.setMode(AudioManager.MODE_NORMAL); //Deactivate loudspeaker
             audioManager.setSpeakerphoneOn(false);
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE); // Remove listener
+            try{
+             mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_NONE); // Remove listener
+            } catch (SecurityException securityException) {             
+             Log.d("SetSpeakerphoneOn", "SecurityException: listen");
+            }
             isListenerRemoved = true;
         } else {
             try {
@@ -206,9 +216,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetIMEI() {
         String sImei = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+        
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
             /*
             //[ifdef_api26up]
             if (Build.VERSION.SDK_INT >=  26) {
@@ -225,9 +236,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetNetworkCountryIso() {
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes            
+        	
             data = mTelephonyManager.getNetworkCountryIso();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_NetCIso", "Sorry... Not Permission granted!!");
@@ -237,9 +249,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetSimCountryIso() {
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             data = mTelephonyManager.getSimCountryIso();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_SimCIso", "Sorry... Not Permission granted!!");
@@ -249,9 +262,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetDeviceSoftwareVersion() {
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             data = mTelephonyManager.getDeviceSoftwareVersion();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_SoftVer", "Sorry... Not Permission granted!!");
@@ -261,9 +275,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetVoiceMailNumber() {
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             data = mTelephonyManager.getVoiceMailNumber();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_VoiceMail", "Sorry... Not Permission granted!!");
@@ -274,9 +289,10 @@ public class jTelephonyManager /*extends ...*/ {
     public String GetPhoneType() {
         int phoneType = -1;
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             phoneType = mTelephonyManager.getPhoneType();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_PhoneType", "Sorry... Not Permission granted!!");
@@ -299,11 +315,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     //By Segator
     public String GetNetworkType() {
-        
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-        
+                
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes            
         	
             int networkType = mTelephonyManager.getNetworkType();
            
@@ -573,9 +588,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public boolean IsNetworkRoaming() {
         boolean isRoaming = false;
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             isRoaming = mTelephonyManager.isNetworkRoaming();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_Roaming", "Sorry... Not Permission granted!!");
@@ -585,9 +601,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetLine1Number() {
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             data = mTelephonyManager.getLine1Number();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_Line1", "Sorry... Not Permission granted!!");
@@ -597,9 +614,10 @@ public class jTelephonyManager /*extends ...*/ {
 
     public String GetNetworkOperatorName() {
         String data = "";
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         try {
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
             data = mTelephonyManager.getNetworkOperatorName();
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_OperName", "Sorry... Not Permission granted!!");
@@ -622,10 +640,11 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public boolean IsWifiEnabled() {
-        if (isListenerRemoved)
-            mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
         
         try{
+        	if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
         	int iType = mTelephonyManager.getNetworkType();
             if ((iType == TelephonyManager.NETWORK_TYPE_GSM) || // 2G
             	(iType == TelephonyManager.NETWORK_TYPE_TD_SCDMA) || // 3G
