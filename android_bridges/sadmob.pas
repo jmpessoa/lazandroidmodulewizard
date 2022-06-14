@@ -31,8 +31,8 @@ TOnAdMobOpened = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobClosed = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobClicked = procedure(Sender: TObject; admobType: TAdMobType) of Object;
 TOnAdMobInitializationComplete = procedure(Sender: TObject) of Object;
+TOnAdMobFailedToShow = procedure(Sender: TObject; admobType: TAdMobType; errorCode: integer) of Object;
 TOnAdMobRewardedUserEarned = procedure(Sender: TObject) of Object;
-TOnAdMobRewardedFailedToShow = procedure(Sender: TObject; errorCode: integer) of Object;
 
 
 {Developed by ADiV for LAMW}
@@ -48,8 +48,8 @@ jsAdMob = class(jVisualControl)
     FOnAdMobClosed:          TOnAdMobClosed;
     FOnAdMobClicked:         TOnAdMobClicked;
     FOnAdMobInitializationComplete:  TOnAdMobInitializationComplete;
+    FOnAdMobFailedToShow:    TOnAdMobFailedToShow;
     FOnAdMobRewardedUserEarned:      TOnAdMobRewardedUserEarned;
-    FOnAdMobRewardedFailedToShow:    TOnAdMobRewardedFailedToShow;
 
     FAdMobBannerSize:        TAdMobBannerSize;
 
@@ -69,8 +69,8 @@ jsAdMob = class(jVisualControl)
     procedure GenEvent_OnAdMobClosed(Obj: TObject; admobType: integer);
     procedure GenEvent_OnAdMobClicked(Obj: TObject; admobType: integer);
     procedure GenEvent_OnAdMobInitializationComplete(Obj: TObject);
+    procedure GenEvent_OnAdMobFailedToShow(Obj: TObject; admobType, errorCode: integer);
     procedure GenEvent_OnAdMobRewardedUserEarned(Obj: TObject);
-    procedure GenEvent_OnAdMobRewardedFailedToShow(Obj: TObject; errorCode: integer);
 
     procedure SetViewParent(_viewgroup: jObject); override;
     function  GetViewParent(): jObject;  override;
@@ -90,6 +90,8 @@ jsAdMob = class(jVisualControl)
     procedure AdMobInit();
     procedure AdMobFree();
 
+    function  AdMobGetUUID() : string;
+
     //--- Banner ---//
     procedure AdMobBannerSetSize(_whBannerSize: TAdMobBannerSize);
     function  AdMobBannerGetSize: TAdMobBannerSize;
@@ -108,8 +110,6 @@ jsAdMob = class(jVisualControl)
     //--- Inter ---//
     procedure AdMobInterSetId( _admobid : string );
     procedure AdMobInterCreateAndLoad();
-    procedure AdMobInterLoad();
-    procedure AdMobInterSetAutoLoadOnClose( _autoLoadOnClose : boolean );
     function  AdMobInterIsLoading(): boolean;
     function  AdMobInterIsLoaded() : boolean;
     procedure AdMobInterShow();
@@ -117,7 +117,6 @@ jsAdMob = class(jVisualControl)
     //--- Rewarded ---//
     procedure AdMobRewardedSetId( _admobid : string );
     procedure AdMobRewardedCreateAndLoad();
-    procedure AdMobRewardedLoad();
     function  AdMobRewardedIsLoading(): boolean;
     function  AdMobRewardedIsLoaded() : boolean;
     function  AdMobRewardedGetAmount() : integer;
@@ -135,8 +134,8 @@ jsAdMob = class(jVisualControl)
     property OnAdMobClosed      :   TOnAdMobClosed read FOnAdMobClosed write FOnAdMobClosed;
     property OnAdMobClicked      :   TOnAdMobClicked read FOnAdMobClicked write FOnAdMobClicked;
     property OnAdMobInitializationComplete :   TOnAdMobInitializationComplete read FOnAdMobInitializationComplete write FOnAdMobInitializationComplete;
+    property OnAdMobFailedToShow   :   TOnAdMobFailedToShow read FOnAdMobFailedToShow write FOnAdMobFailedToShow;
     property OnAdMobRewardedUserEarned     :   TOnAdMobRewardedUserEarned read FOnAdMobRewardedUserEarned write FOnAdMobRewardedUserEarned;
-    property OnAdMobRewardedFailedToShow   :   TOnAdMobRewardedFailedToShow read FOnAdMobRewardedFailedToShow write FOnAdMobRewardedFailedToShow;
 
 end;
 
@@ -299,14 +298,14 @@ begin
   if Assigned(FOnAdMobClosed) then FOnAdMobClosed(Obj, TAdMobType(admobType));
 end;
 
+procedure jsAdMob.GenEvent_OnAdMobFailedToShow(Obj: TObject; admobType, errorCode: integer);
+begin
+  if Assigned(FOnAdMobFailedToShow) then FOnAdMobFailedToShow(Obj, TAdMobType(admobType), errorCode);
+end;
+
 procedure jsAdMob.GenEvent_OnAdMobRewardedUserEarned(Obj: TObject);
 begin
   if Assigned(FOnAdMobRewardedUserEarned) then OnAdMobRewardedUserEarned(Obj);
-end;
-
-procedure jsAdMob.GenEvent_OnAdMobRewardedFailedToShow(Obj: TObject; errorCode: integer);
-begin
-  if Assigned(FOnAdMobRewardedFailedToShow) then FOnAdMobRewardedFailedToShow(Obj, errorCode);
 end;
 
 procedure jsAdMob.SetViewParent(_viewgroup: jObject);
@@ -381,6 +380,15 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInit');
+end;
+
+function jsAdMob.AdMobGetUUID() : string;
+begin
+ result := '';
+
+ //in designing component state: set value here...
+ if FInitialized then
+  result := jni_func_out_t(gApp.jni.jEnv, FjObject, 'AdMobGetUUID');
 end;
 
 procedure jsAdMob.AdMobFree();
@@ -494,20 +502,6 @@ begin
   jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInterCreateAndLoad');
 end;
 
-procedure jsAdMob.AdMobInterLoad();
-begin
- //in designing component state: set value here...
- if FjObject <> nil then
-  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobInterLoad');
-end;
-
-procedure jsAdMob.AdMobInterSetAutoLoadOnClose( _autoLoadOnClose : boolean );
-begin
- //in designing component state: set value here...
- if FjObject <> nil then
-  jni_proc_z(gApp.jni.jEnv, FjObject, 'AdMobInterSetAutoLoadOnClose', _autoLoadOnClose);
-end;
-
 procedure jsAdMob.AdMobInterSetId( _admobid : string );
 begin
  //in designing component state: set value here...
@@ -546,13 +540,6 @@ begin
 end;
 
 procedure jsAdMob.AdMobRewardedCreateAndLoad();
-begin
- //in designing component state: set value here...
- if FjObject <> nil then
-  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobRewardedLoad');
-end;
-
-procedure jsAdMob.AdMobRewardedLoad();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then

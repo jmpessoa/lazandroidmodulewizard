@@ -4,5 +4,5 @@ public native void pOnAdMobOpened(long pasobj, int admobType);
 public native void pOnAdMobClosed(long pasobj, int admobType);
 public native void pOnAdMobClicked(long pasobj, int admobType);
 public native void pOnAdMobInitializationComplete(long pasobj);
+public native void pOnAdMobFailedToShow(long pasobj, int admobType, int errorCode);
 public native void pOnAdMobRewardedUserEarned(long pasobj);
-public native void pOnAdMobRewardedFailedToShow(long pasobj, int errorCode);

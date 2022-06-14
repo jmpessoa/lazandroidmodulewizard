@@ -2686,6 +2686,7 @@ begin
                 if FVersionName = '' then  FVersionName:= '1.0';
                 strList.Add('            versionCode ' + intToStr(FVersionCode));
                 strList.Add('            versionName "' + FVersionName + '"');
+                strList.Add('            multiDexEnabled true }');
                 strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
                 strList.Add('    }');
                 strList.Add('    sourceSets {');
