@@ -774,7 +774,7 @@ class jArrayAdapter extends ArrayAdapter {
 				   itemText[i].setGravity(Gravity.CENTER_HORIZONTAL);
 				
 				if (items.get(position).textAlign == 1)   //right  ***
-				   itemText[i].setGravity(Gravity.RIGHT);
+				   itemText[i].setGravity(Gravity.END);
 								
 				if( mEnableOnClickTextCenter )
 				    itemText[i].setOnClickListener( getOnClickText(position, 1) );

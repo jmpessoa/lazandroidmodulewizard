@@ -305,46 +305,30 @@ public class jTelephonyManager /*extends ...*/ {
         
         try {
         	
-           switch (mTelephonyManager.getNetworkType()) {
-            case TelephonyManager.NETWORK_TYPE_GPRS:
-                return "GPRS";
-            case TelephonyManager.NETWORK_TYPE_EDGE:
-                return "EDGE";
-            case TelephonyManager.NETWORK_TYPE_CDMA:
-                return "CDMA";
-            case TelephonyManager.NETWORK_TYPE_1xRTT:
-                return "1xRTT";
-            case TelephonyManager.NETWORK_TYPE_IDEN:
-                return "IDEN";
+            int networkType = mTelephonyManager.getNetworkType();
+           
+            if(networkType == TelephonyManager.NETWORK_TYPE_GPRS)   return "GPRS";
+            if(networkType == TelephonyManager.NETWORK_TYPE_EDGE)   return "EDGE";
+            if(networkType == TelephonyManager.NETWORK_TYPE_CDMA)   return "CDMA";
+            if(networkType == TelephonyManager.NETWORK_TYPE_1xRTT)  return "1xRTT";
+            if(networkType == TelephonyManager.NETWORK_TYPE_IDEN)   return "IDEN";
             // "2G"
-            case TelephonyManager.NETWORK_TYPE_UMTS:
-                return "UMTS";
-            case TelephonyManager.NETWORK_TYPE_EVDO_0:
-                return "EVDO_0";
-            case TelephonyManager.NETWORK_TYPE_EVDO_A:
-                return "EVDO_A";
-            case TelephonyManager.NETWORK_TYPE_HSDPA:
-                return "HSDPA";
-            case TelephonyManager.NETWORK_TYPE_HSUPA:
-                return "HSUPA";
-            case TelephonyManager.NETWORK_TYPE_HSPA:
-                return "HSPA";
-            case TelephonyManager.NETWORK_TYPE_EVDO_B:
-                return "EVDO_B";
-            case TelephonyManager.NETWORK_TYPE_EHRPD:
-                return "EHRPD";
-            case TelephonyManager.NETWORK_TYPE_HSPAP:
-                return "HSPAP";
+            if(networkType == TelephonyManager.NETWORK_TYPE_UMTS)   return "UMTS";
+            if(networkType == TelephonyManager.NETWORK_TYPE_EVDO_0) return "EVDO_0";
+            if(networkType == TelephonyManager.NETWORK_TYPE_EVDO_A) return "EVDO_A";
+            if(networkType == TelephonyManager.NETWORK_TYPE_HSDPA)  return "HSDPA";
+            if(networkType == TelephonyManager.NETWORK_TYPE_HSUPA)  return "HSUPA";
+            if(networkType == TelephonyManager.NETWORK_TYPE_HSPA)   return "HSPA";
+            if(networkType == TelephonyManager.NETWORK_TYPE_EVDO_B) return "EVDO_B";
+            if(networkType == TelephonyManager.NETWORK_TYPE_EHRPD)  return "EHRPD";            
+            if(networkType == TelephonyManager.NETWORK_TYPE_HSPAP)  return "HSPAP";
             // "3G";
-            case TelephonyManager.NETWORK_TYPE_LTE:
-                return "LTE";
+            if(networkType == TelephonyManager.NETWORK_TYPE_LTE)    return "LTE";
             // "4G"
-            case TelephonyManager.NETWORK_TYPE_NR:
-                return "NR";
+            if(networkType == TelephonyManager.NETWORK_TYPE_NR)     return "NR";
             // "5G"
-            default:
-                return "";
-           }
+            return "";
+           
         } catch (SecurityException securityException) {
             Log.d("jTelephonyManager", "Sorry... Not Permission granted!!");
             return "";
