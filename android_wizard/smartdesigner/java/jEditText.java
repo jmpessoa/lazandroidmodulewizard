@@ -43,10 +43,9 @@ import android.widget.Scroller;
 import android.view.Gravity;
 import android.widget.TextView;
 
-//Reviewed by TR3E on 08/20/2019
+//Reviewed by ADiV on 08/20/2019
 
-//public class jEditText extends androidx.appcompat.widget.AppCompatEditText {
-public class jEditText extends EditText {
+public class jEditText extends androidx.appcompat.widget.AppCompatEditText {
 
 	//Pascal Interface
 	//private long           pascalObj   = 0;      // Pascal Obj

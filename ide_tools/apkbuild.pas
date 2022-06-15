@@ -1346,8 +1346,9 @@ end;
 
 function TApkBuilder.GetTargetCpuAbiList : Boolean;
 begin
-                                                        FAdbShellOneLine:='';
-         Result   := DoAdbCommand   (' Get CPU Abilist',
+  FAdbShellOneLine:='';
+
+  Result   := DoAdbCommand   (' Get CPU Abilist',
                                      'shell getprop ro.product.cpu.abilist',
                                       SubToolList) and (FAdbShellOneLine<>'');
   If Not Result then raise
@@ -1357,8 +1358,10 @@ end;
 function  TApkBuilder.GetTargetBuildVersionSdk(var VerSdk : Integer) : Boolean;
 var             Code:Integer;
 begin
-                                                       FAdbShellOneLine:='';
-        Result   := DoAdbCommand    (' Get Build Version Sdk',
+
+  FAdbShellOneLine:='';
+
+  Result   := DoAdbCommand    (' Get Build Version Sdk',
                                     'shell getprop ro.build.version.sdk',
                                      SubToolList) and (FAdbShellOneLine<>'');
   If    Result then
@@ -1405,9 +1408,12 @@ begin
 end;
 
 function  TApkBuilder.CopyLibCtrls(DestPath:String) : Boolean;
-var                                                 LibCtrlsName:String;
+var LibCtrlsName:String;
 begin
-           Result := GetLibCtrlsFileName           (LibCtrlsName);
+  LibCtrlsName := '';
+
+  Result := GetLibCtrlsFileName(LibCtrlsName);
+
   If       Result then
     begin
            Result := FileExists(LibCtrlsName+'.so')  and
@@ -1425,6 +1431,7 @@ end;
 function  GetBigBuildMode(LibCtrlsName:String):TBigBuildMode;
 var I:TBigBuildMode;
 begin
+
   For I:=Low(TBigBuildMode) to High(TBigBuildMode) do
     If Pos(bmLibsSubDir[I],LibCtrlsName)<>0 then begin Result:=I; Exit; end
                                             else       Result:=bmNo
@@ -1453,9 +1460,14 @@ begin
 end;
 
 function  TApkBuilder.CopyGdbServerToLibsDir : Boolean;
-var                I:TBigBuildMode;      LibCtrlsName,GdbServer:String;
+var  I:TBigBuildMode;
+     LibCtrlsName,GdbServer:String;
 begin
-           Result := GetLibCtrlsFileName(LibCtrlsName);
+  GdbServer    := '';
+  LibCtrlsName := '';
+
+  Result := GetLibCtrlsFileName(LibCtrlsName);
+
   If       Result then
      begin
                    I := GetBigBuildMode (LibCtrlsName);
@@ -1514,8 +1526,10 @@ begin
 end;
 
 procedure TApkBuilder.DoAfterRunApk;
-var                                                  VerSdk : Integer;
+var VerSdk : Integer;
 begin
+  VerSdk := 0;
+
   If FGdbCop and FApkRun then else Exit;
                                  // Check gdbserver in Apk & Apk is running
   If GetTargetCpuAbiList then else Exit;

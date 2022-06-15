@@ -170,7 +170,7 @@ end;
 function TFormSettingsPaths.TryGetNDKRelease(pathNDK: string): string;
 var
    list: TStringList;
-   aux, strNdkVersion: string;
+   strNdkVersion: string;
 begin
     list:= TStringList.Create;
     if FileExists(pathNDK+DirectorySeparator+'source.properties') then
@@ -181,7 +181,7 @@ begin
            Pkg.Revision = 18.1.5063045
         }
         strNdkVersion:= list.Strings[1]; //Pkg.Revision = 18.1.5063045
-        aux:= SplitStr(strNdkVersion, '='); //aux:= 'Pkg.Revision '   ...strNdkVersion:=' 18.1.506304'
+        SplitStr(strNdkVersion, '='); //aux:= 'Pkg.Revision '   ...strNdkVersion:=' 18.1.506304'
         Result:= Trim(strNdkVersion); //18.1.506304
 
     end
@@ -299,6 +299,8 @@ begin
                  '.run the command> sdkmanager --update'+ sLineBreak +
                  '.run the command> sdkmanager "build-tools;30.0.2" "platforms;android-30"');
   end;
+
+  CloseAction := caFree;
 
 end;
 

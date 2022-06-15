@@ -41,6 +41,7 @@ procedure TFormPathMissing.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
   PathMissing:= EditPath.Text;
+  CloseAction := caFree;
 end;
 
 procedure TFormPathMissing.SpeedButton1Click(Sender: TObject);

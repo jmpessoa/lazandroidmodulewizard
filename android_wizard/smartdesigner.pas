@@ -32,7 +32,6 @@ type
     FPathToJavaJDK: string;
 
     FInstructionSet: string;
-    FFPUSet: string;
     FSmallProjName: string;
     FGradleVersion: string;
     FPrebuildOSYS: string;
@@ -45,7 +44,6 @@ type
     FMaxNdk: integer;
     FNDKVersion: integer;
     FMinSdkControl: integer;
-    FTargetSdkControl: integer;
     FNdkApi: string;
     FAndroidTheme: string;
 
@@ -755,7 +753,6 @@ var
   strList, providerList: TStringList;
   i, minsdkApi : integer;
   strTargetApi, auxStr, tempStr : string;
-  aSupportLib:TSupportLib;
   aAppCompatLib:TAppCompatLib;
   androidPluginNumber: integer;
   pluginVersion: string;
@@ -770,14 +767,12 @@ var
   sourcepath,targetpath:string;
   includeList: TStringList;
   universalApk: boolean;
-  insertRef, manifestApis, supportProvider: string;
-  p1, p2: integer;
-  c: char;
+  insertRef, supportProvider: string;
+  p1 : integer;
   versionCode : string;
   versionName : string;
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
-  innerSupported: boolean;
 begin
 
   strList:= TStringList.Create;
@@ -914,40 +909,6 @@ begin
 
     end;
   end;
-
-  (*if sdkManifMinApiNumber < minsdkApi  then
-  begin
-    strList.Clear;
-    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-    tempStr:= strList.Text;  //manifest
-    if Pos('android:minSdkVersion=', tempStr) > 0 then
-    begin
-      tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+sdkManifMinApi+'"' , 'android:minSdkVersion="'+IntToStr(minsdkApi)+'"', [rfReplaceAll,rfIgnoreCase]);
-    end
-    else //re-introduce it!
-    begin
-       if isGradle then // Gradle not need minSdkVersion in manifest
-          manifestApis:= '<uses-sdk android:targetSdkVersion="'+IntToStr(targetApi)+'"/>'
-       else
-          manifestApis:= '<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="'+IntToStr(targetApi)+'"/>';
-
-       insertRef:= 'android:versionName='; //insert reference point
-       p1:= Pos(insertRef, tempStr);
-       p2:= p1 + Length(insertRef);
-       c:= tempStr[p2];
-       while c <> '>' do
-       begin
-          Inc(p2);
-          c:= tempStr[p2];
-       end;
-       Inc(p2);
-       insertRef:= Trim(Copy(tempStr, p1, p2-p1));
-       p1:= Pos(insertRef, tempStr);
-       Insert(sLineBreak + manifestApis, tempStr, p1+Length(insertRef) );
-    end;
-    strList.Text:= tempStr;
-    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-  end;*)
 
   //Apply to "smartdesigner.pas" improvement by LongDirtyAnimAlf in "AndroidWizard_intf"
   strList.Clear;
@@ -1326,10 +1287,12 @@ begin
          strList.Add('    }');
          strList.Add('    buildTypes {');
          strList.Add('        debug {');
+         strList.Add('            minifyEnabled false');
          strList.Add('            debuggable true');
          strList.Add('            jniDebuggable true');
          strList.Add('        }');
          strList.Add('        release {');
+         strList.Add('            minifyEnabled false');
          strList.Add('            debuggable false');
          strList.Add('            jniDebuggable false');
          strList.Add('        }');
@@ -1344,28 +1307,13 @@ begin
            directive:='implementation';
 
          strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
-         innerSupported:= False;
-         if Pos('AppCompat', FAndroidTheme) > 0 then
+
+         for aAppCompatLib in AppCompatLibs do
          begin
-           innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
-           for aAppCompatLib in AppCompatLibs do
-           begin
              strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
              if aAppCompatLib.MinAPI > StrToInt(buildToolApi) then
                 ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
                              IntToStr(aAppCompatLib.MinAPI));
-           end;
-
-         end
-         else if FSupport and (not innerSupported) then  //only Supported
-         begin
-           for aSupportLib in SupportLibs do
-           begin
-              strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
-              if aSupportLib.MinAPI > StrToInt(buildToolApi) then
-                ShowMessage('Warning: Support library need Android SDK >= ' +
-                             IntToStr(aSupportLib.MinAPI));
-           end;
          end;
 
          if Pos('GDXGame', FAndroidTheme) > 0 then
@@ -2413,7 +2361,7 @@ var
   list, auxList, manifestList, gradleList: TStringList;
   p, p1, p2, i,  minSdkManifest, count: integer;
   aux, tempStr, auxStr: string;
-  insertRef, insertRefShort , minSdkManifestStr: string;
+  insertRef, minSdkManifestStr: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;

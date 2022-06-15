@@ -539,11 +539,13 @@ end;
 
 function TFormWorkspace.IsLamwManagerForWindows(): boolean;
 begin
-//TODO
+ result := false;
+ //TODO
 end;
 
 function TFormWorkspace.IsLamwManagerForLinux(): boolean;
 begin
+ result := false;
  //TODO
 end;
 
@@ -820,6 +822,8 @@ begin
     end;
 
   end;
+
+  CloseAction := caFree;
 
 end;
 

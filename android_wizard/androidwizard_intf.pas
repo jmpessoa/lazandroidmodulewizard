@@ -1460,9 +1460,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 var
   frm: TFormWorkspace;
   strList: TStringList;
-  aSupportLib:TSupportLib;
   aAppCompatLib:TAppCompatLib;
-  innerSupported: boolean;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -2706,10 +2704,12 @@ begin
                 strList.Add('    }');
                 strList.Add('    buildTypes {');
                 strList.Add('        debug {');
+                strList.Add('            minifyEnabled false');
                 strList.Add('            debuggable true');
                 strList.Add('            jniDebuggable true');
                 strList.Add('        }');
                 strList.Add('        release {');
+                strList.Add('            minifyEnabled false');
                 strList.Add('            debuggable false');
                 strList.Add('            jniDebuggable false');
                 strList.Add('        }');
@@ -2724,31 +2724,13 @@ begin
 
                 strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-                innerSupported:= False;
-
-                if Pos('AppCompat', FAndroidTheme) > 0 then
+                for aAppCompatLib in AppCompatLibs do
                 begin
-                   innerSupported:= True;
-                   for aAppCompatLib in AppCompatLibs do
-                   begin
                      strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
                      if aAppCompatLib.MinAPI > StrToInt(compileSdkVersion) then
                          ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
                                       IntToStr(aAppCompatLib.MinAPI));
-                   end;
-                   //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                end else
-                 if FSupport and (not innerSupported) then
-                 begin
-                   for aSupportLib in SupportLibs do
-                   begin
-                     strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
-                     if aSupportLib.MinAPI > StrToInt(compileSdkVersion) then
-                       ShowMessage('Warning: Support library need Android SDK >= ' +
-                                    IntToStr(aSupportLib.MinAPI));
-                   end;
-                   //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                 end;
+                end;
 
                 if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
                 begin

@@ -31,8 +31,7 @@ import android.widget.Toast;
 //Reviewed by ADiV on 2021-09-16
 //-------------------------------------------------------------------------
 
-//public class jImageBtn extends androidx.appcompat.widget.AppCompatImageView {
-public class jImageBtn extends ImageView {
+public class jImageBtn extends androidx.appcompat.widget.AppCompatImageView {
 	
 	private Controls        controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
