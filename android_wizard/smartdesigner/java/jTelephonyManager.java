@@ -215,19 +215,22 @@ public class jTelephonyManager /*extends ...*/ {
     }
 
     public String GetIMEI() {
+                        
         String sImei = "";
         
-        try {
-        	if (isListenerRemoved)
-                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
-            /*
+        try {        	
             //[ifdef_api26up]
-            if (Build.VERSION.SDK_INT >=  26) {
+            /*if (Build.VERSION.SDK_INT >=  26) {
                 sImei = mTelephonyManager.getImei();
-            }else //[endif_api26up]   */
-        	// Need system app - android.permission.READ_PRIVILIGED_PHONE_STATE
-            //sImei = mTelephonyManager.getDeviceId();
-        	sImei = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID); 
+            }else //[endif_api26up]   
+        	 // Need system app - android.permission.READ_PRIVILIGED_PHONE_STATE
+             sImei = mTelephonyManager.getDeviceId();*/
+        	
+        	sImei = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);
+        	
+            if (isListenerRemoved)
+                mTelephonyManager.listen(myPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE); // start listening to the phone changes
+            
         } catch (SecurityException securityException) {
             Log.d("jTelephonyMgr_IMEI", "Sorry... Not Permission granted!!");
         }

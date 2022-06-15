@@ -2724,31 +2724,15 @@ begin
 
                 strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-                innerSupported:= False;
+                innerSupported:= True;
 
-                if Pos('AppCompat', FAndroidTheme) > 0 then
+                for aAppCompatLib in AppCompatLibs do
                 begin
-                   innerSupported:= True;
-                   for aAppCompatLib in AppCompatLibs do
-                   begin
                      strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
                      if aAppCompatLib.MinAPI > StrToInt(compileSdkVersion) then
                          ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
                                       IntToStr(aAppCompatLib.MinAPI));
-                   end;
-                   //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                end else
-                 if FSupport and (not innerSupported) then
-                 begin
-                   for aSupportLib in SupportLibs do
-                   begin
-                     strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
-                     if aSupportLib.MinAPI > StrToInt(compileSdkVersion) then
-                       ShowMessage('Warning: Support library need Android SDK >= ' +
-                                    IntToStr(aSupportLib.MinAPI));
-                   end;
-                   //strList.Add('    '+directive+' ''com.google.android.gms:play-services-ads:11.0.4''');
-                 end;
+                end;
 
                 if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
                 begin

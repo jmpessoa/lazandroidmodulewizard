@@ -1344,28 +1344,15 @@ begin
            directive:='implementation';
 
          strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
-         innerSupported:= False;
-         if Pos('AppCompat', FAndroidTheme) > 0 then
+
+         innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
+
+         for aAppCompatLib in AppCompatLibs do
          begin
-           innerSupported:= True; //that is, AppCompat has inner "Support" Libraries
-           for aAppCompatLib in AppCompatLibs do
-           begin
              strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
              if aAppCompatLib.MinAPI > StrToInt(buildToolApi) then
                 ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
                              IntToStr(aAppCompatLib.MinAPI));
-           end;
-
-         end
-         else if FSupport and (not innerSupported) then  //only Supported
-         begin
-           for aSupportLib in SupportLibs do
-           begin
-              strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
-              if aSupportLib.MinAPI > StrToInt(buildToolApi) then
-                ShowMessage('Warning: Support library need Android SDK >= ' +
-                             IntToStr(aSupportLib.MinAPI));
-           end;
          end;
 
          if Pos('GDXGame', FAndroidTheme) > 0 then

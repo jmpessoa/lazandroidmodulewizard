@@ -24,8 +24,7 @@ import android.graphics.drawable.BitmapDrawable;
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl template*/
 
-//public class jSeekBar extends androidx.appcompat.widget.AppCompatSeekBar { //please, fix what GUI object will be extended!
-public class jSeekBar extends SeekBar { //please, fix what GUI object will be extended!
+public class jSeekBar extends androidx.appcompat.widget.AppCompatSeekBar { //please, fix what GUI object will be extended!
 
     private long       pascalObj = 0;    // Pascal Object
     private Controls   controls  = null; // Control Class for events
