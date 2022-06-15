@@ -1287,10 +1287,12 @@ begin
          strList.Add('    }');
          strList.Add('    buildTypes {');
          strList.Add('        debug {');
+         strList.Add('            minifyEnabled false');
          strList.Add('            debuggable true');
          strList.Add('            jniDebuggable true');
          strList.Add('        }');
          strList.Add('        release {');
+         strList.Add('            minifyEnabled false');
          strList.Add('            debuggable false');
          strList.Add('            jniDebuggable false');
          strList.Add('        }');
