@@ -39,9 +39,7 @@ type
     FPathToJavaJDK: string;
     FPathToAntBin: string;
     FPathToGradle: string;
-    FFPUSet: string;
     FInstructionSet: string;
-    FGradleVersion: string;
     FPrebuildOSYS: string;
     FNDK: string;
     FNDKRelease: string;

@@ -72,6 +72,8 @@ begin
      3: PrebuildOSYS:= 'linux-x86_64';
      4: PrebuildOSYS:= 'osx';
    end;
+
+   CloseAction := caFree;
 end;
 
 procedure TFormOSystem.FormCreate(Sender: TObject);

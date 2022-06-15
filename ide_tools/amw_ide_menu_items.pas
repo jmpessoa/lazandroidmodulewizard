@@ -306,12 +306,12 @@ end;
 function GetMethodName(methodHeader: string): string;
 var
   p: integer;
-  aux, firstPart: string;
+  aux : string;
 begin
   p:= Pos('(', methodHeader);
   aux:= Copy(methodHeader, 1, p-1); //function add
   aux:= Trim(aux);
-  firstPart:= SplitStr(aux, ' ');
+  SplitStr(aux, ' ');
   Result:= Trim(aux);
 end;
 

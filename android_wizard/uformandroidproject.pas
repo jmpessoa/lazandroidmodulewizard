@@ -804,6 +804,8 @@ begin
      end;
 
    end;
+
+   CanClose := true;
 end;
 
 procedure TFormAndroidProject.FormShow(Sender: TObject);
@@ -899,6 +901,8 @@ begin
     FImportsList.Free;
     Memo2List.Free;
     FListJNIBridge.Free;
+
+    CloseAction := caFree;
 end;
 
 procedure TFormAndroidProject.FormCreate(Sender: TObject);

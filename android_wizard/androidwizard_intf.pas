@@ -1460,9 +1460,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 var
   frm: TFormWorkspace;
   strList: TStringList;
-  aSupportLib:TSupportLib;
   aAppCompatLib:TAppCompatLib;
-  innerSupported: boolean;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -2723,8 +2721,6 @@ begin
                   directive:='implementation';
 
                 strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
-
-                innerSupported:= True;
 
                 for aAppCompatLib in AppCompatLibs do
                 begin

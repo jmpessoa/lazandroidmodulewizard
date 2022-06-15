@@ -977,6 +977,8 @@ end;
 procedure TFormBuildFPCCross.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   Self.SaveSettings(LazarusIDE.GetPrimaryConfigPath +  DirectorySeparator + 'LAMW.ini' );
+
+  CloseAction := caFree;
 end;
 
 procedure TFormBuildFPCCross.PageControl1Change(Sender: TObject);
