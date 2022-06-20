@@ -135,6 +135,7 @@ public class App extends AppCompatActivity {
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+    	super.onRequestPermissionsResult(permsRequestCode, permissions, grantResults);
     	
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {

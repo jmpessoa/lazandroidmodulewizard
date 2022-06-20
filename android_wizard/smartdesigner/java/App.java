@@ -41,7 +41,7 @@ import android.graphics.Canvas;
 
 public class App extends Activity {
     
-private Controls       controls;
+    private Controls       controls;
     
     private int screenOrientation = 0; //For update screen orientation. [by TR3E]
     private boolean rlSizeChanged = false;
@@ -136,6 +136,7 @@ private Controls       controls;
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+    	super.onRequestPermissionsResult(permsRequestCode, permissions, grantResults);
     	
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {
@@ -183,8 +184,7 @@ private Controls       controls;
     }	   	
  
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-     //super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {    	
      controls.jAppOnActivityResult(requestCode,resultCode,data);                                     
     }
 
