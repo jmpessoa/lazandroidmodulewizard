@@ -162,7 +162,7 @@ class CustomSpinnerArrayAdapter<T> extends ArrayAdapter<String>{
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl template*/
 
-public class jSpinner extends androidx.appcompat.widget.AppCompatSpinner {
+public class jSpinner extends  Spinner { //androidx.appcompat.widget.AppCompatSpinner
 
     private long       pascalObj = 0;    // Pascal Object
     private Controls   controls  = null; // Control Class for events

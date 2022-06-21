@@ -21,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class jButton extends androidx.appcompat.widget.AppCompatButton {
+public class jButton extends Button { //androidx.appcompat.widget.AppCompatButton
 
 	private Controls controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;

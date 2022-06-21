@@ -34,7 +34,7 @@ import android.view.ViewGroup;
 import android.view.Gravity;
 import android.widget.TextView;
 
-public class jTextView extends androidx.appcompat.widget.AppCompatTextView {
+public class jTextView extends  TextView { //androidx.appcompat.widget.AppCompatTextView
     //Java-Pascal Interface
     private Controls        controls = null;   // Control Class for Event
     private jCommons LAMWCommon;

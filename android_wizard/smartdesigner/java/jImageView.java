@@ -54,7 +54,7 @@ import java.util.Locale;
 // Reviewed by ADiV on 2021-09-16
 //-------------------------------------------------------------------------
 
-public class jImageView extends androidx.appcompat.widget.AppCompatImageView {
+public class jImageView extends ImageView { //androidx.appcompat.widget.AppCompatImageView
 	
 	//Pascal Interface
 	private long           PasObj   = 0;      // Pascal Obj

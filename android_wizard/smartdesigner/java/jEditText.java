@@ -45,8 +45,8 @@ import android.widget.TextView;
 
 //Reviewed by ADiV on 08/20/2019
 
-public class jEditText extends androidx.appcompat.widget.AppCompatEditText {
-
+public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatEditText 
+ 
 	//Pascal Interface
 	//private long           pascalObj   = 0;      // Pascal Obj
 
