@@ -998,6 +998,11 @@ begin
       strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
       strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
+      if FProjectModel = 'Ant' then
+         strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', '', [rfReplaceAll, rfIgnoreCase])
+      else
+         strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', 'android:name="androidx.multidex.MultiDexApplication"', [rfReplaceAll, rfIgnoreCase]);
+
       auxList.Clear;
       auxList.Text:= strAfterReplace;
 
@@ -2218,8 +2223,8 @@ begin
           //strList.Add('RELEASE_STORE_PASSWORD=123456');
           //strList.Add('RELEASE_KEY_PASSWORD=123456');
 
-          if Pos('AppCompat', FAndroidTheme) > 0 then
-             strList.Add('android.useAndroidX=true');
+          //if Pos('AppCompat', FAndroidTheme) > 0 then
+          strList.Add('android.useAndroidX=true');
 
           if DirectoryExists(FPathToJavaJDK) then
           begin
@@ -2684,7 +2689,10 @@ begin
                 if FVersionName = '' then  FVersionName:= '1.0';
                 strList.Add('            versionCode ' + intToStr(FVersionCode));
                 strList.Add('            versionName "' + FVersionName + '"');
-                strList.Add('            multiDexEnabled true }');
+
+                //if Pos('AppCompat', FAndroidTheme) > 0 then
+                strList.Add('            multiDexEnabled true');
+
                 strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
                 strList.Add('    }');
                 strList.Add('    sourceSets {');

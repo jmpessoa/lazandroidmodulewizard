@@ -1249,7 +1249,10 @@ begin
 
          strList.Add('            versionCode ' + versionCode);
          strList.Add('            versionName "'+ versionName+'"');
+
+         //if Pos('AppCompat', FAndroidTheme) > 0 then
          strList.Add('            multiDexEnabled true');
+
          strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
          strList.Add('    }');
 
