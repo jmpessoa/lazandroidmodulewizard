@@ -386,6 +386,7 @@ type
     procedure SetUnvaluedNameData(_unvaluedName: string);
     procedure SetEncodeValueData(_value: boolean);
     procedure PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
+    function PostJSONData(_strURI: string; _jsonData: string): string;
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: RawByteString);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -8440,6 +8441,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_tt(gApp.jni.jEnv, FjObject, 'PostSOAPDataAsync', _SOAPData ,_stringUrl);
+end;
+
+
+function jHttpClient.PostJSONData(_strURI: string; _jsonData: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jHttpClient_PostJSONData(gApp.jni.jEnv, FjObject, _strURI ,_jsonData);
 end;
 
 { jSMTPClient }

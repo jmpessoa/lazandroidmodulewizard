@@ -369,7 +369,7 @@ function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: j
 function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
 function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
 function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
-
+function jHttpClient_PostJSONData(env: PJNIEnv; _jhttpclient: JObject; _strURI: string; _jsonData: string): string;
 
 {ImageList}
 
@@ -4916,6 +4916,38 @@ begin
   env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
+end;
+
+function jHttpClient_PostJSONData(env: PJNIEnv; _jhttpclient: JObject; _strURI: string; _jsonData: string): string;
+var
+  jStr: JString;
+  jBoo: JBoolean;
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jhttpclient = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'PostJSONData', '(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_strURI));
+  jParams[1].l:= env^.NewStringUTF(env, PChar(_jsonData));
+
+
+  jStr:= env^.CallObjectMethodA(env, _jhttpclient, jMethod, @jParams);
+
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+  env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[1].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
   {jImageList}

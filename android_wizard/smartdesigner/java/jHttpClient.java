@@ -1,4 +1,4 @@
-package org.lamw.apptfphttpclientdemo1;
+package org.lamw.apphttpclientrestdemo1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,6 +18,7 @@ import java.net.CookiePolicy;
 import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -1522,5 +1523,59 @@ public class jHttpClient /*extends ...*/ {
         } catch (Exception e) {
         }
     }
+
+    //https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts_example_requests.htm
+    //https://code.tutsplus.com/tutorials/android-from-scratch-using-rest-apis--cms-27117
+    //https://code.tutsplus.com/tutorials/a-beginners-guide-to-http-and-rest--net-16340
+    //https://reqbin.com/req/v0crmky0/rest-api-post-example
+    //https://www.baeldung.com/httpurlconnection-post
+    public String PostJSONData(String _strURI, String _jsonData) { //
+
+        URL url = null;
+        HttpURLConnection con=null;
+        String response = "500";  //server error ...
+
+        try {
+            url = new URL (_strURI);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        if (url != null) {
+            try {
+                con = (HttpURLConnection)url.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "application/json");
+                con.setDoOutput(true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            OutputStream os = con.getOutputStream();
+            byte[] input = _jsonData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
+            StringBuilder resp = new StringBuilder();
+            String responseLine = null;
+            while ((responseLine = br.readLine()) != null) {
+                resp.append(responseLine.trim());
+            }
+            response = resp.toString();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
 }
 
