@@ -3248,7 +3248,7 @@ public class jForm {
             Cursor cursor = resolver.query(uri, null, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
-                	int iColum = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                	int iColum = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                     if(iColum >= 0) result = cursor.getString(iColum);                    
                 }
             } finally {
