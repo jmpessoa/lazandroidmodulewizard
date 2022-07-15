@@ -1,0 +1,3 @@
+<Libraries Value="C:\Users\user\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\i686-linux-android\22;C:\Users\user\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\i686-android-linux\4.9.x"/>
+<TargetCPU Value="i386"/>
+<CustomOptions Value="-Xd -XPi686-linux-android- -FDC:\Users\user\AppData\Local\Android\Sdk\ndk\22.1.7171670\toolchains\x86-4.9\prebuilt\windows-x86_64\bin"/>
