@@ -362,6 +362,12 @@ public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatE
 		if(str.equals("NUMBER")) {
 			this.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 		}
+		else if(str.equals("NUMBERFLOAT")) {
+			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
+		}
+		else if(str.equals("NUMBERFLOATPOSITIVE")) {
+			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		}
 		else if(str.equals("CURRENCY")) {  		    //thanks to @renabor
 			this.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
 		}
