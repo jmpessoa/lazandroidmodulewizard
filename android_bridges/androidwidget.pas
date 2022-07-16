@@ -563,6 +563,8 @@ type
   TInputTypeEx  =(  itxText,
                     itxCapCharacters,
                     itxNumber,
+                    itxNumberFloat,
+                    itxNumberFloatPositive,		    
                     itxCurrency,
                     itxPhone,
                     itxNumberPassword,
@@ -6571,6 +6573,8 @@ Function InputTypeToStrEx ( InputType : TInputTypeEx ) : String;
    itxText       : Result := 'TEXT';
    itxCapCharacters: Result := 'CAPCHARACTERS'; 
    itxNumber     : Result := 'NUMBER';
+   itxNumberFloat     : Result := 'NUMBERFLOAT';   
+   itxNumberFloatPositive     : Result := 'NUMBERFLOATPOSITIVE';   
    itxCurrency   : Result := 'CURRENCY';  //thanks to @renabor
    itxPhone      : Result := 'PHONE';
    itxNumberPassword : Result := 'PASSNUMBER';
