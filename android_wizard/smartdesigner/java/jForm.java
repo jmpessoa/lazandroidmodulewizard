@@ -92,6 +92,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
 import java.lang.Class;
+import java.lang.Math;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -1656,7 +1657,27 @@ public class jForm {
         controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.densityDpi;
     }
-
+    
+    public double GetScreenRealXdpi() {
+        double r = 0.0;
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (metrics == null) {
+            return 0;
+        }
+        controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.xdpi;
+    }
+    
+    public double GetScreenRealYdpi() {
+        double r = 0.0;
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (metrics == null) {
+            return 0;
+        }
+        controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.ydpi;
+    }  	
+	
     public String GetScreenDensity() {
         String r = "";
         DisplayMetrics metrics = new DisplayMetrics();
@@ -2525,6 +2546,22 @@ public class jForm {
         return displaymetrics.heightPixels;
     }
 
+    public double GetScreenRealSizeInInches() {
+        double r = 0.0;
+        double screen_width = 0.0;
+        double screen_height = 0.0;
+
+        if(GetScreenRealXdpi() != 0)
+        {screen_width = GetRealScreenWidth() / GetScreenRealXdpi();}
+		
+        if(GetScreenRealYdpi() != 0)
+        screen_height = GetRealScreenHeight() / GetScreenRealYdpi();		
+		
+        r = Math.sqrt(screen_width*screen_width + screen_height*screen_height);	
+		
+        return r;
+    } 	
+	
     //by ADiV
     public String GetSystemVersionString() {
         return android.os.Build.VERSION.RELEASE;
