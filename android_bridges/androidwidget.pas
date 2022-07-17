@@ -1302,7 +1302,10 @@ type
     function  GetJavaLastId(): integer; // by ADiV
     function  GetScreenSize(): string;
     function  GetScreenDensity(): string; overload;
+    function  GetScreenRealSizeInInches(): double;
     function  GetScreenDpi(): integer;
+    function  GetScreenRealXdpi(): double;
+    function  GetScreenRealYdpi(): double;    
     function  GetScreenDensity(strDensity: string): integer; overload;
     procedure SetDensityAssets( _value : TDensityAssets ); // by ADiV
 
@@ -4216,6 +4219,22 @@ begin
    Result:= jni_func_out_i(gapp.Jni.jEnv, FjObject, 'GetScreenDpi');
 end;
 
+function jForm.GetScreenRealXdpi(): double;
+begin
+  result := 0.0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_d(gapp.Jni.jEnv, FjObject, 'GetScreenRealXdpi');
+end;
+
+function jForm.GetScreenRealYdpi(): double;
+begin
+  result := 0.0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_d(gapp.Jni.jEnv, FjObject, 'GetScreenRealYdpi');
+end;
+
 function jForm.GetScreenDensity(): string;
 begin
   result := '';
@@ -4239,6 +4258,14 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jni_func_out_t(gapp.Jni.jEnv, FjObject, 'GetScreenSize');
+end;
+
+function jForm.GetScreenRealSizeInInches(): double;
+begin
+  result := 0.0;
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jni_func_out_d(gapp.Jni.jEnv, FjObject, 'GetScreenRealSizeInInches');
 end;
 
 procedure jForm.LogDebug(_tag: string; _msg: string);
