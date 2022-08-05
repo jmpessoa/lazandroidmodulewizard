@@ -1814,6 +1814,8 @@ type
     procedure SetEnableOnClickTextCenter(_value: boolean); // by ADiV
     procedure SetEnableOnClickTextRight(_value: boolean); // by ADiV
 
+    procedure SetMaxLinesFirstString(_value: integer); // by ADiV
+
     procedure SetLayoutByIndex(Value: TItemLayout; index: integer);
 
     function GetTotalHeight: integer;
@@ -8443,7 +8445,6 @@ begin
      jni_proc_tt(gApp.jni.jEnv, FjObject, 'PostSOAPDataAsync', _SOAPData ,_stringUrl);
 end;
 
-
 function jHttpClient.PostJSONData(_strURI: string; _jsonData: string): string;
 begin
   //in designing component state: result value here...
@@ -9879,6 +9880,14 @@ begin
   if FjObject = nil then exit;
 
   jni_proc_z(gApp.jni.jEnv, FjObject, 'SetEnableOnClickTextRight', _value);
+end;
+
+procedure jListView.SetMaxLinesFirstString(_value: integer);
+begin
+  //in designing component state: set value here...
+  if FjObject = nil then exit;
+
+  jni_proc_i(gApp.jni.jEnv, FjObject, 'SetMaxLinesFirstString', _value);
 end;
 
 // by ADiV
