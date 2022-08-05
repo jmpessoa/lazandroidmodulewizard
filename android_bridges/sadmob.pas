@@ -543,7 +543,7 @@ procedure jsAdMob.AdMobRewardedCreateAndLoad();
 begin
  //in designing component state: set value here...
  if FjObject <> nil then
-  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobRewardedLoad');
+  jni_proc(gApp.jni.jEnv, FjObject, 'AdMobRewardedCreateAndLoad');
 end;
 
 function  jsAdMob.AdMobRewardedIsLoaded() : boolean;
