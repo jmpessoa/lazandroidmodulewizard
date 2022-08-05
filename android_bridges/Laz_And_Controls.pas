@@ -8447,9 +8447,10 @@ end;
 
 function jHttpClient.PostJSONData(_strURI: string; _jsonData: string): string;
 begin
+  Result := '';
   //in designing component state: result value here...
   if FInitialized then
-   Result:= jHttpClient_PostJSONData(gApp.jni.jEnv, FjObject, _strURI ,_jsonData);
+   Result := jni_func_tt_out_t(gApp.jni.jEnv, FjObject, 'PostJSONData', _strURI ,_jsonData);
 end;
 
 { jSMTPClient }
