@@ -111,6 +111,8 @@ class jArrayAdapter extends ArrayAdapter {
 	private boolean mDispatchOnDrawItemWidgetText;
 	private boolean mWidgetInputTypeIsCurrency;
 	private boolean mDispatchOnDrawItemWidgetImage;
+	
+	private int     mMaxLinesFirstString = 0;
 
 	boolean mChangeFontSizeByComplexUnitPixel;
 	int mTextSizeTypedValue;
@@ -223,6 +225,8 @@ class jArrayAdapter extends ArrayAdapter {
 		mChangeFontSizeByComplexUnitPixel = true;
 		mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP;
 		
+		mMaxLinesFirstString = 0;
+		
 		mWordWrap = false;
 		
 		mEnableOnClickTextLeft   = false;
@@ -272,6 +276,10 @@ class jArrayAdapter extends ArrayAdapter {
 	
 	public void SetAllPartsOnDrawItemTextColor(boolean _value) {
 		mDrawAllItemPartsTextColor = _value;
+	}
+	
+	public void SetMaxLinesFirstString(int _value){
+		mMaxLinesFirstString = _value;
 	}
 	
 	public void SetDispatchOnDrawItemBitmap(boolean _value) {
@@ -713,6 +721,7 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				if (lines.length > 1) {				   	
 					if (i == 0) {
+						if(mMaxLinesFirstString > 0) itemText[i].setMaxLines(mMaxLinesFirstString);
 						////left, top, right, bottom
 						itemText[i].setPadding(mItemCenterMarginLeft, mItemPaddingTop, mItemCenterMarginRight, mItemCenterMarginInner);						
 					}
@@ -2469,6 +2478,10 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 	
 	public void SetAllPartsOnDrawItemTextColor(boolean _value) {
 		aadapter.SetAllPartsOnDrawItemTextColor(_value);		
+	}
+	
+	public void SetMaxLinesFirstString(int _value) {
+		aadapter.SetMaxLinesFirstString(_value);		
 	}
 
 	public void SetItemPaddingTop(int _ItemPaddingTop) { 
