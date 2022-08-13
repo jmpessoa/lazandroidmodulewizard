@@ -369,7 +369,7 @@ function jHttpClient_Get(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: j
 function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject; _headerName: string; _headerValue: string): jObject;
 function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
 function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
-function jHttpClient_PostJSONData(env: PJNIEnv; _jhttpclient: JObject; _strURI: string; _jsonData: string): string;
+//function jHttpClient_PostJSONData(env: PJNIEnv; _jhttpclient: JObject; _strURI: string; _jsonData: string): string;
 
 {ImageList}
 
