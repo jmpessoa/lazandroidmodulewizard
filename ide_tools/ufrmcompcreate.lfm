@@ -4,9 +4,10 @@ object FrmCompCreate: TFrmCompCreate
   Top = 300
   Width = 1019
   Caption = '[LAMW]  Create New jComponent'
-  ClientHeight = 648
-  ClientWidth = 1019
+  ClientHeight = 601
+  ClientWidth = 1001
   DesignTimePPI = 120
+  Font.Height = -15
   Icon.Data = {
     9E09000000000100010018180000010020008809000016000000280000001800
     0000300000000100200000000000000900006400000064000000000000000000
@@ -91,7 +92,6 @@ object FrmCompCreate: TFrmCompCreate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
   object Panel1: TPanel
     Left = 0
     Height = 50
@@ -304,10 +304,10 @@ object FrmCompCreate: TFrmCompCreate
     Height = 531
     Top = 50
     Width = 1019
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Align = alClient
     ParentFont = False
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
@@ -1566,8 +1566,16 @@ object FrmCompCreate: TFrmCompCreate
       Caption = 'Insert Java jControl template'
       OnClick = PopupMenu1Close
     end
+    object MenuItem17: TMenuItem
+      Caption = 'Insert Kotlin jControl template'
+      OnClick = PopupMenu1Close
+    end
     object MenuItem5: TMenuItem
       Caption = 'Insert Java jVisualControl template'
+      OnClick = PopupMenu1Close
+    end
+    object MenuItem18: TMenuItem
+      Caption = 'Insert Kotlin jVisualControl template'
       OnClick = PopupMenu1Close
     end
     object MenuItem6: TMenuItem

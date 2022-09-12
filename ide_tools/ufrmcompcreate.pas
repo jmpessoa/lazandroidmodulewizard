@@ -26,6 +26,8 @@ type
     MenuItem14: TMenuItem;
     MenuItem15: TMenuItem;
     MenuItem16: TMenuItem;
+    MenuItem17: TMenuItem;
+    MenuItem18: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
@@ -84,7 +86,18 @@ type
     FPathToJavaJDK: string;        //PathToJavaJDK=C:\Program Files\Java\jdk1.8.0_151
     //FNativeEventNamingBypass: string;
 
+    FIsKotlin: boolean;
+
     procedure DoJavaParse(produceAll: boolean);
+    procedure DoKotlinParse(produceAll: boolean);
+
+    function SwapKotlinParams(params: string): string;
+    function GetJavaTypeFromKotlin(ktType: string): string;
+    function GetJavaSignatureFromKotlin(ktSign: string): string;
+    function GetKotlinClassName(selList: TStringList): string;
+    function GetKotlinClassConstructorSignature(selList: TStringList): string;
+    function TryIsKotlinComplementary(selList: TStrings): boolean;
+
     procedure InsertJControlCodeTemplate(txt: string);
     function GetHackListPascalClassInterf(produceAll: boolean): string;
     function GetJSignature(params, res: string): string;
@@ -101,6 +114,7 @@ type
     procedure LoadSettings(const fileName: string);
     procedure AddComplements(javaclassName: string);
     function GetJavaClassName(selList: TStringList): string;
+
     function GetCleanDepData(aux: string): string;
 
     //native event interface...
@@ -435,11 +449,14 @@ var
   strList: TStringList;
   txtCaption, newJavaClassName: string;
 begin
+   FIsKotlin:= False;
+
    txtCaption:= txt;
-   if Pos('jControl', txtCaption) > 0 then
+   if Pos('Java jControl', txtCaption) > 0 then
    begin
-     newJavaClassName:= 'MyControl';
+     newJavaClassName:= 'jMyControl';
      strList:= TStringList.Create;
+     strList.Add(' ');
      strList.Add(' ');
      strList.Add('import android.content.Context;');
      strList.Add(' ');
@@ -447,7 +464,7 @@ begin
      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
      strList.Add('/*jControl LAMW template*/');
      strList.Add(' ');
-     strList.Add('public class j'+newJavaClassName+' /*extends ...*/ {');
+     strList.Add('public class '+newJavaClassName+' /*extends ...*/ {');
      strList.Add('  ');
      strList.Add('    private long pascalObj = 0;        //Pascal Object');
      strList.Add('    private Controls controls  = null; //Java/Pascal [events] Interface ...');
@@ -455,10 +472,10 @@ begin
      strList.Add('  ');
      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
      strList.Add('  ');
-     strList.Add('    public j'+newJavaClassName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!');
+     strList.Add('    public '+newJavaClassName+'(Controls _ctrls, long _self) { //Add more others news "_xxx" params if needed!');
      strList.Add('       //super(_ctrls.activity);');
      strList.Add('       context   = _ctrls.activity;');
-     strList.Add('       pascalObj = _Self;');
+     strList.Add('       pascalObj = _self;');
      strList.Add('       controls  = _ctrls;');
      strList.Add('    }');
      strList.Add('  ');
@@ -534,20 +551,61 @@ begin
      strList.Free;
    end;
 
-   if Pos('jVisualControl', txtCaption) > 0 then
+   if Pos('Kotlin jControl', txtCaption) > 0 then
    begin
-     newJavaClassName:= 'MyNewVisualControl';
+     FIsKotlin:= True;
+     newJavaClassName:= 'KMyControl';
      strList:= TStringList.Create;
      strList.Add(' ');
+     strList.Add(' ');
+     strList.Add('import android.content.Context;');
+     strList.Add(' ');
+     strList.Add('/*Draft java code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']*/');
+     strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
+     strList.Add('/*Kotlin jControl LAMW template*/');
+     strList.Add(' ');
+     strList.Add('class '+newJavaClassName+'(_ctrls: Controls, _self: Long)/*: ???*/ {');
+     strList.Add('  ');
+     strList.Add('    private var pascalObj: Long = 0    //Pascal Object');
+     strList.Add('    private var controls: Controls? = null //Java/Pascal [events] Interface ...');
+     strList.Add('    private var context: Context? = null');
+     strList.Add('  ');
+     strList.Add('    init {');
+     strList.Add('       context = _ctrls.activity');
+     strList.Add('       pascalObj = _self');
+     strList.Add('       controls = _ctrls');
+     strList.Add('    }');
+     strList.Add('  ');
+     strList.Add('    fun kFree() {');
+     strList.Add('      //free local objects...');
+     strList.Add('    }');
+     strList.Add('  ');
+     strList.Add('  //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+     strList.Add('  ');
+     strList.Add('  //write others [public] methods code here......');
+     strList.Add('  ');
+     strList.Add('}');
+     SynMemo1.Clear;
+     SynMemo1.Lines.Text:= strList.Text;
+     strList.Free;
+   end;
+
+   if Pos('Java jVisualControl', txtCaption) > 0 then
+   begin
+     newJavaClassName:= 'jMyVisualControl';
+     strList:= TStringList.Create;
+     strList.Add(' ');
+     strList.Add(' ');
+     strList.Add('import android.widget.RelativeLayout'); //dummy
      strList.Add('import android.content.Context;');
      strList.Add('import android.view.View;');
      strList.Add('import android.view.ViewGroup;');
      strList.Add(' ');
-     strList.Add('/*Draft java code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']*/');
+     strList.Add('/*Draft Java code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']*/');
      strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
-     strList.Add('/*jVisualControl LAMW template*/');
+     strList.Add('/*LAMW jVisualControl template*/');
      strList.Add('  ');
-     strList.Add('public class j'+newJavaClassName+' extends RelativeLayout /*dummy*/ { //please, fix what GUI object will be extended!');
+     strList.Add('public class '+newJavaClassName+' extends RelativeLayout /*dummy*/ { //please, fix what GUI object will be extended!');
      strList.Add(' ');
      strList.Add('    private long pascalObj = 0;        // Pascal Object');
      strList.Add('    private Controls controls  = null; //Java/Pascal [events] Interface ...');
@@ -558,11 +616,11 @@ begin
      strList.Add('    private Boolean enabled  = true;           // click-touch enabled!');
      strList.Add(' ');
      strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
-     strList.Add('    public j'+newJavaClassName+'(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!');
+     strList.Add('    public '+newJavaClassName+'(Controls _ctrls, long _self) { //Add more others news "_xxx" params if needed!');
      strList.Add(' ');
      strList.Add('       super(_ctrls.activity);');
      strList.Add('       context   = _ctrls.activity;');
-     strList.Add('       pascalObj = _Self;');
+     strList.Add('       pascalObj = _self;');
      strList.Add('       controls  = _ctrls;');
       strList.Add(' ');
      strList.Add('       LAMWCommon = new jCommons(this,context,pascalObj);');
@@ -654,6 +712,128 @@ begin
      SynMemo1.Lines.Text:= strList.Text;
      strList.Free;
    end;
+
+   if Pos('Kotlin jVisualControl', txtCaption) > 0 then
+   begin
+     FIsKotlin:= True;
+     newJavaClassName:= 'KMyToyButton';
+     strList:= TStringList.Create;
+     strList.Add(' ');
+     strList.Add(' ');
+     strList.Add('import android.view.View');
+     strList.Add('import android.view.ViewGroup');
+     strList.Add('import androidx.appcompat.widget.AppCompatButton');//"AppCompatButton" just as demo...change It!
+     strList.Add(' ');
+     strList.Add('/*Draft Kotlin code by "Lazarus Android Module Wizard" ['+DateTimeToStr(Now)+']*/');
+     strList.Add('/*https://github.com/jmpessoa/lazandroidmodulewizard*/');
+     strList.Add('/*LAMW Kotlin jVisualControl template*/');
+     strList.Add('  ');
+     strList.Add('class '+newJavaClassName+'(_ctrls: Controls, _self: Long) : AppCompatButton(_ctrls.activity) {');
+     strList.Add(' ');
+     strList.Add('    private var pascalObj: Long = 0        // Pascal Object');
+     strList.Add('    private var controls: Controls? = null //Java/Pascal [events] Interface ...');
+     strList.Add('    private val LAMWCommon: jCommons');
+     strList.Add(' ');
+     strList.Add('    private val onClickListener: OnClickListener   // click event');
+     strList.Add('    private var clicktouchEnable: Boolean = true           // click-touch enabled!');
+     strList.Add(' ');
+     strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+     strList.Add('    init {');
+     strList.Add('       pascalObj = _self');
+     strList.Add('       controls = _ctrls');
+     strList.Add('       LAMWCommon = jCommons(this, context, pascalObj)');
+     strList.Add(' ');
+     strList.Add('       onClickListener = OnClickListener {');
+     strList.Add('          if (clicktouchEnable) {');
+     strList.Add('              controls?.pOnClickGeneric(pascalObj) //JNI event onClick!');
+     strList.Add('          }');
+     strList.Add('       }');
+     strList.Add('       setOnClickListener(onClickListener)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun kFree() {');
+     strList.Add('       //free local objects...');
+     strList.Add('   	 setOnClickListener(null)');
+     strList.Add('	 LAMWCommon.free()');
+     strList.Add('    }');
+     strList.Add('  ');
+     strList.Add('    fun SetViewParent(_viewgroup: ViewGroup?) {');
+     strList.Add('	 LAMWCommon.setParent(_viewgroup)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun GetParent(): ViewGroup {');
+     strList.Add('       return LAMWCommon.getParent()');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun RemoveFromViewParent() {');
+     strList.Add('   	 LAMWCommon.removeFromViewParent()');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun GetView(): View {');
+     strList.Add('       return this');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetLParamWidth(_w: Int) {');
+     strList.Add('   	 LAMWCommon.setLParamWidth(_w)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetLParamHeight(_h: Int) {');
+     strList.Add('   	 LAMWCommon.setLParamHeight(_h)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun GetLParamWidth(): Int {');
+     strList.Add('       return LAMWCommon.getLParamWidth()');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun GetLParamHeight(): Int {');
+     strList.Add('	 return  LAMWCommon.getLParamHeight()');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetLGravity(_g: Int) {');
+     strList.Add('   	 LAMWCommon.setLGravity(_g)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetLWeight(_w: Float) {');
+     strList.Add('   	 LAMWCommon.setLWeight(_w)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetLeftTopRightBottomWidthHeight(_left: Int, _top: Int, _right: Int, _bottom: Int, _w: Int, _h: Int) {');
+     strList.Add('       LAMWCommon.setLeftTopRightBottomWidthHeight(_left, _top, _right, _bottom, _w, _h)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun AddLParamsAnchorRule(_rule: Int) {');
+     strList.Add('	 LAMWCommon.addLParamsAnchorRule(_rule)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun AddLParamsParentRule(_rule: Int) {');
+     strList.Add('	 LAMWCommon.addLParamsParentRule(_rule)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetLayoutAll(_idAnchor: Int) {');
+     strList.Add('   	 LAMWCommon.setLayoutAll(_idAnchor)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun ClearLayoutAll() {');
+     strList.Add('	 LAMWCommon.clearLayoutAll()');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...');
+     strList.Add('    fun SetId(_id: Int) {');  //need by code generation....
+     strList.Add('       this.setId(_id)');
+     strList.Add('    }');
+     strList.Add(' ');
+     strList.Add('    fun SetEnable(_value: Boolean) {');
+     strList.Add('       clicktouchEnable = _value;');
+     strList.Add('       this.setEnabled(_value)');
+     strList.Add('    }');
+      strList.Add(' ');
+     strList.Add('}');
+
+     SynMemo1.Clear;
+     SynMemo1.Lines.Text:= strList.Text;
+     strList.Free;
+   end;
+
 end;
 
 function TFrmCompCreate.GetHackListPascalClassInterf(produceAll: boolean): string;
@@ -663,7 +843,7 @@ var
 begin
   listPascal:= TStringList.Create;
 
-  listPascal.Add('unit '+Copy(LowerCase(FJavaClassName), 2, Length(FJavaClassName))+';');
+  listPascal.Add('unit u'+LowerCase(FJavaClassName)+';');
   listPascal.Add(' ');
   listPascal.Add('{$mode delphi}');
   listPascal.Add(' ');
@@ -706,7 +886,7 @@ begin
     else
     begin
       listPascal.Add('{warning: draft "'+FJavaClassName+'" complement....}');
-      listPascal.Add('{         copy/add to "'+Copy(LowerCase(FJavaClassName), 2, Length(FJavaClassName))+'.pas" file}');
+      listPascal.Add('{         copy/add to *'+LowerCase(FJavaClassName)+'.pas" file}');
       listPascal.Add(' ');
       listPascal.Add(FJavaClassName+' = class');
       listPascal.Add(' public');
@@ -857,7 +1037,10 @@ begin
     listPascal.Add('  begin');
     listPascal.Add('     if FjObject <> nil then');
     listPascal.Add('     begin');
-    listPascal.Add('       jFree();');
+    if not FIsKotlin then
+       listPascal.Add('       jFree();')
+    else
+       listPascal.Add('       kFree();');
     listPascal.Add('       FjObject:= nil;');
     listPascal.Add('     end;');
     listPascal.Add('  end;');
@@ -1114,7 +1297,11 @@ begin
      if auxList.Text = '' then auxList.Text:= SynMemo1.Text; //java class code...
      if auxList.Text = '' then Exit;
 
-     clsName:= Trim(GetJavaClassName(auxList));
+
+//     if not Self.FIsKotlin then
+        clsName:= Trim(GetJavaClassName(auxList));
+  //   else
+        //clsName:= Trim(GetKotlinClassName(auxList))
 
      nativeEventMethodList:= TStringList.Create;
      namingBypassList:= TStringList.Create;
@@ -1151,7 +1338,11 @@ begin
   begin
 
     produceAll:= True;
-    if Pos('complementary', strCaption) > 0  then produceAll:= False;
+    if Pos('complementary', strCaption) > 0  then
+    begin
+      produceAll:= False;
+      FIsKotlin:= TryIsKotlinComplementary(SynMemo1.Lines);
+    end;
 
     for i:= 0 to SynMemo1.Lines.Count-1 do  //import local....
     begin
@@ -1191,9 +1382,13 @@ begin
         auxList.Text:= SynMemo1.SelText; //java class code...
 
     if auxList.Text = '' then auxList.Text:= SynMemo1.Text; //java class code...
+
     if auxList.Text = '' then Exit;
 
-    clsName:= GetJavaClassName(auxList);
+    if not FIsKotlin then
+      clsName:= GetJavaClassName(auxList)
+    else
+      clsName:= GetKotlinClassName(auxList);
 
     if clsName <> '' then
     begin
@@ -1203,7 +1398,10 @@ begin
       FHackListPascalClass.Clear;
       FHackListPascalClassImpl.Clear;
 
-      DoJavaParse(produceAll);    //process...   FPascalJNIInterfaceCode
+      if not FIsKotlin then
+         DoJavaParse(produceAll)    //process...   FPascalJNIInterfaceCode
+      else
+         DoKotlinParse(produceAll);    //process...   FPascalJNIInterfaceCode
 
       FHackListPascalClassImpl.Add(' ');
       FHackListPascalClassImpl.Add('{-------- '+FJavaClassName +'_JNI_Bridge ----------}');
@@ -1389,9 +1587,11 @@ begin
       end;
       SplitStr(clsLine, ' ');  //remove "class" word...
       clsLine:= Trim(clsLine); //cleanup...
+
       if Pos(' ', clsLine) > 0  then index:= Pos(' ', clsLine)
       else if Pos('{', clsLine) > 0 then index:= Pos('{', clsLine)
       else if Pos(#10, clsLine) > 0 then index:= Pos(#10, clsLine);
+
       Result:= Trim(Copy(clsLine,1,index-1));  //get class name
    end;
 end;
@@ -1404,6 +1604,7 @@ var
  strList: TStringList;
  i: integer;
  frm: TFormRegisterComp;
+ fileExt: string;
 begin
   if (Sender as TMenuItem).Caption <> 'Cancel' then
   begin
@@ -1417,6 +1618,7 @@ begin
     frm.PathToLAMW:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator;
     frm.EditRegisterPath.Text:= FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'register_extras.pas';
     frm.EditRegisterPath.ReadOnly:= True;
+
     if frm.ShowModal = mrOK then
     begin
       iconPath:= frm.EditIconPath.Text;
@@ -1464,7 +1666,7 @@ begin
                  if Pos('Classes,', strList.strings[i]) > 0 then
                  begin
                    Inc(i);
-                   strList.Insert(i, '  '+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+',');
+                   strList.Insert(i, '  '+'u'+LowerCase(FJavaClassName)+',');
                  end else if Pos('begin', strList.strings[i]) > 0 then
                  begin
                     Inc(i);
@@ -1494,20 +1696,24 @@ begin
            SynMemo2.ClearSelection;
            SynMemo2.PasteFromClipboard;
 
-           if not FileExists(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas') then
-              SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas')
+           if not FileExists(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'u'+LowerCase(FJavaClassName)+'.pas') then
+              SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'u'+LowerCase(FJavaClassName)+'.pas')
            else
            begin
               case QuestionDlg ('FileExists!','Overwrite the ".pas" File?',mtWarning,[mrYes,'Yes', mrNo, 'No'], '') of
-                  mrYes: SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
+                  mrYes: SynMemo2.Lines.SaveToFile(FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+'u'+LowerCase(FJavaClassName)+'.pas');
               end;
            end;
-           //ShowMessage('Saved to: '+ FPathToLAMW+DirectorySeparator+'android_bridges'+DirectorySeparator+Copy(LowerCase(FJavaClassName),2,Length(FJavaClassName))+'.pas');
-           if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java') then
-              SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java')
+
+           fileExt:= '.kt';
+           if not FIsKotlin then
+             fileExt:= '.java';
+
+           if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+fileExt) then
+              SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+fileExt)
            else
            begin
-             case QuestionDlg ('FileExists!','Overwrite the ".java" File?',mtWarning,[mrYes,'Yes', mrNo, 'No'],'') of
+             case QuestionDlg ('FileExists!','Overwrite the "'+fileExt+'" File?',mtWarning,[mrYes,'Yes', mrNo, 'No'],'') of
                  mrYes: SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java');
              end;
            end;
@@ -1522,7 +1728,7 @@ begin
     end      //showModal
     else
     begin //cancel -> clean up
-      if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java') then
+      if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+fileExt) then
       begin
           if FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+'.create') then
           begin
@@ -1851,7 +2057,7 @@ begin
       strList.Add('import '+ importPack+';');
       strList.Add('import android.content.Context;');
 
-      if codeFrom = 1then //VisualControl
+      if codeFrom = 1 then //VisualControl
       begin
         strList.Add('import android.view.View;');
         strList.Add('import android.view.ViewGroup;');
@@ -1887,9 +2093,9 @@ begin
       supperParamEx:= listSupperParam.DelimitedText;
 
       if countSupperParam > 0 then
-           strList.Add('    public j'+javaClass+'(Controls _ctrls, long _Self,'+supperParamEx+') {')
+           strList.Add('    public j'+javaClass+'(Controls _ctrls, long _self,'+supperParamEx+') {')
       else
-           strList.Add('    public j'+javaClass+'(Controls _ctrls, long _Self) {');
+           strList.Add('    public j'+javaClass+'(Controls _ctrls, long _self) {');
 
       if countSupperParam > 0 then
       begin
@@ -1914,7 +2120,7 @@ begin
          strList.Add('       LAMWCommon = new jCommons(this,_ctrls.activity,pasobj);');
       end;
       strList.Add('       context   = _ctrls.activity;');
-      strList.Add('       pasobj = _Self;');
+      strList.Add('       pasobj = _self;');
       strList.Add('       controls  = _ctrls;');
       if codeFrom = 1 then
       begin
@@ -2257,10 +2463,10 @@ begin
     if pascalParamName <> '' then pascalParamName:= ', '+ pascalParamName;
 
     if FJavaClassName <> funcName then
-       FHackListPascalClassImpl.Add('   Result:= '+FJavaClassName+'_'+funcName+'(gApp.jni.jEnv, FjObject'+StringReplace(pascalParamName,'_Self', 'int64(Self)',[])+');')
+       FHackListPascalClassImpl.Add('   Result:= '+FJavaClassName+'_'+funcName+'(gApp.jni.jEnv, FjObject'+StringReplace(pascalParamName,'_self', 'int64(Self)',[])+');')
     else
     begin
-      FHackListPascalClassImpl.Add('   Result:= '+FJavaClassName+'_jCreate(gApp.jni.jEnv'+StringReplace(pascalParamName,'_Self', 'int64(Self)',[])+', gApp.jni.jThis);');
+      FHackListPascalClassImpl.Add('   Result:= '+FJavaClassName+'_jCreate(gApp.jni.jEnv'+StringReplace(pascalParamName,'_self', 'int64(Self)',[])+', gApp.jni.jThis);');
     end;
     FHackListPascalClassImpl.Add('end;');
   end;
@@ -2574,7 +2780,7 @@ var
   s1, s2: string;
   i, p1, p2: integer;
   strList, Memo3List, Memo4List, Memo5List, Memo6List: TStringList;
-  auxStr, auxName, auxParam, strPascalCode, auxPathJNI, methSignature, auxSignature: string;
+  auxStr, auxName, auxParam, strPascalCode, {auxPathJNI,} methSignature, auxSignature: string;
   strOnLoadList: TStringList;
   clipList: TStringList;
 begin
@@ -2602,16 +2808,19 @@ begin
         pNative:= Pos('public ', s1);
         if pNative > 0  then
         begin
-           s2:= s1;
-           pSemicolon:= Pos(')', s1);
-           while pSemicolon = 0 do
-           begin
-             inc(i);
-             s1:= s1 + clipList.Strings[i];
-             s2:=DeleteLineBreaks(s1);
-             pSemicolon:= Pos(')', s2);
-           end;
-           strList.Add(s2);
+          if Pos('class ', s1) <= 0 then
+          begin
+             s2:= s1;
+             pSemicolon:= Pos(')', s1);
+             while pSemicolon = 0 do
+             begin
+               inc(i);
+               s1:= s1 + clipList.Strings[i];
+               s2:=DeleteLineBreaks(s1);
+               pSemicolon:= Pos(')', s2);
+             end;
+             strList.Add(Trim(Copy(s2, 1, pSemicolon)));
+          end;
         end;
         inc(i);
     end;
@@ -2646,8 +2855,8 @@ begin
 
       Memo4List.Add(auxParam);
 
-      auxPathJNI:= FJNIDecoratedMethodName;
-      SplitStr(auxPathJNI,'_');
+      //auxPathJNI:= FJNIDecoratedMethodName;
+      //SplitStr(auxPathJNI,'_');
 
       auxSignature:= Trim(strList.Strings[strList.Count-2]);
       methSignature:= GetJSignature(Trim(auxParam), auxSignature);
@@ -2678,6 +2887,335 @@ begin
 
     strList.Free;
     strOnLoadList.Free;
+end;
+
+             {New Kotlin Support!}
+
+//Int -> int
+function TFrmCompCreate.GetJavaTypeFromKotlin(ktType: string): string;
+var
+  storeList: TStringList;
+  javaType: string;
+  index: integer;
+begin
+  storeList:= TStringList.Create;
+
+  storeList.Sorted:= True;
+  storeList.AddPair('Long', 'long');
+  storeList.AddPair('Int', 'int');
+  storeList.AddPair('Short', 'short');
+  storeList.AddPair('Byte', 'byte');
+  storeList.AddPair('Float','float');
+  storeList.AddPair('Double','double');
+  storeList.AddPair('Boolean', 'boolean');
+  storeList.AddPair('Unit', 'void');
+  storeList.AddPair('Void', 'void');
+
+  index:= storeList.IndexOfName(ktType);
+  if index >=0 then
+    javaType:= storeList.ValueFromIndex[index]
+  else
+    javaType:= ktType;
+
+  Result:= javaType;
+
+  storeList.Free;
+end;
+
+//a: Int  --> Int a
+function TFrmCompCreate.SwapKotlinParams(params: string): string;
+var
+  listParam, listJavaParam: TStringList;
+  paramName, paramValue: string;
+  i, count: integer;
+begin
+   listJavaParam:= TStringList.Create;
+   listJavaParam.StrictDelimiter:= True;
+   listJavaParam.Delimiter:= ',';
+   listParam:= TStringList.Create;
+   listParam.StrictDelimiter:= True;
+   listParam.Delimiter:= ',';
+   listParam.DelimitedText:= params;
+   count:=listParam.Count;
+   for i:= 0 to count-1 do
+   begin
+      paramValue:=listParam.Strings[i];
+      paramName:= SplitStr(paramValue, ':');
+
+      if Pos('?',paramValue) > 0 then
+         paramValue:= ReplaceChar(paramValue, '?', ' ');
+
+      listJavaParam.Add( GetJavaTypeFromKotlin( Trim(paramValue) ) + ' ' + Trim(paramName) );
+
+   end;
+   Result:= listJavaParam.DelimitedText;
+   listParam.Free;
+   listJavaParam.Free;
+end;
+
+function TFrmCompCreate.GetJavaSignatureFromKotlin(ktSign: string): string;
+var
+  kotlinParams, javaParams: string;
+  kotlinMethodName: string;
+  methodResult: string;
+  p0, p1, p2, p3: integer;
+begin
+   p1:= Pos('(', ktSign);
+   p2:= Pos(')', ktSign);
+
+   kotlinParams:= Copy(ktSign, p1+1,  p2-(p1+1));
+
+   javaParams:= SwapKotlinParams(kotlinParams);
+
+   p0:= Pos('fun', ktSign);
+
+   kotlinMethodName:= Copy(ktSign, p0+4,  p1 - (p0+4) );
+
+   methodResult:=  ktSign;
+   SplitStr(methodResult, ')');
+
+   methodResult:= Trim(methodResult);
+
+   if Length(methodResult) > 0 then
+   begin
+      p3:= Pos(':',methodResult);
+      if p3 > 0 then
+      begin
+        methodResult:= Copy(methodResult, p3+1,Length(methodResult));
+      end else methodResult:= 'Unit';
+   end else methodResult:= 'Unit';
+
+   Result:= 'public '+GetJavaTypeFromKotlin(Trim(methodResult))+' '+kotlinMethodName+'('+javaParams+')';
+
+end;
+
+//TKControl(_ctrls: Controls, _self: Long)/*: ???*/ {
+function TFrmCompCreate.GetKotlinClassName(selList: TStringList): string;
+var
+  clsLine: string;
+  foundClass: boolean;
+  i, p1, p2: integer;
+begin
+    Result:= 'MyKotlinControl';
+    if selList.Text = '' then Exit;
+    foundClass:= False;
+    i:= 0;
+    while (not foundClass) and (i < selList.Count) do
+    begin
+       clsLine:= selList.Strings[i];
+       p1:= Pos('class ', clsLine);
+       if  p1 > 0 then foundClass:= True;
+       Inc(i);
+    end;
+    if foundClass then
+    begin
+      p1:= p1 + 6; //'class '
+      p2:= Pos('(',clsLine);
+      Result:= Trim(Copy(clsLine,p1,p2-p1));  //get class name
+    end;
+end;
+
+//public TKControl(Controls _ctrls, long _self)
+function TFrmCompCreate.GetKotlinClassConstructorSignature(selList: TStringList): string;
+var
+  clsLine: string;
+  foundClass: boolean;
+  i, p1, p2: integer;
+  kotlinParams, kotlinSignature: string;
+begin
+    Result:= 'public '+Self.FJavaClassName+'(Controls _ctrls, long _self)';
+
+    if selList.Text = '' then Exit;
+    foundClass:= False;
+    i:= 0;
+    while (not foundClass) and (i < selList.Count) do
+    begin
+       clsLine:= selList.Strings[i];
+       p1:= Pos('class ', clsLine);
+       if  p1 > 0 then foundClass:= True;
+       Inc(i);
+    end;
+    if foundClass then
+    begin
+      p1:= Pos('(', clsLine);
+      p2:= Pos (')', clsLine);
+      kotlinParams:= Trim( Copy( clsLine,p1+1,p2-(p1+1) ) );  //get class name
+    end;
+    kotlinSignature:='fun '+Self.FJavaClassName+'('+kotlinParams+')';
+    kotlinSignature:= GetJavaSignatureFromKotlin(kotlinSignature);
+    Result:= StringReplace(kotlinSignature,'void', '', [rfIgnoreCase, rfReplaceAll]);
+end;
+
+procedure TFrmCompCreate.DoKotlinParse(produceAll: boolean);
+var
+  pNative, pPublic, pComment1, pComment2, pSemicolon: integer;
+  s1, s2: string;
+  i, p1, p2: integer;
+  strList, Memo3List, Memo4List, Memo5List, Memo6List: TStringList;
+  auxStr, auxName, auxParam, strPascalCode, {auxPathJNI,} methSignature, auxSignature: string;
+  strOnLoadList: TStringList;
+  clipList: TStringList;
+  javaSignature, kotlinClassConstructorSignature: string;
+begin
+    Memo2List.Clear;   //global
+    SynMemo2.Clear;    //global
+
+    Memo3List:= TStringList.Create;
+    Memo4List:= TStringList.Create;
+    Memo5List:= TStringList.Create;
+    Memo6List:= TStringList.Create;
+    strOnLoadList:= TStringList.Create;
+
+    strList:= TStringList.Create;
+    clipList:= TStringList.Create;
+
+    if  SynMemo1.SelText <> '' then
+       clipList.Text:= SynMemo1.SelText
+    else
+       clipList.Text:= SynMemo1.Text;
+
+    kotlinClassConstructorSignature:= GetKotlinClassConstructorSignature(clipList);
+    strList.Add(kotlinClassConstructorSignature);
+
+    i:= 0;
+    while i < clipList.Count do
+    begin
+        s1:= clipList.Strings[i];
+        pNative:= Pos('fun ', s1);
+        if pNative > 0  then
+        begin
+             s2:= s1;
+             pSemicolon:= Pos('{', s1);
+             while pSemicolon = 0 do
+             begin
+               inc(i);
+               s1:= s1 + clipList.Strings[i];
+               s2:=DeleteLineBreaks(s1);
+               pSemicolon:= Pos('{', s2);
+             end;
+             javaSignature:= GetJavaSignatureFromKotlin(Trim(Copy(s2, 1, pSemicolon-1)));
+             strList.Add(javaSignature);
+        end;
+        inc(i);
+    end;
+    clipList.Free;
+
+    for i:=0 to strList.Count-1 do   //check if the code was "//" [commented] or  "/*.*/" [invisible]
+    begin
+       s1:= strList.Strings[i];
+       if s1 <> '' then
+       begin
+         pPublic:= Pos('public ', s1);
+         pComment1:= Pos('//', s1);
+         if pComment1 = 0 then  pComment1:= 10000;  //not found...
+         pComment2:= Pos('/*.*/', s1);              //just a mask for parse invisibility...
+         if pComment2 = 0 then  pComment2:= 10000;  //not found...
+
+         if (pPublic < pComment1) and (pPublic < pComment2) then
+            Memo2List.Add(s1);
+
+       end;
+    end;
+    strList.Clear;
+
+    for i:=0 to Memo2List.Count - 1 do
+    begin
+      auxStr:= Trim(Memo2List.Strings[i]);
+      p1:= Pos('(', auxStr);
+      p2:= Pos(')', auxStr);
+      auxName:=  Copy(auxStr, 0, p1-1);
+      auxParam:= Copy(auxStr, p1+1, (p2-p1)-1);
+
+      strList.DelimitedText:= auxName;
+      Memo3List.Add(Trim(strList.Strings[strList.Count-1]));
+      Memo3List.Add(Trim(strList.Strings[strList.Count-2]));
+
+      Memo4List.Add(auxParam);
+
+      //auxPathJNI:= FJNIDecoratedMethodName;
+      //SplitStr(auxPathJNI,'_');
+
+      auxSignature:= Trim(strList.Strings[strList.Count-2]);
+      methSignature:= GetJSignature(Trim(auxParam), auxSignature);
+
+      if produceAll then
+         strPascalCode:= GetPascalCodeHack(Trim(strList.Strings[strList.Count-1]) {funct},
+                                           Trim(auxParam),
+                                           auxSignature{result}, methSignature)
+
+      else if auxSignature <> 'public' then
+             strPascalCode:= GetPascalCodeHack(Trim(strList.Strings[strList.Count-1]) {funct},
+                                               Trim(auxParam),
+                                               auxSignature{result}, methSignature);
+      Memo5List.Add(strPascalCode);
+      Memo6List.Add('  '+Trim(strList.Strings[strList.Count-1])+' name '''+
+                       FJNIDecoratedMethodName+'_'+Trim(strList.Strings[strList.Count-1])+''',');
+    end;
+
+    auxStr:= Memo6List.Strings[Memo6List.Count-1];
+    Memo6List.Strings[Memo6List.Count-1]:= ReplaceChar(auxStr,',',';');
+
+    FPascalJNIInterfaceCode:= Memo5List.Text + LineEnding;
+
+    Memo3List.Free;
+    Memo4List.Free;
+    Memo5List.Free;
+    Memo6List.Free;
+
+    strList.Free;
+    strOnLoadList.Free;
+end;
+
+function TFrmCompCreate.TryIsKotlinComplementary(selList: TStrings): boolean;
+var
+  i, count, index: integer;
+  flag1, flag2: boolean;
+begin
+
+   flag1:= False;
+   flag2:= False;
+
+   count:= selList.Count;
+   i:= 0;
+   while( i < count) do
+   begin
+      if Pos('class ', selList.Strings[i]) > 0 then
+      begin
+         index:= i;
+         i:= count;
+      end;
+      inc(i);
+   end;
+
+   if Pos('()', selList.Strings[index]) > 0 then
+   begin
+      flag1:= True;
+   end;
+
+   if Pos(' fun ',  selList.Text) >  0 then
+   begin
+     flag2:= True;
+   end
+   else
+   begin
+      if flag1 then
+      begin
+         if Pos('fun ',  selList.Text) >  0 then
+           flag2:= True;
+      end
+   end;
+
+   if flag1 and flag2 then
+   begin
+     ShowMessage('warning: Handling as Kotlin code!');
+     Result:= True
+   end
+   else
+   begin
+     ShowMessage('warning: Handling as Java code!');
+      Result:= False;
+   end;
+
 end;
 
 function GetPathToWizard(): string;

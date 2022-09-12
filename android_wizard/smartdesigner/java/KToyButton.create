@@ -1,0 +1,3 @@
+public java.lang.Object KToyButton_jCreate(long _self) {
+  return (java.lang.Object)(new KToyButton(this,_self));
+}

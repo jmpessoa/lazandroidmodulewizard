@@ -5821,6 +5821,7 @@ begin
   FLParamHeight := lpWrapContent;
   FEnabled:= True;
   FAllCaps := False;
+
 end;
 
 destructor jButton.Destroy;
@@ -5968,6 +5969,7 @@ end;
 procedure jButton.SetText(Value: string);
 begin
   inherited SetText(Value); //by thierry
+
   if FjObject = nil then exit;
 
   jni_proc_h(gApp.jni.jEnv, FjObject, 'setText', Value{FText}); //by thierry

@@ -53,8 +53,8 @@ type
 
     //Smart Designer helpers
     procedure InitSmartDesignerHelpers;
-    procedure UpdateJControlsList; inline;
-    procedure UpdateFCLControlsList; inline;
+    procedure UpdateJControlsList; //inline;
+    procedure UpdateFCLControlsList; //inline;
 
   protected
     //procedure OnDesignerModified(Sender: TObject);
@@ -93,8 +93,8 @@ type
     destructor Destroy; override;
     procedure InvalidateRect(Sender: TObject; ARect: TRect; Erase: boolean);
     function RootDir: string;
-    function AssetsDir: string; inline;
-    function ResDir: string; inline;
+    function AssetsDir: string;// inline;
+    function ResDir: string; //inline;
     function FindDrawable(AResourceName: string): string;
     property AndroidForm: TAndroidForm{jForm} read GetAndroidForm;  //gdx
     property AndroidTheme: TAndroidTheme read FTheme;
@@ -207,6 +207,15 @@ type
   { TDraftButton }
 
   TDraftButton = class(TDraftDrawableWidget)
+  public
+    constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
+    procedure Draw; override;
+    procedure UpdateLayout; override;
+  end;
+
+  { TDraftKToyButton }
+
+  TDraftKToyButton = class(TDraftDrawableWidget)
   public
     constructor Create(AWidget: TAndroidWidget; Canvas: TCanvas); override;
     procedure Draw; override;
@@ -332,6 +341,7 @@ type
     procedure Draw; override;
     procedure UpdateLayout; override;
   end;
+
 
   { TDraftZoomableImageView }
 
@@ -788,7 +798,7 @@ uses
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
   customcamera, sadmob, calendarview, searchview, zbarcodescannerview,
   scontinuousscrollableimageview, copenmapview, csignaturepad,
-  zoomableimageview, tablelayout, imagebutton;
+  zoomableimageview, tablelayout, imagebutton, uktoybutton;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -1762,7 +1772,7 @@ begin
   Dec(FFreeLeft);
 end;
 
-function TDraftControlHash.Find(VisualControlClass: TClass): TDraftWidgetClass;
+function TDraftControlHash.Find(VisualControlClass: TClass): TDraftWidgetClass;  //??
 var i: PtrUInt;
 begin
   Result := nil;
@@ -2179,55 +2189,53 @@ var
 begin
   if AComponent <> AndroidForm then // to preserve jForm size
   begin
-
     if Acomponent is jControl then
     begin
-      if AComponent.Name.StartsWith(AComponent.ClassName) and (AComponent.Name[1] = 'j') then
+      if AComponent.Name.StartsWith(AComponent.ClassName) then
       begin
+          if (AComponent.Name[1] = 'j') or (AComponent.Name[1] = 'J') or (AComponent.Name[1] = 'K') then
+          begin
+              newName := AComponent.ClassName;
+              Delete(newName, 1, 1); // drop j
 
-        newName := AComponent.ClassName;
-        Delete(newName, 1, 1); // drop j
+              //for jc or js  prefix
+              if (newName[1] = 'c') or  (newName[1] = 's') then
+              begin
+                 Delete(newName, 1, 1); //drop c or s
+              end;
 
-        //for jc or js  prefix
-        if (newName[1] = 'c') or  (newName[1] = 's') then
-        begin
-           Delete(newName, 1, 1); //drop c or s
-        end;
+              i := 1;
 
-        i := 1;
+              //begin legacy
+              oldName:=  AComponent.ClassName;
+              while (Root.FindComponent(oldName + IntToStr(i)) <> nil)  do
+              begin
+                 Inc(i);
+              end;
+              //end legacy
 
-        //begin legacy
-        oldName:=  AComponent.ClassName;
-        while (Root.FindComponent(oldName + IntToStr(i)) <> nil)  do
-        begin
-           Inc(i);
-        end;
-        //end legacy
-
-        if i > 1 then i := i - 1;
-        while (Root.FindComponent(newName + IntToStr(i)) <> nil)  do
-        begin
-           Inc(i);
-        end;
-        AComponent.Name := newName + IntToStr(i);
+              if i > 1 then i := i - 1;
+              while (Root.FindComponent(newName + IntToStr(i)) <> nil)  do
+              begin
+                 Inc(i);
+              end;
+              AComponent.Name := newName + IntToStr(i);
+          end;
       end;
-
     end; //jControl
 
     if AComponent is TAndroidWidget then
     begin
-
       with NewBounds do
       begin
         if (Right - Left = 50) and (Bottom - Top = 50) then // ugly check, but IDE makes 50x50 default size for non TControl
         begin
           // restore default size
           Right := Left + TAndroidWidget(AComponent).Width;
-          Bottom := Top + TAndroidWidget(AComponent).Height
+          Bottom := Top + TAndroidWidget(AComponent).Height;
         end;
         inherited InitComponent(AComponent, NewParent, NewBounds);
       end;
-
     end; //visual control
 
     if (AComponent is jVisualControl) and Assigned(jVisualControl(AComponent).Parent) then
@@ -2280,7 +2288,9 @@ var
       Font.Color:= Self.FDefaultFontColor;
 
       if AWidget is jVisualControl then
+      begin
         with jVisualControl(AWidget) do
+        begin
           if Assigned(Anchor) then
           begin
             RestoreHandleState;
@@ -2292,6 +2302,8 @@ var
             SaveHandleState;
             MoveWindowOrgEx(Handle, AWidget.Left, AWidget.Top);
           end;
+        end;
+      end;
 
       if (AWidget is jForm) then
       begin
@@ -2324,22 +2336,22 @@ var
            //StretchDraw(Rect(0,0,AWidget.Width,AWidget.Height), fbkImage);
            Draw(0, 0, fbkImage);
         end;
-
       end else
-      // generic
-      begin
-        fWidgetClass := DraftClassesMap.Find(AWidget.ClassType);
+      begin  // generic visualcontrol
+
+        fWidgetClass := DraftClassesMap.Find(AWidget.ClassType); //warning! capacty = 128 ... update when needed! --> DraftClassesMap := TDraftControlHash.Create(256)
+
         if Assigned(fWidgetClass) then
         begin
           fWidget := fWidgetClass.Create(AWidget, LCLForm.Canvas);
-          if CanUpdateLayout
-          and (not FSizing or (FSelection.IndexOf(AWidget) < 0)) then
+          if CanUpdateLayout and (not FSizing or (FSelection.IndexOf(AWidget) < 0)) then
+          begin
             fWidget.UpdateLayout;
+          end;
           fWidget.Draw;
           fWidget.Free;
         end
-        // default drawing: rect with Text
-        else if (AWidget is jVisualControl) then
+        else if (AWidget is jVisualControl) then  // default drawing: rect with Text
         begin
           Brush.Color:= Self.FDefaultBrushColor;
           FillRect(0,0,AWidget.Width,AWidget.Height);
@@ -2349,7 +2361,7 @@ var
           TextOut(5,4,AWidget.Text);
         end;
 
-      end;
+      end; //generic visual control
 
       if AWidget.AcceptChildrenAtDesignTime then
       begin       //inner rect...
@@ -2431,13 +2443,16 @@ var
 var
   i: Integer;
 begin
-  CanUpdateLayout := (FProjFile = nil)
-    or not SameText(FProjFile.CustomData['DisableLayout'], 'True');
+
+  CanUpdateLayout := (FProjFile = nil) or not SameText(FProjFile.CustomData['DisableLayout'], 'True');
+
   FStarted.Clear;
   FDone.Clear;
+
   FCustomDialogs.Clear; // jCustomDialogs are drawn after all other components
 
   PaintWidget(AndroidForm);
+
   for i := 0 to FCustomDialogs.Count - 1 do
     PaintCustomDialog(jCustomDialog(FCustomDialogs[i]));
 
@@ -2984,6 +2999,116 @@ begin
       Font.Size := lastSize;
       Font.Style := lastStyle;
     end;
+  inherited UpdateLayout;
+end;
+
+
+{ TDraftKToyButton }
+
+constructor TDraftKToyButton.Create(AWidget: TAndroidWidget; Canvas: TCanvas);
+begin
+  BaseStyle := 'buttonStyle';
+  DrawableDest := 'android:background';
+  DrawableAttribs := 'android:state_enabled=' + IfThen(KToyButton(AWidget).Enabled, 'true', 'false');
+  inherited;
+  Color := KToyButton(AWidget).BackgroundColor;
+  FontColor := KToyButton(AWidget).FontColor;
+end;
+
+procedure TDraftKToyButton.Draw;
+var
+  r: TRect;
+  ts: TTextStyle;
+  lastFontSize: Integer;
+  auxText: string;
+begin
+  with Fcanvas do
+  begin
+    Brush.Color := BackGroundColor;
+    Pen.Color := clForm;
+    Font.Color := TextColor;
+
+    r := Rect(0, 0, Self.Width, Self.Height);
+
+    if Drawable <> nil then
+    begin
+      if BackGroundColor <> clNone then
+        FillRect(r)
+      else
+        StretchDraw(r, Drawable);
+    end else begin
+      if BackGroundColor = clNone then
+        Brush.Color := BlendColors(GetBackgroundColor, 2/5, 153, 153, 153);
+      FillRect(r);
+
+      //outer frame
+      Rectangle(r);
+
+      Pen.Color := clMedGray;
+      Brush.Style := bsClear;
+      InflateRect(r, -1, -1);
+      Rectangle(r);
+    end;
+
+    Brush.Style := bsClear;
+    lastFontSize := Font.Size;
+    Font.Size := AndroidToLCLFontSize(KToyButton(FAndroidWidget).FontSize, 12);
+    ts := TextStyle;
+    ts.Layout := tlCenter;
+    ts.Alignment := Classes.taCenter;
+
+    auxText:= FAndroidWidget.Text;
+
+    if KToyButton(FAndroidWidget).AllCaps then
+    begin
+       auxText:= UpperCase(auxText);
+    end;
+
+    TextRect(r, r.Left, r.Top, auxText, ts);
+    Font.Size := lastFontSize;
+  end;
+end;
+
+procedure TDraftKToyButton.UpdateLayout;
+var
+  lastSize: Integer;
+  lastStyle: TFontStyles;
+begin
+
+  with KToyButton(FAndroidWidget), FCanvas do
+    if (LayoutParamHeight = lpWrapContent)
+    or (LayoutParamWidth = lpWrapContent) then
+    begin
+      lastSize := Font.Size;
+      lastStyle := Font.Style;
+      SetupFont(Font, FontSize, 13, tfNormal);
+
+      with TextExtent(Text) do
+      begin
+        if LayoutParamWidth = lpWrapContent then
+        begin
+          FMinWidth := cx;
+          if Drawable is T9PatchPNG then
+            with T9PatchPNG(Drawable).Padding do
+              FMinWidth := FMinWidth + Left + Right
+          else
+            FMinWidth := FMinWidth + 14 + 13
+        end;
+        if LayoutParamHeight = lpWrapContent then
+        begin
+          FMinHeight := cy;
+          if Drawable is T9PatchPNG then
+            with T9PatchPNG(Drawable).Padding do
+              FMinHeight := FMinHeight + Top + Bottom + 11
+          else
+            FMinHeight := FMinHeight + 14 + 13
+        end;
+      end;
+
+      Font.Size := lastSize;
+      Font.Style := lastStyle;
+    end;
+
   inherited UpdateLayout;
 end;
 
@@ -5095,7 +5220,7 @@ end;
 
 
 initialization
-  DraftClassesMap := TDraftControlHash.Create(64); // should be power of 2 for efficiency
+  DraftClassesMap := TDraftControlHash.Create(128); // should be power of 2 for efficiency
   RegisterPropertyEditor(TypeInfo(TARGBColorBridge), nil, '', TARGBColorBridgePropertyEditor);
   RegisterPropertyEditor(TypeInfo(jVisualControl), jVisualControl, 'Anchor', TAnchorPropertyEditor);
   RegisterComponentEditor(jForm, TAndroidFormComponentEditor);
@@ -5130,6 +5255,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jProgressBar, TDraftProgressBar);
   RegisterAndroidWidgetDraftClass(jSeekBar, TDraftSeekBar);
   RegisterAndroidWidgetDraftClass(jButton, TDraftButton);
+  RegisterAndroidWidgetDraftClass(KToyButton, TDraftKToyButton);
   RegisterAndroidWidgetDraftClass(jCheckBox, TDraftCheckBox);
   RegisterAndroidWidgetDraftClass(jRadioButton, TDraftRadioButton);
   RegisterAndroidWidgetDraftClass(jTextView, TDraftTextView);

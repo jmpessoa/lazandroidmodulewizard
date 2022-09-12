@@ -2112,7 +2112,6 @@ var
 
 implementation
 
-
 //by Tomash
 function GetPStringAndDeleteLocalRef(env: PJNIEnv; var jStr: jString): string;
 var

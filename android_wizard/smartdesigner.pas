@@ -46,6 +46,7 @@ type
     FMinSdkControl: integer;
     FNdkApi: string;
     FAndroidTheme: string;
+    FIsKotlinSupported: boolean;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -276,7 +277,8 @@ begin
          AComponentClass.ClassNameIs('jsBottomNavigationView') or
          AComponentClass.ClassNameIs('jsContinuousScrollableImageView') or
          AComponentClass.ClassNameIs('jsAdMod') or
-         AComponentClass.ClassNameIs('jsFirebasePushNotificationListener') then
+         AComponentClass.ClassNameIs('jsFirebasePushNotificationListener') or
+         AComponentClass.ClassNameIs('KToyButton')  then
       begin
         ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
                      'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
@@ -1089,6 +1091,8 @@ begin
 
          strList.Clear;
          strList.Add('buildscript {');
+         if FIsKotlinSupported then
+           strList.Add('    ext.kotlin_version = ''1.6.10''');
          strList.Add('    repositories {');
          strList.Add('        mavenCentral()');
          strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
@@ -1099,6 +1103,9 @@ begin
          strList.Add('    }');
          strList.Add('    dependencies {');
          strList.Add('        classpath ''com.android.tools.build:gradle:'+ pluginVersion+'''');
+         if FIsKotlinSupported then
+           strList.Add('        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"');
+
          strList.Add('    }');
          strList.Add('}');
 
@@ -1114,6 +1121,9 @@ begin
          strList.Add('}');
 
          strList.Add('apply plugin: ''com.android.application''');
+         if FIsKotlinSupported then
+            strList.Add('apply plugin: ''kotlin-android''');
+
          strList.Add('android {');
          strList.Add('    lintOptions {');
          strList.Add('       abortOnError false');
@@ -1311,12 +1321,20 @@ begin
 
          strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-         for aAppCompatLib in AppCompatLibs do
+         if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
-             strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
-             if aAppCompatLib.MinAPI > StrToInt(buildToolApi) then
-                ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
-                             IntToStr(aAppCompatLib.MinAPI));
+           for aAppCompatLib in AppCompatLibs do
+           begin
+               strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
+               if aAppCompatLib.MinAPI > StrToInt(buildToolApi) then
+                  ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
+                               IntToStr(aAppCompatLib.MinAPI));
+           end;
+           if FIsKotlinSupported then
+           begin
+              strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
+              strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
+           end;
          end;
 
          if Pos('GDXGame', FAndroidTheme) > 0 then
@@ -1692,6 +1710,7 @@ var
   updateTargetApi: integer;
   updateBuildTool: string;
   outBuildTool: string;
+  tryKotlin: string;
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
@@ -1704,6 +1723,12 @@ begin
     FPathToSmartDesigner:= LamwGlobalSettings.PathToSmartDesigner;
 
     FAndroidTheme:= AProject.CustomData['Theme'];
+
+    tryKotlin:= AProject.CustomData['TryKotlin'];
+
+    FIsKotlinSupported:= False;
+    if tryKotlin = 'TRUE' then
+       FIsKotlinSupported:= True;
 
     ndkRelease:= LamwGlobalSettings.GetNDKRelease;
     if ndkRelease <> '' then
@@ -2180,39 +2205,36 @@ var
   i: integer;
   fileName: string;
 begin
-   //By TR3E, disable backup of .java for not incrementase .apk file
-  //of gradle and not showing source code of program
 
-  //ForceDirectory(FPathToJavaSource+'bak');
   contentList:= FindAllFiles(FPathToJavaSource, '*.java', False);
   for i:= 0 to contentList.Count-1 do
   begin
-
-    //dont backup anymore...
-    //CopyFile(contentList.Strings[i],
-          //FPathToJavaSource+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
-
     fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
-
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
     begin
        DeleteFile(contentList.Strings[i]);
     end;
-
   end;
   contentList.Free;
 
-  //ForceDirectory(FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak');
+  contentList:= FindAllFiles(FPathToJavaSource, '*.kt', False);
+  for i:= 0 to contentList.Count-1 do
+  begin
+    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
+    if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
+    begin
+       DeleteFile(contentList.Strings[i]);
+    end;
+  end;
+  contentList.Free;
+
   contentList := FindAllFiles(FPathToAndroidProject+'lamwdesigner', '*.native', False);
   for i:= 0 to contentList.Count-1 do
   begin
-    { //dont backup anymore...
-    CopyFile(contentList.Strings[i],
-         FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'bak'+DirectorySeparator+ExtractFileName(contentList.Strings[i])+'.bak');
-    }
     DeleteFile(contentList.Strings[i]);
   end;
   contentList.Free;
+
 end;
 
 procedure TLamwSmartDesigner.GetAllJControlsFromForms(jControlsList: TStrings);
@@ -2346,7 +2368,7 @@ begin
 end;
 
 // returns the original file name from the JAVA template directory
-// ex: JClasSs = class(JControl) -> jClass.java
+// ex: JClass = class(JControl) -> jClass.java
 //warning: On Linux, this should also work because TSearchRec is cross-platform, but I have not tested it.
 function TLamwSmartDesigner.GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
 var
@@ -2369,6 +2391,8 @@ var
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
   isGradle : boolean;
+  LenInsertRef, LenInsertRefVer: integer;
+
 begin
    nativeAdded:= False;
    Result:= False;
@@ -2376,6 +2400,7 @@ begin
    if FPackageName = '' then Exit;
 
    if FileExists(FPathToJavaSource+jclassname+'.java') then Exit; //do not duplicated!
+   if FileExists(FPathToJavaSource+jclassname+'.kt') then Exit; //do not duplicated!
 
    list:= TStringList.Create;
    manifestList:= TStringList.Create;
@@ -2403,7 +2428,31 @@ begin
           end;
        end;
      end;
+     Result:= True;
+   end;
 
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.kt') then
+   begin
+     list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.kt');
+     list.Strings[0]:= 'package '+FPackageName+';';
+
+     //Pascal classes can now be written case-insensitively :)
+     list.SaveToFile(FPathToJavaSource + GetCorrectTemplateFileName(LamwGlobalSettings.PathToJavaTemplates, jclassname + '.kt')); // by kordal
+
+     //add relational class
+     if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational') then
+     begin
+       list.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.relational');
+       for i:= 0 to list.Count-1 do
+       begin
+          if FileExists(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]) then
+          begin
+            auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + list.Strings[i]);
+            auxList.Strings[0]:= 'package '+FPackageName+';';
+            auxList.SaveToFile(FPathToJavaSource + list.Strings[i]);
+          end;
+       end;
+     end;
      Result:= True;
    end;
 
@@ -2486,7 +2535,7 @@ begin
    begin
       if not isGradle then
       begin
-         ShowMessage(jclassname+'.java require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
+         ShowMessage(jclassname+' component require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
          LazarusIDE.ActiveProject.Modified:= True;
          LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
       end;
@@ -2871,42 +2920,40 @@ begin
    end;
    //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.classpath') then
-   begin
-      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.classpath');
+   begin                                                                                     //jsFirebasePushNotificationListener.classpath
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.classpath');  //classpath 'com.google.gms:google-services:4.3.8'
       if auxList.Text <> '' then
       begin
+
         gradleList:=TStringList.Create;
         gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
         aux:= gradleList.Text;
-        insertRef:= 'classpath ''com.android.tools.build:gradle:4.1.3''';
+        insertRef:= 'classpath ''com.android.tools.build:gradle:'; //4.1.3
+
+        LenInsertRefVer:= 6; //4.1.3'
+        LenInsertRef:=Length(insertRef) + LenInsertRefVer;
+
         for i:= 0 to auxList.Count-1 do
         begin
            auxStr:=auxList.Strings[i];
-           SplitStr(auxStr, ' ');
-
-           count:= WordCount(auxStr, [':']);
-           if count > 2 then //has version
-              p:= LastDelimiter(':',auxStr)
-           else
-              p:= Length(auxStr);
-
+           SplitStr(auxStr, ' '); //--> 'com.google.gms:google-services:4.3.8'
+           p:= LastDelimiter(':',auxStr); //classpath 'com.google.gms:google-services:4.3.8'
            tempStr:= Copy(auxStr, 2, p - 2);
            if Pos(tempStr, aux) <= 0 then
            begin
              p1:= Pos(insertRef, aux);
-             Insert(sLineBreak + '        ' + auxList.Strings[i] , aux, p1 + Length(insertRef));
+             Insert(sLineBreak + '        ' + auxList.Strings[i] , aux, p1 + LenInsertRef);
            end;
-
         end;
         gradleList.Text:= aux;
-        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle');
         gradleList.Free;
       end;
    end;
    //-----
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin') then
-   begin
-      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin');
+   begin                                                                                  //jsFirebasePushNotificationListener.plugin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin');  //apply plugin: 'com.google.gms.google-services'
       if auxList.Text <> '' then
       begin
         gradleList:=TStringList.Create;
@@ -3025,6 +3072,18 @@ begin
   javaClassList.Free;
 
   javaClassList := FindAllFiles(FPathToJavaSource, '*.java', False);
+  for k := 0 to javaClassList.Count - 1 do
+  begin
+    tempList.LoadFromFile(javaClassList.Strings[k]);
+    for i := 0 to tempList.Count - 1 do
+    begin
+      if Pos('import ', tempList.Strings[i]) > 0 then
+        importList.Add(Trim(tempList.Strings[i]));
+    end;
+  end;
+  javaClassList.Free;
+
+  javaClassList := FindAllFiles(FPathToJavaSource, '*.kt', False);
   for k := 0 to javaClassList.Count - 1 do
   begin
     tempList.LoadFromFile(javaClassList.Strings[k]);
@@ -3297,7 +3356,9 @@ begin
             if k > 0 then
             begin
               str := Trim(Copy(str, k + 1, MaxInt)); //(str = 'TFPNoGUIGraphicsBridge')
-              if  (Pos(str, fclList.Text) > 0) or FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.java') then
+              if  (Pos(str, fclList.Text) > 0) or
+                  FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.java') or
+                  FileExists(LamwGlobalSettings.PathToJavaTemplates + str + '.kt') then
               begin
                   jControls.Add(str);
               end;
@@ -3419,6 +3480,8 @@ begin
     for j:= 0 to controlsList.Count - 1 do
     begin
       if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.java') then
+           TryAddJControl(ControlsJava, controlsList.Strings[j], nativeExists)
+      else if FileExists(PathToJavaTemplates+controlsList.Strings[j]+'.kt') then
            TryAddJControl(ControlsJava, controlsList.Strings[j], nativeExists);
     end;
 

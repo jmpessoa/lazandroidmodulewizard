@@ -95,7 +95,6 @@ object FormWorkspace: TFormWorkspace
   OnClose = FormClose
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
@@ -1443,11 +1442,11 @@ object FormWorkspace: TFormWorkspace
       ParentFont = False
     end
     object CheckBoxPIE: TCheckBox
-      AnchorSideLeft.Control = CheckBoxLibrary
+      AnchorSideLeft.Control = CheckBoxGeneric
       AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = CheckBoxLibrary
+      AnchorSideTop.Control = CheckBoxGeneric
       AnchorSideTop.Side = asrCenter
-      Left = 77
+      Left = 165
       Height = 24
       Top = 65
       Width = 194
@@ -1457,27 +1456,25 @@ object FormWorkspace: TFormWorkspace
       ParentFont = False
       TabOrder = 3
     end
-    object CheckBoxLibrary: TCheckBox
+    object CheckBoxGeneric: TCheckBox
       AnchorSideLeft.Control = PanelButtons
       AnchorSideTop.Control = ComboBoxTheme
       AnchorSideTop.Side = asrBottom
       Left = 4
       Height = 24
       Top = 65
-      Width = 69
+      Width = 157
       BorderSpacing.Left = 4
       BorderSpacing.Top = 5
-      Caption = 'Library'
-      OnClick = CheckBoxLibraryClick
+      Caption = 'Build raw .so Library'
+      OnClick = CheckBoxGenericClick
       ParentFont = False
       TabOrder = 4
     end
     object Label1: TLabel
-      AnchorSideLeft.Control = CheckBoxSupport
       AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = CheckBoxSupport
       AnchorSideTop.Side = asrCenter
-      Left = 174
+      Left = 137
       Height = 20
       Top = 96
       Width = 208
@@ -1485,22 +1482,6 @@ object FormWorkspace: TFormWorkspace
       Caption = '(*) Fpcupdeluxe/LamwManager'
       ParentColor = False
       ParentFont = False
-    end
-    object CheckBoxSupport: TCheckBox
-      AnchorSideLeft.Control = PanelButtons
-      AnchorSideTop.Control = CheckBoxLibrary
-      AnchorSideTop.Side = asrBottom
-      Left = 4
-      Height = 24
-      Top = 94
-      Width = 158
-      BorderSpacing.Left = 4
-      BorderSpacing.Top = 5
-      Caption = 'Add Support Library'
-      OnChange = CheckBoxSupportChange
-      OnClick = CheckBoxSupportClick
-      ParentFont = False
-      TabOrder = 5
     end
     object ComboBoxThemeColor: TComboBoxEx
       AnchorSideLeft.Control = PanelButtons
@@ -1549,7 +1530,7 @@ object FormWorkspace: TFormWorkspace
         end>
       ItemIndex = 0
       OnChange = ComboBoxThemeColorChange
-      TabOrder = 6
+      TabOrder = 5
     end
   end
   object Panel1: TPanel

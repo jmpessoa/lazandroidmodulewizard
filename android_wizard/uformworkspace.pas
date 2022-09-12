@@ -16,8 +16,7 @@ type
   TFormWorkspace  = class(TForm)
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
-    CheckBoxLibrary: TCheckBox;
-    CheckBoxSupport: TCheckBox;
+    CheckBoxGeneric: TCheckBox;
     CheckBoxPIE: TCheckBox;
     cbBuildSystem: TComboBox;
     ComboBoxThemeColor: TComboBoxEx;
@@ -54,10 +53,9 @@ type
     StatusBarInfo: TStatusBar;
 
     procedure cbBuildSystemCloseUp(Sender: TObject);
-    procedure CheckBoxLibraryClick(Sender: TObject);  // raw library
+    procedure CheckBoxGenericClick(Sender: TObject);  // raw library
     procedure CheckBoxPIEClick(Sender: TObject);
     procedure CheckBoxSupportChange(Sender: TObject);
-    procedure CheckBoxSupportClick(Sender: TObject);
     procedure ComboBoxThemeChange(Sender: TObject);
     procedure ComboBoxThemeColorChange(Sender: TObject);
     procedure ComboSelectProjectNameKeyPress(Sender: TObject; var Key: char);
@@ -124,7 +122,7 @@ type
     FAndroidTheme: string;
     FAndroidThemeColor: string;
     FPieChecked: boolean;
-    FLibraryChecked: boolean;  //raw .so
+    FRawLibraryChecked: boolean;  //raw .so
     FGradleVersion: string;
 
     FMaxSdkPlatform: integer;
@@ -136,6 +134,8 @@ type
     FInstructionSetIndex: integer;
     FNDKRelease: string;
     FNDKVersion: integer;
+
+    FIsKotlinSupported: boolean;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -199,11 +199,12 @@ type
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property AndroidThemeColor: string read FAndroidThemeColor write FAndroidThemeColor;
     property PieChecked: boolean read FPieChecked write FPieChecked;
-    property LibraryChecked: boolean read FLibraryChecked write FLibraryChecked; //raw .so
+    property RawLibraryChecked: boolean read FRawLibraryChecked write FRawLibraryChecked; //raw .so
     property BuildSystem: string read GetBuildSystem;
     property MaxSdkPlatform: integer read FMaxSdkPlatform write FMaxSdkPlatform;
     property GradleVersion: string read FGradleVersion write FGradleVersion;
   //  property LAMWHintChecked: boolean read FLAMWHintChecked write FLAMWHintChecked;
+    property IsKotlinSupported: boolean read FIsKotlinSupported write FIsKotlinSupported;
 
   end;
 
@@ -314,7 +315,10 @@ begin
   else if api='27' then Result:= 'Oreo 8.1'
   else if api='28' then Result:= 'Pie 9.0'
   else if api='29' then Result:= 'Android 10'
-  else if api='30' then Result:= 'Android 11';
+  else if api='30' then Result:= 'Android 11'
+  else if api='31' then Result:= 'Android 12'
+  else if api='32' then Result:= 'Android 13'
+  else if api='33' then Result:= 'Android 14';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -344,6 +348,9 @@ begin
      15: Result:= 'Pie 9.0'; // Api(28)
      16: Result:= 'Android 10'; // Api(29)
      17: Result:= 'Android 11'; // Api(30)
+     18: Result:= 'Android 12'; // Api(31)
+     19: Result:= 'Android 13'; // Api(32)
+     20: Result:= 'Android 14'; // Api(33)
    end;
 end;
 
@@ -554,7 +561,6 @@ var
   strList: TStringList;
   count: integer;
   path: string;
-
 begin
     strList:= TStringList.Create;
     path:= fullProjectName+DirectorySeparator+'src';
@@ -626,6 +632,7 @@ begin
 
   apiTarg:= StrToInt(FTargetApi);
 
+
   if apiTarg < 30 then
   begin
     ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
@@ -681,14 +688,17 @@ begin
 
   FJavaClassName:= 'Controls'; //GUI  [try guess]
 
-  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then
+  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then  //new project"!
   begin
      FProjectModel:= 'Ant';   //please, read as "project not exists or new project"!
+
      FSmallProjName:= StringReplace(ComboSelectProjectName.Text,' ','',[rfReplaceAll]);
-     FAndroidProjectName:= FPathToWorkspace + DirectorySeparator+ FSmallProjName;
-       FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
-       if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
-       if FModuleType > 0 then //NoGUI
+     FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + FSmallProjName;
+
+     if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
+     FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
+
+     if FModuleType > 0 then //NoGUI
           FJavaClassName:=  FSmallProjName;
   end
   else
@@ -756,7 +766,7 @@ begin
      FPackagePrefaceName:= TrimChar(path, '.');
      strList.Free;
 
-     FFullJavaSrcPath:=GetFullJavaSrcPath(FAndroidProjectName);
+     FFullJavaSrcPath:=GetFullJavaSrcPath(FAndroidProjectName); //if [old] project exists
 
      CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
                  FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
@@ -823,7 +833,7 @@ begin
 
   end;
 
-  CloseAction := caFree;
+  //CloseAction := caFree;
 
 end;
 
@@ -1310,6 +1320,9 @@ begin
 
   FAndroidThemeColor:= 'blue';
   ComboBoxThemeColor.Enabled:= False;
+
+  FSupport:= False; //[old] supporte library need "gradle" and "targetApi >= 29"
+
 end;
 
 procedure TFormWorkspace.ComboBoxThemeChange(Sender: TObject);
@@ -1317,21 +1330,15 @@ var
   index, intTargetApi: integer;
 begin
 
-  if Pos('AppCompat',  ComboBoxTheme.Text) > 0 then
-  begin
-     ComboBoxThemeColor.Enabled:= True;
-     if ComboBoxThemeColor.ItemIndex = 0 then ComboBoxThemeColor.ItemIndex:= 1; //blue
-  end
-  else
-  begin
-     ComboBoxThemeColor.ItemIndex:= 0;
-     ComboBoxThemeColor.Enabled:= False;
-  end;
-
   if Pos('AppCompat', ComboBoxTheme.Text) > 0 then
   begin
-    CheckBoxSupport.Checked:= True; //inner Supported!!!
-    //sCheckBoxSupport.Enabled:= False;
+    ComboBoxThemeColor.Enabled:= True;
+
+    FSupport:= True;  //default: old library Supported!
+
+    CheckBoxGeneric.Visible:= True;  //that is: can enable kotlin option...
+
+    if ComboBoxThemeColor.ItemIndex = 0 then ComboBoxThemeColor.ItemIndex:= 1; //blue
 
     if (FMaxSdkPlatform < 30) or (FPathToGradle = '')   then
     begin
@@ -1386,6 +1393,13 @@ begin
 
     if ListBoxMinSDK.ItemIndex < 1 then ListBoxMinSDK.ItemIndex:= 1;   //Api 14
 
+  end
+  else
+  begin
+    CheckBoxGeneric.Visible:= False;  //that is: can't enable kotlin option...
+
+    ComboBoxThemeColor.ItemIndex:= 0;
+    ComboBoxThemeColor.Enabled:= False;
   end;
 
   if Pos('GDXGame', ComboBoxTheme.Text) > 0 then
@@ -1438,73 +1452,54 @@ begin
    end;
 end;
 
-procedure TFormWorkspace.CheckBoxSupportClick(Sender: TObject);
-var
-  intApi, index: integer;
-  flag: boolean;
+
+procedure TFormWorkspace.CheckBoxGenericClick(Sender: TObject);
 begin
+  //using the "CheckBoxGeneric" for two totally different things... sorry!
 
-  if Pos('AppCompat', FAndroidTheme) > 0 then CheckBoxSupport.Checked:= True;
+  IsKotlinSupported:= False;
+  FRawLibraryChecked:= False;
 
-  FSupport:=TCheckBox(Sender).Checked;
-  if FSupport then
+  if TCheckBox(Sender).Checked then
   begin
-     intApi:= StrToInt(ListBoxTargetAPI.Text);
+    if Pos('Kotlin', CheckBoxGeneric.Caption) > 0 then
+    begin
+       showMessage('warning: Kotlin is still just a proof of concept...' + sLIneBreak +
+                    'not practical yet...' + sLIneBreak +
+                    'you can try the demo "AppCompatKToyButtonDemo1"');
 
-     if intApi < 29 then
-     begin
-       flag:= False;
-       if Pos('29',ListBoxTargetAPI.Items.Text) > 0 then
-       begin
-          flag:= True;
-          index:= ListBoxTargetAPI.Items.IndexOf('29');
-          ListBoxTargetAPI.ItemIndex:= index;
-          ListBoxTargetAPI.Text:= '29';
-          ListBoxTargetAPICloseUp(Self);
-       end;
+       IsKotlinSupported:= False; //True;
+       TCheckBox(Sender).Checked:= False;
 
-       if (not flag) then
-       begin
-          if (Pos('29',ListBoxTargetAPI.Items.Text) > 0) then
-          begin
-            flag:= True;
-            index:= ListBoxTargetAPI.Items.IndexOf('29');
-            ListBoxTargetAPI.ItemIndex:= index;
-            ListBoxTargetAPI.Text:= '29';
-            ListBoxTargetAPICloseUp(Self);
-          end;
-       end;
+       FRawLibraryChecked:= False;
+    end
+    else
+    begin
+      IsKotlinSupported:= False;
+      FRawLibraryChecked:= True;
+    end;
+  end;
 
-       if not flag then
-          ShowMessage('warning: Support Library need TargetApi >= 29');
-
-     end;
-
-     if (cbBuildSystem.Text <> 'Gradle') then
-     begin
-       cbBuildSystem.Text:= 'Gradle';
-       ShowMessage('Warning: Support Library need Gradle 6.6.1 and Target API >= 29');
-     end
-  end
-end;
-
-procedure TFormWorkspace.CheckBoxLibraryClick(Sender: TObject);
-begin
-  FLibraryChecked:=TCheckBox(Sender).Checked;
 end;
 
 procedure TFormWorkspace.cbBuildSystemCloseUp(Sender: TObject);
 var
   s: string;
+  intTargetApi: integer;
 begin
 
   if (cbBuildSystem.Text = 'Gradle') then
-     CheckBoxSupport.Checked:= True //inner Supported!!!
+  begin
+    intTargetApi:= StrToInt(ListBoxTargetAPI.Text);
+    if intTargetApi >= 29 then
+         FSupport:= True //add [old] support library!
+  end
   else
-     CheckBoxSupport.Checked:= False; //Ant don't support extern libraries...
+     FSupport:= False; //don't get [old] "support" libraries...
 
   if (cbBuildSystem.Text = 'Gradle') and ( Pos('AppCompat', ComboBoxTheme.Text) > 0) then
   begin
+    FSupport:= True; //by default ...
     s := LowerCase(ExtractFileName(ExcludeTrailingPathDelimiter(LamwGlobalSettings.PathToJavaJDK)));
     if Pos('1.7.', s) > 0 then
       MessageDlg('[LAMW 0.8.6.2] "AppCompat" [material] theme need JDK 1.8 + Gradle 6.6.1 [or up]!', mtWarning, [mbOk], 0);

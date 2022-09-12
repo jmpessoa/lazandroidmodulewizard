@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  uktoybutton,
   sfirebasepushnotificationlistener,
   scontinuousscrollableimageview,
   sadmob,
@@ -36,6 +37,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I ktoybutton_icon.lrs}
   {$I jsfirebasepushnotificationlistener_icon.lrs}
   {$I jsadmob_icon.lrs}
   {$I jscontinuousscrollableimageview_icon.lrs}
@@ -55,6 +57,7 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges AppCompat',
     [
+      KToyButton,
       jsFirebasePushNotificationListener,
       jsAdMob,
       jsContinuousScrollableImageView,

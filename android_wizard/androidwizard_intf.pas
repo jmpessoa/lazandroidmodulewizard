@@ -45,7 +45,8 @@ type
      FSyntaxMode: TSyntaxMode;   {}
 
      FPieChecked: boolean;
-     FLibraryChecked: boolean; //raw .so
+     FRawLibraryChecked: boolean; //raw .so
+     FIsKotlinSupported: boolean;
 
      FPathToJavaJDK: string;
      FPathToAndroidSDK: string;  //Included TrailingPathDelimiter
@@ -757,24 +758,28 @@ begin
 
     if GetWorkSpaceFromForm(0, outTag) then //GUI
     begin
-     strPackName:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+      strPackName:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
       with TStringList.Create do
         try
           if FSupport then  // refactored by jmpessoa: UNIQUE "Controls.java" !!!
           begin
+
             if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java') then
             begin
               LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'jSupported.java');
               Strings[0] := 'package ' + strPackName + ';';  //replace dummy
               SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jSupported.java');
             end;
+
+            ForceDirectories(FAndroidProjectName + DirectorySeparator +'res'+DirectorySeparator+'xml');
             if FileExists(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml') and
                (not FileExists(FAndroidProjectName + DirectorySeparator +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml'))then
             begin
               LoadFromFile(FPathToJavaTemplates+DirectorySeparator +'support'+DirectorySeparator+'support_provider_paths.xml');
               SaveToFile(FAndroidProjectName + DirectorySeparator +'res'+DirectorySeparator+'xml'+DirectorySeparator+'support_provider_paths.xml');
             end;
+
           end
           else
           begin
@@ -1139,8 +1144,10 @@ begin
   frm.TargetApi:= FTargetApi;
   frm.Support:=FSupport;
 
-  frm.ProjectModel:= FProjectModel; //'Ant'  or 'Eclipse'
+  frm.ProjectModel:= FProjectModel; //'Ant-> "new project"  or Eclipse-> "project exists"
+
   frm.FullJavaSrcPath:= FFullJavaSrcPath;
+
   frm.ModuleType:= projectType;
   frm.SmallProjName := FSmallProjName;
 
@@ -1509,7 +1516,10 @@ begin
     frm.SpeedButtonHintTheme.Visible:= True;
 
     frm.CheckBoxPIE.Visible:= False;
-    frm.CheckBoxLibrary.Visible:= False;
+    frm.CheckBoxGeneric.Visible:= False; //support to Kotlin need "AppCompat" theme and Gradle
+    if FModuleType = 0 then //GUI
+      frm.CheckBoxGeneric.Caption:= 'Add support to Kotlin'; //bad reuse ... sorry
+
 
     if FModuleType = -1 then //Gdx
     begin
@@ -1564,7 +1574,7 @@ begin
       frm.SpeedButtonHintTheme.Visible:= False;
 
       frm.CheckBoxPIE.Visible:= True;
-      frm.CheckBoxLibrary.Visible:= True;  //support to generic [not jni] .so library
+      frm.CheckBoxGeneric.Visible:= True;  //support to raw [not jni] .so library
 
     end;
 
@@ -1575,6 +1585,8 @@ begin
       FBuildSystem:= frm.BuildSystem;
 
       FAndroidTheme:= frm.AndroidTheme;
+      FIsKotlinSupported:= frm.IsKotlinSupported;
+
       FAndroidThemeColor:= frm.AndroidThemeColor;
       FAndroidTemplateTheme:= '';
 
@@ -1620,24 +1632,29 @@ begin
       FSupport:=frm.Support;
 
       FPieChecked:= frm.PieChecked;
-      FLibraryChecked:= frm.LibraryChecked;
+      FRawLibraryChecked:= frm.RawLibraryChecked;
 
       FMaxSdkPlatform:= frm.MaxSdkPlatform;
 
       FGradleVersion:= frm.GradleVersion;
 
-      if FLibraryChecked then
+      if Pos('Library', frm.CheckBoxGeneric.Caption) >= 0 then  //bad CheckBox reuse... sorry!
       begin
-        outTag:= 3;
-        FModuleType:= 3;
+        if FRawLibraryChecked then
+        begin
+          outTag:= 3;
+          FModuleType:= 3;  //build raw .so library
+        end;
       end;
 
       FMainActivity:= frm.MainActivity;  //App
       FJavaClassName:= frm.JavaClassName;
 
       FProjectModel:= frm.ProjectModel;   //<-- output from [Eclipse or Ant Project]
-      if FProjectModel = 'Eclipse' then
-           FFullJavaSrcPath:= frm.FullJavaSrcPath;
+
+      if FProjectModel = 'Eclipse' then     //please, read as "project exists!"
+          FFullJavaSrcPath:= frm.FullJavaSrcPath;
+
 
       if  frm.TouchtestEnabled = 'True' then
          FTouchtestEnabled:= '-Dtouchtest.enabled=true'
@@ -1665,19 +1682,21 @@ begin
       end;
 
       try
-        if  FProjectModel = 'Ant' then
+        if FProjectModel = 'Ant' then   //please read as "new project"...
         begin
           if FModuleType < 2 then   //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
           begin
             ForceDirectories(FAndroidProjectName + DirectorySeparator + 'src');
 
             FPathToJavaSrc:= FAndroidProjectName+DirectorySeparator+ 'src';
-            FFullJavaSrcPath:= FPathToJavaSrc;
+
+            FFullJavaSrcPath:= FPathToJavaSrc;  //initialize
 
             strList.Clear;
             strList.StrictDelimiter:= True;
             strList.Delimiter:= '.';
             strList.DelimitedText:= FPackagePrefaceName+'.'+LowerCase(FSmallProjName);
+
             for i:= 0 to strList.Count -1 do
             begin
                FFullJavaSrcPath:= FFullJavaSrcPath + DirectorySeparator + strList.Strings[i];
@@ -1753,7 +1772,6 @@ begin
 
 
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
-
 
             if DirectoryExists(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor) then
                CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor+DirectorySeparator+'colors.xml',
@@ -1972,7 +1990,6 @@ begin
              strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'packagename.txt');
 
           end; //just Ant NoGUI project
-
         end; // Ant
 
         if FModuleType < 2 then    {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
@@ -2574,6 +2591,10 @@ begin
 
                 strList.Clear;
                 strList.Add('buildscript {');
+
+                if FIsKotlinSupported then
+                   strList.Add('    ext.kotlin_version = ''1.6.10''');
+
                 strList.Add('    repositories {');
                 strList.Add('        mavenCentral()');
                 strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
@@ -2584,6 +2605,10 @@ begin
                 strList.Add('    }');
                 strList.Add('    dependencies {');
                 strList.Add('        classpath ''com.android.tools.build:gradle:'+pluginVersion+'''');
+
+                if FIsKotlinSupported then
+                  strList.Add('        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"');
+
                 strList.Add('    }');
                 strList.Add('}');
 
@@ -2610,6 +2635,9 @@ begin
                 strList.Add('}');
 
                 strList.Add('apply plugin: ''com.android.application''');
+                if FIsKotlinSupported then
+                  strList.Add('apply plugin: ''kotlin-android''');
+
                 strList.Add('android {');
                 strList.Add('    lintOptions {');
                 strList.Add('       abortOnError false');
@@ -2732,12 +2760,19 @@ begin
 
                 strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
 
-                for aAppCompatLib in AppCompatLibs do
+                if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
+                  for aAppCompatLib in AppCompatLibs do
+                  begin
                      strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
                      if aAppCompatLib.MinAPI > StrToInt(compileSdkVersion) then
-                         ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
-                                      IntToStr(aAppCompatLib.MinAPI));
+                           ShowMessage('Warning: AppCompat theme need Android SDK >= ' + IntToStr(aAppCompatLib.MinAPI));
+                  end;
+                  if FIsKotlinSupported then
+                  begin
+                     strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
+                     strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
+                  end;
                 end;
 
                 if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
@@ -3377,6 +3412,10 @@ begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
 
     AProject.CustomData.Values['Theme']:= FAndroidTheme;
+    if FIsKotlinSupported then
+       AProject.CustomData.Values['TryKotlin']:= 'TRUE'
+    else
+       AProject.CustomData.Values['TryKotlin']:= 'FALSE';
 
     AProject.CustomData['StartModule'] := 'AndroidModule1';
     if FSupport then
