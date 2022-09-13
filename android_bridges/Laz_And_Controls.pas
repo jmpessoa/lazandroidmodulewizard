@@ -1783,7 +1783,11 @@ type
 
     function IsItemChecked(index: integer): boolean;
     procedure Add(item: string); overload;
+
     procedure Add(item: string; delim: string); overload;
+    procedure Insert(_index: integer; item: string; _delimiter: string); overload;
+    procedure Insert(_index: integer; item: string); overload;
+
     procedure Add(item: string; delim: string; fontColor: TARGBColorBridge;
                   fontSize: integer; hasWidget: TWidgetItem; widgetText: string; image: jObject); overload;
     Procedure Delete(index: Integer);
@@ -9231,6 +9235,21 @@ begin
       jListView_add2(gApp.jni.jEnv, FjObject, item, delim);
   end;
 end;
+
+procedure jListView.Insert(_index: integer; item: string; _delimiter: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_Insert(gApp.jni.jEnv, FjObject, _index ,item ,_delimiter);
+end;
+
+procedure jListView.Insert(_index: integer; item: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jListView_Insert(gApp.jni.jEnv, FjObject, _index ,item , FDelimiter);
+end;
+
 
 Procedure jListView.Add(item: string);
 begin

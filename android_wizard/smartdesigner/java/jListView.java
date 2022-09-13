@@ -1,4 +1,4 @@
-package org.lamw.appcustomfontdemo1;
+package org.lamw.applistviewdemo8;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -2027,6 +2027,49 @@ public class jListView extends ListView {
 
 		alist.add(info);
 		
+		aadapter.notifyDataSetChanged();
+	}
+
+	public void Insert(int _index, String item, String _delimiter) {
+
+		int pos = _index;
+
+		if (pos < 0) {
+			pos = 0;
+		}
+
+		if (pos > alist.size()) {
+			pos = alist.size();
+		}
+
+		jListItemRow info = new jListItemRow(controls.activity);
+		delimiter = _delimiter;
+		info.label = item;
+		info.delimiter=  delimiter;
+		info.leftDelimiter = leftDelimiter;
+		info.rightDelimiter = rightDelimiter;
+		info.id = alist.size();
+		info.checked = false;
+		info.widget = widgetItem;
+		info.widgetText= widgetText;
+		info.checked = false;
+		info.textSize= textSize;
+		info.textColor     = textColor;
+		info.textColorInfo = textColorInfo;
+		info.widgetTextColor= widgetTextColor;
+		info.bmp = genericBmp;
+
+		info.textDecorated = textDecorated;
+		info.itemLayout = itemLayout;
+		info.textSizeDecorated = textSizeDecorated;
+		info.textAlign    = textAlign;
+		info.textPosition = textPosition;
+
+		info.typeFace = this.typeFace;
+		info.tagString = "";
+
+		alist.add(pos, info);
+
 		aadapter.notifyDataSetChanged();
 	}
 

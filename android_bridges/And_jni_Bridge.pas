@@ -161,6 +161,8 @@ Procedure jListView_add                (env:PJNIEnv;  this:jobject;
                                         ListView : jObject; Str : string;
                                         delimiter: string; fontColor: integer; fontSize: integer; hasWidgetItem: integer);
 Procedure jListView_add2(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string);
+procedure jListView_Insert(env: PJNIEnv; _jlistview: JObject; _index: integer; item: string; _delimiter: string);
+
 Procedure jListView_add22(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string; image: jObject);
 Procedure jListView_add3                (env:PJNIEnv;
                                         ListView : jObject; Str : string;
@@ -1159,7 +1161,6 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
-//by jmpessoa
 Procedure jListView_add2(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string);
 var
   jMethod: jMethodID = nil;
@@ -1188,6 +1189,35 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+procedure jListView_Insert(env: PJNIEnv; _jlistview: JObject; _index: integer; item: string; _delimiter: string);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jlistview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'Insert', '(ILjava/lang/String;Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _index;
+  jParams[1].l:= env^.NewStringUTF(env, PChar(item));
+  jParams[2].l:= env^.NewStringUTF(env, PChar(_delimiter));
+
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[1].l);
+  env^.DeleteLocalRef(env,jParams[2].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 Procedure jListView_add22(env:PJNIEnv; ListView: jObject; Str: string; delimiter: string; image: jObject);
 var
