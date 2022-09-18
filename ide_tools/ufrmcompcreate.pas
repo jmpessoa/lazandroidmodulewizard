@@ -1744,12 +1744,12 @@ procedure TFrmCompCreate.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('About Android Bridges components palettes' + sLineBreak +
             'and Android system builder (Ant/Gradle):' + sLineBreak + sLineBreak +
-            '"Android Bridges" [visual controls] support "Ant" and "Gradle" prefix class "j"' + sLineBreak +
-            '"Android Bridges Extra" [not visual] support "Ant" and "Gradle" prefix class "j"'+ sLineBreak + sLineBreak+
-            '"Android Bridges jCenter" support only "Gradle" prefix class "jc"' + sLineBreak +
-            '(here we put bridges for generics "online" libraries)' + sLineBreak + sLineBreak +
-            '"Android Bridges AppCompat" support only "Gradle" prefix class "js"' + sLineBreak +
-            '(here we put bridges for Android AppCompat/Material libraries)');
+            '"Android Bridges" [visual controls] support "Ant" and "Gradle": prefix class "j"' + sLineBreak +
+            '"Android Bridges Extra" [not visual] support "Ant" and "Gradle": prefix class "j"'+ sLineBreak + sLineBreak+
+            '"Android Bridges jCenter" support only "Gradle": prefix class "jc"' + sLineBreak +
+            '(here we put bridges for generics "online" jar libraries)' + sLineBreak + sLineBreak +
+            '"Android Bridges AppCompat" support only "Gradle" prefix class "js" or "K" for Kotlin' + sLineBreak +
+            '(here we put bridges for Android AppCompat/Material libraries and Koltlin based component)');
 end;
 
 procedure TFrmCompCreate.FormCreate(Sender: TObject);
