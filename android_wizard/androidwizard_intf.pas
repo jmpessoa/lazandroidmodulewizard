@@ -1472,7 +1472,8 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 var
   frm: TFormWorkspace;
   strList: TStringList;
-  aAppCompatLib:TAppCompatLib;
+  aAppCompatLib: TAppCompatLib;
+  aSupportLib: TSupportLib;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -1971,7 +1972,10 @@ begin
 
                FVersionCode := 1;
                FVersionName := '1.0';
-             end else
+             end;
+
+             (*
+             else
              begin
               ReadXMLFile(xmlAndroidManifest, FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
 
@@ -1979,11 +1983,12 @@ begin
                  Exit;
               with xmlAndroidManifest.DocumentElement do
               begin
-                      FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
-                      FVersionName := AttribStrings['android:versionName'];
-                      if FVersionName = '' then  FVersionName:= '1.0';
+                FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
+                FVersionName := AttribStrings['android:versionName'];
+                if FVersionName = '' then  FVersionName:= '1.0';
               end;
              end;
+             *)
 
              strList.Clear;
              strList.Add(FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
@@ -2773,7 +2778,18 @@ begin
                      strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
                      strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
                   end;
+                end
+                else if Pos('Gradle',  FBuildSystem) > 0 then  //only gradle not AppCompat
+                begin
+                  for aSupportLib in SupportLibs do
+                  begin
+                     strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
+                     if aSupportLib.MinAPI > StrToInt(compileSdkVersion) then
+                           ShowMessage('Warning: Support library need Android SDK >= ' + IntToStr(aSupportLib.MinAPI));
+                  end;
                 end;
+
+
 
                 if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
                 begin

@@ -71,6 +71,10 @@ type
 
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetMaxSdkPlatform(out outBuildTool: string): integer;
+
+    function GetVesionCodeFromBuilGradle(): string;
+    function GetVesionNameFromBuilGradle(): string;
+
     procedure KeepBuildUpdated(targetApi: integer; buildTool: string);
 
     function GetBuildTool(sdkApi: integer): string;
@@ -749,6 +753,51 @@ begin
 
 end;
 
+function TLamwSmartDesigner.GetVesionCodeFromBuilGradle(): string;
+var
+  list: TStringList;
+  i, p: integer;
+  aux: string;
+begin
+   Result:= '1';
+   if FileExists(FPathToAndroidProject + 'build.gradle') then
+   begin
+     list:= TStringList.Create;
+     list.LoadFromFile(FPathToAndroidProject + 'build.gradle');
+     p:= Pos('versionCode', list.Text);
+     aux:= Copy(list.Text, p + Length('versionCode') + 1, 10);
+     aux:= Trim(aux);
+     aux:= ReplaceChar(aux, #10, ' ');
+     aux:= ReplaceChar(aux, #13, ' ');
+     aux:= Trim(aux);
+     Result:=aux;
+   end;
+end;
+
+function TLamwSmartDesigner.GetVesionNameFromBuilGradle(): string;
+var
+  list: TStringList;
+  i, p: integer;
+  aux: string;
+begin
+   Result:= '"1.0"';
+
+   if FileExists(FPathToAndroidProject + 'build.gradle') then
+   begin
+     list:= TStringList.Create;
+     list.LoadFromFile(FPathToAndroidProject + 'build.gradle');
+     p:= Pos('versionName', list.Text);
+     aux:= Copy(list.Text, p + Length('versionName') + 1, 10);
+
+     aux:= Trim(aux);
+     aux:= ReplaceChar(aux, #10, ' ');
+     aux:= ReplaceChar(aux, #13, ' ');
+     aux:= Trim(aux);
+
+     Result:=aux;
+   end;
+end;
+
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
@@ -756,6 +805,8 @@ var
   i, minsdkApi : integer;
   strTargetApi, auxStr, tempStr : string;
   aAppCompatLib:TAppCompatLib;
+  aSupportLib: TSupportLib;
+  buildSystem: string;
   androidPluginNumber: integer;
   pluginVersion: string;
   gradleCompatible, outgradleCompatible: string;
@@ -776,6 +827,8 @@ var
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
 begin
+
+  buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
 
   strList:= TStringList.Create;
 
@@ -1240,12 +1293,13 @@ begin
          else
             strList.Add('            targetSdkVersion '+buildToolApi);
 
+         (*
          if fileExists(FPathToAndroidProject+'AndroidManifest.xml') then
          begin
           ReadXMLFile(xmlAndroidManifest, FPathToAndroidProject+'AndroidManifest.xml');
 
-          if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then
-             Exit;
+          if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then Exit;
+
           with xmlAndroidManifest.DocumentElement do
           begin
               versionCode := AttribStrings['android:versionCode'];
@@ -1256,9 +1310,13 @@ begin
           versionCode := '1';
           versionName := '1.0';
          end;
+         *)
+
+         versionCode := GetVesionCodeFromBuilGradle();
+         versionName := GetVesionNameFromBuilGradle();
 
          strList.Add('            versionCode ' + versionCode);
-         strList.Add('            versionName "'+ versionName+'"');
+         strList.Add('            versionName ' + versionName);
 
          //if Pos('AppCompat', FAndroidTheme) > 0 then
          strList.Add('            multiDexEnabled true');
@@ -1335,7 +1393,18 @@ begin
               strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
               strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
            end;
+         end
+         else if Pos('Gradle',  buildSystem) > 0 then  //only gradle not AppCompat
+         begin
+            for aSupportLib in SupportLibs do
+            begin
+               strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
+               if aSupportLib.MinAPI > StrToInt(buildToolApi) then
+                  ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
+                               IntToStr(aSupportLib.MinAPI));
+            end;
          end;
+
 
          if Pos('GDXGame', FAndroidTheme) > 0 then
          begin
