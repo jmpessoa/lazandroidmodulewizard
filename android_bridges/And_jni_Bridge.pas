@@ -105,6 +105,9 @@ Function  jgetTick                     (env:PJNIEnv;this:jobject) : LongInt;
 function  jTextView_Create(env:PJNIEnv; this:jobject; SelfObj: TObject): jObject;
 
 procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: single; _dx: single; _dy: single; _color: integer);
+procedure jTextView_SetSingleLine(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+procedure jTextView_SetHorizontallyScrolling(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+procedure jTextView_SetEllipsize(env: PJNIEnv; _jtextview: JObject; _mode: integer);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -179,6 +182,7 @@ Procedure jListView_setWidgetItem3(env:PJNIEnv; ListView : jObject; value: integ
 procedure jListView_setWidgetCheck(env: PJNIEnv; _jlistview: JObject; _value: boolean; _index: integer);
 function  jListView_SplitCenterItemCaption(env: PJNIEnv; _jlistview: JObject; _centerItemCaption: string; _delimiter: string): TDynArrayOfString;
 function  jListView_LoadFromFile(env: PJNIEnv; _jlistview: JObject; _appInternalFileName: string): TDynArrayOfString;
+procedure jListView_SetItemTextEllipsis(env: PJNIEnv; _jlistview: JObject; _value: boolean);
 
 // ScrollView
 Function  jScrollView_Create           (env:PJNIEnv;  this:jobject; SelfObj: TObject): jObject;
@@ -521,6 +525,81 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+procedure jTextView_SetSingleLine(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jtextview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetSingleLine', '(Z)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].z:= JBool(_value);
+
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jTextView_SetHorizontallyScrolling(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jtextview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHorizontallyScrolling', '(Z)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].z:= JBool(_value);
+
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jTextView_SetEllipsize(env: PJNIEnv; _jtextview: JObject; _mode: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jtextview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetEllipsize', '(I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _mode;
+
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //------------------------------------------------------------------------------
 // EditText
@@ -1467,6 +1546,31 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+procedure jListView_SetItemTextEllipsis(env: PJNIEnv; _jlistview: JObject; _value: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jlistview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jlistview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetItemTextEllipsis', '(Z)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].z:= JBool(_value);
+
+  env^.CallVoidMethodA(env, _jlistview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //------------------------------------------------------------------------------
 // ScrollView

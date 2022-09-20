@@ -1014,6 +1014,8 @@ type
 
   { jTextView }
 
+  TEllipsizeMode = (emEnd, emMidle, emMarquee, emStart);
+
   jTextView = class(jVisualControl)
   private
     FTextAlignment: TTextAlignment;
@@ -1089,6 +1091,10 @@ type
     procedure SetUnderline( _on : boolean ); // by ADiV
 
     procedure ApplyDrawableXML(_xmlIdentifier: string);
+
+    procedure SetSingleLine(_value: boolean);
+    procedure SetHorizontallyScrolling(_value: boolean);
+    procedure SetEllipsize(_mode: TEllipsizeMode);
 
   published
     property Text: string read GetText write SetText;
@@ -1723,6 +1729,7 @@ type
     FEnableOnClickTextRight : boolean; // by ADiV
 
     FWidgetTextColor: TARGBColorBridge;
+    FItemTextEllipsis: boolean;
 
     procedure SetHighLightSelectedItemColor(_color: TARGBColorBridge);
 
@@ -1889,6 +1896,8 @@ type
     procedure SetBackgroundByResIdentifier(_imgResIdentifier: string);
     procedure DispatchOnDrawItemTextCustomFont(_value: boolean);
 
+     procedure SetItemTextEllipsis(_value: boolean);
+
     //Property
     property setItemIndex: TXY write SetItemPosition;
     property Count: integer read GetCount;
@@ -1928,7 +1937,7 @@ type
     property TextMarginInner: integer read FTextMarginInner write SetTextMarginInner; // by ADiV
     
     property WidgetTextColor: TARGBColorBridge read FWidgetTextColor write SetWidgetTextColor;
-
+    property ItemTextEllipsis: boolean read FItemTextEllipsis write SetItemTextEllipsis;
     // Event
     property OnClickItem : TOnClickCaptionItem read FOnClickItem write FOnClickItem;
     property OnClickItemTextLeft : TOnClickCaptionItem read FOnClickTextLeft write FOnClickTextLeft; // by ADiV
@@ -4886,6 +4895,27 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+end;
+
+procedure jTextView.SetSingleLine(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetSingleLine(gApp.jni.jEnv, FjObject, _value);
+end;
+
+procedure jTextView.SetHorizontallyScrolling(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetHorizontallyScrolling(gApp.jni.jEnv, FjObject, _value);
+end;
+
+procedure jTextView.SetEllipsize(_mode: TEllipsizeMode);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetEllipsize(gApp.jni.jEnv, FjObject, Ord(_mode));
 end;
 
 //------------------------------------------------------------------------------
@@ -8840,10 +8870,11 @@ begin
   FTextMarginRight   := 10;
   FTextMarginInner   := 2;
 
-  FTextWordWrap := false;
-  FEnableOnClickTextLeft   := false;
-  FEnableOnClickTextCenter := false;
-  FEnableOnClickTextRight  := false;
+  FTextWordWrap := False;
+  FEnableOnClickTextLeft   := False;
+  FEnableOnClickTextCenter := False;
+  FEnableOnClickTextRight  := False;
+  FItemTextEllipsis:= False;
 
   FWidgetTextColor:= colbrDefault;
 
@@ -9041,8 +9072,12 @@ begin
 
    if FTextColorInfo <> colbrDefault then
    begin
-    SetTextColorInfo(FTextColorInfo);
+     SetTextColorInfo(FTextColorInfo);
    end;
+
+   if FItemTextEllipsis then
+      jListView_SetItemTextEllipsis(gApp.jni.jEnv, FjObject, FItemTextEllipsis);
+
   end;
 
 end;
@@ -10098,6 +10133,14 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_z(gApp.jni.jEnv, FjObject, 'DispatchOnDrawItemTextCustomFont', _value);
+end;
+
+procedure jListView.SetItemTextEllipsis(_value: boolean);
+begin
+  //in designing component state: set value here...
+  FItemTextEllipsis:= _value;
+  if FInitialized then
+     jListView_SetItemTextEllipsis(gApp.jni.jEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------

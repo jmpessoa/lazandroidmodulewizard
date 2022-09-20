@@ -1,4 +1,4 @@
-package com.example.appspinnerdemo;
+package org.lamw.applistviewdemo8;
 
 import java.lang.reflect.Field;
 
@@ -22,6 +22,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
@@ -540,5 +541,26 @@ public class jTextView extends  TextView { //androidx.appcompat.widget.AppCompat
 	public void ApplyDrawableXML(String _xmlIdentifier) {	    
 		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
     }
+
+    //https://stackoverflow.com/questions/8087555/programmatically-create-textview-with-ellipsis
+
+	public void SetSingleLine(boolean _value) {
+		this.setSingleLine(_value);
+	}
+
+	public void SetHorizontallyScrolling(boolean _value) {
+		this.setHorizontallyScrolling(_value);
+	}
+
+    public void SetEllipsize(int _mode) {
+		switch (_mode) {
+			case 0: 	{this.setEllipsize(TextUtils.TruncateAt.END); this.setHorizontallyScrolling(false); this.setSingleLine();  break;}
+			case 1: 	{this.setEllipsize(TextUtils.TruncateAt.MIDDLE); this.setHorizontallyScrolling(false); this.setSingleLine();  break;}
+			case 2: 	{this.setEllipsize(TextUtils.TruncateAt.MARQUEE); this.setHorizontallyScrolling(true);  this.setSingleLine();  break;}
+			case 3: 	{this.setEllipsize(TextUtils.TruncateAt.START); this.setHorizontallyScrolling(false); this.setSingleLine(); break;}
+		}
+		this.setHorizontallyScrolling(false);
+		this.setSingleLine();
+	}
 
 }

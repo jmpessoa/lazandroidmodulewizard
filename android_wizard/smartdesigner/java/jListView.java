@@ -23,6 +23,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -76,6 +77,8 @@ class jListItemRow {
 	int itemLayout;
 	int textAlign = 0;
 	int textPosition=1; //posCenter
+	boolean ellipsize = false;
+
 	String tagString="";
 
 	Context ctx;
@@ -784,6 +787,13 @@ class jArrayAdapter extends ArrayAdapter {
 				
 				if (items.get(position).textAlign == 1)   //right  ***
 				   itemText[i].setGravity(Gravity.END);
+
+				if (items.get(position).ellipsize == true) {
+					itemText[i].setGravity(Gravity.END);
+					itemText[i].setEllipsize(TextUtils.TruncateAt.END);
+					itemText[i].setHorizontallyScrolling(false);
+					itemText[i].setSingleLine();
+				}
 								
 				if( mEnableOnClickTextCenter )
 				    itemText[i].setOnClickListener( getOnClickText(position, 1) );
@@ -1654,6 +1664,7 @@ public class jListView extends ListView {
 
     final ListView mListView = this;
 
+    boolean itemTextEllipsis = false;
 	//Constructor
 	public  jListView(android.content.Context context,
 					  Controls ctrls,long pasobj, int widget, String widgetTxt,  Bitmap bmp,
@@ -2024,6 +2035,7 @@ public class jListView extends ListView {
 		
 		info.typeFace = this.typeFace;
 		info.tagString = "";
+        info.ellipsize = itemTextEllipsis;
 
 		alist.add(info);
 		
@@ -2067,6 +2079,7 @@ public class jListView extends ListView {
 
 		info.typeFace = this.typeFace;
 		info.tagString = "";
+		info.ellipsize = itemTextEllipsis;
 
 		alist.add(pos, info);
 
@@ -2099,6 +2112,7 @@ public class jListView extends ListView {
 		
 		info.typeFace = this.typeFace;
 		info.tagString = "";
+		info.ellipsize = itemTextEllipsis;
 
 		alist.add(info);
 		aadapter.notifyDataSetChanged();
@@ -2130,6 +2144,7 @@ public class jListView extends ListView {
 		info.typeFace = this.typeFace;
 		//info.fontTextStyle = Typeface.NORMAL;
 		info.tagString = "";
+		info.ellipsize = itemTextEllipsis;
 
 		alist.add(info);
 		aadapter.notifyDataSetChanged();
@@ -2162,6 +2177,7 @@ public class jListView extends ListView {
 		info.typeFace = this.typeFace;
 		// info.fontTextStyle = Typeface.NORMAL;
 		info.tagString = "";
+		info.ellipsize = itemTextEllipsis;
 
 		alist.add(info);
 		aadapter.notifyDataSetChanged();
@@ -2638,6 +2654,14 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 		}			
 	}
 
+	/*
+	listView.post(new Runnable() {
+       @Override
+       public void run() {
+           listView.smoothScrollToPosition(0);
+       }
+     }
+	 */
     public void SmoothScrollToPosition(int _index) {
         if( (_index < 0) || (_index >= alist.size()) ) return;
         
@@ -2841,5 +2865,9 @@ public String GetLeftItemCaption(String _fullItemCaption) {
 		//this.setTypeface(customfont);
 	}
 	*/
+
+	public void SetItemTextEllipsis(boolean _value) {
+		itemTextEllipsis = _value;
+	}
 
 }
