@@ -65,11 +65,18 @@ jImageFileManager = class(jControl)
 
     function ImageOpen() : boolean;
 
+    function LoadThumbnailFromFile(_fullFilePath: string; _maxWidth: integer; _maxHeight: integer): jObject;
+    function LoadThumbnailFromAssets(_fileName: string; _maxWidth: integer; _maxHeight: integer): jObject;
+
+
  published
 
 end;
 
 function jImageFileManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
+function jImageFileManager_LoadThumbnailFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _fullFilePath: string; _maxWidth: integer; _maxHeight: integer): jObject;
+function jImageFileManager_LoadThumbnailFromAssets(env: PJNIEnv; _jimagefilemanager: JObject; _fileName: string; _maxWidth: integer; _maxHeight: integer): jObject;
+
 
 implementation
 
@@ -365,6 +372,20 @@ begin
    Result:= jni_func_t_out_bmp(gApp.jni.jEnv, FjObject, 'LoadFromUri', _uriAsString);
 end;
 
+function jImageFileManager.LoadThumbnailFromFile(_fullFilePath: string; _maxWidth: integer; _maxHeight: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_LoadThumbnailFromFile(gApp.jni.jEnv, FjObject, _fullFilePath ,_maxWidth ,_maxHeight);
+end;
+
+function jImageFileManager.LoadThumbnailFromAssets(_fileName: string; _maxWidth: integer; _maxHeight: integer): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jImageFileManager_LoadThumbnailFromAssets(gApp.jni.jEnv, FjObject, _fileName ,_maxWidth ,_maxHeight);
+end;
+
 {-------- jImageFileManager_JNI_Bridge ----------}
 
 function jImageFileManager_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -392,15 +413,63 @@ begin
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
-(*
-//Please, you need insert:
 
-   public java.lang.Object jImageFileManager_jCreate(long _Self) {
-      return (java.lang.Object)(new jImageFileManager(this,_Self));
-   }
+function jImageFileManager_LoadThumbnailFromFile(env: PJNIEnv; _jimagefilemanager: JObject; _fullFilePath: string; _maxWidth: integer; _maxHeight: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
 
-//to end of "public class Controls" in "Controls.java"
-*)
+  if (env = nil) or (_jimagefilemanager = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadThumbnailFromFile', '(Ljava/lang/String;II)Landroid/graphics/Bitmap;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFilePath));
+  jParams[1].i:= _maxWidth;
+  jParams[2].i:= _maxHeight;
+
+
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jImageFileManager_LoadThumbnailFromAssets(env: PJNIEnv; _jimagefilemanager: JObject; _fileName: string; _maxWidth: integer; _maxHeight: integer): jObject;
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jimagefilemanager = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jimagefilemanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'LoadThumbnailFromAssets', '(Ljava/lang/String;II)Landroid/graphics/Bitmap;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fileName));
+  jParams[1].i:= _maxWidth;
+  jParams[2].i:= _maxHeight;
+
+
+  Result:= env^.CallObjectMethodA(env, _jimagefilemanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 
 end.

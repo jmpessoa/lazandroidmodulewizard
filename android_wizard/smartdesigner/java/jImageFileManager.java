@@ -1,4 +1,4 @@
-package com.example.appopenfiledialogdemo1;
+package org.lamw.applistviewdemo8;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -182,6 +183,7 @@ public class jImageFileManager /*extends ...*/ {
       bo.inDensity = controls.GetDensityAssets();
      
      return BitmapFactory.decodeStream(istr, null, bo);
+
  }
  
 	public Bitmap LoadFromRawFolder(String pictureName)
@@ -715,6 +717,80 @@ public class jImageFileManager /*extends ...*/ {
 		cursor.close();               
 		return path;
 	    // String path contains the path of selected Image  
+	}
+
+   //https://stackoverflow.com/questions/2577221/android-how-to-create-runtime-thumbnail
+	/**
+	 * @return the largest power of 2 that is smaller than or equal to number.
+	 * WARNING: return {0b1000000...000} for ZERO input.
+	 */
+	private int pow2Ceil(int number) {
+		return 1 << -(Integer.numberOfLeadingZeros(number) + 1); // is equivalent to:
+		// return Integer.rotateRight(1, Integer.numberOfLeadingZeros(number) + 1);
+	}
+
+	//https://stackoverflow.com/questions/2577221/android-how-to-create-runtime-thumbnail
+	public Bitmap LoadThumbnailFromFile(String _fullFilePath, int _maxWidth, int _maxHeight) {
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(_fullFilePath, options);
+
+		final float wRatio_inv = (float) options.outWidth / _maxWidth,
+				hRatio_inv = (float) options.outHeight / _maxHeight; // Working with inverse ratios is more comfortable
+		final int finalW, finalH, minRatio_inv /* = max{Ratio_inv} */;
+
+		if (wRatio_inv > hRatio_inv) {
+			minRatio_inv = (int) wRatio_inv;
+			finalW = _maxWidth;
+			finalH = Math.round(options.outHeight / wRatio_inv);
+		} else {
+			minRatio_inv = (int) hRatio_inv;
+			finalH = _maxHeight;
+			finalW = Math.round(options.outWidth / hRatio_inv);
+		}
+
+		options.inSampleSize = pow2Ceil(minRatio_inv); // pow2Ceil: A utility function
+		options.inJustDecodeBounds = false; // Decode bitmap with inSampleSize set
+
+		return Bitmap.createScaledBitmap(BitmapFactory.decodeFile(_fullFilePath, options), finalW, finalH, true);
+	}
+
+	public Bitmap LoadThumbnailFromAssets(String _fileName, int _maxWidth, int _maxHeight) {
+
+		InputStream input;
+		try {
+			input = controls.activity.getAssets().open(_fileName);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		// First decode with inJustDecodeBounds=true to check dimensions
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+
+		if( controls.GetDensityAssets() > 0 )
+			options.inDensity = controls.GetDensityAssets();
+
+		BitmapFactory.decodeStream(input, null, options);
+
+		final float wRatio_inv = (float) options.outWidth / _maxWidth,
+					hRatio_inv = (float) options.outHeight / _maxHeight; // Working with inverse ratios is more comfortable
+		final int finalW, finalH, minRatio_inv /* = max{Ratio_inv} */;
+
+		if (wRatio_inv > hRatio_inv) {
+				minRatio_inv = (int) wRatio_inv;
+				finalW = _maxWidth;
+				finalH = Math.round(options.outHeight / wRatio_inv);
+		} else {
+				minRatio_inv = (int) hRatio_inv;
+				finalH = _maxHeight;
+				finalW = Math.round(options.outWidth / hRatio_inv);
+		}
+		options.inSampleSize = pow2Ceil(minRatio_inv); // pow2Ceil: A utility function that comes later
+		options.inJustDecodeBounds = false; // Decode bitmap with inSampleSize set
+		return Bitmap.createScaledBitmap(BitmapFactory.decodeStream(input, null, options), finalW, finalH, true);
 	}
 
 }
