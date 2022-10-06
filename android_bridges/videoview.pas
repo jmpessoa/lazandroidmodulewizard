@@ -52,6 +52,7 @@ jVideoView = class(jVisualControl)
     procedure PlayFromURL(_url: string);
     procedure PlayFromRawResource(_fileName: string);
     procedure PlayFromSdcard(_fileName: string);
+    function GetDuration(): integer;
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -85,6 +86,7 @@ procedure jVideoView_SetProgressDialog(env: PJNIEnv; _jvideoview: JObject; _titl
 procedure jVideoView_PlayFromUrl(env: PJNIEnv; _jvideoview: JObject; _url: string);
 procedure jVideoView_PlayFromRawResource(env: PJNIEnv; _jvideoview: JObject; _fileName: string);
 procedure jVideoView_PlayFromSdcard(env: PJNIEnv; _jvideoview: JObject; _fileName: string);
+function jVideoView_GetDuration(env: PJNIEnv; _jvideoview: JObject): integer;
 
 implementation
 
@@ -399,6 +401,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jVideoView_PlayFromSdcard(gApp.jni.jEnv, FjObject, _fileName);
+end;
+
+function jVideoView.GetDuration(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jVideoView_GetDuration(gApp.jni.jEnv, FjObject);
 end;
 
 {-------- jVideoView_JNI_Bridge ----------}
@@ -741,6 +750,27 @@ begin
   env^.CallVoidMethodA(env, _jvideoview, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
   env^.DeleteLocalRef(env, jCls);
+end;
+
+function jVideoView_GetDuration(env: PJNIEnv; _jvideoview: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jvideoview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jvideoview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDuration', '()I');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  Result:= env^.CallIntMethod(env, _jvideoview, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.

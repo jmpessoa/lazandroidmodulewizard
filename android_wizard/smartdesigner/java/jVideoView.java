@@ -234,5 +234,9 @@ public class jVideoView extends VideoView /*dummy*/ { //please, fix what GUI obj
         new BackgroundAsyncTask() 
         .execute(path);
     }
-        
+
+    public int GetDuration() {
+        return this.getDuration();
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.appbroadcastreceiverdemo1;
+package org.lamw.appvideoviewdemo1;
 
 import android.app.Activity;
 import android.app.DownloadManager;
@@ -36,7 +36,7 @@ public class jBroadcastReceiver extends BroadcastReceiver {
    }
 
    @Override
-   /*.*/public void onReceive(Context arg0, Intent intent) { 
+   /*.*/public void onReceive(Context ctx, Intent intent) { 
 	   mResultCode = 0;
 	   switch (this.getResultCode()) {
 	        case Activity.RESULT_OK: mResultCode = -1; break;
@@ -44,8 +44,20 @@ public class jBroadcastReceiver extends BroadcastReceiver {
 	   }	     	     	
 	   
 	   mResultData = this.getResultData();	    	      	    
-	   mResultExtras = this.getResultExtras(true);	   
-	   controls.pOnBroadcastReceiver(pascalObj,  intent);
+	   mResultExtras = this.getResultExtras(true);	
+   
+	   //https://forum.lazarus.freepascal.org/index.php/topic,60663.0.html
+       if (controls != null) {
+             controls.pOnBroadcastReceiver(pascalObj,  intent); //normal behaviour
+       } else {
+              Context appContext = ctx.getApplicationContext();
+              String packageName = appContext.getPackageName();
+              Intent appIntent = new Intent();
+              appIntent.setClassName(packageName,packageName+".App");
+              appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+              appIntent.putExtras(intent);
+              appContext.startActivity(appIntent);
+       }
    }
    
   //write others [public] methods code here......
