@@ -1791,7 +1791,7 @@ begin
             {$IFDEF Unix}
             AProcess.Executable := '/bin/sh';
             AProcess.Parameters.Add('-c');
-            AProcess.Parameters.Add('release-keystore.sh');
+            AProcess.Parameters.Add(PathToAndroidProject +'/release-keystore.sh');
             {$ENDIF Unix}
 
             AProcess.Options:= AProcess.Options + [poWaitOnExit];
