@@ -1817,6 +1817,7 @@ begin
       auxList.Add('RELEASE_KEY_ALIAS = '+ Lowercase(SmallProjName)+'.keyalias');
       auxList.Add('RELEASE_STORE_PASSWORD = '+ks_pass);
       auxList.Add('RELEASE_KEY_PASSWORD = '+key_pass);
+      auxList.Add(savedGradleProperties);
       auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
 
       tempList.Clear;
