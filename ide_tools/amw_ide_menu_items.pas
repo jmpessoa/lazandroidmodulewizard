@@ -1852,8 +1852,10 @@ begin
       //gradle-local-build-bundle.bat
       try
         bundleList:= TStringList.Create;
-        bundleList.Add('gradle-local-build-bundle.bat');
-        bundleList.Add('jarsigner.bat -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore' + ' ' + Lowercase(SmallProjName)+ '-release.keystore' + ' ' +PathToAndroidProject+'\build\outputs\bundle\release\'+SmallProjName+'-release.aab'  + ' '  + Lowercase(SmallProjName)+'.keyalias' + ' < keytool_input.txt' );
+        bundleList.Add('@echo on');
+        bundleList.Add('cmd.exe /c gradle-local-build-bundle.bat');
+        bundleList.Add('jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore' + ' ' + Lowercase(SmallProjName)+ '-release.keystore' + ' ' +PathToAndroidProject+'\build\outputs\bundle\release\'+SmallProjName+'-release.aab'  + ' '  + Lowercase(SmallProjName)+'.keyalias' + ' < keytool_input.txt' );
+        bundleList.Add('pause');
         bundleList.SaveToFile(PathToAndroidProject+PathDelim+'signer-bundle.bat');
         bundleList.Clear;
         bundleList.Add('#!/bin/bash');
@@ -1877,7 +1879,7 @@ begin
           AProcess.Parameters.Add(PathToAndroidProject+'/signer-bundle.sh');
           {$ENDIF Unix}
 
-          AProcess.Options:= AProcess.Options + [poWaitOnExit,poUsePipes,poNewConsole];
+          AProcess.Options:= AProcess.Options + [poWaitOnExit {$IFDEF Unix} ,poUsePipes,poNewConsole {$ENDIF Unix} ];
           AProcess.Execute;
       finally
           AProcess.Free;
