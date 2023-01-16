@@ -1596,6 +1596,7 @@ var
   PathToAndroidProject, smallProjName, strTemp: string;
   p1: integer;
   auxList, signList,  tempList: TStringList;
+  bundleList: TStringList;
   instructionChip, ks_pass, key_pass: string;
   AProcess: TProcess;
   buildSystem: string;
@@ -1811,15 +1812,14 @@ begin
       auxList.Clear;
       auxList.LoadFromFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
       savedGradleProperties:= auxList.Text;
-
-      auxList.Clear;
+      auxList.Clear;  
       auxList.Add('RELEASE_STORE_FILE = '+ Lowercase(SmallProjName)+'-release.keystore');
       auxList.Add('RELEASE_KEY_ALIAS = '+ Lowercase(SmallProjName)+'.keyalias');
       auxList.Add('RELEASE_STORE_PASSWORD = '+ks_pass);
       auxList.Add('RELEASE_KEY_PASSWORD = '+key_pass);
       auxList.Add(savedGradleProperties);
       auxList.SaveToFile(PathToAndroidProject +  DirectorySeparator + 'gradle.properties');
-
+      
       tempList.Clear;
       tempList.LoadFromFile(PathToAndroidProject  +  DirectorySeparator +  'build.gradle');
       savedBuildGradle:= tempList.Text;
@@ -1851,22 +1851,33 @@ begin
 
       //gradle-local-build-bundle.bat
       try
+        bundleList:= TStringList.Create;
+        bundleList.Add('gradle-local-build-bundle.bat');
+        bundleList.Add('jarsigner.bat -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore' + ' ' + Lowercase(SmallProjName)+ '-release.keystore' + ' ' +PathToAndroidProject+'\build\outputs\bundle\release\'+SmallProjName+'-release.aab'  + ' '  + Lowercase(SmallProjName)+'.keyalias' + ' < keytool_input.txt' );
+        bundleList.SaveToFile(PathToAndroidProject+PathDelim+'signer-bundle.bat');
+        bundleList.Clear;
+        bundleList.Add('#!/bin/bash');
+        bundleList.Add('./gradle-local-build-bundle.sh');
+        bundleList.Add('jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore' + ' ' + Lowercase(SmallProjName)+ '-release.keystore' + ' ' +PathToAndroidProject+'/build/outputs/bundle/release/'+SmallProjName+'-release.aab' + ' '+  Lowercase(SmallProjName)+'.keyalias' + ' < keytool_input.txt' );
+        bundleList.Add('echo "Press ENTER to exit"');
+        bundleList.Add('read');
+        SaveShellScript(bundleList,PathToAndroidProject+PathDelim+'signer-bundle.sh');
           AProcess:= TProcess.Create(nil);
           AProcess.CurrentDirectory:= PathToAndroidProject;
 
           {$IFDEF Windows}
           AProcess.Executable := 'c:\windows\system32\cmd.exe';
           AProcess.Parameters.Add('/c');  //Executes the command(s) in command and then quits.
-          AProcess.Parameters.Add('gradle-local-build-bundle.bat');
+          AProcess.Parameters.Add('signer-bundle.bat');
           {$ENDIF Windows}
 
           {$IFDEF Unix}
           AProcess.Executable := '/bin/sh';
           AProcess.Parameters.Add('-c');
-          AProcess.Parameters.Add('gradle-local-build-bundle.sh');
+          AProcess.Parameters.Add(PathToAndroidProject+'/signer-bundle.sh');
           {$ENDIF Unix}
 
-          AProcess.Options:= AProcess.Options + [poWaitOnExit];
+          AProcess.Options:= AProcess.Options + [poWaitOnExit,poUsePipes,poNewConsole];
           AProcess.Execute;
       finally
           AProcess.Free;
@@ -1888,6 +1899,7 @@ begin
     end;
     tempList.Free;
     auxList.Free;
+    bundleList.Free;
   end
   else
     ShowMessage('The active project not is a LAMW project!');
