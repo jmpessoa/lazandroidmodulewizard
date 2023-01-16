@@ -2893,7 +2893,7 @@ begin
                 else
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 strList.Add(' ');
                 strList.Add('WARNING: The following tasks assume that you have:');
                 strList.Add('         .Internet connection;');
@@ -2928,7 +2928,7 @@ begin
                   strList.Add('export GRADLE_HOME='+linuxPathToGradle);
 
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 strList.Add(' ');
                 strList.Add('[linux] cmd line prompt:');
                 //strList.Add('.\gradle clean build --info');
@@ -3021,7 +3021,7 @@ begin
                 else
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 //strList.Add('./gradle wrapper');
                 strList.Add('gradle wrapper');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-making-wrapper.sh');
@@ -3046,7 +3046,7 @@ begin
                 else
                    strList.Add('export GRADLE_HOME='+linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 //strList.Add('./gradlew build');
                 strList.Add('gradlew build');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-build.sh');
@@ -3069,7 +3069,7 @@ begin
                 else
                    strList.Add('export GRADLE_HOME='+linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 //strList.Add('./gradlew run');
                 strList.Add('gradlew run');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-run.sh');
@@ -3136,7 +3136,7 @@ begin
                 else
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 strList.Add('gradle clean build --info');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build.sh');
 
@@ -3147,7 +3147,7 @@ begin
                 else
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 strList.Add('gradle clean bundle --info');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build-bundle.sh');
 
@@ -3178,7 +3178,7 @@ begin
                   strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
 
                 strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('source ~/.bashrc');
+                strList.Add('. ~/.bashrc');
                 //strList.Add('.\gradle run');
                 strList.Add('gradle run');
                 SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-run.sh');
