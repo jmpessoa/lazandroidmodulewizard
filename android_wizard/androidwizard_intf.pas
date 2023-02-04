@@ -4112,6 +4112,8 @@ begin
 
   if FModuleType < 2 then
   begin
+    AProject.LazCompilerOptions.OtherUnitFiles := '$(ProjOutDir)';
+
     AProject.LazCompilerOptions.TargetFilename:=
           '..'+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'lib'+LowerCase(FJavaClassName){+'.so'};
 

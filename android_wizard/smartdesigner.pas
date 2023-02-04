@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget,
-  process, math, SourceChanger, propedits;
+  process, math, SourceChanger, propedits, LCLClasses;
 
 //tk min and max API versions for build.xml
 const
@@ -231,65 +231,74 @@ begin
   Result:= True;
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
   begin
-
-      if AComponentClass.ClassName[1] = 'T' then
-      begin
-        case QuestionDlg ('Warning: LCL Component','"'+AComponentClass.ClassName+'"'+sLineBreak+
-                                    'does not seem to be a LAMW component...',
-                                    mtCustom,[mrYes,'Continue', mrNo, 'Exit'],'') of
-             mrNo: begin Result:= False; Exit; end;
+    if AComponentClass.InheritsFrom(TWinControl) then
+    begin
+      MessageDlg('Error: TWinControl Component',
+                 '"'+AComponentClass.ClassName+'"'+sLineBreak+'not supported by LAMW project...',
+                 mtError, [mbOK], 0);
+      Exit;
+    end;
+    if AComponentClass.InheritsFrom(TLCLComponent) then
+    begin
+      case QuestionDlg ('Warning: LCL Component',
+                        '"'+AComponentClass.ClassName+'"'+sLineBreak+'does not seem to be a LAMW component...',
+                        mtCustom,[mrYes,'Continue', mrNo, 'Exit'],'') of
+        mrNo:
+        begin
+          Result := False;
+          Exit;
         end;
       end;
+    end;
 
+    temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
 
-      temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
-
-      if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
+    if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
+    begin
+      if temp <> 'jgdx' then
       begin
-         if temp <> 'jgdx' then
-         begin
-          Result:= False;
-          ShowMessage('Sorry.. ['+AComponentClass.ClassName+'] not for a libGDX project...');
-          Exit;
-         end;
-      end
-      else
-      begin
-         if temp = 'jgdx' then
-         begin
-           Result:= False;
-           ShowMessage('Sorry..['+AComponentClass.ClassName+'] only for a libGDX project...');
-           Exit;
-         end;
-      end;
-
-      if Pos('AppCompat.',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then Exit;
-
-      if AComponentClass.ClassNameIs('jsFloatingButton') or
-         AComponentClass.ClassNameIs('jsTextInput') or
-         AComponentClass.ClassNameIs('jsRecyclerView') or
-         AComponentClass.ClassNameIs('jsCardView') or
-         AComponentClass.ClassNameIs('jsViewPager') or
-         AComponentClass.ClassNameIs('jsDrawerLayout') or
-         AComponentClass.ClassNameIs('jsNavigationView') or
-         AComponentClass.ClassNameIs('jsAppBarLayout') or
-         AComponentClass.ClassNameIs('jsTabLayout') or
-         AComponentClass.ClassNameIs('jsToolBar') or
-         AComponentClass.ClassNameIs('jsCoordenatorLayout') or
-         AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
-         AComponentClass.ClassNameIs('jsNestedScrollView') or
-         AComponentClass.ClassNameIs('jsBottomNavigationView') or
-         AComponentClass.ClassNameIs('jsContinuousScrollableImageView') or
-         AComponentClass.ClassNameIs('jsAdMod') or
-         AComponentClass.ClassNameIs('jsFirebasePushNotificationListener') or
-         AComponentClass.ClassNameIs('KToyButton')  then
-      begin
-        ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
-                     'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
-                     '       menu "Tools" --> "[LAMW]..." --> "Convert..."');
         Result:= False;
+        ShowMessage('Sorry.. ['+AComponentClass.ClassName+'] not for a libGDX project...');
+        Exit;
       end;
+    end
+    else
+    begin
+      if temp = 'jgdx' then
+      begin
+        Result:= False;
+        ShowMessage('Sorry..['+AComponentClass.ClassName+'] only for a libGDX project...');
+        Exit;
+      end;
+    end;
 
+    if Pos('AppCompat.',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
+      Exit;
+
+    if AComponentClass.ClassNameIs('jsFloatingButton') or
+       AComponentClass.ClassNameIs('jsTextInput') or
+       AComponentClass.ClassNameIs('jsRecyclerView') or
+       AComponentClass.ClassNameIs('jsCardView') or
+       AComponentClass.ClassNameIs('jsViewPager') or
+       AComponentClass.ClassNameIs('jsDrawerLayout') or
+       AComponentClass.ClassNameIs('jsNavigationView') or
+       AComponentClass.ClassNameIs('jsAppBarLayout') or
+       AComponentClass.ClassNameIs('jsTabLayout') or
+       AComponentClass.ClassNameIs('jsToolBar') or
+       AComponentClass.ClassNameIs('jsCoordenatorLayout') or
+       AComponentClass.ClassNameIs('jsCollapsingToolbarLayout') or
+       AComponentClass.ClassNameIs('jsNestedScrollView') or
+       AComponentClass.ClassNameIs('jsBottomNavigationView') or
+       AComponentClass.ClassNameIs('jsContinuousScrollableImageView') or
+       AComponentClass.ClassNameIs('jsAdMod') or
+       AComponentClass.ClassNameIs('jsFirebasePushNotificationListener') or
+       AComponentClass.ClassNameIs('KToyButton')  then
+     begin
+       ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
+                   'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
+                   '       menu "Tools" --> "[LAMW]..." --> "Convert..."');
+       Result:= False;
+    end;
   end;
 end;
 
