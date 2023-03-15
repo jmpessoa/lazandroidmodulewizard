@@ -12,7 +12,7 @@ type
 TBarcodeFormat = (
             cfNONE=0,
             cfPARTIAL=1,
-            cfmEAN8=8,
+            cfEAN8=8,
             cfUPCE=9,
             cfISBN10=10,
             cfUPCA=12,

@@ -1712,9 +1712,9 @@ begin
            if not FileExists(FPathToJavaTemplates+PathDelim+FJavaClassName+fileExt) then
               SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+fileExt)
            else
-           begin
+           begin   //save java/kotlin class template
              case QuestionDlg ('FileExists!','Overwrite the "'+fileExt+'" File?',mtWarning,[mrYes,'Yes', mrNo, 'No'],'') of
-                 mrYes: SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+'.java');
+                 mrYes: SynMemo1.Lines.SaveToFile(FPathToJavaTemplates+PathDelim+FJavaClassName+fileExt);
              end;
            end;
 
@@ -2235,7 +2235,6 @@ begin
 
       end;
       strList.Add('}');
-      //strList.SaveToFile(FPathToJavaTemplates+PathDelim+'j'+javaClass+'.java'); //TODO
 
       SynMemo1.Clear;
       SynMemo1.Lines.Text:= strList.Text;
@@ -2748,7 +2747,6 @@ begin
     listJCreate:= TStringList.Create;
     auxStr:= funcParam;
     SplitStr(auxStr,',');
-    //listJCreate.Add('  ');
     listJCreate.Add('public java.lang.Object '+funcName+'_jCreate('+Trim(auxStr)+') {');
     auxStr2:= Trim(auxStr);
     SplitStr(auxStr2,' ');

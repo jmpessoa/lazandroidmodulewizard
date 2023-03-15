@@ -108,6 +108,7 @@ procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: s
 procedure jTextView_SetSingleLine(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetHorizontallyScrolling(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetEllipsize(env: PJNIEnv; _jtextview: JObject; _mode: integer);
+procedure jTextView_SetTextAllCaps(env: PJNIEnv; _jtextview: JObject; _text: string);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -594,6 +595,31 @@ begin
   jParams[0].i:= _mode;
 
   env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+  procedure jTextView_SetTextAllCaps(env: PJNIEnv; _jtextview: JObject; _text: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jtextview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextAllCaps', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
 
   env^.DeleteLocalRef(env, jCls);
 

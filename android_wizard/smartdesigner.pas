@@ -765,7 +765,7 @@ end;
 function TLamwSmartDesigner.GetVesionCodeFromBuilGradle(): string;
 var
   list: TStringList;
-  i, p: integer;
+  p: integer;
   aux: string;
 begin
    Result:= '1';
@@ -786,7 +786,7 @@ end;
 function TLamwSmartDesigner.GetVesionNameFromBuilGradle(): string;
 var
   list: TStringList;
-  i, p: integer;
+  p: integer;
   aux: string;
 begin
    Result:= '"1.0"';
@@ -2462,9 +2462,9 @@ function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname
   out nativeAdded: boolean): boolean;
 var
   list, auxList, manifestList, gradleList: TStringList;
-  p, p1, p2, i,  minSdkManifest, count: integer;
+  p, q, p1, p2, i,  minSdkManifest, count: integer;
   aux, tempStr, auxStr: string;
-  insertRef, minSdkManifestStr: string;
+  insertRef, minSdkManifestStr, minSdkCtl: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
@@ -2558,46 +2558,53 @@ begin
 
    end;
 
-   isGradle := (LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle');
+    isGradle := (LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle');
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
+   begin
+      if not isGradle then
+      begin
+         ShowMessage(jclassname+' component require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
+         LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
+         LazarusIDE.ActiveProject.Modified:= True;
+      end;
+   end;
 
    //updated manifest minAdkApi
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
    begin
 
-     minSdkManifestStr:= LazarusIDE.ActiveProject.CustomData['MinSdk'];
+     minSdkManifestStr:= Trim(LazarusIDE.ActiveProject.CustomData['MinSdk']);
 
      if minSdkManifestStr <> '' then
+     begin
          minSdkManifest:= StrToInt(minSdkManifestStr)
-      else minSdkManifest:= 0;
+     end
+     else
+     begin
+       if FileExists(FPathToAndroidProject+'build.gradle') then
+       begin
+         auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+         p:= Pos('minSdkVersion ', auxList.Text);
+         q:= p + Length('minSdkVersion ');
+         minSdkManifestStr:= auxList.Text[q] + auxList.Text[q+1];
+         minSdkManifest:= StrToInt(minSdkManifestStr)
+       end;
+     end;
 
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
+     minSdkCtl:= Trim(auxList.Strings[0]);
 
-     aux:= auxList.Strings[0];
-
-     if aux <> '' then
-        tempMinSdk:= StrToInt(aux)
+     if minSdkCtl <> '' then
+       tempMinSdk:= StrToInt(minSdkCtl)
      else
-        tempMinSdk:= 14;
+       tempMinSdk:= 14;
 
      if FMinSdkControl < tempMinSdk then
-     begin
         FMinSdkControl:= tempMinSdk;
-        LazarusIDE.ActiveProject.CustomData['MinSdk']:= aux;
-        LazarusIDE.ActiveProject.Modified:= True;
-     end;
 
      if FMinSdkControl > minSdkManifest then
      begin
-        auxList.Clear;
-        auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-        tempStr:= auxList.Text;
-
-        if not isGradle then // Gradle not need minSdkVersion on manifest
-           tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
-
-        auxList.Text:= tempStr;
-        auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-
         if FileExists(FPathToAndroidProject+'build.gradle') then
         begin
           auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
@@ -2606,17 +2613,19 @@ begin
           auxList.Text:= tempStr;
           auxList.SaveToFile(FPathToAndroidProject+'build.gradle');
         end;
-     end;
-   end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
-   begin
-      if not isGradle then
-      begin
-         ShowMessage(jclassname+' component require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
-         LazarusIDE.ActiveProject.Modified:= True;
-         LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
-      end;
+        auxList.Clear;
+        auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+        tempStr:= auxList.Text;
+        if not isGradle then // Gradle not need minSdkVersion on manifest
+        begin
+           tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+           auxList.Text:= tempStr;
+           auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+        end;
+        LazarusIDE.ActiveProject.CustomData['MinSdk']:= minSdkCtl; //FMinSdkControl
+        LazarusIDE.ActiveProject.Modified:= True;
+     end;
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..

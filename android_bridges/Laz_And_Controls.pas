@@ -1095,6 +1095,8 @@ type
     procedure SetSingleLine(_value: boolean);
     procedure SetHorizontallyScrolling(_value: boolean);
     procedure SetEllipsize(_mode: TEllipsizeMode);
+    procedure SetTextAllCaps(_text: string);
+
 
   published
     property Text: string read GetText write SetText;
@@ -1115,6 +1117,7 @@ type
     property OnAfterDispatchDraw: TOnBeforeDispatchDraw read FOnAfterDispatchDraw write FOnAfterDispatchDraw;
     property OnLayouting: TOnLayouting read FOnLayouting write FOnLayouting;
   end;
+
 
   TEditTextOnActionIconTouchUp=procedure(Sender:TObject;textContent:string) of object;
   TEditTextOnActionIconTouchDown=procedure(Sender:TObject;textContent:string) of object;
@@ -4918,6 +4921,13 @@ begin
      jTextView_SetEllipsize(gApp.jni.jEnv, FjObject, Ord(_mode));
 end;
 
+procedure jTextView.SetTextAllCaps(_text: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetTextAllCaps(gApp.jni.jEnv, FjObject, _text);
+end;
+
 //------------------------------------------------------------------------------
 // jEditText
 //------------------------------------------------------------------------------
@@ -5154,6 +5164,7 @@ end;
 procedure jEditText.SetText(Value: string);
 begin
   inherited SetText(Value);
+
   if not FInitialized then exit;
 
   if Value <> '' then
@@ -16027,5 +16038,6 @@ begin
     jDBListView(Obj).GenEvent_OnLongClickDBListItem(Obj, position,  pascaption);
   end
 end;
+
 
 end.
