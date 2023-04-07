@@ -91,6 +91,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
   }
   OnActivate = FormActivate
   OnClose = FormClose
+  OnCreate = FormCreate
   Position = poScreenCenter
   object StatusBar1: TStatusBar
     Left = 0
@@ -114,9 +115,9 @@ object FormBuildFPCCross: TFormBuildFPCCross
       Height = 453
       Top = 0
       Width = 530
-      ActivePage = TabSheet3
+      ActivePage = TabSheet2
       Align = alClient
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 0
       OnChange = PageControl1Change
       object TabSheet2: TTabSheet
@@ -457,7 +458,7 @@ object FormBuildFPCCross: TFormBuildFPCCross
     end
   end
   object SelectDirectoryDialog1: TSelectDirectoryDialog
-    left = 152
-    top = 320
+    Left = 152
+    Top = 320
   end
 end
