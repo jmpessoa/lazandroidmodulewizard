@@ -116,13 +116,16 @@ implementation
 uses PackageIntf, LazIDEIntf, StdCtrls, EditBtn, Controls, ButtonPanel;
 
 function QueryPath(APrompt: string; out Path: string;
-  ACaption: string = 'Android Wizard: Path Missing!'): Boolean;
+  ACaption: string = 'Android Wizard [LamwSettings]: Path Missing!'): Boolean;
 var
   f: TForm;
   l: TLabel;
   de: TDirectoryEdit;
 begin
   Result := False;
+
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW']= '' then Exit;
+
   f := TForm.Create(nil);
   with f do
   try
