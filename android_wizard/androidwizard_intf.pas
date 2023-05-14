@@ -1211,6 +1211,10 @@ begin
      27: Result:= 'Oreo-8.1';
      28: Result:= 'Pie';
      29: Result:= 'Android-10.0';
+     30: Result:= 'Android-11.0';
+     31: Result:= 'Android-12.0';
+     32: Result:= 'Android-13.0';
+     33: Result:= 'Android-14.0';
   end;
 end;
 

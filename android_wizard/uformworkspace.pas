@@ -349,7 +349,7 @@ begin
      16: Result:= 'Android 10'; // Api(29)
      17: Result:= 'Android 11'; // Api(30)
      18: Result:= 'Android 12'; // Api(31)
-     19: Result:= 'Android 13'; // Api(32)
+     19: Result:= 'Android 13'; // Api(32) or 33
      20: Result:= 'Android 14'; // Api(33)
    end;
 end;
@@ -1030,7 +1030,6 @@ var
   i, k: integer;
   strIndexNdk: string;
 begin
-
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
@@ -1716,7 +1715,6 @@ var
   tagVersion: integer;
   i: integer;
 begin
-
   //run before "OnFormActive"
 
   FFileName:= pFilename; //full filename
