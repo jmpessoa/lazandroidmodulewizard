@@ -110,6 +110,8 @@ type
      function TryUndoFakeVersion(grVer: string): string;
      function IsTemplateProject(tryTheme: string; out outAndroidTheme: string): boolean;
 
+     function GetVerAsString(aVers: integer): string;
+
    public
      constructor Create; override;
      function GetLocalizedName: string; override;
@@ -1449,6 +1451,14 @@ begin
   else if grVer = '4.9.4' then Result:= '4.10.3';
 end;
 
+function TAndroidProjectDescriptor.GetVerAsString(aVers: integer): string;
+begin
+  Result:= '';
+  case aVers of
+     34: Result:= 'android-UpsideDownCake';
+  end;
+end;
+
 function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
 
   function MakeUniqueName(const Orig: string; sl: TStrings): string;
@@ -2670,8 +2680,10 @@ begin
                 strList.Add('    }');
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
-
-                  strList.Add('    compileSdkVersion '+compileSdkVersion);
+                  if StrToInt(compileSdkVersion) < 34 then
+                    strList.Add('    compileSdkVersion '+compileSdkVersion)
+                  else
+                    strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(compileSdkVersion))+'"');
 
                   if androidPluginNumber < 3000 then
                   begin

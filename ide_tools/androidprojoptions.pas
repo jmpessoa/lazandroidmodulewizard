@@ -597,24 +597,27 @@ begin
     //compileSdkVersion 25
 
     p := Pos(' ', tempStr);
-    oldCompileSdkVersion := Trim(Copy(tempStr, p + 1, 2));
+    oldCompileSdkVersion:= Trim(Copy(tempStr, p + 1, 2));
 
-    if FTargetSdkVersion <> StrToInt(oldCompileSdkVersion) then
+    if IsAllCharNumber(PChar(oldCompileSdkVersion)) then
     begin
-
-      tempStr := strList.Text;
-
-      findString:='compileSdkVersion ';
-      if (Pos(findString,tempStr)>0) then
-        tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
-
-      for aSupportLib in SupportLibs do
+      if FTargetSdkVersion <> StrToInt(oldCompileSdkVersion) then
       begin
-        if (Pos(aSupportLib.Name,tempStr)>0) then
-          tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*), [rfIgnoreCase]);
-      end;
 
-      strList.Text := tempStr;
+        tempStr := strList.Text;
+
+        findString:='compileSdkVersion ';
+        if (Pos(findString,tempStr)>0) then
+          tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+
+        for aSupportLib in SupportLibs do
+        begin
+          if (Pos(aSupportLib.Name,tempStr)>0) then
+            tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*), [rfIgnoreCase]);
+        end;
+
+        strList.Text := tempStr;
+      end;
     end;
 
     strList.SaveToFile(ExtractFilePath(FFileName) + 'build.gradle');

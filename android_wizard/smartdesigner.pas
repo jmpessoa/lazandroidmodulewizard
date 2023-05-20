@@ -103,6 +103,8 @@ type
     function GetNDKVersion(ndkRelease: string): integer;
 
     procedure TryUpdateMipmap();
+    function GetVerAsString(aVers: integer): string;
+
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
@@ -807,6 +809,14 @@ begin
    end;
 end;
 
+function TLamwSmartDesigner.GetVerAsString(aVers: integer): string;
+begin
+  Result:= '';
+  case aVers of
+     34: Result:= 'android-UpsideDownCake';
+  end;
+end;
+
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
 var
@@ -1280,14 +1290,22 @@ begin
 
          if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
-           strList.Add('    compileSdkVersion '+ buildToolApi);
+
+           if StrToInt(buildToolApi) < 34 then
+              strList.Add('    compileSdkVersion '+ buildToolApi)
+           else
+              strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(buildToolApi))+'"');
+
            if androidPluginNumber < 3000 then
               strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
            //else: each version of the Android Gradle Plugin now has a default version of the build tools
          end
          else
          begin
-           strList.Add('    compileSdkVersion '+ buildToolApi);
+           if StrToInt(buildToolApi) < 34 then
+              strList.Add('    compileSdkVersion '+ buildToolApi)
+           else
+              strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(buildToolApi))+'"');
            if androidPluginNumber < 3000 then
               strList.Add('    buildToolsVersion "'+buildTool+'"');
            //else: each version of the Android Gradle Plugin now has a default version of the build tools
@@ -1301,25 +1319,6 @@ begin
             strList.Add('            targetSdkVersion '+IntToStr(targetApi))
          else
             strList.Add('            targetSdkVersion '+buildToolApi);
-
-         (*
-         if fileExists(FPathToAndroidProject+'AndroidManifest.xml') then
-         begin
-          ReadXMLFile(xmlAndroidManifest, FPathToAndroidProject+'AndroidManifest.xml');
-
-          if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then Exit;
-
-          with xmlAndroidManifest.DocumentElement do
-          begin
-              versionCode := AttribStrings['android:versionCode'];
-              versionName := AttribStrings['android:versionName'];
-          end;
-         end else
-         begin
-          versionCode := '1';
-          versionName := '1.0';
-         end;
-         *)
 
          versionCode := GetVesionCodeFromBuilGradle();
          versionName := GetVesionNameFromBuilGradle();

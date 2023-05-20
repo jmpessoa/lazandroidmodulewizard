@@ -415,6 +415,9 @@ begin
   begin
    intApi:= StrToInt(ListBoxTargetAPI.Text);
 
+   if intApi  < 24 then
+     ShowMessage('Warning. Starting with "Android 14", apps with a targetSdkVersion lower than 23 can''t be installed...');
+
    if intApi < 30  then
    begin
      ShowMessage('Warning. AppCompat theme and Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
