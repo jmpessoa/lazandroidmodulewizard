@@ -436,7 +436,7 @@ type
   TMenuItemShowAsAction = (misNever,
                         misIfRoom,
                         misAlways,
-                        misNone,    //dummy
+                        misIfRoomCollapseView,
                         misIfRoomWithText,
                         misAlwaysWithText);
 

@@ -206,6 +206,7 @@ Function  jWebView_Create              (env:PJNIEnv;  this:jobject; SelfObj: TOb
 procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
 
 procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2,_s3,_s4,_s5: string);//LMB
+procedure jWebView_SetInitialScale(env: PJNIEnv; _jwebview: JObject; _scaleInPercent: integer);
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -1866,6 +1867,29 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+procedure jWebView_SetInitialScale(env: PJNIEnv; _jwebview: JObject; _scaleInPercent: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jwebview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetInitialScale', '(I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _scaleInPercent;
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 //------------------------------------------------------------------------------
 // Canvas

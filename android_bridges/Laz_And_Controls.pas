@@ -2208,6 +2208,7 @@ type
     procedure SetSafeBrowsingEnabled(_safeBrowsingEnabled: boolean);
     procedure SetSupportZoom(_supportZoom: boolean);
     procedure SetUserAgent(_userAgent: string);
+    procedure SetInitialScale(_scaleInPercent: integer);
 
     procedure CallEvaluateJavascript(_jsInnerCode: string); //segator
     procedure GenEvent_OnEvaluateJavascriptResult(Sender:TObject;data:string); //segator
@@ -11447,6 +11448,12 @@ begin
      jni_proc_t(gApp.jni.jEnv, FjObject, 'SetUserAgent', _userAgent);
 end;
 
+procedure jWebView.SetInitialScale(_scaleInPercent: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jWebView_SetInitialScale(gApp.jni.jEnv, FjObject, _scaleInPercent);
+end;
 
 //by segator
 procedure jWebView.GenEvent_OnEvaluateJavascriptResult(Sender:TObject;data:string);

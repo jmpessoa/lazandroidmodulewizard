@@ -135,7 +135,6 @@ public class App extends AppCompatActivity {
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
-    	super.onRequestPermissionsResult(permsRequestCode, permissions, grantResults);
     	
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {
@@ -258,10 +257,27 @@ public class App extends AppCompatActivity {
        return super.onPrepareOptionsMenu(menu);
    }
    
-   @Override
+   /*Handle opened menu */
+  @Override     
    public boolean onMenuOpened(int featureId, Menu menu) {
-	   //TODO!!!!
-     return super.onMenuOpened(featureId, menu);
+	   //https://stackoverflow.com/questions/33820366/how-to-show-icon-with-menus-in-android
+      if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
+          if(menu.getClass().getSimpleName().equals("MenuBuilder")){
+              try{
+                  Method m = menu.getClass().getDeclaredMethod(
+                          "setOptionalIconsVisible", Boolean.TYPE);
+                  m.setAccessible(true);
+                  m.invoke(menu, true);
+              }
+              catch(NoSuchMethodException e){
+                  //Log.e(TAG, "onMenuOpened", e);
+              }
+              catch(Exception e){
+                  throw new RuntimeException(e);
+              }
+          }
+      }
+      return super.onMenuOpened(featureId, menu);
    }
    
    //https://abhik1987.wordpress.com/tag/android-disable-home-button/
