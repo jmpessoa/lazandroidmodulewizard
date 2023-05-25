@@ -845,6 +845,7 @@ var
   versionName : string;
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
+  TargetBuildFileName : string;
 begin
 
   buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
@@ -1217,6 +1218,7 @@ begin
            auxStr := ExtractFileName(auxStr);
          end;
 
+         TargetBuildFileName := 'lib' + ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename) + '.so';
          includeList:= TStringList.Create;
          includeList.Delimiter:= ',';
          includeList.StrictDelimiter:= True;
@@ -1225,32 +1227,32 @@ begin
 
          includeList.Add(''''+auxStr+''''); //initial  Instruction Set
 
-         if FileExists(FPathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
          begin
            includeList.Add('''armeabi''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\' + TargetBuildFileName ) then
          begin
            includeList.Add('''armeabi-v7a''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\' + TargetBuildFileName ) then
          begin
            includeList.Add('''arm64-v8a''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\x86_64\' + TargetBuildFileName ) then
          begin
            includeList.Add('''x86_64''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\x86\' + TargetBuildFileName ) then
          begin
            includeList.Add('''x86''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\mips\' + TargetBuildFileName ) then
          begin
            includeList.Add('''mips''');
          end;
