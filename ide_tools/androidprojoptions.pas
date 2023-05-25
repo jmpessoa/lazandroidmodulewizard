@@ -375,6 +375,7 @@ var
   includeList: TStringList;
   universalApk: boolean;
   pathToAndroidProject: string;
+  TargetBuildFileName: string;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
   if not FileExists(fn) then
@@ -506,33 +507,34 @@ begin
   includeList.Add(''''+cpuTarget+''''); //initial  Instruction Set
 
   PathToAndroidProject:= ExtractFilePath(FFileName);
+  TargetBuildFileName := 'lib' + ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename) + '.so';
 
-  if FileExists(pathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
   begin
     includeList.Add('''armeabi''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\' + TargetBuildFileName ) then
   begin
     includeList.Add('''armeabi-v7a''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\' + TargetBuildFileName ) then
   begin
     includeList.Add('''arm64-v8a''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\x86_64\' + TargetBuildFileName ) then
   begin
     includeList.Add('''x86_64''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\x86\' + TargetBuildFileName ) then
   begin
     includeList.Add('''x86''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\mips\' + TargetBuildFileName ) then
   begin
     includeList.Add('''mips''');
   end;
