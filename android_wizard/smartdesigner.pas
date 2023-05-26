@@ -1218,7 +1218,7 @@ begin
            auxStr := ExtractFileName(auxStr);
          end;
 
-         TargetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+         TargetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.CreateTargetFilename);
          includeList:= TStringList.Create;
          includeList.Delimiter:= ',';
          includeList.StrictDelimiter:= True;
