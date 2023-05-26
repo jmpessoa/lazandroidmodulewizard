@@ -507,7 +507,7 @@ begin
   includeList.Add(''''+cpuTarget+''''); //initial  Instruction Set
 
   PathToAndroidProject:= ExtractFilePath(FFileName);
-  TargetBuildFileName := 'lib' + ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename) + '.so';
+  TargetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.CreateTargetFilename);
 
   if FileExists(pathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
   begin
