@@ -233,7 +233,7 @@ end;
 function jsEscPosThermalPrinter_ImageToHexadecimalString(env: PJNIEnv; _jsescposthermalprinter: JObject; _imageIdentifier: string): string;
 var
   jStr: JString;
-  jBoo: JBoolean;
+  //jBoo: JBoolean;
   jParams: array[0..0] of jValue;
   jMethod: jMethodID=nil;
   jCls: jClass=nil;
@@ -249,11 +249,10 @@ begin
 
   jParams[0].l:= env^.NewStringUTF(env, PChar(_imageIdentifier));
 
-
   jStr:= env^.CallObjectMethodA(env, _jsescposthermalprinter, jMethod, @jParams);
 
   Result:= GetPStringAndDeleteLocalRef(env, jStr);
-env^.DeleteLocalRef(env,jParams[0].l);
+  env^.DeleteLocalRef(env,jParams[0].l);
 
   env^.DeleteLocalRef(env, jCls);
 

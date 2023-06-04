@@ -1491,6 +1491,9 @@ type
     function GetFileList(_treeUri: jObject): TDynArrayOfString; overload;
     function GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
 
+    function GetMimeTypeFromExtension(_fileExtension: string): string;
+    function GetUriFromFile(_fullFileName: string): jObject;
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1744,6 +1747,8 @@ end;
   procedure jForm_SaveTextToUri(env: PJNIEnv; _jform: JObject; _text: string; _toUri: jObject);
   function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject): TDynArrayOfString; overload;
   function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
+  function jForm_GetMimeTypeFromExtension(env: PJNIEnv; _jform: JObject; _fileExtension: string): string;
+  function jForm_GetUriFromFile(env: PJNIEnv; _jform: JObject; _fullFileName: string): jObject;
 
   //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -5251,6 +5256,21 @@ begin
    Result:= jForm_GetFileList(gapp.Jni.jEnv, FjObject, _treeUri ,_fileExtension);
 end;
 
+function jForm.GetMimeTypeFromExtension(_fileExtension: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetMimeTypeFromExtension(gApp.jni.jEnv, FjObject, _fileExtension);
+end;
+
+function jForm.GetUriFromFile(_fullFileName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetUriFromFile(gApp.jni.jEnv, FjObject, _fullFileName);
+end;
+
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
@@ -6365,6 +6385,63 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+function jForm_GetMimeTypeFromExtension(env: PJNIEnv; _jform: JObject; _fileExtension: string): string;
+var
+  jStr: JString;
+  //jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMimeTypeFromExtension', '(Ljava/lang/String;)Ljava/lang/String;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fileExtension));
+
+
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jForm_GetUriFromFile(env: PJNIEnv; _jform: JObject; _fullFileName: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUriFromFile', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //-----{ jApp } ------
 

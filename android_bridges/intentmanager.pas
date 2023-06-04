@@ -154,6 +154,7 @@ jIntentManager = class(jControl)
     function JByteArrayToString(var _byteArray: TDynArrayOfJByte): string;
 
     function GetBundleContent(_intent: jObject; keyValueDelimiter: string): TDynArrayOfString; overload;
+    function GetUriFromFile(_fullFileName: string): jObject;
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
@@ -194,6 +195,8 @@ procedure jIntentManager_PutExtraByteArray(env: PJNIEnv; _jintentmanager: JObjec
 function jIntentManager_ByteArrayToString(env: PJNIEnv; _jintentmanager: JObject; var _byteArray: TDynArrayOfJByte): string;
 
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; keyValueDelimiter: string): TDynArrayOfString; overload;
+function jIntentManager_GetUriFromFile(env: PJNIEnv; _jintentmanager: JObject; _fullFileName: string): jObject;
+
 implementation
 
 
@@ -1028,6 +1031,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetBundleContent(gApp.jni.jEnv, FjObject, _intent ,keyValueDelimiter);
+end;
+
+function jIntentManager.GetUriFromFile(_fullFileName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_GetUriFromFile(gApp.jni.jEnv, FjObject, _fullFileName);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2028,5 +2038,31 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+function jIntentManager_GetUriFromFile(env: PJNIEnv; _jintentmanager: JObject; _fullFileName: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jintentmanager = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUriFromFile', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+
+  Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 end.

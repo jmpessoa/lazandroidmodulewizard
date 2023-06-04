@@ -1,4 +1,4 @@
-package org.lamw.apppublicfoldersaccessdemo1;
+package org.lamw.appcompatescposthermalprinterdemo1;
 
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [jForm.java]
@@ -3302,4 +3302,15 @@ public class jForm {
         	
         return result;
     }
+
+    public Uri GetUriFromFile(String _fullFileName) {
+        Uri r = null;
+        try {
+            r = Uri.fromFile(new File(_fullFileName));
+        } catch (Exception e) {
+            Toast.makeText(controls.activity,"[GetUriFromFile] File Not found...",Toast.LENGTH_SHORT).show();
+        }
+        return r;
+    }
+
 }
