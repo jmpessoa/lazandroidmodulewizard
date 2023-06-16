@@ -1871,12 +1871,12 @@ public class jForm {
         if (imm == null) {
             return;
         }
-
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        /*
         if (controls.activity.getCurrentFocus() != null) {
             imm.hideSoftInputFromWindow(controls.activity.getCurrentFocus().getWindowToken(), 0);
             imm.hideSoftInputFromInputMethod(controls.activity.getCurrentFocus().getWindowToken(), 0);
-        }
-
+        }*/
     }
 
     public void HideSoftInput(View _view) {
@@ -1887,12 +1887,14 @@ public class jForm {
         imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
     }
 
+
     public void ShowSoftInput() {
         InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm == null) {
             return;
         }
-        imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
+        //imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);;
     }
 
     public void SetSoftInputMode(int _inputMode) {
