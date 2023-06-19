@@ -120,7 +120,7 @@ type
   public
     { public declarations }
     property HackJNIMethod: boolean read FHackJNIMethod write FHackJNIMethod;
-    property ProjectModel: string read FProjectModel write FProjectModel;
+    property ProjectModel: string read FProjectModel write FProjectModel; //NEW-> "new project/ant"  or SAVED -> "project exists/eclpse"
     property PathToClassName: string read FPathToClassName write FPathToClassName;
     property ModuleType: integer read FModuleType write FModuleType;
     property SyntaxMode: TSyntaxMode read FSyntaxMode write FSyntaxMode;

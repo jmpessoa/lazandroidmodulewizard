@@ -98,7 +98,7 @@ type
     FPathToAntBin: string;
     FPathToGradle: string;
 
-    FProjectModel: string;
+    FProjectModel: string;   //NEW or SAVED
     FModuleType: integer;  //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
     FSmallProjName: string;
     FPackagePrefaceName: string;
@@ -177,7 +177,7 @@ type
     property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
     property PathToGradle: string read FPathToGradle write FPathToGradle;
-    property ProjectModel: string read FProjectModel write FProjectModel; {eclipse or ant}
+    property ProjectModel: string read FProjectModel write FProjectModel;
     property PackagePrefaceName: string read FPackagePrefaceName write FPackagePrefaceName;
     property MinApi: string read FMinApi write FMinApi;
     property TargetApi: string read FTargetApi write FTargetApi;
@@ -691,9 +691,9 @@ begin
 
   FJavaClassName:= 'Controls'; //GUI  [try guess]
 
-  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then  //new project"!
+  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then  //new project" = NEW
   begin
-     FProjectModel:= 'Ant';   //please, read as "project not exists or new project"!
+     FProjectModel:= 'NEW';
 
      FSmallProjName:= StringReplace(ComboSelectProjectName.Text,' ','',[rfReplaceAll]);
      FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + FSmallProjName;
@@ -706,7 +706,7 @@ begin
   end
   else
   begin
-     FProjectModel:= 'Eclipse';  //please, read as "project exists!"
+     FProjectModel:= 'SAVED';   //please, read as "project exists!"
      FAndroidProjectName:= Trim(ComboSelectProjectName.Text); //full
      aList:= TStringList.Create;
      aList.StrictDelimiter:= True;
@@ -721,7 +721,7 @@ begin
 
   FNdkApi:= ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex];
 
-  if FProjectModel = 'Eclipse' then ////please, read as "project exists!"
+  if FProjectModel = 'SAVED' then ////please, read as "project exists!"
   begin
 
      strList:= TStringList.Create;
@@ -794,7 +794,7 @@ begin
 
   end;
 
-  if FProjectModel = 'Ant' then
+  if FProjectModel = 'NEW' then  //new project
   begin
     if DirectoryExists(FAndroidProjectName) then   //if project exits
     begin

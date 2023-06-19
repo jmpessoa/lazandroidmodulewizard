@@ -12,13 +12,13 @@ object LamwProjectOptions: TLamwProjectOptions
   DesignTop = 228
   object PageControl1: TPageControl
     Left = 0
-    Height = 300
+    Height = 375
     Top = 0
-    Width = 491
-    ActivePage = tsAppl
+    Width = 614
+    ActivePage = tsMiscellaneous
     Align = alClient
     ParentFont = False
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     object tsManifest: TTabSheet
       Caption = 'Android Manifest'
@@ -43,16 +43,12 @@ object LamwProjectOptions: TLamwProjectOptions
         ColCount = 2
         Columns = <        
           item
-            MinSize = 10
-            MaxSize = 200
             ReadOnly = True
             Title.Caption = 'Permissions'
-            Width = 530
+            Width = 505
           end        
           item
             ButtonStyle = cbsCheckboxColumn
-            MinSize = 10
-            MaxSize = 200
             SizePriority = 0
             Title.Alignment = taRightJustify
             Title.Caption = 'Enabled'
@@ -69,7 +65,7 @@ object LamwProjectOptions: TLamwProjectOptions
         OnMouseDown = PermissonGridMouseDown
         OnMouseMove = PermissonGridMouseMove
         ColWidths = (
-          530
+          505
           64
         )
       end
@@ -165,7 +161,7 @@ object LamwProjectOptions: TLamwProjectOptions
         AutoSize = True
         BorderSpacing.Around = 6
         Caption = 'Version'
-        ClientHeight = 45
+        ClientHeight = 40
         ClientWidth = 590
         ParentFont = False
         TabOrder = 3
@@ -231,11 +227,11 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Control = gbVersion
         AnchorSideTop.Side = asrBottom
         Left = 324
-        Height = 23
+        Height = 28
         Top = 118
         Width = 50
         BorderSpacing.Around = 6
-        ItemHeight = 15
+        ItemHeight = 20
         ParentFont = False
         TabOrder = 4
       end
@@ -270,17 +266,17 @@ object LamwProjectOptions: TLamwProjectOptions
     end
     object tsAppl: TTabSheet
       Caption = 'Application'
-      ClientHeight = 272
-      ClientWidth = 483
+      ClientHeight = 342
+      ClientWidth = 606
       ParentFont = False
       object Label5: TLabel
         AnchorSideLeft.Control = tsAppl
         AnchorSideTop.Control = edLabel
         AnchorSideTop.Side = asrCenter
         Left = 8
-        Height = 15
-        Top = 11
-        Width = 22
+        Height = 20
+        Top = 10
+        Width = 29
         BorderSpacing.Left = 8
         Caption = 'Title'
         ParentColor = False
@@ -291,9 +287,9 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Control = cbTheme
         AnchorSideTop.Side = asrCenter
         Left = 8
-        Height = 15
-        Top = 46
-        Width = 36
+        Height = 20
+        Top = 44
+        Width = 45
         BorderSpacing.Left = 8
         Caption = 'Theme'
         ParentColor = False
@@ -305,11 +301,11 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Control = edLabel
         AnchorSideTop.Side = asrBottom
         Left = 59
-        Height = 23
-        Top = 41
+        Height = 28
+        Top = 40
         Width = 350
         BorderSpacing.Around = 6
-        ItemHeight = 15
+        ItemHeight = 20
         Items.Strings = (
           ''
         )
@@ -330,7 +326,7 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Control = cbTheme
         AnchorSideTop.Control = tsAppl
         Left = 59
-        Height = 23
+        Height = 28
         Top = 6
         Width = 350
         BorderSpacing.Top = 6
@@ -342,14 +338,14 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Control = rbOrientation
         AnchorSideTop.Side = asrBottom
         Left = 6
-        Height = 148
-        Top = 191
-        Width = 178
+        Height = 161
+        Top = 189
+        Width = 217
         AutoSize = True
         BorderSpacing.Left = 6
         Caption = 'Launcher icon'
-        ClientHeight = 128
-        ClientWidth = 174
+        ClientHeight = 136
+        ClientWidth = 213
         ParentFont = False
         TabOrder = 2
         object Label8: TLabel
@@ -357,9 +353,9 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideTop.Control = cbLaunchIconSize
           AnchorSideTop.Side = asrCenter
           Left = 6
-          Height = 15
-          Top = 11
-          Width = 20
+          Height = 20
+          Top = 10
+          Width = 27
           BorderSpacing.Around = 6
           Caption = 'Size'
           ParentColor = False
@@ -370,10 +366,10 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = cbLaunchIconSize
           AnchorSideTop.Side = asrCenter
-          Left = 186
+          Left = 187
           Height = 20
           Hint = 'Load from file...'
-          Top = 8
+          Top = 10
           Width = 20
           AutoSize = True
           BorderSpacing.Around = 6
@@ -422,13 +418,13 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideLeft.Control = Label8
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = GroupBox1
-          Left = 38
-          Height = 29
+          Left = 39
+          Height = 28
           Top = 6
           Width = 142
           AutoSize = False
           BorderSpacing.Around = 6
-          ItemHeight = 15
+          ItemHeight = 20
           ItemIndex = 0
           Items.Strings = (
             '36x36 ldpi'
@@ -449,9 +445,9 @@ object LamwProjectOptions: TLamwProjectOptions
           AnchorSideLeft.Side = asrCenter
           AnchorSideTop.Control = cbLaunchIconSize
           AnchorSideTop.Side = asrBottom
-          Left = 52
+          Left = 61
           Height = 90
-          Top = 41
+          Top = 40
           Width = 90
           AutoSize = True
           BorderSpacing.Around = 6
@@ -464,7 +460,7 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Side = asrCenter
         Left = 415
         Height = 20
-        Top = 42
+        Top = 44
         Width = 20
         AutoSize = True
         Glyph.Data = {
@@ -511,9 +507,9 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideTop.Control = cbTheme
         AnchorSideTop.Side = asrBottom
         Left = 6
-        Height = 87
-        Top = 76
-        Width = 178
+        Height = 109
+        Top = 74
+        Width = 219
         AutoFill = True
         AutoSize = True
         BorderSpacing.Around = 6
@@ -526,8 +522,8 @@ object LamwProjectOptions: TLamwProjectOptions
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 67
-        ClientWidth = 174
+        ClientHeight = 84
+        ClientWidth = 215
         ItemIndex = 0
         Items.Strings = (
           'Sensor (by Device Status)'
@@ -540,17 +536,17 @@ object LamwProjectOptions: TLamwProjectOptions
     end
     object tsMiscellaneous: TTabSheet
       Caption = 'Build'
-      ClientHeight = 272
-      ClientWidth = 483
+      ClientHeight = 342
+      ClientWidth = 606
       ParentFont = False
       object Label9: TLabel
         AnchorSideLeft.Control = tsMiscellaneous
         AnchorSideTop.Control = cbBuildSystem
         AnchorSideTop.Side = asrCenter
         Left = 6
-        Height = 15
-        Top = 11
-        Width = 64
+        Height = 20
+        Top = 10
+        Width = 80
         BorderSpacing.Around = 6
         Caption = 'Apk Builder:'
         ParentColor = False
@@ -561,11 +557,11 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = tsMiscellaneous
         Left = 92
-        Height = 23
+        Height = 28
         Top = 6
         Width = 140
         BorderSpacing.Around = 6
-        ItemHeight = 15
+        ItemHeight = 20
         ItemIndex = 0
         Items.Strings = (
           'Ant'
@@ -583,10 +579,10 @@ object LamwProjectOptions: TLamwProjectOptions
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbBuildSystem
         AnchorSideTop.Side = asrCenter
-        Left = 239
-        Height = 15
-        Top = 11
-        Width = 93
+        Left = 238
+        Height = 20
+        Top = 10
+        Width = 119
         Caption = '(require JDK 1.8+)'
         ParentColor = False
         ParentFont = False
@@ -594,9 +590,9 @@ object LamwProjectOptions: TLamwProjectOptions
       end
       object Label10: TLabel
         Left = 2
-        Height = 15
+        Height = 20
         Top = 59
-        Width = 43
+        Width = 52
         BorderSpacing.Around = 6
         Caption = 'Chipset:'
         ParentColor = False
@@ -604,10 +600,10 @@ object LamwProjectOptions: TLamwProjectOptions
       end
       object cbChipset: TComboBox
         Left = 92
-        Height = 23
+        Height = 28
         Top = 56
         Width = 140
-        ItemHeight = 15
+        ItemHeight = 20
         ItemIndex = 1
         Items.Strings = (
           'ARMv6             '

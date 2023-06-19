@@ -2800,8 +2800,8 @@ object FormAndroidProject: TFormAndroidProject
     NumberAttri.Foreground = clBlue
     StringAttri.Foreground = clBlue
     SymbolAttri.Foreground = clRed
-    left = 590
-    top = 240
+    Left = 590
+    Top = 240
   end
   object SynFreePascalSyn1: TSynFreePascalSyn
     Enabled = False
@@ -2813,11 +2813,11 @@ object FormAndroidProject: TFormAndroidProject
     DirectiveAttri.Foreground = clRed
     CompilerMode = pcmObjFPC
     NestedComments = True
-    left = 790
-    top = 290
+    Left = 790
+    Top = 290
   end
   object MainMenu1: TMainMenu
-    left = 40
+    Left = 40
     object MenuItem17: TMenuItem
       Caption = 'Help'
       object MenuItem18: TMenuItem
@@ -2841,7 +2841,7 @@ object FormAndroidProject: TFormAndroidProject
     NumberAttri.Foreground = clBlue
     StringAttri.Foreground = clBlue
     SymbolAttri.Foreground = clRed
-    left = 450
-    top = 250
+    Left = 450
+    Top = 250
   end
 end
