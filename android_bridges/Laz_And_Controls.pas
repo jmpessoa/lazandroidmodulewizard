@@ -1125,8 +1125,6 @@ type
   jEditText = class(jVisualControl)
   private
     FActionIconIdentifier: string;
-    FOnActionIconTouchUp: TEditTextOnActionIconTouchUp;
-    FOnActionIconTouchDown: TEditTextOnActionIconTouchDown;
     FInputTypeEx: TInputTypeEx;
     FHint     : string;
     FMaxTextLength : integer;
@@ -1144,8 +1142,10 @@ type
     FOnBackPressed : TOnNotify; // by ADiV
     FOnChange : TOnChange;
     FOnChanged : TOnChange;
-    FEditable: boolean;
+    FOnActionIconTouchUp: TEditTextOnActionIconTouchUp;
+    FOnActionIconTouchDown: TEditTextOnActionIconTouchDown;
 
+    FEditable: boolean;
     FTextAlignment: TTextAlignment;
     FCloseSoftInputOnEnter: boolean;
     FCapSentence: boolean;
@@ -1321,7 +1321,6 @@ type
     property ActionIconIdentifier: string read FActionIconIdentifier write SetActionIconIdentifier;
     property OnActionIconTouchUp: TEditTextOnActionIconTouchUp read FOnActionIconTouchUp write FOnActionIconTouchUp;
     property OnActionIconTouchDown: TEditTextOnActionIconTouchDown read FOnActionIconTouchDown write FOnActionIconTouchDown;
-
 
   end;
 
