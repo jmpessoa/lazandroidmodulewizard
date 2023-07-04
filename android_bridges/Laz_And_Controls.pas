@@ -1275,6 +1275,7 @@ type
     function IsEmpty(): boolean;
 
     procedure ApplyDrawableXML(_xmlIdentifier: string);
+    procedure SetImeKeyEnterLabel(_label: string);
 
     // Property
     property CursorPos : TXY        read GetCursorPos  write SetCursorPos;
@@ -5835,6 +5836,13 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jni_proc_t(gApp.jni.jEnv, FjObject, 'ApplyDrawableXML', _xmlIdentifier);
+end;
+
+procedure jEditText.SetImeKeyEnterLabel(_label: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jEditText_SetImeKeyEnterLabel(gApp.jni.jEnv, FjObject, _label);
 end;
 
 procedure jEditText.GenEvent_EditTextOnActionIconTouchUp(Sender:TObject;textContent:string);

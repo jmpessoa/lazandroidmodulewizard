@@ -1,4 +1,4 @@
-package org.lamw.appedittextdemo1;
+package org.lamw.apphellodemo1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -151,7 +151,9 @@ public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatE
 	     });
 		
 		onKeyListener = new OnKeyListener() {
-			public  boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a hardware key is dispatched to a view
+
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) { //Called when a "hardware" key is dispatched to a view
 				
 				    final EditText caption = (EditText)v;
 				    
@@ -175,8 +177,7 @@ public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatE
 						}
 						return mCloseSoftInputOnEnter;
 					}
-				
-				return false;
+				    return false;
 			}
 		};
 
@@ -934,5 +935,9 @@ public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatE
 	public void ApplyDrawableXML(String _xmlIdentifier) {
 		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
     }
+
+    public void SetImeKeyEnterLabel(String _label) {
+		this.setImeActionLabel(_label, KeyEvent.KEYCODE_ENTER);
+	}
 
 }

@@ -117,6 +117,7 @@ procedure jTextView_SetTextAllCaps(env: PJNIEnv; _jtextview: JObject; _text: str
 function  jEditText_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
 
 procedure jEditText_GetCursorPos(env:PJNIEnv; EditText : jObject; Var x,y : Integer);
+procedure jEditText_SetImeKeyEnterLabel(env: PJNIEnv; _jedittext: JObject; _label: string);
 
 // Button
 function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -691,6 +692,31 @@ begin
  env^.ReleaseIntArrayElements(env,_jIntArray,PIntSav,0);
 
  env^.DeleteLocalRef(env, cls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jEditText_SetImeKeyEnterLabel(env: PJNIEnv; _jedittext: JObject; _label: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jedittext = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImeKeyEnterLabel', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_label));
+
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
