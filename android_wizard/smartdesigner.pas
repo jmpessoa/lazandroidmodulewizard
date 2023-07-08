@@ -1055,6 +1055,26 @@ begin
   end;
 
   strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+  tempStr:= strList.Text;
+  if Pos('xmlns:tools=', strList.Text) <= 0 then
+  begin
+    tempStr:= StringReplace(tempStr, 'xmlns:android="http://schemas.android.com/apk/res/android"', 'xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"', [rfReplaceAll,rfIgnoreCase]);
+    strList.Text:= tempStr;
+    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+  end;
+
+  strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+  tempStr:= strList.Text;
+  if Pos('QUERY_ALL_PACKAGES', strList.Text) > 0 then
+  begin
+    tempStr:= StringReplace(tempStr, '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>', '', [rfReplaceAll,rfIgnoreCase]);
+    strList.Text:= tempStr;
+    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+  end;
+
+  strList.Clear;
   strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
   strList.Add('<project name="'+FSmallProjName+'" default="help">');
   strList.Add('<property name="sdk.dir" location="'+FPathToAndroidSDK+'"/>');

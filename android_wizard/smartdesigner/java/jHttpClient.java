@@ -273,6 +273,7 @@ public class jHttpClient /*extends ...*/ {
             url = new URL(_urlString);
 
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setReadTimeout(mReadTimeout);
             client3.setConnectTimeout(mConnectTimeout);
             client3.setRequestMethod("POST");
@@ -514,6 +515,7 @@ public class jHttpClient /*extends ...*/ {
             mUrlString = _urlString;
             URL url = new URL(_urlString);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
         } catch (IOException e) {
             //TODO Auto-generated catch block
             e.printStackTrace();
@@ -862,6 +864,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(_url);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setRequestMethod("GET");
 
             if (mAuthenticationMode == 1) {
@@ -923,6 +926,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(urlString);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setRequestMethod("POST");
             client3.setDoOutput(true);
 
@@ -982,6 +986,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(_stringUrl + "/" + _value);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             // renabor
             if (mAuthenticationMode == 1) {
                 String _credentials = mUSERNAME + ":" + mPASSWORD;
@@ -1036,6 +1041,7 @@ public class jHttpClient /*extends ...*/ {
                 url = new URL(stringUrl[0]);
 
                 client3 = (HttpURLConnection) url.openConnection();
+                client3.setInstanceFollowRedirects(mFollowRedirects);
                 mResponseCode = HttpURLConnection.HTTP_CREATED;
 
                 if (mAuthenticationMode == 1) {
@@ -1114,6 +1120,7 @@ public class jHttpClient /*extends ...*/ {
                 URL url = new URL(stringUrl[0]);
                 mResponseCode = HttpURLConnection.HTTP_CREATED;
                 client3 = (HttpURLConnection) url.openConnection();
+                client3.setInstanceFollowRedirects(mFollowRedirects);
                 client3.setRequestMethod("GET");
 
                 if (mAuthenticationMode == 1) {
