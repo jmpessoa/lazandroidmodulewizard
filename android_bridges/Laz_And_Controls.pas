@@ -387,6 +387,7 @@ type
     procedure SetEncodeValueData(_value: boolean);
     procedure PostSOAPDataAsync(_SOAPData: string; _stringUrl: string);
     function PostJSONData(_strURI: string; _jsonData: string): string;
+    procedure SetFollowRedirects(_followRedirects: boolean);
 
     procedure GenEvent_OnHttpClientContentResult(Obj: TObject; content: RawByteString);
     procedure GenEvent_OnHttpClientCodeResult(Obj: TObject; code: integer);
@@ -8506,6 +8507,13 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result := jni_func_tt_out_t(gApp.jni.jEnv, FjObject, 'PostJSONData', _strURI ,_jsonData);
+end;
+
+procedure jHttpClient.SetFollowRedirects(_followRedirects: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jHttpClient_SetFollowRedirects(gApp.jni.jEnv, FjObject, _followRedirects);
 end;
 
 { jSMTPClient }

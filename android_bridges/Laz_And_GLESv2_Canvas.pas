@@ -1670,6 +1670,18 @@ begin
 end;
 
 //
+(*Reported bug:
+
+  https://forum.lazarus.freepascal.org/index.php/topic,32951.msg212717.html#msg212717
+
+  suggestion:   xp3D
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(oglFOVY, oglWidth / oglHeight, oglzNear, oglzFar);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+*)
 Procedure jCanvasES2.Screen_Setup(w,h : Integer;
                                   Projection : TxgProjection = xp2D;
                                   CullFace   : Boolean = True);
@@ -1682,7 +1694,7 @@ begin
   //
   Case Projection of
    xp2D : MVP := cID4x4;
-   xp3D : _glPerspective (MVP,cfieldOfView,w/h,czNear,czFar);
+   xp3D : _glPerspective (MVP,cfieldOfView {FOVY},w/h,czNear,czFar);
   End;
   //
   Case CullFace of
