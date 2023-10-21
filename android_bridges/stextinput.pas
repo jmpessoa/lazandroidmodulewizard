@@ -54,8 +54,8 @@ jsTextInput = class(jVisualControl)
     procedure ClearLayout();
     procedure SetHint(_hint: string);
     procedure SetHintTextColor(_color: TARGBColorBridge);
-    procedure SetBackgroundTextColor(_color: integer);
-    procedure SetHighlightTextColor(_color: integer);
+    procedure SetBackgroundTextColor(_color: TARGBColorBridge);
+    procedure SetHighlightTextColor(_color: TARGBColorBridge);
     procedure CopyToClipboard();
     procedure PasteFromClipboard();
     procedure SetInputTypeEx(str: string);
@@ -409,18 +409,18 @@ begin
      jsTextInput_SetHintTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 end;
 
-procedure jsTextInput.SetBackgroundTextColor(_color: integer);
+procedure jsTextInput.SetBackgroundTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetBackgroundTextColor(gApp.jni.jEnv, FjObject, _color);
+     jsTextInput_SetBackgroundTextColor(gApp.jni.jEnv, FjObject,GetARGB(FCustomColor, _color) );
 end;
 
-procedure jsTextInput.SetHighlightTextColor(_color: integer);
+procedure jsTextInput.SetHighlightTextColor(_color: TARGBColorBridge);
 begin
   //in designing component state: set value here...
   if FInitialized then
-     jsTextInput_SetHighlightTextColor(gApp.jni.jEnv, FjObject, _color);
+     jsTextInput_SetHighlightTextColor(gApp.jni.jEnv, FjObject,GetARGB(FCustomColor, _color));
 end;
 
 procedure jsTextInput.CopyToClipboard();
