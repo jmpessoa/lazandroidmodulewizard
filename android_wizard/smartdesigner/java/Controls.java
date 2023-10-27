@@ -282,6 +282,12 @@ public class Controls {
   public native void pOnEnter(long pasobj);
 
   public native void pOnBackPressed(long pasobj);
+  
+  public native void pOnDone(long pasobj);
+  public native void pOnSearch(long pasobj);
+  public native void pOnNext(long pasobj);
+  public native void pOnGo(long pasobj);
+
 
   public native void pOnClose(long pasobj);
 
