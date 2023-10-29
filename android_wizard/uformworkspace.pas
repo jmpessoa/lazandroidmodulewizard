@@ -283,13 +283,13 @@ begin
     end;
   end;
 
-  if Result < 30 then
-       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+  if Result < 33 then
+       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                    'Please, update your android sdk/platforms folder!' + sLineBreak +
                    'How to:'+ sLineBreak +
                    '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                    '.run the command  >>sdkmanager --update'+ sLineBreak +
-                   '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                   '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
 
   lisDir.free;
 end;
@@ -319,6 +319,7 @@ begin
   else if api='31' then Result:= 'Android 12'
   else if api='32' then Result:= 'Android 13'
   else if api='33' then Result:= 'Android 14';
+  else if api='34' then Result:= 'Android 15';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -351,6 +352,7 @@ begin
      18: Result:= 'Android 12'; // Api(31)
      19: Result:= 'Android 13'; // Api(32) or 33
      20: Result:= 'Android 14'; // Api(33)
+     21: Result:= 'Android 14'; // Api(34)
    end;
 end;
 
@@ -398,11 +400,11 @@ begin
        FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
     if not IsAllCharNumber(PChar(FTargetApi))  then
-      FTargetApi:= '30';
+      FTargetApi:= '33';
 
     intTarqetApi:= StrToInt(FTargetApi);
-    if intTarqetApi  < 30 then
-       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 30 !');
+    if intTarqetApi  < 33 then
+       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 33 !');
 
   end;
 end;
@@ -418,14 +420,14 @@ begin
    if intApi  < 24 then
      ShowMessage('Warning. Starting with "Android 14", apps with a targetSdkVersion lower than 23 can''t be installed...');
 
-   if intApi < 30  then
+   if intApi < 33  then
    begin
-     ShowMessage('Warning. AppCompat theme and Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+     ShowMessage('Warning. AppCompat theme and Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                   'Please, update your android sdk/platforms folder!' + sLineBreak +
                   'How to:'+ sLineBreak +
                   '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                   '.run the command  >>sdkmanager --update'+ sLineBreak +
-                  '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                  '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
    end;
 
   end;
@@ -636,14 +638,14 @@ begin
   apiTarg:= StrToInt(FTargetApi);
 
 
-  if apiTarg < 30 then
+  if apiTarg < 33 then
   begin
-    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                  'Please, update your android sdk/platforms folder!' + sLineBreak +
                  'How to:'+ sLineBreak +
                  '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                  '.run the command  >>sdkmanager --update'+ sLineBreak +
-                 '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                 '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
   end;
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
@@ -1661,7 +1663,7 @@ begin
         numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
         if Length(numberAsString) < 3 then
         begin
-           numberAsString:= numberAsString+ '0'  //330
+           numberAsString:= numberAsString+ '0'  //30
         end;
         tagVersion:= StrToInt(Trim(numberAsString));
     end;
