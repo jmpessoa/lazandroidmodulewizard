@@ -318,7 +318,7 @@ begin
   else if api='30' then Result:= 'Android 11'
   else if api='31' then Result:= 'Android 12'
   else if api='32' then Result:= 'Android 13'
-  else if api='33' then Result:= 'Android 14';
+  else if api='33' then Result:= 'Android 14'
   else if api='34' then Result:= 'Android 15';
 end;
 
