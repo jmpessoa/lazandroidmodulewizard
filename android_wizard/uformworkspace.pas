@@ -317,9 +317,9 @@ begin
   else if api='29' then Result:= 'Android 10'
   else if api='30' then Result:= 'Android 11'
   else if api='31' then Result:= 'Android 12'
-  else if api='32' then Result:= 'Android 13'
-  else if api='33' then Result:= 'Android 14'
-  else if api='34' then Result:= 'Android 15';
+  else if api='32' then Result:= 'Android 12'
+  else if api='33' then Result:= 'Android 13'
+  else if api='34' then Result:= 'Android 14';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -350,8 +350,8 @@ begin
      16: Result:= 'Android 10'; // Api(29)
      17: Result:= 'Android 11'; // Api(30)
      18: Result:= 'Android 12'; // Api(31)
-     19: Result:= 'Android 13'; // Api(32) or 33
-     20: Result:= 'Android 14'; // Api(33)
+     19: Result:= 'Android 12'; // Api(32) or 33
+     20: Result:= 'Android 13'; // Api(33)
      21: Result:= 'Android 14'; // Api(34)
    end;
 end;
@@ -551,13 +551,13 @@ end;
 
 function TFormWorkspace.IsLamwManagerForWindows(): boolean;
 begin
- result := false;
+ result := False;
  //TODO
 end;
 
 function TFormWorkspace.IsLamwManagerForLinux(): boolean;
 begin
- result := false;
+ result := False;
  //TODO
 end;
 
