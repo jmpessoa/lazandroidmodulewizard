@@ -11672,7 +11672,7 @@ begin
    //in designing component state: result value here...
   Result:= FHeight;
   if FInitialized then
-   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
 end;
 
 function jBitmap.GetWidth: integer;
@@ -11680,7 +11680,7 @@ begin
   //in designing component state: result value here...
    Result:= FWidth;
   if FInitialized then
-   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
+   Result:= jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
 end;
 
 procedure jBitmap.SetImageByIndex(Value: integer);
