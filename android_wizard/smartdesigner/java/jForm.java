@@ -1,4 +1,4 @@
-package org.lamw.apppublicfoldersaccessdemo1;
+package org.lamw.apphellodemo1;
 
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [jForm.java]
@@ -1871,12 +1871,12 @@ public class jForm {
         if (imm == null) {
             return;
         }
-
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        /*
         if (controls.activity.getCurrentFocus() != null) {
             imm.hideSoftInputFromWindow(controls.activity.getCurrentFocus().getWindowToken(), 0);
             imm.hideSoftInputFromInputMethod(controls.activity.getCurrentFocus().getWindowToken(), 0);
-        }
-
+        }*/
     }
 
     public void HideSoftInput(View _view) {
@@ -1887,12 +1887,14 @@ public class jForm {
         imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
     }
 
+
     public void ShowSoftInput() {
         InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm == null) {
             return;
         }
-        imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
+        //imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);;
     }
 
     public void SetSoftInputMode(int _inputMode) {
@@ -3302,4 +3304,47 @@ public class jForm {
         	
         return result;
     }
+
+    public Uri GetUriFromFile(String _fullFileName) {
+        Uri r = null;
+        try {
+            r = Uri.fromFile(new File(_fullFileName));
+        } catch (Exception e) {
+            Toast.makeText(controls.activity,"[GetUriFromFile] File Not found...",Toast.LENGTH_SHORT).show();
+        }
+        return r;
+    }
+
+    public boolean IsAirPlaneModeOn() {
+        boolean  r = false;
+        try {
+            if( android.provider.Settings.System.getInt(controls.activity.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON) == 1 ) {
+                r = true;
+            }
+        } catch(android.provider.Settings.SettingNotFoundException e) {
+            r = false;
+        }
+        return r;
+    }
+
+    public boolean IsBluetoothOn() {
+        boolean  r = false;
+        try {
+            if(android.provider.Settings.System.getInt(controls.activity.getContentResolver(), Settings.Global.BLUETOOTH_ON) == 1 ) {
+                r = true;
+            }
+        } catch(android.provider.Settings.SettingNotFoundException e) {
+            r = false;
+        }
+        return r;
+    }
+
+    public int GetDeviceBuildVersionApi() {
+      return android.os.Build.VERSION.SDK_INT;   //android.os.Build.VERSION.PREVIEW_SDK_INT
+    }
+
+    public String GetDeviceBuildVersionRelease() {
+        return android.os.Build.VERSION.RELEASE;
+    }
+
 }

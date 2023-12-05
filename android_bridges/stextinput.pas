@@ -54,8 +54,11 @@ jsTextInput = class(jVisualControl)
     procedure ClearLayout();
     procedure SetHint(_hint: string);
     procedure SetHintTextColor(_color: TARGBColorBridge);
+    procedure SetBackgroundTextColor(_color: TARGBColorBridge);
+    procedure SetHighlightTextColor(_color: TARGBColorBridge);
     procedure CopyToClipboard();
     procedure PasteFromClipboard();
+    procedure SetInputTypeEx(str: string);
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -88,12 +91,15 @@ procedure jsTextInput_ClearLayoutAll(env: PJNIEnv; _jstextinput: JObject);
 procedure jsTextInput_SetId(env: PJNIEnv; _jstextinput: JObject; _id: integer);
 procedure jsTextInput_SetHint(env: PJNIEnv; _jstextinput: JObject; _hint: string);
 procedure jsTextInput_SetHintTextColor(env: PJNIEnv; _jstextinput: JObject; _color: integer);
+procedure jsTextInput_SetBackgroundTextColor(env: PJNIEnv; _jstextinput: JObject; _color: integer);
+procedure jsTextInput_SetHighlightTextColor(env: PJNIEnv; _jstextinput: JObject; _color: integer);
 procedure jsTextInput_SetTextSize(env: PJNIEnv; _jstextinput: JObject; _size: single);
 procedure jsTextInput_SetTextColor(env: PJNIEnv; _jstextinput: JObject; _color: integer);
 procedure jsTextInput_CopyToClipboard(env: PJNIEnv; _jstextinput: JObject);
 procedure jsTextInput_PasteFromClipboard(env: PJNIEnv; _jstextinput: JObject);
 procedure jsTextInput_SetText(env: PJNIEnv; _jstextinput: JObject; _text: string);
 function jsTextInput_GetText(env: PJNIEnv; _jstextinput: JObject): string;
+procedure jsTextInput_SetInputTypeEx(env: PJNIEnv; _jstextinput: JObject; str: string);
 
 implementation
 
@@ -403,6 +409,20 @@ begin
      jsTextInput_SetHintTextColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FHintTextColor));
 end;
 
+procedure jsTextInput.SetBackgroundTextColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsTextInput_SetBackgroundTextColor(gApp.jni.jEnv, FjObject,GetARGB(FCustomColor, _color) );
+end;
+
+procedure jsTextInput.SetHighlightTextColor(_color: TARGBColorBridge);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsTextInput_SetHighlightTextColor(gApp.jni.jEnv, FjObject,GetARGB(FCustomColor, _color));
+end;
+
 procedure jsTextInput.CopyToClipboard();
 begin
   //in designing component state: set value here...
@@ -429,6 +449,13 @@ begin
   inherited SetText(_text);
   if FInitialized then
     jsTextInput_SetText(gApp.jni.jEnv, FjObject, _text);
+end;
+
+procedure jsTextInput.SetInputTypeEx(str: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jsTextInput_SetInputTypeEx(gApp.jni.jEnv, FjObject, str);
 end;
 
 {-------- jsTextInput_JNI_Bridge ----------}
@@ -703,6 +730,55 @@ begin
   env^.DeleteLocalRef(env, jCls);
 end;
 
+procedure jsTextInput_SetBackgroundTextColor(env: PJNIEnv; _jstextinput: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jstextinput = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jstextinput);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetBackgroundTextColor', '(I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _color;
+
+  env^.CallVoidMethodA(env, _jstextinput, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jsTextInput_SetHighlightTextColor(env: PJNIEnv; _jstextinput: JObject; _color: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jstextinput = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jstextinput);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetHighlightTextColor', '(I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _color;
+
+  env^.CallVoidMethodA(env, _jstextinput, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 procedure jsTextInput_SetTextSize(env: PJNIEnv; _jstextinput: JObject; _size: single);
 var
   jParams: array[0..0] of jValue;
@@ -786,6 +862,31 @@ begin
             end;
   end;
   env^.DeleteLocalRef(env, jCls);
+end;
+
+procedure jsTextInput_SetInputTypeEx(env: PJNIEnv; _jstextinput: JObject; str: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jstextinput = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jstextinput);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetInputTypeEx', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(str));
+
+  env^.CallVoidMethodA(env, _jstextinput, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
 end.

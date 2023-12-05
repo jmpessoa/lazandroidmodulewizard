@@ -1,5 +1,6 @@
-package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
+package org.lamw.appcompatescposthermalprinterdemo1;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 
 import android.content.ActivityNotFoundException; 
 import android.os.Build;
+import android.widget.Toast;
 
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
@@ -969,5 +971,16 @@ Sending Data: Extras vs. URI Parameters
     public String ByteArrayToString(byte[] _byteArray) {
         return (new String(_byteArray));
     }
+
+    public Uri GetUriFromFile(String _fullFileName) {
+       Uri r = null;
+        try {
+            r = Uri.fromFile(new File(_fullFileName));
+        } catch (Exception e) {
+            Toast.makeText(controls.activity,"[GetUriFromFile] File Not found...",Toast.LENGTH_SHORT).show();
+        }
+        return r;
+    }
+
 }
 

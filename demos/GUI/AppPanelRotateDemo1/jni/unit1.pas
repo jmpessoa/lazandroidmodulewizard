@@ -23,7 +23,7 @@ type
     jPanel3: jPanel;
     jPanel4: jPanel;
     procedure AndroidModule1Rotate(Sender: TObject; rotate: TScreenStyle);
-    procedure jPanel1FlingGesture(Sender: TObject; flingGesture: TFlingGesture);
+ 
   private
     {private declarations}
   public
@@ -96,10 +96,5 @@ begin
 
 end;
 
-procedure TAndroidModule1.jPanel1FlingGesture(Sender: TObject;
-  flingGesture: TFlingGesture);
-begin
-
-end;
 
 end.

@@ -1,4 +1,4 @@
-package org.lamw.appimageviewrippleeffectdemo1;
+package org.lamw.appcompatescposthermalprinterdemo1;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -1023,13 +1023,14 @@ public class jImageView extends ImageView { //androidx.appcompat.widget.AppCompa
 
 	//https://stackoverflow.com/questions/2459916/how-to-make-an-imageview-with-rounded-corners  [7]
 	public void SetRoundCorner(int _cornersRadius) {
+		final int cornersRadius = _cornersRadius;
 		ViewOutlineProvider provider;
 		if (android.os.Build.VERSION.SDK_INT >= 21) {
 			//[ifdef_api21up]
 			provider = new ViewOutlineProvider() {
 				@Override
 				public void getOutline(View view, Outline outline) {
-					outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight()), _cornersRadius);
+					outline.setRoundRect(0, 0, view.getWidth(), (view.getHeight()), cornersRadius);
 				}
 			};
 			this.setOutlineProvider(provider);

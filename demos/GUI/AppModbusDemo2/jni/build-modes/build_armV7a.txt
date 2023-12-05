@@ -1,0 +1,3 @@
+<Libraries Value="E:\lamw\android-ndk-r22b\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\arm-linux-androideabi\22;E:\lamw\android-ndk-r22b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x"/>
+<TargetCPU Value="arm"/>
+<CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDE:\lamw\android-ndk-r22b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>

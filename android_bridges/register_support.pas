@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  ujsescposthermalprinter,
   uktoybutton,
   sfirebasepushnotificationlistener,
   scontinuousscrollableimageview,
@@ -37,6 +38,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsescposthermalprinter_icon.lrs}
   {$I ktoybutton_icon.lrs}
   {$I jsfirebasepushnotificationlistener_icon.lrs}
   {$I jsadmob_icon.lrs}
@@ -57,6 +59,7 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges AppCompat',
     [
+      jsEscPosThermalPrinter,
       KToyButton,
       jsFirebasePushNotificationListener,
       jsAdMob,

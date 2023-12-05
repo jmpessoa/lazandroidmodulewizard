@@ -13,7 +13,7 @@ uses
 
 const
   cMinAPI = 10;
-  cMaxAPI = 30;
+  cMaxAPI = 34;
 
 type
 
@@ -375,6 +375,7 @@ var
   includeList: TStringList;
   universalApk: boolean;
   pathToAndroidProject: string;
+  TargetBuildFileName: string;
 begin
   fn := ExtractFilePath(FFileName) + 'build.xml';
   if not FileExists(fn) then
@@ -506,33 +507,34 @@ begin
   includeList.Add(''''+cpuTarget+''''); //initial  Instruction Set
 
   PathToAndroidProject:= ExtractFilePath(FFileName);
+  TargetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.CreateTargetFilename);
 
-  if FileExists(pathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
   begin
     includeList.Add('''armeabi''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\armeabi-v7a\' + TargetBuildFileName ) then
   begin
     includeList.Add('''armeabi-v7a''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\arm64-v8a\' + TargetBuildFileName ) then
   begin
     includeList.Add('''arm64-v8a''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\x86_64\' + TargetBuildFileName ) then
   begin
     includeList.Add('''x86_64''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\x86\' + TargetBuildFileName ) then
   begin
     includeList.Add('''x86''');
   end;
 
-  if FileExists(pathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+  if FileExists(pathToAndroidProject + 'libs\mips\' + TargetBuildFileName ) then
   begin
     includeList.Add('''mips''');
   end;
@@ -597,24 +599,27 @@ begin
     //compileSdkVersion 25
 
     p := Pos(' ', tempStr);
-    oldCompileSdkVersion := Trim(Copy(tempStr, p + 1, 2));
+    oldCompileSdkVersion:= Trim(Copy(tempStr, p + 1, 2));
 
-    if FTargetSdkVersion <> StrToInt(oldCompileSdkVersion) then
+    if IsAllCharNumber(PChar(oldCompileSdkVersion)) then
     begin
-
-      tempStr := strList.Text;
-
-      findString:='compileSdkVersion ';
-      if (Pos(findString,tempStr)>0) then
-        tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
-
-      for aSupportLib in SupportLibs do
+      if FTargetSdkVersion <> StrToInt(oldCompileSdkVersion) then
       begin
-        if (Pos(aSupportLib.Name,tempStr)>0) then
-          tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*), [rfIgnoreCase]);
-      end;
 
-      strList.Text := tempStr;
+        tempStr := strList.Text;
+
+        findString:='compileSdkVersion ';
+        if (Pos(findString,tempStr)>0) then
+          tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
+
+        for aSupportLib in SupportLibs do
+        begin
+          if (Pos(aSupportLib.Name,tempStr)>0) then
+            tempStr := StringReplace(tempStr, aSupportLib.Name+oldCompileSdkVersion, aSupportLib.Name(*+IntToStr(FTargetSdkVersion)*), [rfIgnoreCase]);
+        end;
+
+        strList.Text := tempStr;
+      end;
     end;
 
     strList.SaveToFile(ExtractFilePath(FFileName) + 'build.gradle');

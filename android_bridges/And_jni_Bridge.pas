@@ -108,6 +108,7 @@ procedure jTextView_SetShadowLayer(env: PJNIEnv; _jtextview: JObject; _radius: s
 procedure jTextView_SetSingleLine(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetHorizontallyScrolling(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetEllipsize(env: PJNIEnv; _jtextview: JObject; _mode: integer);
+procedure jTextView_SetTextAllCaps(env: PJNIEnv; _jtextview: JObject; _text: string);
 
 //-----------------------------------
 // EditText  :: changed by jmpessoa [support Api > 13]
@@ -116,6 +117,7 @@ procedure jTextView_SetEllipsize(env: PJNIEnv; _jtextview: JObject; _mode: integ
 function  jEditText_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
 
 procedure jEditText_GetCursorPos(env:PJNIEnv; EditText : jObject; Var x,y : Integer);
+procedure jEditText_SetImeKeyEnterLabel(env: PJNIEnv; _jedittext: JObject; _label: string);
 
 // Button
 function jButton_Create(env: PJNIEnv;   this:jobject; SelfObj: TObject): jObject;
@@ -205,6 +207,7 @@ Function  jWebView_Create              (env:PJNIEnv;  this:jobject; SelfObj: TOb
 procedure jWebView_SetHttpAuthUsernamePassword(env: PJNIEnv; _jwebview: JObject; _hostName: string; _hostDomain: string; _username: string; _password: string);
 
 procedure jWebView_LoadDataWithBaseURL(env: PJNIEnv; _jwebview: JObject; _s1,_s2,_s3,_s4,_s5: string);//LMB
+procedure jWebView_SetInitialScale(env: PJNIEnv; _jwebview: JObject; _scaleInPercent: integer);
 
 // Canvas
 Function  jCanvas_Create               (env:PJNIEnv;
@@ -376,6 +379,7 @@ function jHttpClient_AddRequestProperty(env: PJNIEnv; _jhttpclient: JObject; _ht
 function jHttpClient_Post(env: PJNIEnv; _jhttpclient: JObject; _httpConnection: jObject): string; overload;
 function jHttpClient_GetDefaultConnection(env: PJNIEnv; _jhttpclient: JObject): jObject;
 //function jHttpClient_PostJSONData(env: PJNIEnv; _jhttpclient: JObject; _strURI: string; _jsonData: string): string;
+procedure jHttpClient_SetFollowRedirects(env: PJNIEnv; _jhttpclient: JObject; _followRedirects: boolean);
 
 {ImageList}
 
@@ -600,6 +604,31 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+  procedure jTextView_SetTextAllCaps(env: PJNIEnv; _jtextview: JObject; _text: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jtextview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jtextview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetTextAllCaps', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_text));
+
+  env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //------------------------------------------------------------------------------
 // EditText
@@ -664,6 +693,31 @@ begin
  env^.ReleaseIntArrayElements(env,_jIntArray,PIntSav,0);
 
  env^.DeleteLocalRef(env, cls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+procedure jEditText_SetImeKeyEnterLabel(env: PJNIEnv; _jedittext: JObject; _label: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jedittext = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jedittext);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetImeKeyEnterLabel', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_label));
+
+  env^.CallVoidMethodA(env, _jedittext, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
@@ -1840,6 +1894,29 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+procedure jWebView_SetInitialScale(env: PJNIEnv; _jwebview: JObject; _scaleInPercent: integer);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jwebview = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jwebview);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetInitialScale', '(I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _scaleInPercent;
+
+  env^.CallVoidMethodA(env, _jwebview, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 //------------------------------------------------------------------------------
 // Canvas
@@ -5052,7 +5129,29 @@ begin
   _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
-  {jImageList}
+procedure jHttpClient_SetFollowRedirects(env: PJNIEnv; _jhttpclient: JObject; _followRedirects: boolean);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jhttpclient = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jhttpclient);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFollowRedirects', '(Z)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].z:= JBool(_followRedirects);
+  env^.CallVoidMethodA(env, _jhttpclient, jMethod, @jParams);
+  env^.DeleteLocalRef(env, jCls);
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+  {-------jImageList-------}
 
 function jImageList_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 var

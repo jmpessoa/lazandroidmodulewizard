@@ -131,7 +131,44 @@ public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatE
 		setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			        @Override
 			        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-			            if (actionId != 0) {
+//						IME_ACTION_DONE = 6;
+//						IME_ACTION_GO = 2;
+//						IME_ACTION_NEXT = 5;
+//						IME_ACTION_NONE = 1;
+//						IME_ACTION_PREVIOUS = 7;
+//						IME_ACTION_SEARCH = 3;
+//						IME_ACTION_SEND = 4;
+
+						//--DONE
+						if(actionId==6){
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							controls.pOnDone(LAMWCommon.getPasObj());
+							return true;
+						}
+						//---Go
+						if(actionId==2){
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							controls.pOnGo(LAMWCommon.getPasObj());
+							return true;
+						}
+						//--SEARCH
+						if(actionId==3){
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							controls.pOnSearch(LAMWCommon.getPasObj());
+							return true;
+						}
+						//---NEXT
+						if(actionId==5){
+							InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+							controls.pOnNext(LAMWCommon.getPasObj());
+							return true;
+						}
+
+						if (actionId != 0) {
 			            	final EditText caption = (EditText)v;
 						    
 			            	if (mCloseSoftInputOnEnter) {
@@ -156,7 +193,7 @@ public class jEditText extends EditText { //androidx.appcompat.widget.AppCompatE
 				    final EditText caption = (EditText)v;
 				    
 				    // by tr3e fix back_key close app
-				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_DOWN) &&
+				    if( mFlagCaptureBackPressed && (event.getAction() == KeyEvent.ACTION_UP) &&
 					   	(KeyEvent.KEYCODE_BACK == keyCode) )
 				    {			            
 				    	InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);

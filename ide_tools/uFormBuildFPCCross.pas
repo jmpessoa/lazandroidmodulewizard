@@ -55,6 +55,7 @@ TBuildMode = (bmArmV6, bmArmV7a, bmX86, bmMipsel, bmAarch64);
     procedure Button3Click(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
     procedure PageControl1Change(Sender: TObject);
     procedure RadioGroupInstructionClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
@@ -503,7 +504,7 @@ begin
        {$IF LCL_FULLVERSION >= 2010000}
        Tool.Parsers.Add(SubToolDefault);
        {$ELSE}
-       Tool.Scanners.Add(SubToolDefault);
+       Tool.Scanners.Add(SubToolDefault); //canners
        {$ENDIF}
 
        if not RunExternalTool(Tool) then
@@ -599,7 +600,6 @@ begin
        {$ELSE}
        Tool.Scanners.Add(SubToolDefault);
        {$ENDIF}
-
 
        if not RunExternalTool(Tool) then
        begin
@@ -981,6 +981,11 @@ begin
   CloseAction := caFree;
 end;
 
+procedure TFormBuildFPCCross.FormCreate(Sender: TObject);
+begin
+  FBuildModeIndex:= '0';
+end;
+
 procedure TFormBuildFPCCross.PageControl1Change(Sender: TObject);
 begin
 
@@ -1186,6 +1191,7 @@ end;
 procedure TFormBuildFPCCross.SaveSettings(const fileName: string);
 var
   list: TStringList;
+  buildIndex: LongInt;
 begin
 
    if not FileExists(fileName) then
@@ -1210,8 +1216,8 @@ begin
     WriteString('BuildCross', 'PathToFPCTrunk', EditPathToFPCTrunk.Text);
     WriteString('BuildCross', 'PathToFPCBin', EditPathToFpc.Text);
     WriteString('BuildCross', 'PathToFPCUnit', EditPathToFPCUnits.Text);
-
-    case StrToInt(FBuildModeIndex) of
+    buildIndex:= StrToInt(FBuildModeIndex);
+    case  buildIndex of
        0: WriteString('BuildCross', 'BuildModeIndex', '0');
        1: WriteString('BuildCross', 'BuildModeIndex', '1');
        2: WriteString('BuildCross', 'BuildModeIndex', '2');

@@ -11,7 +11,7 @@ uses
 //tk min and max API versions for build.xml
 const
   cMinAPI = 14;
-  cMaxAPI = 31;
+  cMaxAPI = 35;
 // end tk
 
 type
@@ -103,6 +103,8 @@ type
     function GetNDKVersion(ndkRelease: string): integer;
 
     procedure TryUpdateMipmap();
+    function GetVerAsString(aVers: integer): string;
+
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
@@ -765,7 +767,7 @@ end;
 function TLamwSmartDesigner.GetVesionCodeFromBuilGradle(): string;
 var
   list: TStringList;
-  i, p: integer;
+  p: integer;
   aux: string;
 begin
    Result:= '1';
@@ -786,7 +788,7 @@ end;
 function TLamwSmartDesigner.GetVesionNameFromBuilGradle(): string;
 var
   list: TStringList;
-  i, p: integer;
+  p: integer;
   aux: string;
 begin
    Result:= '"1.0"';
@@ -805,6 +807,14 @@ begin
 
      Result:=aux;
    end;
+end;
+
+function TLamwSmartDesigner.GetVerAsString(aVers: integer): string;
+begin
+  Result:= '';
+  case aVers of
+     34: Result:= 'android-UpsideDownCake';
+  end;
 end;
 
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
@@ -835,7 +845,10 @@ var
   versionName : string;
   xmlAndroidManifest: TXMLDocument;
   foundSignature : boolean;
+  TargetBuildFileName : string;
 begin
+
+  strTargetApi:= IntTostr(targetApi);
 
   buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
 
@@ -926,17 +939,39 @@ begin
     SaveToFile(targetpath);
   end;
 
-  // Delete <uses-sdk
   strList.Clear;
   strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
 
-  for i := 0 to strList.Count - 1 do
-   if pos('<uses-sdk', strList.Strings[i]) <> 0 then
-   begin
-     strList.Delete(i);
-     strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-     break;
-   end;
+  if LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle' then  // Delete <uses-sdk
+  begin
+    if Pos('<uses-sdk', strList.Text) > 0 then
+    begin
+      for i := 0 to strList.Count - 1 do
+      begin
+        if Pos('<uses-sdk', strList.Strings[i]) > 0 then
+        begin
+          strList.Delete(i);
+          strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+          break;
+        end;
+      end;
+    end;
+  end
+  else //Ant builder need it.....
+  begin
+    if Pos('<uses-sdk', strList.Text) <= 0 then
+    begin
+       for i := 0 to strList.Count - 1 do
+       begin
+         if Pos('<uses-permission', strList.Strings[i]) > 0 then
+         begin
+           strList.Insert(i, '    <uses-sdk android:minSdkVersion="'+IntToStr(minsdkApi)+'" android:targetSdkVersion="'+strTargetApi+'"/>');
+           strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+           break;
+         end;
+       end;
+    end
+  end;
 
   if (FSupport) or (Pos('AppCompat', FAndroidTheme) > 0) then
   begin
@@ -998,7 +1033,46 @@ begin
        strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;*)
 
-  strTargetApi:= IntTostr(targetApi);
+  strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+  if Pos('ScopedStorage', strList.Text) <= 0 then
+  begin
+    for i := 0 to strList.Count - 1 do
+    begin
+        if Pos('<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE', strList.Strings[i]) > 0 then
+        begin
+          strList.Strings[i]:= '    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:remove="android:maxSdkVersion" tools:ignore="ScopedStorage"/>';
+
+          if Pos('MANAGE_EXTERNAL_STORAGE', strList.Text) <= 0 then
+          begin
+            strList.Insert(i, '    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>');
+          end;
+
+          strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+          break;
+        end;
+    end;
+  end;
+
+  strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+  tempStr:= strList.Text;
+  if Pos('xmlns:tools=', strList.Text) <= 0 then
+  begin
+    tempStr:= StringReplace(tempStr, 'xmlns:android="http://schemas.android.com/apk/res/android"', 'xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"', [rfReplaceAll,rfIgnoreCase]);
+    strList.Text:= tempStr;
+    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+  end;
+
+  strList.Clear;
+  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+  tempStr:= strList.Text;
+  if Pos('QUERY_ALL_PACKAGES', strList.Text) > 0 then
+  begin
+    tempStr:= StringReplace(tempStr, '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>', '', [rfReplaceAll,rfIgnoreCase]);
+    strList.Text:= tempStr;
+    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+  end;
 
   strList.Clear;
   strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
@@ -1207,6 +1281,7 @@ begin
            auxStr := ExtractFileName(auxStr);
          end;
 
+         TargetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.CreateTargetFilename);
          includeList:= TStringList.Create;
          includeList.Delimiter:= ',';
          includeList.StrictDelimiter:= True;
@@ -1215,32 +1290,32 @@ begin
 
          includeList.Add(''''+auxStr+''''); //initial  Instruction Set
 
-         if FileExists(FPathToAndroidProject + 'libs\armeabi\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
          begin
            includeList.Add('''armeabi''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\' + TargetBuildFileName ) then
          begin
            includeList.Add('''armeabi-v7a''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\' + TargetBuildFileName ) then
          begin
            includeList.Add('''arm64-v8a''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\x86_64\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\x86_64\' + TargetBuildFileName ) then
          begin
            includeList.Add('''x86_64''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\x86\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\x86\' + TargetBuildFileName ) then
          begin
            includeList.Add('''x86''');
          end;
 
-         if FileExists(FPathToAndroidProject + 'libs\mips\libcontrols.so' ) then
+         if FileExists(FPathToAndroidProject + 'libs\mips\' + TargetBuildFileName ) then
          begin
            includeList.Add('''mips''');
          end;
@@ -1280,14 +1355,22 @@ begin
 
          if Pos('AppCompat', FAndroidTheme) > 0 then
          begin
-           strList.Add('    compileSdkVersion '+ buildToolApi);
+
+           if StrToInt(buildToolApi) < 34 then
+              strList.Add('    compileSdkVersion '+ buildToolApi)
+           else
+              strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(buildToolApi))+'"');
+
            if androidPluginNumber < 3000 then
               strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
            //else: each version of the Android Gradle Plugin now has a default version of the build tools
          end
          else
          begin
-           strList.Add('    compileSdkVersion '+ buildToolApi);
+           if StrToInt(buildToolApi) < 34 then
+              strList.Add('    compileSdkVersion '+ buildToolApi)
+           else
+              strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(buildToolApi))+'"');
            if androidPluginNumber < 3000 then
               strList.Add('    buildToolsVersion "'+buildTool+'"');
            //else: each version of the Android Gradle Plugin now has a default version of the build tools
@@ -1301,25 +1384,6 @@ begin
             strList.Add('            targetSdkVersion '+IntToStr(targetApi))
          else
             strList.Add('            targetSdkVersion '+buildToolApi);
-
-         (*
-         if fileExists(FPathToAndroidProject+'AndroidManifest.xml') then
-         begin
-          ReadXMLFile(xmlAndroidManifest, FPathToAndroidProject+'AndroidManifest.xml');
-
-          if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then Exit;
-
-          with xmlAndroidManifest.DocumentElement do
-          begin
-              versionCode := AttribStrings['android:versionCode'];
-              versionName := AttribStrings['android:versionName'];
-          end;
-         end else
-         begin
-          versionCode := '1';
-          versionName := '1.0';
-         end;
-         *)
 
          versionCode := GetVesionCodeFromBuilGradle();
          versionName := GetVesionNameFromBuilGradle();
@@ -2462,9 +2526,9 @@ function TLamwSmartDesigner.TryAddJControl(ControlsJava: TStringList; jclassname
   out nativeAdded: boolean): boolean;
 var
   list, auxList, manifestList, gradleList: TStringList;
-  p, p1, p2, i,  minSdkManifest, count: integer;
+  p, q, p1, p2, i,  minSdkManifest, count: integer;
   aux, tempStr, auxStr: string;
-  insertRef, minSdkManifestStr: string;
+  insertRef, minSdkManifestStr, minSdkCtl: string;
   c: char;
   androidNdkApi, pathToNdkApiPlatforms,  arch: string;
   tempMinSdk: integer;
@@ -2558,46 +2622,53 @@ begin
 
    end;
 
-   isGradle := (LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle');
+    isGradle := (LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle');
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
+   begin
+      if not isGradle then
+      begin
+         ShowMessage(jclassname+' component require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
+         LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
+         LazarusIDE.ActiveProject.Modified:= True;
+      end;
+   end;
 
    //updated manifest minAdkApi
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk') then
    begin
 
-     minSdkManifestStr:= LazarusIDE.ActiveProject.CustomData['MinSdk'];
+     minSdkManifestStr:= Trim(LazarusIDE.ActiveProject.CustomData['MinSdk']);
 
      if minSdkManifestStr <> '' then
+     begin
          minSdkManifest:= StrToInt(minSdkManifestStr)
-      else minSdkManifest:= 0;
+     end
+     else
+     begin
+       if FileExists(FPathToAndroidProject+'build.gradle') then
+       begin
+         auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+         p:= Pos('minSdkVersion ', auxList.Text);
+         q:= p + Length('minSdkVersion ');
+         minSdkManifestStr:= auxList.Text[q] + auxList.Text[q+1];
+         minSdkManifest:= StrToInt(minSdkManifestStr)
+       end;
+     end;
 
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.minsdk');
+     minSdkCtl:= Trim(auxList.Strings[0]);
 
-     aux:= auxList.Strings[0];
-
-     if aux <> '' then
-        tempMinSdk:= StrToInt(aux)
+     if minSdkCtl <> '' then
+       tempMinSdk:= StrToInt(minSdkCtl)
      else
-        tempMinSdk:= 14;
+       tempMinSdk:= 14;
 
      if FMinSdkControl < tempMinSdk then
-     begin
         FMinSdkControl:= tempMinSdk;
-        LazarusIDE.ActiveProject.CustomData['MinSdk']:= aux;
-        LazarusIDE.ActiveProject.Modified:= True;
-     end;
 
      if FMinSdkControl > minSdkManifest then
      begin
-        auxList.Clear;
-        auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-        tempStr:= auxList.Text;
-
-        if not isGradle then // Gradle not need minSdkVersion on manifest
-           tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
-
-        auxList.Text:= tempStr;
-        auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-
         if FileExists(FPathToAndroidProject+'build.gradle') then
         begin
           auxList.LoadFromFile(FPathToAndroidProject+'build.gradle');
@@ -2606,17 +2677,19 @@ begin
           auxList.Text:= tempStr;
           auxList.SaveToFile(FPathToAndroidProject+'build.gradle');
         end;
-     end;
-   end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.buildsys') then   //JCenter component palette
-   begin
-      if not isGradle then
-      begin
-         ShowMessage(jclassname+' component require Gradle'+sLineBreak+'Build system...'+sLineBreak+'Changed to Gradle!');
-         LazarusIDE.ActiveProject.Modified:= True;
-         LazarusIDE.ActiveProject.CustomData['BuildSystem']:= 'Gradle';
-      end;
+        auxList.Clear;
+        auxList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+        tempStr:= auxList.Text;
+        if not isGradle then // Gradle not need minSdkVersion on manifest
+        begin
+           tempStr:= StringReplace(tempStr, 'android:minSdkVersion="'+minSdkManifestStr+'"' , 'android:minSdkVersion="'+IntToStr(FMinSdkControl)+'"', [rfReplaceAll,rfIgnoreCase]);
+           auxList.Text:= tempStr;
+           auxList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+        end;
+        LazarusIDE.ActiveProject.CustomData['MinSdk']:= minSdkCtl; //FMinSdkControl
+        LazarusIDE.ActiveProject.Modified:= True;
+     end;
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..

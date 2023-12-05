@@ -1,0 +1,3 @@
+public java.lang.Object jsEscPosThermalPrinter_jCreate(long _self) {
+  return (java.lang.Object)(new jsEscPosThermalPrinter(this,_self));
+}

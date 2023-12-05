@@ -445,7 +445,7 @@ public class jWebView extends WebView {
     }
 
     public void SetAppCacheEnabled(boolean _cacheEnabled) {
-//        this.getSettings().setAppCacheEnabled(_cacheEnabled);  // Application Cache API is deprecated, does not compile in Target SDK 33
+        this.getSettings().setAppCacheEnabled(_cacheEnabled);
     }
 
     public void SetDisplayZoomControls(boolean _displayZoomControls) {
@@ -498,6 +498,10 @@ public class jWebView extends WebView {
 
     public void SetUserAgent(String _userAgent) {
         this.getSettings().setUserAgentString(_userAgent);
+    }
+
+    public void SetInitialScale(int _scaleInPercent) {
+        this.setInitialScale(_scaleInPercent);
     }
 
 }

@@ -1,0 +1,85 @@
+buildscript {
+    repositories {
+        jcenter()
+        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.3'
+    }
+}
+allprojects {
+    repositories {
+       google()
+       jcenter()
+       maven { url 'https://jitpack.io' }
+    }
+}
+apply plugin: 'com.android.application'
+android {
+    lintOptions {
+       abortOnError false
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a'
+            universalApk false
+        }
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    compileSdkVersion 30
+    defaultConfig {
+            minSdkVersion 18
+            targetSdkVersion 30
+            versionCode 1
+            versionName "1.0"
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+            jni.srcDirs = []
+            jniLibs.srcDirs = ['libs']
+        }
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+        release {
+            debuggable false
+            jniDebuggable false
+        }
+    }
+}
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.0.0'
+}
+ 
+task run(type: Exec, dependsOn: ':installDebug') {
+	if (System.properties['os.name'].toLowerCase().contains('windows')) {
+	    commandLine 'cmd', '/c', 'adb', 'shell', 'am', 'start', '-n', "org.lamw.modbus/.App"
+	} else {
+	    commandLine 'adb', 'shell', 'am', 'start', '-n', "org.lamw.modbus/.App"
+	}
+}
+ 
+wrapper {
+    gradleVersion = '6.8.3'
+}
+//how to use: look for "gradle_readme.txt"

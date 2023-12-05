@@ -6,6 +6,7 @@ interface
   
 uses
   Classes,
+  ujczxingbarcodescan,
   cwebsocketclient,
   ctoytimerservice,
   cbillingclient,
@@ -26,6 +27,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jczxingbarcodescan_icon.lrs}
   {$I jcwebsocketclient_icon.lrs}
   {$I jctoytimerservice_icon.lrs}
   {$I jcbillingclient_icon.lrs}
@@ -39,6 +41,7 @@ begin
   {$I jcmikrotikrouteros_icon.lrs}
   RegisterComponents('Android Bridges jCenter',
     [
+      jcZXingBarcodeScan,
       jcWebSocketClient,
       jcToyTimerService,
       jcBillingClient,

@@ -436,7 +436,7 @@ type
   TMenuItemShowAsAction = (misNever,
                         misIfRoom,
                         misAlways,
-                        misNone,    //dummy
+                        misIfRoomCollapseView,
                         misIfRoomWithText,
                         misAlwaysWithText);
 
@@ -1491,6 +1491,14 @@ type
     function GetFileList(_treeUri: jObject): TDynArrayOfString; overload;
     function GetFileList(_treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
 
+    function GetMimeTypeFromExtension(_fileExtension: string): string;
+    function GetUriFromFile(_fullFileName: string): jObject;
+
+    function IsAirPlaneModeOn(): boolean;
+    function IsBluetoothOn(): boolean;
+    function GetDeviceBuildVersionApi(): integer;
+    function GetDeviceBuildVersionRelease(): string;
+
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
     property ViewParent {ViewParent}: jObject  read  GetLayoutParent  write SetLayoutParent; // Java : Parent Relative Layout
@@ -1744,6 +1752,13 @@ end;
   procedure jForm_SaveTextToUri(env: PJNIEnv; _jform: JObject; _text: string; _toUri: jObject);
   function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject): TDynArrayOfString; overload;
   function jForm_GetFileList(env: PJNIEnv; _jform: JObject; _treeUri: jObject; _fileExtension: string): TDynArrayOfString; overload;
+  function jForm_GetMimeTypeFromExtension(env: PJNIEnv; _jform: JObject; _fileExtension: string): string;
+  function jForm_GetUriFromFile(env: PJNIEnv; _jform: JObject; _fullFileName: string): jObject;
+  function jForm_IsAirPlaneModeOn(env: PJNIEnv; _jform: JObject): boolean;
+  function jForm_IsBluetoothOn(env: PJNIEnv; _jform: JObject): boolean;
+  function jForm_GetDeviceBuildVersionApi(env: PJNIEnv; _jform: JObject): integer;
+  function jForm_GetDeviceBuildVersionRelease(env: PJNIEnv; _jform: JObject): string;
+
 
   //jni API Bridge
 // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html
@@ -5251,6 +5266,48 @@ begin
    Result:= jForm_GetFileList(gapp.Jni.jEnv, FjObject, _treeUri ,_fileExtension);
 end;
 
+function jForm.GetMimeTypeFromExtension(_fileExtension: string): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetMimeTypeFromExtension(gApp.jni.jEnv, FjObject, _fileExtension);
+end;
+
+function jForm.GetUriFromFile(_fullFileName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetUriFromFile(gApp.jni.jEnv, FjObject, _fullFileName);
+end;
+
+function jForm.IsAirPlaneModeOn(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsAirPlaneModeOn(gApp.jni.jEnv, FjObject);
+end;
+
+function jForm.IsBluetoothOn(): boolean;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_IsBluetoothOn(gApp.jni.jEnv, FjObject);
+end;
+
+function jForm.GetDeviceBuildVersionApi(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDeviceBuildVersionApi(gApp.jni.jEnv, FjObject);
+end;
+
+function jForm.GetDeviceBuildVersionRelease(): string;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jForm_GetDeviceBuildVersionRelease(gApp.jni.jEnv, FjObject);
+end;
+
 {-------- jForm_JNI_Bridge ----------}
 
 function jForm_GetBitmapFromUri(env: PJNIEnv; _jform: JObject; _uri: jObject): jObject;
@@ -6365,6 +6422,154 @@ begin
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+function jForm_GetMimeTypeFromExtension(env: PJNIEnv; _jform: JObject; _fileExtension: string): string;
+var
+  jStr: JString;
+  //jBoo: JBoolean;
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetMimeTypeFromExtension', '(Ljava/lang/String;)Ljava/lang/String;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fileExtension));
+
+
+  jStr:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+
+  Result:= GetPStringAndDeleteLocalRef(env, jStr);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_GetUriFromFile(env: PJNIEnv; _jform: JObject; _fullFileName: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetUriFromFile', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+
+  Result:= env^.CallObjectMethodA(env, _jform, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_IsAirPlaneModeOn(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'IsAirPlaneModeOn', '()Z');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+
+  Result:= boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_IsBluetoothOn(env: PJNIEnv; _jform: JObject): boolean;
+var
+  jBoo: JBoolean;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'IsBluetoothOn', '()Z');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jBoo:= env^.CallBooleanMethod(env, _jform, jMethod);
+
+  Result:= boolean(jBoo);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jForm_GetDeviceBuildVersionApi(env: PJNIEnv; _jform: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceBuildVersionApi', '()I');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  Result:= env^.CallIntMethod(env, _jform, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+function jForm_GetDeviceBuildVersionRelease(env: PJNIEnv; _jform: JObject): string;
+var
+  jStr: JString;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jform = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jform);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetDeviceBuildVersionRelease', '()Ljava/lang/String;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jStr:= env^.CallObjectMethod(env, _jform, jMethod);
+
+  Result := GetPStringAndDeleteLocalRef(env, jStr);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
 
 //-----{ jApp } ------
 

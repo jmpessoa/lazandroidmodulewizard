@@ -58,7 +58,7 @@ type
      FPathToAntBin: string;
      FPathToGradle: string;
 
-     FProjectModel: string;
+     FProjectModel: string; //NEW or SAVED (that is, project already  exists!)
      FPackagePrefaceName: string;
      FMinApi: string;
      FTargetApi: string;
@@ -109,6 +109,8 @@ type
      procedure WriteIniString(Key, Value: string);
      function TryUndoFakeVersion(grVer: string): string;
      function IsTemplateProject(tryTheme: string; out outAndroidTheme: string): boolean;
+
+     function GetVerAsString(aVers: integer): string;
 
    public
      constructor Create; override;
@@ -399,7 +401,7 @@ begin
       if  FModuleType < 2 then
         CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
-      if FProjectModel = 'Ant' then
+      if FProjectModel = 'NEW' then  //new project
       begin
         auxList:= TStringList.Create;
         //eclipe compatibility [Neon!]
@@ -881,7 +883,7 @@ begin
 
       auxList:= TStringList.Create;
 
-      if FProjectModel = 'Ant' then
+      if FProjectModel = 'NEW' then   //new project (Ant)
       begin
         //eclipe compatibility [Neon!]
         CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
@@ -1000,13 +1002,20 @@ begin
 
       strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strMainActivity, [rfReplaceAll, rfIgnoreCase]);
 
+      //    <!-- This is a comment -->
       strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
       strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
-      if FProjectModel = 'Ant' then
+      if FBuildSystem  = 'Ant' then
+      begin
+         strAfterReplace  := StringReplace(strAfterReplace, '<!--', '', [rfReplaceAll, rfIgnoreCase]);
+         strAfterReplace  := StringReplace(strAfterReplace, '-->', '', [rfReplaceAll, rfIgnoreCase]);
          strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', '', [rfReplaceAll, rfIgnoreCase])
-      else
+      end
+      else //gradle
+      begin
          strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', 'android:name="androidx.multidex.MultiDexApplication"', [rfReplaceAll, rfIgnoreCase]);
+      end;
 
       auxList.Clear;
       auxList.Text:= strAfterReplace;
@@ -1030,6 +1039,8 @@ begin
            providerList.Free;
          end;
       end;
+
+
 
       auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
       auxList.Free;
@@ -1144,7 +1155,7 @@ begin
   frm.TargetApi:= FTargetApi;
   frm.Support:=FSupport;
 
-  frm.ProjectModel:= FProjectModel; //'Ant-> "new project"  or Eclipse-> "project exists"
+  frm.ProjectModel:= FProjectModel; //'NEW-> "new project"  or SAVED -> "project exists"
 
   frm.FullJavaSrcPath:= FFullJavaSrcPath;
 
@@ -1211,6 +1222,10 @@ begin
      27: Result:= 'Oreo-8.1';
      28: Result:= 'Pie';
      29: Result:= 'Android-10.0';
+     30: Result:= 'Android-11.0';
+     31: Result:= 'Android-12.0';
+     32: Result:= 'Android-13.0';
+     33: Result:= 'Android-14.0';
   end;
 end;
 
@@ -1445,6 +1460,14 @@ begin
   else if grVer = '4.9.4' then Result:= '4.10.3';
 end;
 
+function TAndroidProjectDescriptor.GetVerAsString(aVers: integer): string;
+begin
+  Result:= '';
+  case aVers of
+     34: Result:= 'android-UpsideDownCake';
+  end;
+end;
+
 function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
 
   function MakeUniqueName(const Orig: string; sl: TStrings): string;
@@ -1651,9 +1674,9 @@ begin
       FMainActivity:= frm.MainActivity;  //App
       FJavaClassName:= frm.JavaClassName;
 
-      FProjectModel:= frm.ProjectModel;   //<-- output from [Eclipse or Ant Project]
+      FProjectModel:= frm.ProjectModel;   //<-- NEW or SAVED
 
-      if FProjectModel = 'Eclipse' then     //please, read as "project exists!"
+      if FProjectModel = 'SAVED' then     //please, read as "project exists!"
           FFullJavaSrcPath:= frm.FullJavaSrcPath;
 
 
@@ -1683,7 +1706,7 @@ begin
       end;
 
       try
-        if FProjectModel = 'Ant' then   //please read as "new project"...
+        if FProjectModel = 'NEW' then   //please read as "new project"...
         begin
           if FModuleType < 2 then   //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
           begin
@@ -2666,8 +2689,10 @@ begin
                 strList.Add('    }');
                 if Pos('AppCompat', FAndroidTheme) > 0 then
                 begin
-
-                  strList.Add('    compileSdkVersion '+compileSdkVersion);
+                  if StrToInt(compileSdkVersion) < 34 then
+                    strList.Add('    compileSdkVersion '+compileSdkVersion)
+                  else
+                    strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(compileSdkVersion))+'"');
 
                   if androidPluginNumber < 3000 then
                   begin

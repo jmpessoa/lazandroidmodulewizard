@@ -1,4 +1,4 @@
-package org.lamw.apphttpclientrestdemo1;
+package com.example.apphttpclientdemo1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -64,7 +64,7 @@ import javax.net.ssl.SSLSession;
 //ref http://lethargicpanda.tumblr.com/post/14784695735/oauth-login-on-your-android-app-the-github
 
 //by  Simon, Choi
-//https://blog.naver.com/simonsayz
+//https://blog.naver.com/simonsayzclient
 class LConst {
     public static final String LogHeader                  = "LAMW_jHttpClient"; //AndCtrls_Java
     public static final int Http_Act_Text                 =  0;
@@ -120,6 +120,8 @@ public class jHttpClient /*extends ...*/ {
     String unvaluedName = "SOAPBODY";
     boolean encodeValue = true;
 
+    boolean mFollowRedirects = false;
+
     //GUIDELINE: please, preferentially, init all yours params names with "_", ex: int _flag, String _hello ...
     public jHttpClient(Controls _ctrls, long _Self) { //Add more others news "_xxx" params if needed!
         //super(_ctrls.activity);
@@ -127,13 +129,9 @@ public class jHttpClient /*extends ...*/ {
         pascalObj = _Self;
         controls = _ctrls;
 
-
         cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
-
         CookieHandler.setDefault(cookieManager);   // <<------- CookieManager work automatically
-
         ValuesForPost = new HashMap<String, String>();
-
     }
 
     //https://www.nczonline.net/blog/2009/05/05/http-cookies-explained/
@@ -152,18 +150,14 @@ public class jHttpClient /*extends ...*/ {
 
     public void GetAsync(String _stringUrl) {
         mUrlString = _stringUrl;
-        
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-        new AsyncHttpClientGet().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,_stringUrl);
-    else
-        new AsyncHttpClientGet().execute(_stringUrl);
-        
-
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+           new AsyncHttpClientGet().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,_stringUrl);
+        else
+          new AsyncHttpClientGet().execute(_stringUrl);
     }
     
     public void GetAsyncGooglePlayVersion(String _stringUrl) {
         mUrlString = _stringUrl;
-        
         new AsyncGooglePlay().execute(_stringUrl);
     }
 
@@ -180,6 +174,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(_urlString);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setRequestMethod("GET");
             if (mAuthenticationMode == 1) {
                 String _credentials = mUSERNAME + ":" + mPASSWORD;
@@ -278,6 +273,7 @@ public class jHttpClient /*extends ...*/ {
             url = new URL(_urlString);
 
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setReadTimeout(mReadTimeout);
             client3.setConnectTimeout(mConnectTimeout);
             client3.setRequestMethod("POST");
@@ -519,6 +515,7 @@ public class jHttpClient /*extends ...*/ {
             mUrlString = _urlString;
             URL url = new URL(_urlString);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
         } catch (IOException e) {
             //TODO Auto-generated catch block
             e.printStackTrace();
@@ -867,6 +864,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(_url);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setRequestMethod("GET");
 
             if (mAuthenticationMode == 1) {
@@ -928,6 +926,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(urlString);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             client3.setRequestMethod("POST");
             client3.setDoOutput(true);
 
@@ -987,6 +986,7 @@ public class jHttpClient /*extends ...*/ {
         try {
             URL url = new URL(_stringUrl + "/" + _value);
             client3 = (HttpURLConnection) url.openConnection();
+            client3.setInstanceFollowRedirects(mFollowRedirects);
             // renabor
             if (mAuthenticationMode == 1) {
                 String _credentials = mUSERNAME + ":" + mPASSWORD;
@@ -1041,6 +1041,7 @@ public class jHttpClient /*extends ...*/ {
                 url = new URL(stringUrl[0]);
 
                 client3 = (HttpURLConnection) url.openConnection();
+                client3.setInstanceFollowRedirects(mFollowRedirects);
                 mResponseCode = HttpURLConnection.HTTP_CREATED;
 
                 if (mAuthenticationMode == 1) {
@@ -1119,6 +1120,7 @@ public class jHttpClient /*extends ...*/ {
                 URL url = new URL(stringUrl[0]);
                 mResponseCode = HttpURLConnection.HTTP_CREATED;
                 client3 = (HttpURLConnection) url.openConnection();
+                client3.setInstanceFollowRedirects(mFollowRedirects);
                 client3.setRequestMethod("GET");
 
                 if (mAuthenticationMode == 1) {
@@ -1575,6 +1577,10 @@ public class jHttpClient /*extends ...*/ {
         }
 
         return response;
+    }
+
+    public void SetFollowRedirects(boolean _followRedirects) {
+        boolean mFollowRedirects = _followRedirects;
     }
 
 }

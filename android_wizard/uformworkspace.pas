@@ -98,7 +98,7 @@ type
     FPathToAntBin: string;
     FPathToGradle: string;
 
-    FProjectModel: string;
+    FProjectModel: string;   //NEW or SAVED
     FModuleType: integer;  //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
     FSmallProjName: string;
     FPackagePrefaceName: string;
@@ -177,7 +177,7 @@ type
     property PathToAndroidNDK: string read FPathToAndroidNDK write FPathToAndroidNDK;
     property PathToAntBin: string read FPathToAntBin write FPathToAntBin;
     property PathToGradle: string read FPathToGradle write FPathToGradle;
-    property ProjectModel: string read FProjectModel write FProjectModel; {eclipse or ant}
+    property ProjectModel: string read FProjectModel write FProjectModel;
     property PackagePrefaceName: string read FPackagePrefaceName write FPackagePrefaceName;
     property MinApi: string read FMinApi write FMinApi;
     property TargetApi: string read FTargetApi write FTargetApi;
@@ -283,13 +283,13 @@ begin
     end;
   end;
 
-  if Result < 30 then
-       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+  if Result < 33 then
+       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                    'Please, update your android sdk/platforms folder!' + sLineBreak +
                    'How to:'+ sLineBreak +
                    '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                    '.run the command  >>sdkmanager --update'+ sLineBreak +
-                   '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                   '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
 
   lisDir.free;
 end;
@@ -317,8 +317,9 @@ begin
   else if api='29' then Result:= 'Android 10'
   else if api='30' then Result:= 'Android 11'
   else if api='31' then Result:= 'Android 12'
-  else if api='32' then Result:= 'Android 13'
-  else if api='33' then Result:= 'Android 14';
+  else if api='32' then Result:= 'Android 12'
+  else if api='33' then Result:= 'Android 13'
+  else if api='34' then Result:= 'Android 14';
 end;
 
 //http://developer.android.com/about/dashboards/index.html
@@ -349,8 +350,9 @@ begin
      16: Result:= 'Android 10'; // Api(29)
      17: Result:= 'Android 11'; // Api(30)
      18: Result:= 'Android 12'; // Api(31)
-     19: Result:= 'Android 13'; // Api(32)
-     20: Result:= 'Android 14'; // Api(33)
+     19: Result:= 'Android 12'; // Api(32) or 33
+     20: Result:= 'Android 13'; // Api(33)
+     21: Result:= 'Android 14'; // Api(34)
    end;
 end;
 
@@ -398,11 +400,11 @@ begin
        FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
     if not IsAllCharNumber(PChar(FTargetApi))  then
-      FTargetApi:= '30';
+      FTargetApi:= '33';
 
     intTarqetApi:= StrToInt(FTargetApi);
-    if intTarqetApi  < 30 then
-       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 30 !');
+    if intTarqetApi  < 33 then
+       ShowMessage('Warning: remember that "google play" store NOW requires Target Api >= 33 !');
 
   end;
 end;
@@ -415,14 +417,17 @@ begin
   begin
    intApi:= StrToInt(ListBoxTargetAPI.Text);
 
-   if intApi < 30  then
+   if intApi  < 24 then
+     ShowMessage('Warning. Starting with "Android 14", apps with a targetSdkVersion lower than 23 can''t be installed...');
+
+   if intApi < 33  then
    begin
-     ShowMessage('Warning. AppCompat theme and Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+     ShowMessage('Warning. AppCompat theme and Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                   'Please, update your android sdk/platforms folder!' + sLineBreak +
                   'How to:'+ sLineBreak +
                   '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                   '.run the command  >>sdkmanager --update'+ sLineBreak +
-                  '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                  '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
    end;
 
   end;
@@ -546,13 +551,13 @@ end;
 
 function TFormWorkspace.IsLamwManagerForWindows(): boolean;
 begin
- result := false;
+ result := False;
  //TODO
 end;
 
 function TFormWorkspace.IsLamwManagerForLinux(): boolean;
 begin
- result := false;
+ result := False;
  //TODO
 end;
 
@@ -633,14 +638,14 @@ begin
   apiTarg:= StrToInt(FTargetApi);
 
 
-  if apiTarg < 30 then
+  if apiTarg < 33 then
   begin
-    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                  'Please, update your android sdk/platforms folder!' + sLineBreak +
                  'How to:'+ sLineBreak +
                  '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                  '.run the command  >>sdkmanager --update'+ sLineBreak +
-                 '.run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                 '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
   end;
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
@@ -688,9 +693,9 @@ begin
 
   FJavaClassName:= 'Controls'; //GUI  [try guess]
 
-  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then  //new project"!
+  if Pos(DirectorySeparator, ComboSelectProjectName.Text) <= 0 then  //new project" = NEW
   begin
-     FProjectModel:= 'Ant';   //please, read as "project not exists or new project"!
+     FProjectModel:= 'NEW';
 
      FSmallProjName:= StringReplace(ComboSelectProjectName.Text,' ','',[rfReplaceAll]);
      FAndroidProjectName:= FPathToWorkspace + DirectorySeparator + FSmallProjName;
@@ -703,7 +708,7 @@ begin
   end
   else
   begin
-     FProjectModel:= 'Eclipse';  //please, read as "project exists!"
+     FProjectModel:= 'SAVED';   //please, read as "project exists!"
      FAndroidProjectName:= Trim(ComboSelectProjectName.Text); //full
      aList:= TStringList.Create;
      aList.StrictDelimiter:= True;
@@ -718,7 +723,7 @@ begin
 
   FNdkApi:= ListBoxNdkPlatform.Items.Strings[ListBoxNdkPlatform.ItemIndex];
 
-  if FProjectModel = 'Eclipse' then ////please, read as "project exists!"
+  if FProjectModel = 'SAVED' then ////please, read as "project exists!"
   begin
 
      strList:= TStringList.Create;
@@ -791,7 +796,7 @@ begin
 
   end;
 
-  if FProjectModel = 'Ant' then
+  if FProjectModel = 'NEW' then  //new project
   begin
     if DirectoryExists(FAndroidProjectName) then   //if project exits
     begin
@@ -1030,7 +1035,6 @@ var
   i, k: integer;
   strIndexNdk: string;
 begin
-
   if FileExists(fileName) then
   begin
     with TIniFile.Create(fileName) do
@@ -1659,7 +1663,7 @@ begin
         numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
         if Length(numberAsString) < 3 then
         begin
-           numberAsString:= numberAsString+ '0'  //330
+           numberAsString:= numberAsString+ '0'  //30
         end;
         tagVersion:= StrToInt(Trim(numberAsString));
     end;
@@ -1716,7 +1720,6 @@ var
   tagVersion: integer;
   i: integer;
 begin
-
   //run before "OnFormActive"
 
   FFileName:= pFilename; //full filename

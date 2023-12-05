@@ -14,6 +14,8 @@ type
 
 {jControl template}
 
+{ jMenu }
+
 jMenu = class(jControl)
  private
     FOptions: TStrings;
@@ -65,6 +67,9 @@ jMenu = class(jControl)
     procedure RemoveItemById(_menu: jObject; _id: integer);
     procedure RemoveItemByIndex(_menu: jObject; _index: integer);
     procedure AddDropDownItem(_menu: jObject; _view: jObject);
+
+    procedure ShowOptions(_menu: jObject); overload;
+    procedure ShowOptions(_menu: jObject; _itemShowAsAction: TMenuItemShowAsAction); overload;
 
  published
     property Options: TStrings read FOptions write SetOptions;
@@ -392,6 +397,50 @@ begin
   //in designing component state: set value here...
   if FInitialized then
      jMenu_AddDropDownItem(gApp.jni.jEnv, FjObject, _menu ,_view);
+end;
+
+procedure jMenu.ShowOptions(_menu: jObject);
+var
+  i, idItem: integer;
+begin
+   if FOptions.Count > 0 then
+   begin
+     idItem:= 1;
+     for i:= 0 to FOptions.Count-1 do
+     begin
+         if FOptions.Strings[i] <> '' then
+         begin
+             AddItem(_menu, idItem , FOptions.Strings[i], '' , mitDefault, misNever);
+             inc(idItem);
+         end;
+     end;
+   end;
+end;
+
+procedure jMenu.ShowOptions(_menu: jObject; _itemShowAsAction: TMenuItemShowAsAction);
+var
+   i, idItem: integer;
+begin
+   if FOptions.Count > 0 then
+   begin
+     idItem:= 1;
+     for i:= 0 to FOptions.Count-1 do
+     begin
+         if FOptions.Strings[i] <> '' then
+         begin
+           if i < FIcons.Count then
+           begin
+             AddItem(_menu, idItem , FOptions.Strings[i], FIcons.Strings[i] , mitDefault, _itemShowAsAction);
+             inc(idItem);
+           end
+           else
+           begin
+             AddItem(_menu, idItem , FOptions.Strings[i], '' , mitDefault, misNever);
+             inc(idItem);
+           end;
+         end;
+     end;
+   end;
 end;
 
 {-------- jMenu_JNI_Bridge ----------}
