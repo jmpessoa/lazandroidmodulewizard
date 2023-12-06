@@ -12398,6 +12398,7 @@ end;
 procedure jBitmap.LoadFromFile(fullFileName: string);
 var
   path: string;
+  knownDir: string;
 begin
   if FInitialized then
   begin
@@ -12426,18 +12427,26 @@ begin
         FFilePath := fpathExt;
       end;
 
-      if path <> '' then FImageName := ExtractFileName(fullFileName)
+      if path <> '' then
+      begin
+        knownDir:=GetFilePath(FFilePath) + '/';
+        FImageName := Copy(fullFileName, length(knownDir) + 1, length(fullFileName) - length(knownDir));//ExtractFileName(fullFileName)
+      end
       else
+      begin
+        knownDir:='';
         FImageName := fullFileName;
+      end;
 
       jni_proc_t(gApp.jni.jEnv, FjObject, 'loadFile',
-        GetFilePath(FFilePath) + '/' + FImageName);
+         knownDir + FImageName);
 
-      FWidth := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
-      FHeight := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
+      _FWidth := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
+      _FHeight := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
     end;
   end;
 end;
+
 
 procedure jBitmap.LoadFromRes(imgResIdentifier: string);  // ..res/drawable
 begin
