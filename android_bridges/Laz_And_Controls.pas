@@ -12430,7 +12430,7 @@ begin
       if path <> '' then
       begin
         knownDir:=GetFilePath(FFilePath) + '/';
-        FImageName := Copy(fullFileName, length(knownDir) + 1, length(fullFileName) - length(knownDir));//ExtractFileName(fullFileName)
+        FImageName := Copy(fullFileName, length(knownDir) + 1, length(fullFileName) - length(knownDir));
       end
       else
       begin
@@ -12441,8 +12441,8 @@ begin
       jni_proc_t(gApp.jni.jEnv, FjObject, 'loadFile',
          knownDir + FImageName);
 
-      _FWidth := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
-      _FHeight := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
+      FWidth := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetWidth');
+      FHeight := jni_func_out_i(gApp.jni.jEnv, FjObject, 'GetHeight');
     end;
   end;
 end;
