@@ -86,6 +86,7 @@ type
      FCandidateSdkBuild: string;
      FIniFileName: string;
      FIniFileSection: string;
+     FKeepMyBuildGradleWhenReopen: boolean;
 
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
@@ -867,7 +868,7 @@ begin
     AndroidFileDescriptor.ModuleType:= FModuleType;
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
 
-    ShowMessage('try new jni FAndroidTheme = ' + FAndroidTheme);
+    //ShowMessage('try new jni FAndroidTheme = ' + FAndroidTheme);
 
     AndroidFileDescriptor.AndroidTheme:= FAndroidTheme;
 
@@ -1581,11 +1582,13 @@ begin
 
     if frm.ShowModal = mrOK then
     begin
-      frm.SaveSettings(SettingsFilename);
+      frm.SaveSettings(SettingsFilename); //LAMW.ini
 
       FBuildSystem:= frm.BuildSystem;
 
       FAndroidTheme:= frm.AndroidTheme;
+
+      FKeepMyBuildGradleWhenReopen:= frm.KeepMyBuildGradleWhenReopen;
       FIsKotlinSupported:= frm.IsKotlinSupported;
 
       FAndroidThemeColor:= frm.AndroidThemeColor;
@@ -2820,14 +2823,20 @@ begin
   if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
   begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
-
+    AProject.CustomData.Values['BuildSystem'] := FBuildSystem;
     AProject.CustomData.Values['Theme']:= FAndroidTheme;
+    AProject.CustomData['StartModule'] := 'AndroidModule1';
+
+    if FKeepMyBuildGradleWhenReopen then
+       AProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= 'YES'
+    else
+       AProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= 'NO';
+
     if FIsKotlinSupported then
        AProject.CustomData.Values['TryKotlin']:= 'TRUE'
     else
        AProject.CustomData.Values['TryKotlin']:= 'FALSE';
 
-    AProject.CustomData['StartModule'] := 'AndroidModule1';
     if FSupport then
       AProject.CustomData.Values['Support'] := 'TRUE'
     else
@@ -2847,8 +2856,6 @@ begin
   AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
 
   AProject.CustomData.Values['NdkApi']:= 'android-'+FNdkApi; //legacy
-
-  AProject.CustomData.Values['BuildSystem'] := FBuildSystem;
 
   AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
 
@@ -3510,6 +3517,8 @@ begin
   if FInstructionSet <> 'x86' then
      AProject.LazCompilerOptions.TargetProcessor:= UpperCase(FInstructionSet); {-Cp}
   *)
+
+  AProject.Modified:= True;
 
   auxList.Free;
   sourceList.Free;

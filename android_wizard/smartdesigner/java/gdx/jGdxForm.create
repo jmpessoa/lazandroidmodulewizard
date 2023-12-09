@@ -1,3 +1,0 @@
-public java.lang.Object jGdxForm_jCreate(long _Self, boolean _active) { 
-  return (java.lang.Object)(new jGdxForm(this,_Self,_active));
-}

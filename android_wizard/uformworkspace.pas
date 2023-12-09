@@ -16,6 +16,7 @@ type
   TFormWorkspace  = class(TForm)
     BitBtnCancel: TBitBtn;
     BitBtnOK: TBitBtn;
+    CheckBoxAutoConfigGradle: TCheckBox;
     CheckBoxGeneric: TCheckBox;
     CheckBoxPIE: TCheckBox;
     cbBuildSystem: TComboBox;
@@ -54,6 +55,7 @@ type
     StatusBarInfo: TStatusBar;
 
     procedure cbBuildSystemCloseUp(Sender: TObject);
+    procedure CheckBoxAutoConfigGradleChange(Sender: TObject);
     procedure CheckBoxGenericClick(Sender: TObject);  // raw library
     procedure CheckBoxPIEClick(Sender: TObject);
     procedure CheckBoxSupportChange(Sender: TObject);
@@ -79,12 +81,6 @@ type
     procedure SpeedButtonSettingsClick(Sender: TObject);
     procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
-    function IsLaz4Android(): boolean;
-    function IsLaz4Android2012(): boolean;
-
-    function IsLamwManagerForWindows(): boolean; //lamw-ide.bat
-
-    function IsLamwManagerForLinux(): boolean; //startlamw4linux
 
   private
     { private declarations }
@@ -140,6 +136,7 @@ type
     FNDKVersion: integer;
 
     FIsKotlinSupported: boolean;
+    FKeepMyBuildGradleWhenReopen: boolean;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -150,6 +147,12 @@ type
     function DoPathToSmartDesigner(): string;
     function DoNewPathToJavaTemplate(): string;
     function GetPathToSmartDesigner(): string;
+    function IsLaz4Android(): boolean;
+    function IsLaz4Android2012(): boolean;
+
+    function IsLamwManagerForWindows(): boolean; //lamw-ide.bat
+    function IsLamwManagerForLinux(): boolean; //startlamw4linux
+
   public
     { public declarations }
     procedure LoadSettings(const pFilename: string);
@@ -212,6 +215,7 @@ type
     property GradleVersion: string read FGradleVersion write FGradleVersion;
   //  property LAMWHintChecked: boolean read FLAMWHintChecked write FLAMWHintChecked;
     property IsKotlinSupported: boolean read FIsKotlinSupported write FIsKotlinSupported;
+    property KeepMyBuildGradleWhenReopen: boolean read FKeepMyBuildGradleWhenReopen write FKeepMyBuildGradleWhenReopen;
 
   end;
 
@@ -890,6 +894,7 @@ end;
 
 procedure TFormWorkspace.FormCreate(Sender: TObject);
 begin
+  FKeepMyBuildGradleWhenReopen:= True;
   if not FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini') then
   begin
     if FileExists(IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'JNIAndroidProject.ini') then
@@ -1345,8 +1350,8 @@ begin
        end;
     end;
 
-    ListBoxMinSDK.ItemIndex:= 11;   //Api 23
-
+    if  ListBoxMinSDK.ItemIndex < 10  then
+        ListBoxMinSDK.ItemIndex:= 10;   //Api 23
   end
   else
   begin
@@ -1457,7 +1462,7 @@ procedure TFormWorkspace.cbBuildSystemCloseUp(Sender: TObject);
 var
   auxStr, auxStrJavaVersion, javaVersionBigNumber: string;
   numberVersion: integer;
-  bigNumber, intApi: integer;
+  bigNumber: integer;
 begin
   auxStrJavaVersion:= TryGetJavaVersion(FPathToJavaJDK, javaVersionBigNumber);
 
@@ -1491,6 +1496,11 @@ begin
      if auxStrJavaVersion = '11' then
         MessageDlg('warning: "Ant" need java JDK 1.8', mtWarning, [mbOk], 0);
   end;
+end;
+
+procedure TFormWorkspace.CheckBoxAutoConfigGradleChange(Sender: TObject);
+begin
+   FKeepMyBuildGradleWhenReopen:= CheckBoxAutoConfigGradle.Checked;
 end;
 
 

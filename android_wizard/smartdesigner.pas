@@ -31,7 +31,6 @@ type
 
     FPathToJavaJDK: string;
 
-    FInstructionSet: string;
     FSmallProjName: string;
     FGradleVersion: string;
     FPrebuildOSYS: string;
@@ -47,6 +46,7 @@ type
     FNdkApi: string;
     FAndroidTheme: string;
     FIsKotlinSupported: boolean;
+    FKeepMyBuildGradleWhenReopen: string;
 
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
@@ -64,28 +64,19 @@ type
     procedure TryChangeDemoProjecPaths;
     procedure TryFindDemoPathsFromReadme(out pathToDemoNDK, pathToDemoSDK: string);
 
-    //function IsChipSetDefault(var projectChipSet: string): boolean;
-    //procedure TryChangeChipSetConfigs(projectChipSet: string);
-
     function GetMaxNdkPlatform(ndkVer: integer): integer;
 
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
-    function GetMaxSdkPlatform(out outBuildTool: string): integer;
+    function GetMaxSdkPlatform(): integer;
 
     function GetVesionCodeFromBuilGradle(): string;
     function GetVesionNameFromBuilGradle(): string;
 
-    procedure KeepBuildUpdated(targetApi: integer; buildTool: string);
+    procedure KeepBuildUpdated(targetApi: integer);
 
-    function GetBuildTool(sdkApi: integer): string;
-    function GetPluginVersion(buildTool: string): string;
-    function TryGradleCompatibility(plugin: string; gradleVers: string; out outGradleVer: string):boolean;
-    function TryPluginCompatibility(gradleVers: string): string;
+    function TryProduceGradleVersion(pathToGradle: string): string;
+    function GetGradleVersion(pathToGradle: string): string;
 
-    function GetVerAsNumber(gradleVers: string): integer;
-    function TryUndoFakeVersion(grVer: string): string;
-
-    function GetGradleVersion(path: string): string;
     function GetGradleVersionFromGradle(path: string): string;
 
     function GetLprStartModuleVarName: string;
@@ -103,7 +94,7 @@ type
     function GetNDKVersion(ndkRelease: string): integer;
 
     procedure TryUpdateMipmap();
-    function GetVerAsString(aVers: integer): string;
+    function GetVerAsString(aVers: integer): string;   //android
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -127,6 +118,10 @@ type
      //calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
+    procedure DoBuildGradle(minSdkApi: string; targetApi: string);
+
+    function GetAndroidPluginVersion(gradleVersion: string): string;  //new!
+    function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
 
   end;
 
@@ -156,7 +151,7 @@ end;
 
 procedure TryRunProcessChmod(path: string);
 var
-  proc: TProcess;
+  proc: TProcess;  //don't delete it!
 begin
   {$ifdef UNIX}
   try
@@ -227,8 +222,6 @@ function TLamwSmartDesigner.AddClicked(ADesigner: TIDesigner;
              Shift: TShiftState; X, Y: Integer;
              var AComponentClass: TComponentClass;
              var NewParent: TComponent): boolean;
-var
-  temp: string;
 begin
   Result:= True;
   if LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then
@@ -250,27 +243,6 @@ begin
           Result := False;
           Exit;
         end;
-      end;
-    end;
-
-    temp:= Lowercase(Copy(AComponentClass.ClassName, 1,4));
-
-    if Pos('GDXGame',LazarusIDE.ActiveProject.CustomData['Theme']) > 0 then
-    begin
-      if temp <> 'jgdx' then
-      begin
-        Result:= False;
-        ShowMessage('Sorry.. ['+AComponentClass.ClassName+'] not for a libGDX project...');
-        Exit;
-      end;
-    end
-    else
-    begin
-      if temp = 'jgdx' then
-      begin
-        Result:= False;
-        ShowMessage('Sorry..['+AComponentClass.ClassName+'] only for a libGDX project...');
-        Exit;
       end;
     end;
 
@@ -468,7 +440,7 @@ begin
    end;
 end;
 
-function TLamwSmartDesigner.GetMaxSdkPlatform(out outBuildTool: string): integer;
+function TLamwSmartDesigner.GetMaxSdkPlatform(): integer;
 var
   lisDir: TStringList;
   strApi: string;
@@ -499,7 +471,6 @@ begin
                 if HasBuildTools(intApi, tempOutBuildTool) then
                 begin
                    Result:= intApi;
-                   outBuildTool:= tempOutBuildTool;  //26.0.2
                 end;
               end;
 
@@ -565,205 +536,6 @@ begin
   lisDir.free;
 end;
 
-
-function TLamwSmartDesigner.GetBuildTool(sdkApi: integer): string;
-var
-  tempOutBuildTool: string;
-begin
-  Result:= '';
-  if not HasBuildTools(sdkApi, tempOutBuildTool) then
-  begin
-     ShowMessage('Warning: Android "sdk\build-tools" not installed for Api ' + IntToStr(sdkApi));
-  end;
-  Result:= tempOutBuildTool;  //26.0.2
-end;
-
-function TLamwSmartDesigner.GetPluginVersion(buildTool: string): string;
-var
-  maxBuilderNumber: integer;
-  numberAsString: string;
-begin
-  Result:= '';
-
-  if (buildTool = '') then Exit;
-
-  numberAsString:= StringReplace(buildTool,'.', '', [rfReplaceAll]); //26.0.2
-  numberAsString:= Trim(numberAsString);
-
-  if IsAllCharNumber(PChar(numberAsString))  then
-  begin
-    maxBuilderNumber:= StrToInt(numberAsString);  //2602
-
-    if (maxBuilderNumber >= 2111) and (maxBuilderNumber < 2112) then
-    begin
-      Result:= '2.0.0';
-    end
-    else if (maxBuilderNumber >= 2112) and (maxBuilderNumber < 2302) then
-    begin
-      Result:= '2.0.0';
-    end
-    else if (maxBuilderNumber >= 2302) and (maxBuilderNumber < 2500) then
-    begin
-        Result:= '2.2.0';
-    end
-    else if (maxBuilderNumber >= 2500) and (maxBuilderNumber < 2602) then   //<<---- good performance !!!
-    begin
-        Result:= '2.3.3';
-        //gradleVer:= '3.3';
-    end
-    else if (maxBuilderNumber >= 2602) and (maxBuilderNumber < 2700)  then
-    begin
-        Result:= '3.0.1';
-        //gradleVer:= '4.1';
-    end
-    else if (maxBuilderNumber >= 2700) and (maxBuilderNumber < 2703)   then
-    begin
-        Result:= '3.1.0';
-        //gradleVer:= '4.4';
-    end
-    else if (maxBuilderNumber >= 2703) and (maxBuilderNumber < 2803)   then
-    begin
-        //Result:= '3.2.0'; //need build-tools 28.0.2 and need drop minSdk/targetSdk from AndroidManifest!!
-        //gradleVer:= '4.6';
-
-         Result:= '3.1.0'; //just to support minSdk/targetSdk in AndroidManifest!!
-    end
-    else if maxBuilderNumber >= 2803   then
-    begin
-        //Result:= '3.3.0';  //need droped minSdk/targetSdk in AndroidManifest!!
-        //gradleVer:= 'Gradle 4.10.1';
-
-        //Result:= '3.4.0';
-        //gradleVer:= 'Gradle Gradle 5.1.1'
-
-         //Result:= '3.4.3';
-        //gradleVer:= 'Gradle Gradle 6.6.1'
-
-         Result:= '3.1.0'; // just to support minSdk/targetSdk from AndroidManifest!!
-    end;
-
-  end;
-
-end;
-
-function TLamwSmartDesigner.TryUndoFakeVersion(grVer: string): string;
-begin
-  Result:=  grVer;
-  if grVer = '4.9.1' then Result := '4.10'
-  else if grVer = '4.9.2' then Result := '4.10.1'
-  else if grVer = '4.9.3' then Result := '4.10.2'
-  else if grVer = '4.9.4' then Result := '4.10.3';
-end;
-
-function TLamwSmartDesigner.GetVerAsNumber(gradleVers: string): integer;
-var
-  numberAsString: string;
-  len: integer;
-begin
-  if (Length(gradleVers)>0) then
-  begin
-    numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]);
-    len:= Length(numberAsString);
-    if len = 2 then numberAsString:= numberAsString + '00';
-    if len = 3 then numberAsString:= numberAsString + '0';
-    Result:= StrToInt(numberAsString);
-  end else Result:=0;
-end;
-
-function TLamwSmartDesigner.TryPluginCompatibility(gradleVers: string): string;
-var
-  gradleVersNumber: integer;
-begin
-  Result:= '3.0.1';
-  gradleVersNumber:= GetVerAsNumber(gradleVers);
-  if gradleVersNumber <  4100 then Result:= '2.3.3'
-  else if (gradleVersNumber >= 4100) and (gradleVersNumber < 4400) then Result:= '3.0.1'
-  else if (gradleVersNumber >= 4400) and (gradleVersNumber < 4600) then Result:= '3.1.0'
-  else if (gradleVersNumber >= 4600) and (gradleVersNumber < 4920) then Result:= '3.2.1'
-  else if (gradleVersNumber >= 4920) and (gradleVersNumber < 5110) then Result:= '3.3.2'
-  else if (gradleVersNumber >= 7000) and (gradleVersNumber < 7999) then Result:= '7.1.3'
-  else Result:= '4.1.3'; //gradleVersNumber >= 5110)
-end;
-
-//https://developer.android.com/studio/releases/gradle-plugin.html#updating-plugin
-function TLamwSmartDesigner.TryGradleCompatibility(plugin: string; gradleVers: string; out outGradleVer: string):boolean;
-var
-  pluginNumber: integer;
-  numberAsString: string;
-  tryGradleVer: string;
-  tryGradleNumber, len: integer;
-  gradleNumber: integer;
-begin
-
-  Result:= False;
-  {200  < 220 ---  2.1
-  220  < 233 ---  2.14.1
-  233  < 301 ---  3.3
-  301  >     ---  4.0}
-  if gradleVers = '' then
-  begin
-   ShowMessage('Error. Gradle version is empty');
-   Exit;
-  end;
-
-  if plugin = '' then
-  begin
-    ShowMessage('Error. Android Gradle plugin version is empty');
-    Exit;
-  end;
-
-  numberAsString:= StringReplace(plugin,'.', '', [rfReplaceAll]); //3.0.1
-  pluginNumber:= StrToInt(numberAsString);  //301
-
-  if (pluginNumber >=  200) and (pluginNumber <  220) then
-  begin
-     tryGradleVer:= '2.10';   //210  -> 2100
-  end else if (pluginNumber >= 220) and (pluginNumber <  233) then
-  begin
-    tryGradleVer:= '2.14.1';  //        2141
-  end else if (pluginNumber >= 233) and (pluginNumber <  310) then
-   begin
-      tryGradleVer:= '4.1';
-   end else if (pluginNumber >= 310) and  (pluginNumber <  320) then
-   begin
-      tryGradleVer:= '4.4';         //27.0.3
-   end else if (pluginNumber >= 320) and  (pluginNumber <  330) then
-   begin
-      tryGradleVer:= '4.6';         //28.0.3
-   end else if (pluginNumber >= 330) and  (pluginNumber <  340) then
-   begin
-      tryGradleVer:= '4.9.2';   //fake -> '4.10.1'  //4.10.1 --> 4920     //28.0.3
-   end else //(pluginNumber >= 340)
-   begin
-       tryGradleVer:= '6.6.1';         //28.0.3
-   end;
-
-  numberAsString:= StringReplace(tryGradleVer,'.', '', [rfReplaceAll]); //3.3
-  len:= Length(numberAsString);
-  if len = 2 then numberAsString:= numberAsString + '00';
-  if len = 3 then numberAsString:= numberAsString + '0';
-  tryGradleNumber:= StrToInt(numberAsString);
-
-  numberAsString:= StringReplace(gradleVers,'.', '', [rfReplaceAll]); //41
-  len:= Length(numberAsString);
-  if len = 2 then numberAsString:= numberAsString + '00'; //4100
-  if len = 3 then numberAsString:= numberAsString + '0';
-
-  gradleNumber:= StrToInt(numberAsString);
-
-  if gradleNumber >= tryGradleNumber then
-  begin
-    outGradleVer:= gradleVers;
-    Result:= True;
-  end
-  else
-  begin
-    outGradleVer:= TryUndoFakeVersion(tryGradleVer);
-    Result:= False;
-  end;
-
-end;
-
 function TLamwSmartDesigner.GetVesionCodeFromBuilGradle(): string;
 var
   list: TStringList;
@@ -817,40 +589,291 @@ begin
   end;
 end;
 
+function TLamwSmartDesigner.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+var
+  auxStr: string;
+  lenAuxStr: integer;
+begin
+  auxStr:= StringReplace(gradleVersionAsString,'.', '', [rfReplaceAll]); //6.6.1
+  lenAuxStr:=  Length(auxStr);
+  if lenAuxStr < 3 then auxStr:= auxStr + '0';   //6.8 -> 680
+  Result:= StrToInt(Trim(auxStr));  //661
+end;
+
+function TLamwSmartDesigner.GetAndroidPluginVersion(gradleVersion: string): string;
+var
+  strGV: string;
+  intGV: integer;
+  bigNumber: integer;
+begin
+   bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
+
+   Result:= '3.4.1';
+   strGV:= SplitStr(gradleVersion,  '.');
+   intGV:= StrToInt(strGV);
+   if intGV >= 8 then
+   begin
+       ShowMessage(' warning: LAMW don''t support Gradle > 7.6.3 yet...');
+       Result:= '7.1.3'; //8 -> Result:= '8.1.4';
+   end;
+   if intGV = 7 then  Result:= '7.1.3';
+   if intGV = 6 then
+   begin
+      if bigNumber <  671 then
+        Result:= '4.1.3'
+      else
+        Result:= '4.2.2';
+   end;
+   if intGV < 6 then
+   begin
+     Result:= '3.4.1';
+   end;
+end;
+
+procedure TLamwSmartDesigner.DoBuildGradle(minSdkApi: string; targetApi: string);
+var
+  strList, includeList: TStringList;
+  directive, buildSystem, listInstructionChip: string;
+  aAppCompatLib: TAppCompatLib;
+  aSupportLib: TSupportLib;
+  androidPluginVersion, targetBuildFileName: string;
+  isAppCompatTheme, isGradleBuildSystem, isUniversalApk, isSignatureFound: boolean;
+  versionCode, versionName: string;
+begin
+
+  androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion); //'7.1.3';
+
+  isAppCompatTheme:= False;
+  if Pos('AppCompat', FAndroidTheme) > 0  then isAppCompatTheme:= True;
+
+  buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
+
+  isGradleBuildSystem:= False;
+  if Pos('Gradle',  buildSystem) > 0 then isGradleBuildSystem:= True;
+
+  targetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.CreateTargetFilename);
+
+  includeList:= TStringList.Create;
+  includeList.Delimiter:= ',';
+  includeList.StrictDelimiter:= True;
+  includeList.Sorted:= True;
+  includeList.Duplicates:= dupIgnore;
+
+  if FileExists(FPathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
+  begin
+    includeList.Add('''armeabi''');
+  end;
+
+  if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\' + TargetBuildFileName ) then
+  begin
+    includeList.Add('''armeabi-v7a''');
+  end;
+
+  if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\' + TargetBuildFileName ) then
+  begin
+    includeList.Add('''arm64-v8a''');
+  end;
+
+  if FileExists(FPathToAndroidProject + 'libs\x86_64\' + TargetBuildFileName ) then
+  begin
+    includeList.Add('''x86_64''');
+  end;
+
+  if FileExists(FPathToAndroidProject + 'libs\x86\' + TargetBuildFileName ) then
+  begin
+    includeList.Add('''x86''');
+  end;
+
+  if FileExists(FPathToAndroidProject + 'libs\mips\' + TargetBuildFileName ) then
+  begin
+    includeList.Add('''mips''');
+  end;
+
+  listInstructionChip:= includeList.DelimitedText;
+
+  isUniversalApk:= False;
+  if includeList.Count > 1 then
+    isUniversalApk:= True;
+
+  versionCode := GetVesionCodeFromBuilGradle();
+  versionName := GetVesionNameFromBuilGradle();
+
+  strList:= TStringList.Create;
+  isSignatureFound := false;
+  if fileExists(FPathToAndroidProject+'gradle.properties') then
+  begin
+     strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
+     if Pos('RELEASE_STORE_FILE', strList.Text) > 0 then
+          isSignatureFound := True;
+  end;
+
+  strList.Clear;
+  strList.Add('buildscript {');
+  if FisKotlinSupported then
+    strList.Add('    ext.kotlin_version = ''1.6.10''');
+  strList.Add('    repositories {');
+  strList.Add('        mavenCentral()');
+  strList.Add('        google()');
+  strList.Add('    }');
+  strList.Add('    dependencies {');
+  strList.Add('        classpath ''com.android.tools.build:gradle:'+androidPluginVersion+''' '); //7.1.3
+  if FisKotlinSupported then
+    strList.Add('        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"');
+
+  strList.Add('    }');
+  strList.Add('}');
+  strList.Add('allprojects {');
+  strList.Add('    repositories {');
+  strList.Add('       google()');
+  strList.Add('       mavenCentral()');
+  strList.Add('       maven {url ''https://jitpack.io''}');
+  strList.Add('    }');
+  strList.Add('}');
+  strList.Add('apply plugin: ''com.android.application''');
+
+  if FisKotlinSupported then
+   strList.Add('apply plugin: ''kotlin-android''');
+
+  strList.Add('android {');
+  strList.Add('    lintOptions {');
+  strList.Add('       abortOnError false');
+  strList.Add('    }');
+  strList.Add('    splits {');
+  strList.Add('        abi {');
+  strList.Add('            enable true');
+  strList.Add('            reset()');
+  strList.Add('            include '+listInstructionChip);
+  if not isUniversalApk then
+     strList.Add('            universalApk false')
+  else
+     strList.Add('            universalApk true');
+  strList.Add('        }');
+  strList.Add('    }');
+  strList.Add('    compileOptions {');
+  strList.Add('        sourceCompatibility 1.8');
+  strList.Add('        targetCompatibility 1.8');
+  strList.Add('    }');
+  strList.Add('    compileSdk '+targetApi+'');
+
+  strList.Add('    defaultConfig {');
+  strList.Add('            minSdkVersion '+minSdkApi+'');
+  strList.Add('            targetSdkVersion '+targetApi+'');
+  strList.Add('            versionCode '+versionCode+'');
+  strList.Add('            versionName '+versionName+''); //  " -> already included!
+  strList.Add('            multiDexEnabled true');
+  strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
+  strList.Add('    }');
+
+  if isSignatureFound then
+  begin
+   strList.Add('    signingConfigs {');
+   strList.Add('        release {');
+   strList.Add('            storeFile file(RELEASE_STORE_FILE)');
+   strList.Add('            storePassword RELEASE_STORE_PASSWORD');
+   strList.Add('            keyAlias RELEASE_KEY_ALIAS');
+   strList.Add('            keyPassword RELEASE_KEY_PASSWORD');
+   strList.Add('        }');
+   strList.Add('    }');
+   strList.Add('    buildTypes {');
+   strList.Add('        release {');
+   strList.Add('            signingConfig signingConfigs.release');
+   strList.Add('        }');
+   strList.Add('    }');
+  end;
+
+  strList.Add('    sourceSets {');
+  strList.Add('        main {');
+  strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
+  strList.Add('            java.srcDirs = [''src'']');
+  strList.Add('            resources.srcDirs = [''src'']');
+  strList.Add('            aidl.srcDirs = [''src'']');
+  strList.Add('            renderscript.srcDirs = [''src'']');
+  strList.Add('            res.srcDirs = [''res'']');
+  strList.Add('            assets.srcDirs = [''assets'']');
+  strList.Add('            jniLibs.srcDirs = [''libs'']');
+  strList.Add('        }');
+  strList.Add('        debug.setRoot(''build-types/debug'')');
+  strList.Add('        release.setRoot(''build-types/release'')');
+  strList.Add('    }');
+  strList.Add('    buildTypes {');
+  strList.Add('        debug {');
+  strList.Add('            minifyEnabled false');
+  strList.Add('            debuggable true');
+  strList.Add('            jniDebuggable true');
+  strList.Add('        }');
+  strList.Add('        release {');
+  strList.Add('            minifyEnabled false');
+  strList.Add('            debuggable false');
+  strList.Add('            jniDebuggable false');
+  strList.Add('        }');
+  strList.Add('    }');
+  strList.Add('}');
+  strList.Add('dependencies {');
+  strList.Add('    implementation  fileTree(include: [''*.jar''], dir: ''libs'')');
+
+  directive:= 'implementation';
+  if isAppCompatTheme then
+  begin
+    for aAppCompatLib in AppCompatLibs do
+    begin
+       strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
+       if aAppCompatLib.MinAPI > StrToInt(targetApi) then
+             ShowMessage('Warning: AppCompat theme need Android SDK >= ' + IntToStr(aAppCompatLib.MinAPI));
+    end;
+    if FisKotlinSupported then
+    begin
+       strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
+       strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
+    end;
+  end
+  else if isGradleBuildSystem then//only gradle not AppCompat
+  begin
+    for aSupportLib in SupportLibs do
+    begin
+       strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
+       if aSupportLib.MinAPI > StrToInt(targetApi) then
+             ShowMessage('Warning: Support library need Android SDK >= ' + IntToStr(aSupportLib.MinAPI));
+    end;
+  end;
+
+  strList.Add('}');
+
+  strList.Add('tasks.register(''run'', Exec) {');
+  strList.Add(' dependsOn '':installDebug''');
+  strList.Add('	if (System.properties[''os.name''].toLowerCase().contains(''windows'')) {');
+  strList.Add('	    commandLine ''cmd'', ''/c'', ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+FPackageName+'/.App"');
+  strList.Add('	} else {');
+  strList.Add('	    commandLine ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+FPackageName+'/.App"');
+  strList.Add('	}');
+  strList.Add('}');
+  strList.Add(' ');
+  strList.Add('wrapper {');
+  strList.Add('    gradleVersion = '''+FGradleVersion+''' ');  //7.6.3
+  strList.Add('}');
+  strList.SaveToFile(FPathToAndroidProject+'build.gradle');
+  strList.Free;
+  includeList.Free;
+
+end;
+
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
-procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer; buildTool: string);
+procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer);
 var
   strList, providerList: TStringList;
-  i, minsdkApi : integer;
+  i, minSdkApi : integer;
   strTargetApi, auxStr, tempStr : string;
-  aAppCompatLib:TAppCompatLib;
-  aSupportLib: TSupportLib;
-  buildSystem: string;
-  androidPluginNumber: integer;
-  pluginVersion: string;
-  gradleCompatible, outgradleCompatible: string;
-  gradleCompatibleAsNumber: integer;
   linuxPathToAndroidSdk: string;
   linuxPathToGradle: string;
   linuxDirSeparator: string; //don't delete it!
-  buildToolApi: string;
-  directive: string;
   FSupport:boolean;
-  sourcepath,targetpath:string;
-  includeList: TStringList;
-  universalApk: boolean;
+  sourcepath, targetpath:string;
   insertRef, supportProvider: string;
   p1 : integer;
-  versionCode : string;
-  versionName : string;
-  xmlAndroidManifest: TXMLDocument;
-  foundSignature : boolean;
-  TargetBuildFileName : string;
 begin
 
   strTargetApi:= IntTostr(targetApi);
 
-  buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
+  //buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
 
   strList:= TStringList.Create;
 
@@ -885,7 +908,7 @@ begin
 
   if not FileExists(targetpath+DirectorySeparator+'styles.xml') then
   begin
-    if Pos('AppCompat', FAndroidTheme) > 0  then
+    if Pos('AppCompat', FAndroidTheme) > 0 then
     begin
        if FileExists(LamwGlobalSettings.PathToJavaTemplates+'values'+DirectorySeparator+FAndroidTheme+'.xml') then
        begin
@@ -905,9 +928,9 @@ begin
   end;
 
   if Pos('AppCompat',  FAndroidTheme) > 0 then
-     minsdkApi:= 16
+     minSdkApi:= 21
   else
-     minsdkApi:= 14;
+     minSdkApi:= 14;
 
   auxStr:= LazarusIDE.ActiveProject.CustomData['MinSdk'];             //new
 
@@ -928,7 +951,8 @@ begin
   sourcepath:=LamwGlobalSettings.PathToJavaTemplates+'androidmanifest.txt';
   targetpath:=FPathToAndroidProject+'AndroidManifest.xml';
 
-  if FileExists(sourcepath) AND (NOT FileExists(targetpath)) then with strList do
+  if FileExists(sourcepath) AND (NOT FileExists(targetpath)) then
+  with strList do
   begin
     LoadFromFile(sourcepath);
     auxStr:=FPackageName + '.' + LowerCase(FSmallProjName);
@@ -987,7 +1011,6 @@ begin
     end
     else
     begin
-
        if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
        begin
          providerList:= TStringList.Create;
@@ -1005,7 +1028,6 @@ begin
            strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
          end;
        end;
-
     end;
   end;
 
@@ -1020,18 +1042,6 @@ begin
    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
   end;
   strList.Clear;
-
-  (*sdkManifestTarqet:= GetTargetFromManifest();
-
-  if sdkManifestTarqet <> '' then
-  begin
-       strList.Clear;
-       strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-       tempStr:= strList.Text;
-       tempStr:= StringReplace(tempStr, 'android:targetSdkVersion="'+sdkManifestTarqet+'"' , 'android:targetSdkVersion="'+IntToStr(targetApi)+'"', [rfReplaceAll,rfIgnoreCase]);
-       strList.Text:= tempStr;
-       strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-  end;*)
 
   strList.Clear;
   strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
@@ -1130,15 +1140,6 @@ begin
   strList.Add('</project>');
   strList.SaveToFile(FPathToAndroidProject+'build.xml');
 
-  (*strList.Clear;
-  strList.LoadFromFile(FPathToAndroidProject+'ant.properties');
-  if Pos('java.source=1.8', strList.Text) <= 0 then
-  begin
-    strList.Insert(0,'java.target=1.8');
-    strList.Insert(0,'java.source=1.8');
-  end;
-  strList.SaveToFile(FPathToAndroidProject+'ant.properties');*)
-
   strList.Clear;
   strList.Add('# This file is automatically generated by Android Tools.');
   strList.Add('# Do not modify this file -- YOUR CHANGES WILL BE ERASED!');
@@ -1168,541 +1169,142 @@ begin
   {$ENDIF}
   strList.SaveToFile(FPathToAndroidProject+'local.properties');
 
-  //gradle.build
+  //begin "build.grade" update
+  FKeepMyBuildGradleWhenReopen:= LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen'];
 
-  if targetApi >= 21 then
+  if FKeepMyBuildGradleWhenReopen = 'NO' then
+      DoBuildGradle(IntToStr(minSdkApi), strTargetApi);
+
+  if FKeepMyBuildGradleWhenReopen = '' then //before LAMW 0.8.6.3
   begin
-    if buildTool <> '' then
-    begin
-       buildToolApi:= Copy(buildTool,1,2);   //26.0.2  --> 26
-       if IsAllCharNumber(PChar(buildToolApi))  then
-       begin
-         if StrToInt(buildToolApi) >= 25 then
-           pluginVersion:= GetPluginVersion(buildTool)
-         else
-           pluginVersion:= '2.3.3';
-       end
-       else
-       begin
-         buildToolApi:= '30';
-         pluginVersion:= '3.1.0';  //gradle 4.4.1
-       end;
-
-       if pluginVersion <> '' then
-       begin
-         //gradleCompatible:= TryGradleCompatibility(pluginVersion, FGradleVersion);
-         outgradleCompatible:= '';
-         gradleCompatible:= FGradleVersion;
-         if not TryGradleCompatibility(pluginVersion, FGradleVersion, outgradleCompatible) then
-         begin
-             if MessageDlg('Warning ','plugin "'+pluginVersion+'" [build-tools "'+buildTool+ '"] require Gradle "'+outgradleCompatible+'"' +sLineBreak + '[current Gradle: "'+FGradleVersion+'"]' + sLineBreak + 'Select [Ignore] to try compatibility...',
-                mtConfirmation, [mbOk, mbIgnore], 0) = mrOk then
-                begin
-                   gradleCompatible:= outgradleCompatible;
-                   ShowMessage('[Ok] Please, update to Gradle "'+outgradleCompatible+'" ' + sLineBreak + 'https://gradle.org/releases/');
-                end
-                else
-                begin
-                   pluginVersion:= TryPluginCompatibility(FGradleVersion);
-                end;
-         end;
-
-         androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
-         gradleCompatibleAsNumber:= GetVerAsNumber(TryPluginCompatibility(FGradleVersion));
-         if gradleCompatibleAsNumber>androidPluginNumber then
-         begin
-           pluginVersion:= TryPluginCompatibility(FGradleVersion);
-           androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
-         end;
-
-         strList.Clear;
-         foundSignature := false;
-
-         if fileExists(FPathToAndroidProject+'gradle.properties') then
-         begin
-          strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
-          if Pos('RELEASE_STORE_FILE', strList.Text) > 0 then
-             foundSignature := True;
-         end;
-
-         strList.Clear;
-         strList.Add('buildscript {');
-         if FIsKotlinSupported then
-           strList.Add('    ext.kotlin_version = ''1.6.10''');
-         strList.Add('    repositories {');
-         strList.Add('        mavenCentral()');
-         strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
-         if androidPluginNumber >= 3000 then
-            strList.Add('        google()')
-         else
-            strList.Add('        //google()');
-         strList.Add('    }');
-         strList.Add('    dependencies {');
-         strList.Add('        classpath ''com.android.tools.build:gradle:'+ pluginVersion+'''');
-         if FIsKotlinSupported then
-           strList.Add('        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"');
-
-         strList.Add('    }');
-         strList.Add('}');
-
-         strList.Add('allprojects {');
-         strList.Add('    repositories {');
-         if androidPluginNumber >= 3000 then
-         strList.Add('       google()')
-         else
-         strList.Add('     //google()');
-         strList.Add('       mavenCentral()');
-         strList.Add('       maven { url ''https://jitpack.io'' }');
-         strList.Add('    }');
-         strList.Add('}');
-
-         strList.Add('apply plugin: ''com.android.application''');
-         if FIsKotlinSupported then
-            strList.Add('apply plugin: ''kotlin-android''');
-
-         strList.Add('android {');
-         strList.Add('    lintOptions {');
-         strList.Add('       abortOnError false');
-         strList.Add('    }');
-
-         tempStr:= LowerCase(FInstructionSet);
-         if Length(tempStr)>0 then
-         begin
-         if tempStr = 'armv6'  then auxStr:='armeabi';
-         if tempStr = 'armv7a' then auxStr:='armeabi-v7a';
-         if tempStr = 'x86'    then auxStr:='x86';
-         if tempStr = 'x86_64' then auxStr:='x86_64';
-         if tempStr = 'mipsel' then auxStr:='mips';
-         if tempStr = 'armv8'  then auxStr:='arm64-v8a';
-         end
-         else
-         begin
-           auxStr := ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
-           auxStr := ExtractFileName(auxStr);
-         end;
-
-         TargetBuildFileName := ExtractFileName(LazarusIDE.ActiveProject.LazCompilerOptions.CreateTargetFilename);
-         includeList:= TStringList.Create;
-         includeList.Delimiter:= ',';
-         includeList.StrictDelimiter:= True;
-         includeList.Sorted:= True;
-         includeList.Duplicates:= dupIgnore;
-
-         includeList.Add(''''+auxStr+''''); //initial  Instruction Set
-
-         if FileExists(FPathToAndroidProject + 'libs\armeabi\' + TargetBuildFileName ) then
-         begin
-           includeList.Add('''armeabi''');
-         end;
-
-         if FileExists(FPathToAndroidProject + 'libs\armeabi-v7a\' + TargetBuildFileName ) then
-         begin
-           includeList.Add('''armeabi-v7a''');
-         end;
-
-         if FileExists(FPathToAndroidProject + 'libs\arm64-v8a\' + TargetBuildFileName ) then
-         begin
-           includeList.Add('''arm64-v8a''');
-         end;
-
-         if FileExists(FPathToAndroidProject + 'libs\x86_64\' + TargetBuildFileName ) then
-         begin
-           includeList.Add('''x86_64''');
-         end;
-
-         if FileExists(FPathToAndroidProject + 'libs\x86\' + TargetBuildFileName ) then
-         begin
-           includeList.Add('''x86''');
-         end;
-
-         if FileExists(FPathToAndroidProject + 'libs\mips\' + TargetBuildFileName ) then
-         begin
-           includeList.Add('''mips''');
-         end;
-
-         auxStr:= includeList.DelimitedText; //NEW! includeList based...
-
-         universalApk:= False;
-         if includeList.Count > 1 then
-           universalApk:= True;
-
-         includeList.Free;
-
-         if Length(auxStr) > 0 then //
-         begin
-         strList.Add('    splits {');
-         strList.Add('        abi {');
-         strList.Add('            enable true');
-         strList.Add('            reset()');
-
-         strList.Add('            include '+auxStr); //NEW! includeList based...
-         //strList.Add('            include '''+auxStr+'''');
-         //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
-
-         if universalApk then
-           strList.Add('            universalApk true')
-         else
-           strList.Add('            universalApk false');
-
-         strList.Add('        }');
-         strList.Add('    }');
-         end;
-
-         strList.Add('    compileOptions {');
-         strList.Add('        sourceCompatibility 1.8');
-         strList.Add('        targetCompatibility 1.8');
-         strList.Add('    }');
-
-         if Pos('AppCompat', FAndroidTheme) > 0 then
-         begin
-
-           if StrToInt(buildToolApi) < 34 then
-              strList.Add('    compileSdkVersion '+ buildToolApi)
-           else
-              strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(buildToolApi))+'"');
-
-           if androidPluginNumber < 3000 then
-              strList.Add('    buildToolsVersion "26.0.2"'); //buildTool
-           //else: each version of the Android Gradle Plugin now has a default version of the build tools
-         end
-         else
-         begin
-           if StrToInt(buildToolApi) < 34 then
-              strList.Add('    compileSdkVersion '+ buildToolApi)
-           else
-              strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(buildToolApi))+'"');
-           if androidPluginNumber < 3000 then
-              strList.Add('    buildToolsVersion "'+buildTool+'"');
-           //else: each version of the Android Gradle Plugin now has a default version of the build tools
-         end;
-
-         strList.Add('    defaultConfig {');
-
-         strList.Add('            minSdkVersion '+IntToStr(minsdkApi));
-
-         if targetApi <= StrToInt(buildToolApi) then
-            strList.Add('            targetSdkVersion '+IntToStr(targetApi))
-         else
-            strList.Add('            targetSdkVersion '+buildToolApi);
-
-         versionCode := GetVesionCodeFromBuilGradle();
-         versionName := GetVesionNameFromBuilGradle();
-
-         strList.Add('            versionCode ' + versionCode);
-         strList.Add('            versionName ' + versionName);
-
-         //if Pos('AppCompat', FAndroidTheme) > 0 then
-         strList.Add('            multiDexEnabled true');
-
-         strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
-         strList.Add('    }');
-
-         if foundSignature then
-         begin
-          strList.Add('    signingConfigs {');
-          strList.Add('        release {');
-          strList.Add('            storeFile file(RELEASE_STORE_FILE)');
-          strList.Add('            storePassword RELEASE_STORE_PASSWORD');
-          strList.Add('            keyAlias RELEASE_KEY_ALIAS');
-          strList.Add('            keyPassword RELEASE_KEY_PASSWORD');
-          strList.Add('        }');
-          strList.Add('    }');
-          strList.Add('    buildTypes {');
-          strList.Add('        release {');
-          strList.Add('            signingConfig signingConfigs.release');
-          strList.Add('        }');
-          strList.Add('    }');
-         end;
-
-         strList.Add('    sourceSets {');
-         strList.Add('        main {');
-         strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
-         strList.Add('            java.srcDirs = [''src'']');
-         strList.Add('            resources.srcDirs = [''src'']');
-         strList.Add('            aidl.srcDirs = [''src'']');
-         strList.Add('            renderscript.srcDirs = [''src'']');
-         strList.Add('            res.srcDirs = [''res'']');
-         strList.Add('            assets.srcDirs = [''assets'']');
-         strList.Add('            jni.srcDirs = []');
-         strList.Add('            jniLibs.srcDirs = [''libs'']');
-         strList.Add('        }');
-         strList.Add('        debug.setRoot(''build-types/debug'')');
-         strList.Add('        release.setRoot(''build-types/release'')');
-         strList.Add('    }');
-         strList.Add('    buildTypes {');
-         strList.Add('        debug {');
-         strList.Add('            minifyEnabled false');
-         strList.Add('            debuggable true');
-         strList.Add('            jniDebuggable true');
-         strList.Add('        }');
-         strList.Add('        release {');
-         strList.Add('            minifyEnabled false');
-         strList.Add('            debuggable false');
-         strList.Add('            jniDebuggable false');
-         strList.Add('        }');
-         strList.Add('    }');
-         strList.Add('}');
-
-         strList.Add('dependencies {');
-
-         if androidPluginNumber < 3000 then
-           directive:='compile'
-         else
-           directive:='implementation';
-
-         strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
-
-         if Pos('AppCompat', FAndroidTheme) > 0 then
-         begin
-           for aAppCompatLib in AppCompatLibs do
-           begin
-               strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
-               if aAppCompatLib.MinAPI > StrToInt(buildToolApi) then
-                  ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
-                               IntToStr(aAppCompatLib.MinAPI));
-           end;
-           if FIsKotlinSupported then
-           begin
-              strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
-              strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
-           end;
-         end
-         else if Pos('Gradle',  buildSystem) > 0 then  //only gradle not AppCompat
-         begin
-            for aSupportLib in SupportLibs do
-            begin
-               strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
-               if aSupportLib.MinAPI > StrToInt(buildToolApi) then
-                  ShowMessage('Warning: AppCompat theme need Android SDK >= ' +
-                               IntToStr(aSupportLib.MinAPI));
-            end;
-         end;
-
-         strList.Add('}');
-
-         strList.Add(' ');
-         strList.Add('task run(type: Exec, dependsOn: '':installDebug'') {');
-         strList.Add('	if (System.properties[''os.name''].toLowerCase().contains(''windows'')) {');
-         strList.Add('	    commandLine ''cmd'', ''/c'', ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+FPackageName+'/.App"');
-         strList.Add('	} else {');
-         strList.Add('	    commandLine ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+FPackageName+'/.App"');
-         strList.Add('	}');
-         strList.Add('}');
-         strList.Add(' ');
-         gradleCompatibleAsNumber:= GetVerAsNumber(gradleCompatible);
-         if  gradleCompatibleAsNumber < 5000 then
-         begin
-           strList.Add('task wrapper(type: Wrapper) {');
-           strList.Add('    gradleVersion = '''+TryUndoFakeVersion(gradleCompatible)+'''');
-           strList.Add('}');
-         end
-         else
-         begin
-           strList.Add('wrapper {');
-           strList.Add('    gradleVersion = '''+TryUndoFakeVersion(gradleCompatible)+'''');
-           strList.Add('}');
-         end;
-         strList.Add('//how to use: look for "gradle_readme.txt"');
-         strList.SaveToFile(FPathToAndroidProject+'build.gradle');
-
-         strList.Clear;
-
-         if fileExists(FPathToAndroidProject+'gradle.properties') then
-         begin
-           strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
-
-           if pos('android.useAndroidX', strList.text) = 0 then
-             strList.Add('android.useAndroidX=true');
-
-           //apply change suggested by DonAlfred
-           if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
-           begin
-             if DirectoryExists(FPathToJavaJDK) then
-             begin
-               tempStr:=FPathToJavaJDK;
-               {$ifdef MSWindows}
-               tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
-               tempStr:=StringReplace(tempStr,':','\:',[]);
-               //tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]); //fix "invalid string escape"
-               {$endif}
-               strList.Add('org.gradle.java.home='+tempStr);
-             end;
-           end;
-
-           strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
-         end;
-
-       end;
-    end;
-
-    //gradle build scripts;
-
-    strList.Clear;
-    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-    if FPathToGradle = '' then
-      strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-    else
-      strList.Add('set GRADLE_HOME='+ FPathToGradle);
-    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-    strList.Add('gradle clean build --info');
-    strList.SaveToFile(FPathToAndroidProject+'gradle-local-build.bat');
-
-    strList.Clear;
-    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-    if FPathToGradle = '' then
-      strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-    else
-      strList.Add('set GRADLE_HOME='+ FPathToGradle);
-    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-    strList.Add('gradle clean bundle --info');
-    strList.SaveToFile(FPathToAndroidProject+'gradle-local-build-bundle.bat');
-
-
-    strList.Clear;
-    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-    if FPathToGradle = '' then
-      strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-    else
-      strList.Add('set GRADLE_HOME='+ FPathToGradle);
-    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-    strList.Add('gradle run');
-    strList.SaveToFile(FPathToAndroidProject+'gradle-local-run.bat');
-
-    linuxDirSeparator:= DirectorySeparator;
-    linuxPathToAndroidSdk:= FPathToAndroidSDK;
-    linuxPathToGradle:= FPathToGradle;
-
-    {$IFDEF WINDOWS}
-       linuxDirSeparator:= '/';
-       tempStr:= FPathToAndroidSDK;
-       SplitStr(tempStr, ':');
-       linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
-
-       tempStr:= FPathToGradle;
-       SplitStr(tempStr, ':');
-       linuxPathToGradle:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
-    {$ENDIF}
-
-    strList.Clear;
-    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-
-    if FPathToGradle = '' then
-      strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-    else
-      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-
-    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-    strList.Add('. ~/.bashrc');
-    //strList.Add('.\gradle clean build --info');
-    strList.Add('gradle clean build --info');
-    SaveShellScript(strList, FPathToAndroidProject+'gradle-local-build.sh');
-
-    strList.Clear;
-    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-    if FPathToGradle = '' then
-      strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-    else
-      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-    strList.Add('. ~/.bashrc');
-    strList.Add('gradle clean bundle --info');
-    SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-build-bundle.sh');
-
-    strList.Clear;
-    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-
-    if FPathToGradle = '' then
-      strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-    else
-      strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-
-    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-    strList.Add('. ~/.bashrc');
-    //strList.Add('.\gradle run');
-    strList.Add('gradle run');
-    SaveShellScript(strList, FPathToAndroidProject+'gradle-local-run.sh');
-
+     if MessageDlg('Question', 'Do you wish update "build.gradle" automatically?',
+         mtConfirmation, [mbYes, mbNo],0) = mrYes then
+     begin
+        DoBuildGradle(IntToStr(minSdkApi), strTargetApi);
+        LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= 'NO';
+        FKeepMyBuildGradleWhenReopen:= 'NO';
+     end
+     else FKeepMyBuildGradleWhenReopen:= 'YES';
+     LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= FKeepMyBuildGradleWhenReopen ;
+     LazarusIDE.ActiveProject.Modified:= True;
   end;
 
-  strList.Free;
+  //end "build.grade" update
+
+  strList.Clear;
+  if fileExists(FPathToAndroidProject+'gradle.properties') then
+   begin
+     strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
+
+     if pos('android.useAndroidX', strList.text) = 0 then
+       strList.Add('android.useAndroidX=true');
+
+     //apply change suggested by DonAlfred
+     if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
+     begin
+       if DirectoryExists(FPathToJavaJDK) then
+       begin
+         tempStr:=FPathToJavaJDK;
+         {$ifdef MSWindows}
+         tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
+         tempStr:=StringReplace(tempStr,':','\:',[]);
+         //tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]); //fix "invalid string escape"
+         {$endif}
+         strList.Add('org.gradle.java.home='+tempStr);
+       end;
+     end;
+   end;
+   strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+
+  //gradle build scripts;
+
+   strList.Clear;
+   strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+   if FPathToGradle = '' then
+    strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+   else
+    strList.Add('set GRADLE_HOME='+ FPathToGradle);
+   strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+   strList.Add('gradle clean build --info');
+   strList.SaveToFile(FPathToAndroidProject+'gradle-local-build.bat');
+
+   strList.Clear;
+   strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+   if FPathToGradle = '' then
+    strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+   else
+    strList.Add('set GRADLE_HOME='+ FPathToGradle);
+   strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+   strList.Add('gradle clean bundle --info');
+   strList.SaveToFile(FPathToAndroidProject+'gradle-local-build-bundle.bat');
+
+
+   strList.Clear;
+   strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+   if FPathToGradle = '' then
+    strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+   else
+    strList.Add('set GRADLE_HOME='+ FPathToGradle);
+   strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+   strList.Add('gradle run');
+   strList.SaveToFile(FPathToAndroidProject+'gradle-local-run.bat');
+
+   linuxDirSeparator:= DirectorySeparator;
+   linuxPathToAndroidSdk:= FPathToAndroidSDK;
+   linuxPathToGradle:= FPathToGradle;
+
+  {$IFDEF WINDOWS}
+     linuxDirSeparator:= '/';
+     tempStr:= FPathToAndroidSDK;
+     SplitStr(tempStr, ':');
+     linuxPathToAndroidSdk:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+
+     tempStr:= FPathToGradle;
+     SplitStr(tempStr, ':');
+     linuxPathToGradle:= StringReplace(tempStr, '\', '/', [rfReplaceAll]);
+  {$ENDIF}
+
+   strList.Clear;
+   strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+
+   if FPathToGradle = '' then
+    strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+   else
+    strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+
+   strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+   strList.Add('. ~/.bashrc');
+   //strList.Add('.\gradle clean build --info');
+   strList.Add('gradle clean build --info');
+   SaveShellScript(strList, FPathToAndroidProject+'gradle-local-build.sh');
+
+   strList.Clear;
+   strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+   if FPathToGradle = '' then
+    strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+   else
+    strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+   strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+   strList.Add('. ~/.bashrc');
+   strList.Add('gradle clean bundle --info');
+   SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-build-bundle.sh');
+
+   strList.Clear;
+   strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+
+   if FPathToGradle = '' then
+    strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+   else
+    strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+
+   strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+   strList.Add('. ~/.bashrc');
+  //strList.Add('.\gradle run');
+   strList.Add('gradle run');
+   SaveShellScript(strList, FPathToAndroidProject+'gradle-local-run.sh');
+
+   strList.Free;
 end;
-
-(*
-//http://forum.lazarus.freepascal.org/index.php/topic,39535.0.html
-//by Jurassic Pork     [and fixed]
-function TLamwSmartDesigner.GetGradleVersionFromGradle(path: string): string;
-var
-   Proc: TProcess;
-   p, ReadCount: integer;
-   strExt, strTemp, buff: string;
-begin
-    Result:='';
-    strTemp:='';
-    if path = '' then Exit;
-    strExt:= '';
-    {$IFDEF WINDOWS}
-    strExt:= '.bat';
-    {$ENDIF}
-
-    //FillChar(CharBuffer,SizeOf(CharBuffer),#0);
-    try
-      Proc := TProcess.Create(nil);
-      Proc.Options := [poUsePipes,poNoConsole];
-      //Proc.Options:= Proc.Options + [poWaitOnExit];
-      Proc.Parameters.Add('-v');
-      Proc.Executable:= ConcatPaths([path,'bin'])+ pathDelim + 'gradle'+strExt;
-      if FileExists(Proc.Executable) then
-      begin
-      Proc.Execute();
-      while (Proc.Running) do
-      begin
-        // read stdout and write to our stdout
-        while Proc.Output.NumBytesAvailable > 0 do
-        begin
-          ReadCount:=Proc.Output.NumBytesAvailable;
-          setlength(buff, ReadCount);
-          Proc.Output.ReadBuffer(buff[1], ReadCount);
-          strTemp := strTemp + buff;
-          p:=Pos('Gradle ', strTemp);
-          if (p > 0) then
-          begin
-            Result:= Trim(Copy(strTemp,p,MaxInt));
-             break;
-          end;
-        end;
-        {
-        // read stderr and write to our stderr
-        while Proc.Stderr.NumBytesAvailable > 0 do
-        begin
-          ReadCount := Min(512, Proc.Stderr.NumBytesAvailable); //Read up to buffer, not more
-          Proc.Stderr.Read(CharBuffer, ReadCount);
-          Lines2.Append(Copy(CharBuffer, 0, ReadCount));
-        end;
-        }
-        application.ProcessMessages;
-        Sleep(1);
-      end;
-      ExitCode := Proc.ExitStatus;
-      end;
-    finally
-      Proc.Free;
-
-      if Result <> '' then
-      begin
-        p:= Pos(' ', Result);  //Gradle 3.3
-        if (p>1) then Result:= Copy(Result, p+1, MaxInt); //3.3
-        //Find line ending
-        p := Pos(#13, Result);
-        if (p=0) then p := Pos(#10, Result);
-        if (p>0) then Delete(Result, p, MaxInt);
-        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Success!! Found Gradle version: ' + Result);
-      end
-      else
-        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Sorry... Fail to find Gradle version from Gradle path ...');
-
-    end;
-end;
-*)
 
 //by af0815
 //https://forum.lazarus.freepascal.org/index.php/topic,53097.0.html
@@ -1774,39 +1376,69 @@ begin
     end;
 end;
 
-function TLamwSmartDesigner.GetGradleVersion(path: string): string;
+function TLamwSmartDesigner.TryProduceGradleVersion(pathToGradle: string): string;
 var
-  p: integer;
-  strAux: string;
-  posLastDelim: integer;
+   AProcess: TProcess;
+   AStringList: TStringList;
+   gradle, ext, version, aux: string;
+   i, p, len: integer;
 begin
-  Result:='';
-  if path <> '' then
+  version:= '';
+  ext:='.bat';
+  {$IFDEF linux}
+    ext:='';
+  {$Endif}
+
+  {$IFDEF darwin}
+     ext:='';
+  {$Endif}
+
+  gradle:= 'gradle'  + ext;
+  AStringList:= TStringList.Create;
+  AProcess := TProcess.Create(nil);
+  AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
+  AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
+  AProcess.Parameters.Add('-version');
+  AProcess.Parameters.Add('>');
+  AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Execute;
+
+  AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
+  i:= 0;
+  while (version='') and (i < AStringList.Count) do
   begin
-     strAux:=ExcludeTrailingPathDelimiter(path);
-     posLastDelim:= LastDelimiter(PathDelim, strAux);
-     strAux:= Copy(strAux, posLastDelim+1, MaxInt);  //gradle-3.3
-
-     p:=1;
-     //skip characters that do not represent a version number
-     while (p<=Length(strAux)) AND (NOT (strAux[p] in ['0'..'9','.'])) do Inc(p);
-     if (p<=Length(strAux)) then
+     p:= Pos('Gradle', AStringList.Strings[i] );
+     if p > 0 then
      begin
-       Result:= Copy(strAux, p, MaxInt);  // 3.3
+        version:=  AStringList.Strings[i];
      end;
-
-     if Result = '' then
-     begin
-       IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Please, wait... trying find Gradle version from Gradle ['+path+']');
-       Result:= GetGradleVersionFromGradle(path);
-     end;
-
-     if Result = '4.10'   then Result:= '4.9.1'  //fake
-     else if Result = '4.10.1' then Result:= '4.9.2'  //fake
-     else if Result = '4.10.2' then Result:= '4.9.3'  //fake
-     else if Result = '4.10.3' then Result:= '4.9.4';  //fake
-
+     i:= i +1;
   end;
+  len:= Length('Gradle');
+  aux:= Trim(Copy(version, p+len, 10));
+  Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1!
+  AStringList.Clear;
+  AStringList.Text:= Result;
+  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Free;
+  AStringList.Free;
+end;
+
+function TLamwSmartDesigner.GetGradleVersion(pathToGradle:string): string;
+var
+   list: TStringList;
+begin
+    if not FileExists(pathToGradle+PathDelim+'version.txt') then
+    begin
+      Result:= TryProduceGradleVersion(pathToGradle);
+    end
+    else
+    begin
+        list:=TStringList.Create;
+        list.LoadFromFile(pathToGradle+PathDelim+'version.txt');
+        Result:= Trim(list.Text);
+        list.Free;
+    end;
 end;
 
 function TLamwSmartDesigner.IsLaz4Android(): boolean;
@@ -1831,17 +1463,12 @@ procedure TLamwSmartDesigner.Init4Project(AProject: TLazProject);
 var
   tempStr: string;
   p: integer;
-  outMaxBuildTool: string;
   isProjectImported: boolean;
-  sdkTargetApi, buildTool: string;
-  iSdkTargetApi : integer;
-  queryValue : String;
+  sdkTargetApi: string;
+  intTargetApi : integer;
   isBrandNew: boolean;
   projectTarget, projectCustom, alertMsg: string;
   ndkRelease, aux: string;
-  updateTargetApi: integer;
-  updateBuildTool: string;
-  outBuildTool: string;
   tryKotlin: string;
 begin
   if AProject.CustomData.Contains('LAMW') then
@@ -1985,82 +1612,31 @@ begin
 
       if length(sdkTargetApi) <= 0 then
       begin
-       sdkTargetApi:= IntToStr(GetMaxSdkPlatform(outBuildTool)); //intToStr(cMaxApi);
+       sdkTargetApi:= IntToStr( GetMaxSdkPlatform() );
        AProject.CustomData['TargetSdk']:= sdkTargetApi;
        AProject.Modified:= True;
       end;
 
       if IsAllCharNumber(PChar(sdkTargetApi))  then
-          iSdkTargetApi:= StrToInt(sdkTargetApi)
-      else iSdkTargetApi:= cMaxApi;
+          intTargetApi:= StrToInt(sdkTargetApi)
+      else intTargetApi:= cMaxApi;
 
-      buildTool:=  GetBuildTool(iSdkTargetApi);
-
-      if iSdkTargetApi < 30 then
+      if intTargetApi < 33 then
       begin
-
-         updateTargetApi:= GetMaxSdkPlatform(updateBuildTool);
-
-         if updateTargetApi >= 30 then
-         begin
-           queryValue:= '30';
-
-           if InputQuery('Warning. Manifest Target Api ['+sdkTargetApi+ '] < 30',
-                         '[Suggestion] Change Target API to 30'+sLineBreak+'[minimum required by "Google Play Store"]:', queryValue) then
-           begin
-             if ( IsAllCharNumber(PChar(queryValue)) AND (queryValue <> '30') ) then
-             begin
-                   iSdkTargetApi:= StrToInt(queryValue);
-                   buildTool:= GetBuildTool(iSdkTargetApi);
-             end
-             else
-             begin
-               iSdkTargetApi:= 30;
-               buildTool:= GetBuildTool(30);
-             end;;
-           end; //if InputQuery
-
-           iSdkTargetApi:= StrToInt(sdkTargetApi);
-           AProject.CustomData['TargetSdk']:= sdkTargetApi;
-           AProject.Modified:= True;
-         end
-         else
-         begin
-            ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
-                         'Please, update your android sdk/platforms folder!' + sLineBreak +
-                         'How to:'+ sLineBreak +
-                         '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
-                         '.run the command> sdkmanager --update'+ sLineBreak +
-                         '.run the command> sdkmanager "build-tools;30.0.2" "platforms;android-30"');
-         end;
-
-      end
-      else //target >= 30
-      begin
-        outMaxBuildTool:= FCandidateSdkBuild;
-        if not LamwGlobalSettings.KeepManifestTargetApi  then
-        begin
-           buildTool:= outMaxBuildTool
-        end
-        else
-        begin
-           buildTool:= GetBuildTool(iSdkTargetApi);
-        end
+        ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
+                     'Please, update your android sdk/platforms folder!' + sLineBreak +
+                     'How to:'+ sLineBreak +
+                     '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                     '.run the command> sdkmanager --update'+ sLineBreak +
+                     '.run the command> sdkmanager "build-tools;33.0.2" "platforms;android-33"');
       end;
 
-      KeepBuildUpdated(iSdkTargetApi, buildTool);
+      KeepBuildUpdated(intTargetApi);
 
       if Self.IsLaz4Android() then
       begin
          projectCustom:= UpperCase(AProject.LazCompilerOptions.CustomOptions);
          projectTarget:= AProject.LazCompilerOptions.TargetCPU;  //aarch64 or arm or i386 or mipsel
-         //(-Fl) C:\adt32\ndk10e\platforms\android-21\arch-arm\usr\lib\;
-         //C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\
-
-         //(-o)  ..\libs\armeabi-v7a\libcontrols
-
-         //-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi-
-         //-FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin
          alertMsg:= '';
          if Pos('aarch64', projectTarget) > 0  then
             alertMsg:= 'WARNING: Target CPU "aarch64" need "Laz4Android 2.0.12" or up..';
@@ -2089,136 +1665,6 @@ begin          //C:\adt32\sdk\tools\ant
      Result:= True;
   end;
 end;
-
-(*
-procedure TLamwSmartDesigner.TryChangeChipSetConfigs(projectChipSet: string);
-var
-  customResult: string;
-  libTarget: string;
-  upFInstructionSet, upProjectChipSet: string;
-begin
-
-  customResult:= LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions;
-
-  upFInstructionSet:= Uppercase(FInstructionSet);
-  upProjectChipSet:= Uppercase(projectChipSet);
-
-  if Pos('ARMV6', upFInstructionSet) > 0 then
-  begin
-    if Pos('ARMV7A',  upProjectChipSet) > 0 then //ARMV7A  ---> ARMV6
-    begin
-      customResult:= StringReplace(customResult, 'CpARMV7A' , 'CpARMV6', [rfReplaceAll,rfIgnoreCase]);
-      customResult:= StringReplace(customResult, 'CfVFPV3', 'CfSoft', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
-
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\arm64-v8a\libcontrols
-      libTarget:= StringReplace(libTarget, 'armeabi-v7a', 'armeabi', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
-    end;
-    //https://developer.android.com/ndk/guides/abis
-    if Pos('ARMV8',  upProjectChipSet) > 0 then //ARMV8  ---> ARMV6
-    begin
-      customResult:= StringReplace(customResult, '-Xd' , '-Xd -CfSoft -CpARMV6', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
-
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
-      libTarget:= StringReplace(libTarget, 'arm64-v8a', 'armeabi', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
-    end;
-  end;
-
-  if Pos('ARMV7A', upFInstructionSet) > 0 then
-  begin
-    if Pos('ARMV6',  upProjectChipSet ) > 0 then  //ARMV6  --> ARMV7A
-    begin
-      customResult:= StringReplace(customResult, 'CpARMV6' , 'CpARMV7A', [rfReplaceAll,rfIgnoreCase]);
-      customResult:= StringReplace(customResult, 'CfSoft', 'Cf'+ FFPUSet, [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
-
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
-      libTarget:= StringReplace(libTarget, 'armeabi', 'armeabi-v7a', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
-    end;
-
-    if Pos('ARMV8',  upProjectChipSet ) > 0 then  //ARMV8  --> ARMV7A
-    begin
-      customResult:= StringReplace(customResult, '-Xd' , '-Xd -Cf'+ FFPUSet+ ' -CpARMV7A', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
-
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;
-      libTarget:= StringReplace(libTarget, 'arm64-v8a', 'armeabi-v7a', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'arm';
-    end;
-
-  end;
-   //https://developer.android.com/ndk/guides/abis
-  if Pos('ARMV8', upFInstructionSet) > 0 then
-  begin
-    if Pos('ARMV6',  upProjectChipSet ) > 0 then  //ARMV6  --> ARMV8
-    begin
-      customResult:= StringReplace(customResult, 'CpARMV6' , '', [rfReplaceAll,rfIgnoreCase]);
-      customResult:= StringReplace(customResult, '-CfSoft', '', [rfReplaceAll,rfIgnoreCase]);   //CfVFPV4
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
-
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;   //..\libs\arm64-v8a\libcontrols
-      libTarget:= StringReplace(libTarget, 'armeabi', 'arm64-v8a', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'aarch64';
-    end;
-    if Pos('ARMV7A',  upProjectChipSet ) > 0 then  //ARMV7A --> ARMV8
-    begin
-      customResult:= StringReplace(customResult, 'CpARMV7A' , '', [rfReplaceAll,rfIgnoreCase]);
-      customResult:= StringReplace(customResult, '-CfVFPV3', '', [rfReplaceAll,rfIgnoreCase]);
-      //or
-      customResult:= StringReplace(customResult, '-CfSoft',  '', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.CustomOptions:= customResult;
-      libTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\arm64-v8a\libcontrols
-      libTarget:= StringReplace(libTarget, 'armeabi-v7a', 'arm64-v8a', [rfReplaceAll,rfIgnoreCase]);
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename:= libTarget;
-      LazarusIDE.ActiveProject.LazCompilerOptions.TargetCPU:= 'aarch64';
-    end;
-  end;
-
-end;
-*)
-
-(*
-function TLamwSmartDesigner.IsChipSetDefault(var projectChipSet: string): boolean;
-var
-  projectTarget: string;
-begin
-
-  projectTarget:= LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename;  //..\libs\armeabi-v7a\libcontrols
-
-  if Pos('arm64-v8a', projectTarget) > 0 then     //arm64-v8a
-  begin
-     projectChipSet:= 'ARMV8';
-  end
-  else if Pos('armeabi-v7a', projectTarget) > 0 then
-  begin
-     projectChipSet:= 'ARMV7A';
-  end
-  else if Pos('armeabi', projectTarget) > 0 then
-  begin
-     projectChipSet:= 'ARMV6';
-  end
-  else if Pos('x86', projectTarget) > 0 then
-  begin
-     projectChipSet:= 'x86';
-  end
-  else if Pos('mips', projectTarget) > 0 then
-  begin
-     projectChipSet:= 'Mipsel';
-  end;
-
-  if LowerCase(FInstructionSet) =  LowerCase(projectChipSet) then
-     Result:= True
-  else
-     Result:= False;
-end;
-*)
 
 // calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
 procedure TLamwSmartDesigner.UpdateJControls(ProjFile: TLazProjectFile;
@@ -2336,7 +1782,7 @@ begin
   contentList:= FindAllFiles(FPathToJavaSource, '*.java', False);
   for i:= 0 to contentList.Count-1 do
   begin
-    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
+    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
     begin
        DeleteFile(contentList.Strings[i]);
@@ -2347,7 +1793,7 @@ begin
   contentList:= FindAllFiles(FPathToJavaSource, '*.kt', False);
   for i:= 0 to contentList.Count-1 do
   begin
-    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher and gdx]
+    fileName:= ExtractFileName(contentList.Strings[i]); //not delete custom java code [support to jActivityLauncher]
     if FileExists(LamwGlobalSettings.PathToJavaTemplates + fileName) then
     begin
        DeleteFile(contentList.Strings[i]);
@@ -2465,15 +1911,6 @@ begin
                           pathToNdkApiPlatforms+PathDelim+auxList.Strings[0]);
 
               end;
-              (*
-              //need by compiler
-              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetype.pp',
-                       FPathToAndroidProject+'jni'+PathDelim+ 'freetype.pp');
-              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'freetypeh.pp',
-                      FPathToAndroidProject+'jni'+PathDelim+ 'freetypeh.pp');
-              CopyFile(PathToJavaTemplates+'lamwdesigner'+PathDelim+'libs'+PathDelim+'ftsrc'+PathDelim+'ftfont.pp',
-                       FPathToAndroidProject+'jni'+PathDelim+ 'ftfont.pp');
-              *)
             end
             else
             begin
@@ -3512,8 +2949,8 @@ end;
 
 function TLamwSmartDesigner.OnProjectSavingAll(Sender: TObject): TModalResult;
 var
-  ControlsJava, auxList, controlsList, libList, nativeGdxFormList, gdxList: TStringList;
-  i, j, p, k: Integer;
+  ControlsJava, auxList, controlsList, libList: TStringList;
+  i, j, p: Integer;
   nativeExists: Boolean;
   aux, PathToJavaTemplates, LibPath, linkLibrariesPath: string;
   AndroidTheme: string;
@@ -3529,7 +2966,6 @@ begin
   hasControls:= False;
 
   if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then hasControls:= True;
-  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GDX' then hasControls:= True;
 
   if not hasControls then Exit;  //no form basead
 
@@ -3686,48 +3122,12 @@ begin
     end;
 
     auxList.Clear;
-    if (Pos('AppCompat', AndroidTheme) > 0) then
+    if Pos('AppCompat', AndroidTheme) > 0 then
     begin
       if FileExists(PathToJavaTemplates +'support'+DirectorySeparator+'App.java') then
         auxList.LoadFromFile(PathToJavaTemplates + 'support'+DirectorySeparator+'App.java');
         auxList.Strings[0]:= 'package '+FPackageName+';';
         auxList.SaveToFile(FPathToJavaSource+'App.java');
-    end
-    else if Pos('GDXGame', AndroidTheme) > 0 then
-    begin
-      if FileExists(PathToJavaTemplates +'gdx'+DirectorySeparator+'App.java') then
-      begin
-
-        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'App.java');
-        auxList.Strings[0]:= 'package '+FPackageName+';';
-        auxList.SaveToFile(FPathToJavaSource+'App.java');
-
-        auxList.Clear;
-        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.java');
-        auxList.Strings[0]:= 'package '+FPackageName+';';
-        auxList.SaveToFile(FPathToJavaSource+'jGdxForm.java');
-
-        auxList.Clear;
-        auxList.LoadFromFile(PathToJavaTemplates + 'gdx'+DirectorySeparator+'MyGdxGame.java');
-        auxList.Strings[0]:= 'package '+FPackageName+';';
-        auxList.SaveToFile(FPathToJavaSource+'MyGdxGame.java');
-
-        ControlsJava.LoadFromFile(FPathToJavaSource+'Controls.java');
-
-        nativeGdxFormList:= TStringList.Create;
-        nativeGdxFormList.LoadFromFile(PathToJavaTemplates + 'gdx'+ DirectorySeparator+'jGdxForm.create');
-
-        gdxList:= TStringList.Create;
-        gdxList.LoadFromFile(PathToJavaTemplates  + 'gdx'+DirectorySeparator+'jGdxForm.native');
-        for i:= 0 to gdxList.Count-1 do
-        begin
-          nativeGdxFormList.Add(gdxList.Strings[i]);
-        end;
-        ControlsJava.Insert(ControlsJava.Count-1, nativeGdxFormList.Text);
-        ControlsJava.SaveToFile(FPathToJavaSource+'Controls.java');
-        gdxList.Free;
-        nativeGdxFormList.Free;
-      end;
     end
     else
     begin
@@ -3778,21 +3178,7 @@ begin
     begin
       tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
     end;
-    if Pos('GDXGame', AndroidTheme) > 0 then
-    begin
-      gdxList:= TStringList.Create;
-      if FileExists(LamwGlobalSettings.PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.native') then
-      begin
-        gdxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + 'gdx'+DirectorySeparator+'jGdxForm.native');
-        for k:= 0 to gdxList.Count-1 do
-        begin
-          tempList.Add(GetEventSignature(gdxList.Strings[k]));
-          nativeMethodList.Add(gdxList.Strings[k]);
-        end;
-      end;
-      gdxList.Free;
-    end;
-    tempList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.events');  //old "ControlsEvents.txt"
+    tempList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.events');
     nativeMethodList.SaveToFile(LamwGlobalSettings.PathToJavaTemplates+'Controls.native');
     nativeMethodList.Free;
     tempList.Free;
@@ -3803,8 +3189,6 @@ begin
     CopyFile(PathToJavaTemplates + 'Controls.native',
        FPathToAndroidProject+'lamwdesigner'+DirectorySeparator+'Controls.native');
   end;
-
-  (*  old code here .... solved in "keepProjectUpdated" !! *)
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);
 end;
