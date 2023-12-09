@@ -1,11 +1,11 @@
 object FormWorkspace: TFormWorkspace
   Left = 461
-  Height = 715
+  Height = 671
   Top = 121
-  Width = 513
-  Caption = '[LAMW 0.8.6.2]  New Project'
-  ClientHeight = 715
-  ClientWidth = 513
+  Width = 499
+  Caption = '[LAMW 0.8.6.3]  New Project'
+  ClientHeight = 671
+  ClientWidth = 499
   Color = clGradientInactiveCaption
   Constraints.MinHeight = 560
   Constraints.MinWidth = 400
@@ -93,14 +93,14 @@ object FormWorkspace: TFormWorkspace
   }
   OnActivate = FormActivate
   OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
-    Top = 686
-    Width = 513
+    Top = 642
+    Width = 499
     Panels = <    
       item
         Text = '[Ndk]'
@@ -119,9 +119,9 @@ object FormWorkspace: TFormWorkspace
   end
   object PanelRadioGroup: TPanel
     Left = 8
-    Height = 276
-    Top = 286
-    Width = 497
+    Height = 229
+    Top = 289
+    Width = 483
     Align = alClient
     BorderSpacing.Around = 8
     BevelOuter = bvNone
@@ -133,8 +133,8 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.ShrinkVertical = crsHomogenousChildResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 4
-    ClientHeight = 276
-    ClientWidth = 497
+    ClientHeight = 229
+    ClientWidth = 483
     Color = clGradientInactiveCaption
     Constraints.MinHeight = 80
     ParentColor = False
@@ -144,9 +144,9 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Side = asrBottom
       Left = 0
-      Height = 268
+      Height = 221
       Top = 4
-      Width = 260
+      Width = 253
       AutoFill = True
       Caption = 'Architecture/Instructions:'
       ChildSizing.LeftRightSpacing = 6
@@ -157,8 +157,8 @@ object FormWorkspace: TFormWorkspace
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 243
-      ClientWidth = 256
+      ClientHeight = 196
+      ClientWidth = 249
       Color = clGradientInactiveCaption
       Items.Strings = (
         'ARMv6             '
@@ -175,10 +175,10 @@ object FormWorkspace: TFormWorkspace
       TabOrder = 0
     end
     object Image1: TImage
-      Left = 264
-      Height = 268
+      Left = 257
+      Height = 221
       Top = 4
-      Width = 233
+      Width = 226
       ParentShowHint = False
       Picture.Data = {
         1754506F727461626C654E6574776F726B47726170686963768B000089504E47
@@ -1305,12 +1305,12 @@ object FormWorkspace: TFormWorkspace
   object PanelButtons: TPanel
     Left = 0
     Height = 116
-    Top = 570
-    Width = 513
+    Top = 526
+    Width = 499
     Align = alBottom
     BevelOuter = bvNone
     ClientHeight = 116
-    ClientWidth = 513
+    ClientWidth = 499
     Color = clGradientInactiveCaption
     Constraints.MinHeight = 50
     ParentColor = False
@@ -1321,7 +1321,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = PanelButtons
       AnchorSideRight.Side = asrBottom
-      Left = 415
+      Left = 401
       Height = 30
       Top = 80
       Width = 90
@@ -1340,7 +1340,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideRight.Control = PanelButtons
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = BitBtnOK
-      Left = 415
+      Left = 401
       Height = 30
       Top = 50
       Width = 90
@@ -1373,7 +1373,7 @@ object FormWorkspace: TFormWorkspace
       Left = 48
       Height = 28
       Top = 32
-      Width = 344
+      Width = 330
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
       BorderSpacing.Top = 4
@@ -1385,7 +1385,7 @@ object FormWorkspace: TFormWorkspace
         'AppCompat.Light.NoActionBar'
         'Holo.Light.NoActionBar'
         'Holo.Light.DarkActionBar'
-        'GDXGame'
+        ''
       )
       OnChange = ComboBoxThemeChange
       ParentFont = False
@@ -1536,14 +1536,14 @@ object FormWorkspace: TFormWorkspace
   end
   object Panel1: TPanel
     Left = 0
-    Height = 125
+    Height = 128
     Top = 0
-    Width = 513
+    Width = 499
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
-    ClientHeight = 125
-    ClientWidth = 513
+    ClientHeight = 128
+    ClientWidth = 499
     Color = clGradientInactiveCaption
     ParentColor = False
     ParentFont = False
@@ -1552,7 +1552,7 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 20
       Top = 8
-      Width = 497
+      Width = 483
       Align = alTop
       BorderSpacing.Left = 8
       BorderSpacing.Top = 8
@@ -1568,7 +1568,7 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 28
       Top = 32
-      Width = 467
+      Width = 446
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
@@ -1582,11 +1582,11 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Left = 483
-      Height = 22
+      Left = 462
+      Height = 28
       Hint = 'Select directory'
-      Top = 35
-      Width = 22
+      Top = 32
+      Width = 29
       Anchors = [akTop, akRight]
       BorderSpacing.Around = 8
       Caption = '...'
@@ -1600,7 +1600,7 @@ object FormWorkspace: TFormWorkspace
       Left = 8
       Height = 28
       Top = 92
-      Width = 467
+      Width = 446
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 8
       BorderSpacing.Top = 4
@@ -1617,10 +1617,10 @@ object FormWorkspace: TFormWorkspace
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Left = 483
-      Height = 22
-      Top = 95
-      Width = 22
+      Left = 462
+      Height = 28
+      Top = 92
+      Width = 29
       Anchors = [akTop, akRight]
       BorderSpacing.Around = 8
       Glyph.Data = {
@@ -1663,10 +1663,10 @@ object FormWorkspace: TFormWorkspace
       ParentFont = False
     end
     object SpeedButton1: TSpeedButton
-      Left = 483
-      Height = 22
+      Left = 462
+      Height = 28
       Top = 0
-      Width = 22
+      Width = 29
       Anchors = [akTop, akRight]
       Glyph.Data = {
         36040000424D3604000000000000360000002800000010000000100000000100
@@ -1724,13 +1724,13 @@ object FormWorkspace: TFormWorkspace
   object Panel2: TPanel
     Left = 0
     Height = 65
-    Top = 125
-    Width = 513
+    Top = 128
+    Width = 499
     Align = alTop
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 65
-    ClientWidth = 513
+    ClientWidth = 499
     Color = clGradientInactiveCaption
     ParentColor = False
     ParentFont = False
@@ -1739,13 +1739,13 @@ object FormWorkspace: TFormWorkspace
       Left = 2
       Height = 65
       Top = 0
-      Width = 343
+      Width = 316
       Align = alClient
       BorderSpacing.Left = 2
       BorderSpacing.Right = 2
       Caption = 'Default Package Name:'
       ClientHeight = 40
-      ClientWidth = 339
+      ClientWidth = 312
       Color = clGradientInactiveCaption
       ParentColor = False
       ParentFont = False
@@ -1756,7 +1756,7 @@ object FormWorkspace: TFormWorkspace
         Left = 6
         Height = 28
         Top = 4
-        Width = 335
+        Width = 298
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Left = 6
         BorderSpacing.Top = 4
@@ -1768,41 +1768,114 @@ object FormWorkspace: TFormWorkspace
       end
     end
     object GroupBox5: TGroupBox
-      Left = 347
+      Left = 320
       Height = 65
       Top = 0
-      Width = 166
+      Width = 179
       Align = alRight
+      Anchors = [akTop, akLeft, akRight, akBottom]
       AutoSize = True
       Caption = 'Apk Builder:'
       ClientHeight = 40
-      ClientWidth = 162
+      ClientWidth = 175
       Color = clGradientInactiveCaption
       ParentColor = False
       ParentFont = False
       TabOrder = 1
       object cbBuildSystem: TComboBox
-        Left = 6
+        Left = 8
         Height = 28
         Top = 6
-        Width = 150
+        Width = 125
+        Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Around = 6
         ItemHeight = 20
-        Items.Strings = (
-          ''
-        )
         OnCloseUp = cbBuildSystemCloseUp
         ParentFont = False
+        Sorted = True
         Style = csDropDownList
         TabOrder = 0
+      end
+      object SpeedButtonSettings: TSpeedButton
+        Left = 138
+        Height = 28
+        Top = 4
+        Width = 29
+        Anchors = [akTop, akRight, akBottom]
+        Glyph.Data = {
+          C6070000424DC607000000000000360000002800000016000000160000000100
+          2000000000009007000064000000640000000000000000000000000000000000
+          0000A0623231874A20FF874A20FF874A20FF8D572C1D00000005000000040000
+          0004000000040000000500000005000000060000000600000007000000060000
+          00060000000400000002000000010000000000000000A0623231874A20FFA185
+          6CFFA1856CFF957B63FF874A20FF7C4C273F613C1E2A00000012000000120000
+          001300000014000000140000001300000014000000120000000F0000000B0000
+          0006000000030000000200000000874A20FFA1856CFFD2B89DFFE2D1C0FFBEA6
+          91FF89715BFF874A20FF462B163A000000260000002600000028000000280000
+          00260000002700000027000000240000001D000000120000000A000000060000
+          000300000000874A20FFDBC6B0FFF6F2EDFF958A81FFD2B89DFFAE9075FF8971
+          5BFF874A20FF4128143F0000002B0000002D0000002E00000030000000320000
+          003146464657919191FF7F7F7FFF7D7D7DC9787878500000000300000000874A
+          20FFBEA691FFF7F4F0FFB6A597FF8F7660FFD2B89DFFAE9075FF89715BFF874A
+          20FF55341B3052321A320000001D0000001F3A3A3A365252524A7F7F7FFFFEFE
+          FEFFF2F3F3FFF0F0F0FF7F7F7FFF0000000200000000A4653430874A20FFC8B4
+          A1FFF6F3EEFFA99381FF8F7660FFD2B89DFFAE9075FF89715BFF874A20FF7146
+          24240000000B0000000C6767673B7F7F7FFFFEFEFEFFE1E3E4FF5E5F5FFFFEFE
+          FEFF7F7F7FFF000000000000000000000000A4653419874A20FFC3AD99FFF0E7
+          DFFFA99381FF846D58FFD2B89DFFAE9075FF89715BFF874A20FF7171711C7979
+          79327F7F7FFFFEFEFEFFE7E9EBFFE7E9EBFFFEFEFEFF868686FF7F7F7F300000
+          0000000000000000000000000000A4653419874A20FFB69C84FFEDE2D7FFA598
+          8DFF957B63FFD2B89DFF917760FF874A20FF7F7F7F307F7F7FFFFEFEFEFFE8EA
+          ECFFE7E9EBFFFEFEFEFF7F7F7FFF7F7F7F300000000000000000000000000000
+          00000000000000000000A4653419874A20FFAE9075FFEADFD3FFBCAEA2FFCEB6
+          9DFF957B63FF874A20FF7F7F7FFFFEFEFEFFE7E9EBFFE7E9EBFFFEFEFEFF7F7F
+          7FFF7F7F7F300000000000000000000000000000000000000000000000000000
+          000000000000A4653419874A20FFAE9075FFD0BAA4FFBEA690FF874A20FFA465
+          34FFBDB1A7FFC1C1C1FFE1E2E3FFFEFEFEFF7F7F7FFF7F7F7F30000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          0000A4653419874A20FF874A20FF874A20FFA46534FFF4F4F4FFAE7C54FFB6AD
+          A4FFFBFBFBFF7F7F7FFF7F7F7F19000000030000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          00007F7F7F307F7F7FFFCAB09DFFA46534FFDFDFDFFFAB7D59FFA6A7A7FF7F7F
+          7F30000000000000000000000001000000000000000000000000000000000000
+          0000000000000000000000000000000000007F7F7F197F7F7F567F7F7FFFF8F9
+          F9FFE4E6E7FFC8C1BBFFA97145FFF4F4F4FFA46534FFA4653430000000000000
+          00000000000000000000000000010000000000000000000000007F7F7F309E9E
+          9ECC7F7F7FFF7F7F7FFF7F7F7FFFB5B5B5FAF8F9F9FFE8EAECFFE7E9EBFFF5F6
+          F6FF9E9F9FFFA46534FFF8F8F8FFA46534FFA465343000000000000000000000
+          00000000000000000001000000007F7F7F19878787EFCACDCFFFF7F8F8FFF8F9
+          F9FFF7F9F9FFF8F9F9FFE7E9EBFFE7E9EBFFF7F8F9FF7F7F7FFF7F7F7F19A465
+          3430A46534FFFEFEFEFBA46534FFA46534440000000000000000000000000000
+          000000000000999999D3E6E7E8FFEFF1F2FFE9EBEDFFE8EAECFFE7E9EBFFE7E9
+          EBFFE7E9EBFFF8F9F9FF7F7F7FFF7F7F7F190000000000000000A4653430A465
+          34FFFAFAFAFFA46534FFA46534FFA46534300000000000000000000000067F7F
+          7FFFE4E7E8FFEAEAEAF87F7F7FFFADADADFFE2E3E3FFE8EAECFFF9FAFAFF7478
+          79C87F7F7F3000000000000000000000000000000000A4653430A46534FFDCDC
+          DCFFAFAFAFFFA46534FFA465341900000000000000017C7C7C827F7F7FFF7F7F
+          7F830000000000000000BBBBBBFFEAEBEDFFF8F9F9FF7F7F7FFF000000000000
+          000000000000000000000000000000000000A46534FFFFFFFFFFCCCCCCFFAFAF
+          AFFFAC8465FF0000000000000000000000017F7F7F3000000000000000007F7F
+          7F197F7F7FFFE8EAECFFF8F9F9FF7F7F7FFF0000000000000002000000000000
+          00000000000000000000A4653430A46534FFFFFFFFFFA4744EBCA46534BC0000
+          0000000000000000000000000000000000007F7F7F197F7F7FFFF6F7F8FFF1F2
+          F3FFD7D8D8FF7F7F7FFF00000000000000010000000000000000000000000000
+          000000000000A4653419B29782FFA46534A40000000000000000000000000000
+          000000000000000000007F7F7FFFE8E9EAFFF8F9F9FFD7D8D8FF7F7F7FFF7373
+          734B000000010000000000000000000000000000000000000000000000000000
+          0000000000010000000200000000000000000000000000000000000000000000
+          00007F7F7F7F7F7F7FFF7F7F7FFF7F7F7F767F7F7F4400000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          00000000000000000000
+        }
+        OnClick = SpeedButtonSettingsClick
       end
     end
   end
   object PanelPlatform: TPanel
     Left = 8
     Height = 80
-    Top = 198
-    Width = 497
+    Top = 201
+    Width = 483
     Align = alTop
     BorderSpacing.Around = 8
     BevelOuter = bvNone
@@ -1815,7 +1888,7 @@ object FormWorkspace: TFormWorkspace
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
     ClientHeight = 80
-    ClientWidth = 497
+    ClientWidth = 483
     Color = clGradientInactiveCaption
     ParentColor = False
     ParentFont = False
@@ -1824,17 +1897,17 @@ object FormWorkspace: TFormWorkspace
       Left = 0
       Height = 72
       Top = 4
-      Width = 163
+      Width = 159
       Caption = 'Ndk Api:'
       ClientHeight = 47
-      ClientWidth = 159
+      ClientWidth = 155
       ParentFont = False
       TabOrder = 0
       object ListBoxNdkPlatform: TComboBox
         Left = 8
         Height = 28
         Top = 4
-        Width = 151
+        Width = 147
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
         OnChange = ListBoxNdkPlatformChange
@@ -1844,13 +1917,13 @@ object FormWorkspace: TFormWorkspace
       end
     end
     object GroupBox3: TGroupBox
-      Left = 167
+      Left = 163
       Height = 72
       Top = 4
-      Width = 163
+      Width = 159
       Caption = 'Min. Device Api:'
       ClientHeight = 47
-      ClientWidth = 159
+      ClientWidth = 155
       Color = clGradientInactiveCaption
       ParentColor = False
       ParentFont = False
@@ -1859,10 +1932,10 @@ object FormWorkspace: TFormWorkspace
         Left = 8
         Height = 28
         Top = 4
-        Width = 139
+        Width = 135
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
-        ItemIndex = 1
+        ItemIndex = 10
         Items.Strings = (
           '13'
           '14'
@@ -1880,30 +1953,30 @@ object FormWorkspace: TFormWorkspace
           '26'
           '27'
           '28'
-          ''
         )
         OnChange = ListBoxMinSDKChange
+        OnCloseUp = ListBoxMinSDKCloseUp
         ParentFont = False
         Style = csDropDownList
         TabOrder = 0
-        Text = '14'
+        Text = '23'
       end
     end
     object GroupBox4: TGroupBox
-      Left = 334
+      Left = 326
       Height = 72
       Top = 4
-      Width = 163
+      Width = 157
       Caption = 'Target Api:'
       ClientHeight = 47
-      ClientWidth = 159
+      ClientWidth = 153
       ParentFont = False
       TabOrder = 2
       object ListBoxTargetAPI: TComboBox
         Left = 1
         Height = 28
         Top = 4
-        Width = 156
+        Width = 150
         Anchors = [akTop, akLeft, akRight, akBottom]
         ItemHeight = 20
         OnChange = ListBoxTargetAPIChange

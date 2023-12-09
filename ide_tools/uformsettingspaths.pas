@@ -6,7 +6,7 @@ interface
 
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf, PackageIntf {, process, math};
+  StdCtrls, Buttons, ExtCtrls, ComCtrls, LazIDEIntf, PackageIntf , Process{, math};
 
 type
 
@@ -36,6 +36,7 @@ type
     SpBPathToAndroidNDK: TSpeedButton;
     SpBPathToAntBinary: TSpeedButton;
     SpBPathToGradle: TSpeedButton;
+    SpeedButtonAnt: TSpeedButton;
     SpeedButtonHelp: TSpeedButton;
     SpeedButtonInfo: TSpeedButton;
     StatusBar1: TStatusBar;
@@ -50,9 +51,11 @@ type
     procedure SpBPathToJavaJDKClick(Sender: TObject);
     procedure SpBPathToAndroidNDKClick(Sender: TObject);
     procedure SpBPathToAntBinaryClick(Sender: TObject);
+    procedure SpeedButtonAntClick(Sender: TObject);
     procedure SpeedButtonHelpClick(Sender: TObject);
     procedure SpeedButtonInfoClick(Sender: TObject);
-    function GetGradleVersion(out tagVersion: integer): string;
+   // function GetGradleVersion(out tagVersion: integer): string;
+
     function GetMaxSdkPlatform(out outBuildTool: string): integer;
     function HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
     function GetPathToSmartDesigner(): string;
@@ -68,6 +71,8 @@ type
     FPathToGradle: string;
     FNDKIndex: integer; {index 3/r10e , index  4/11x, index 5/12...21, index 6/22....}
     FNDKRelease: string; // 18.1.506304
+    FGradleVersion: string;
+
     procedure WriteIniString(Key, Value: string);
 
   public
@@ -79,6 +84,7 @@ type
     function GetPrebuiltDirectory: string;
     function TryGetNDKRelease(pathNDK: string): string;
     function GetNDKVersionItemIndex(ndkRelease: string): integer;
+    function TryProduceGradleVersion(pathToGradle: string): string;
 
   end;
 
@@ -225,59 +231,68 @@ begin
     else Result := 2; //unknown
 end;
 
-//C:\adt32\gradle-4.2.1
-//C:\adt32\gradle-3.3
-function TFormSettingsPaths.GetGradleVersion(out tagVersion: integer): string;
+
+function TFormSettingsPaths.TryProduceGradleVersion(pathToGradle: string): string;
 var
-   p: integer;
-   strAux: string;
-   numberAsString: string;
-   userString: string;
+   AProcess: TProcess;
+   AStringList: TStringList;
+   gradle, ext, version, aux: string;
+   i, p, len: integer;
 begin
-  Result:='';
-  strAux:= Trim(ExcludeTrailingPathDelimiter(EditpathToGradle.Text));  // C:\adt32\gradle-3.3
-  if strAux <> '' then
-  begin
-     p:= LastDelimiter(PathDelim, strAux);
-     strAux:= Copy(strAux, p+1, MaxInt);  //gradle-3.3
+  version:= '';
+  ext:='.bat';
+  {$IFDEF linux}
+    ext:='';
+  {$Endif}
 
-     p:=1;
-     //skip characters that do not represent a version number
-     while (p<=Length(strAux)) AND (NOT (strAux[p] in ['0'..'9','.'])) do Inc(p);
-     if (p<=Length(strAux)) then
+  {$IFDEF darwin}
+     ext:='';
+  {$Endif}
+
+  gradle:= 'gradle'  + ext;
+  AStringList:= TStringList.Create;
+  AProcess := TProcess.Create(nil);
+  AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
+  AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
+  AProcess.Parameters.Add('-version');
+  AProcess.Parameters.Add('>');
+  AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Execute;
+
+  AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
+  i:= 0;
+  while (version='') and (i < AStringList.Count) do
+  begin
+     p:= Pos('Gradle', AStringList.Strings[i] );
+     if p > 0 then
      begin
-        Result:= Copy(strAux, p, MaxInt);  // 3.3
-        numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
-        if Length(numberAsString) < 3 then
-        begin
-           numberAsString:= numberAsString+ '0'  //330
-        end;
-        tagVersion:= StrToInt(Trim(numberAsString));
+        version:=  AStringList.Strings[i];
      end;
+     i:= i +1;
   end;
-
-  if Result = '' then
-  begin
-    userString:= '3.3';
-    if InputQuery('Gradle', 'Please, Enter Gradle Version', userString) then
-    begin
-      Result:= Trim(UserString);  // 3.3
-      numberAsString:= StringReplace(Result,'.', '', [rfReplaceAll]); // 33
-      if Length(numberAsString) < 3 then
-      begin
-         numberAsString:= numberAsString+ '0'  //330
-      end;
-      tagVersion:= StrToInt(Trim(numberAsString));
-    end;
-  end;
-
+  len:= Length('Gradle');
+  aux:= Trim(Copy(version, p+len, 10));
+  Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1!
+  AStringList.Clear;
+  AStringList.Text:= Result;
+  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Free;
+  AStringList.Free;
 end;
+
 
 procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
    fName: string;
    outBuildTool: string;
 begin
+
+  if Self.ModalResult = mrCancel then Exit;
+
+  if EditPathToGradle.Text <> '' then
+     if FGradleVersion = '' then
+         FGradleVersion:= TryProduceGradleVersion(EditPathToGradle.Text);
+
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
   if FOk then
   begin
@@ -290,14 +305,14 @@ begin
     LamwGlobalSettings.ReloadPaths;
   end;
 
-  if GetMaxSdkPlatform(outBuildTool) < 30 then
+  if GetMaxSdkPlatform(outBuildTool) < 33 then
   begin
-    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 30'+ sLineBreak +
+    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                  'Please, update your android sdk/platforms folder!' + sLineBreak +
                  'How to:'+ sLineBreak +
                  '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
                  '.run the command> sdkmanager --update'+ sLineBreak +
-                 '.run the command> sdkmanager "build-tools;30.0.2" "platforms;android-30"');
+                 '.run the command> sdkmanager "build-tools;33.0.2" "platforms;android-33"');
   end;
 
   CloseAction := caFree;
@@ -556,6 +571,10 @@ begin
   begin
     EditPathToGradle.Text:= SelDirDlgPathTo.FileName;
     FPathToGradle:= SelDirDlgPathTo.FileName;
+
+    if EditPathToGradle.Text <> '' then
+      if FGradleVersion = '' then
+         FGradleVersion:= TryProduceGradleVersion(EditPathToGradle.Text);
   end;
 end;
 
@@ -606,20 +625,32 @@ begin
   end;
 end;
 
+procedure TFormSettingsPaths.SpeedButtonAntClick(Sender: TObject);
+begin
+     MessageDlg('About Java and Gradle:' +  sLineBreak +
+                     '  Java JDK 1.8 need Gradle version <=  6.7' + sLineBreak +
+                     '  Java 11 need Gradle version >=  6.7.1 to 7.6.3' + sLineBreak +
+                     '      warning: LAMW don''t support Gradle > 7.6.3 yet...' + sLineBreak +  sLineBreak +
+                'About Java and Ant:' +  sLineBreak +
+                     '  Ant need java JDK 1.8 and Android SDK r25.2.5'
+                  , mtInformation, [mbOk], 0);
+end;
+
 procedure TFormSettingsPaths.SpeedButtonHelpClick(Sender: TObject);
 begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.6.1] "AppCompat" [material] theme need:'+
-           sLineBreak+' 1. Java JDK 1.8'+
-           sLineBreak+' 2. Gradle 6.6.1 [https://gradle.org/next-steps/?version=6.6.1&format=bin]' +
-           sLineBreak+' 3. Android SDK "plataforms" 29 + "build-tools" 29.0.3'+
-           sLineBreak+' 4. Android SDK/Extra  "Support Repository"'+
-           sLineBreak+' 5. Android SDK/Extra  "Support Library"'+
-           sLineBreak+' 6. Android SDK/Extra  "Google Repository"'+
-           sLineBreak+' 7. Android SDK/Extra  "Google Play Services"'+
+           sLineBreak+'[LAMW 0.8.6.3] recomentations:'+
+           sLineBreak+' 1. Java JDK 11 + Gradle version: "6.7.1" to "7.6.3"' +
+           sLineBreak+'     warning: LAMW don''t support Gradle > 7.6.3 yet...'+
+           sLineBreak+' 2. Android SDK "plataforms" 33 + "build-tools" 33.0.2'+
+           sLineBreak+' 3. Android SDK/Extra  "Support Repository"'+
+           sLineBreak+' 4. Android SDK/Extra  "Support Library"'+
+           sLineBreak+' 5. Android SDK/Extra  "Google Repository"'+
+           sLineBreak+' 6. Android SDK/Extra  "Google Play Services"'+
            sLineBreak+' '+
            sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
+
 end;
 
 procedure TFormSettingsPaths.SpeedButtonInfoClick(Sender: TObject);

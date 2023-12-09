@@ -10,8 +10,8 @@ interface
 uses
   regandroidbridge, And_jni, And_jni_Bridge, Laz_And_Controls, And_log, 
   And_log_h, register_extras, Laz_And_Controls_Events, AndroidWidget, 
-  register_support, commonparent, supportparent, systryparent, 
-  register_jcenter, LazarusPackageIntf;
+  Laz_And_jni_Controls, register_support, commonparent, supportparent, 
+  systryparent, register_jcenter, LazarusPackageIntf;
 
 implementation
 

@@ -501,6 +501,50 @@ begin
   end;
 end;
 
+function TryProduceGradleVersion(pathToGradle: string): string;
+var
+   AProcess: TProcess;
+   AStringList: TStringList;
+   gradle, ext, version: string;
+   i, p: integer;
+begin
+  version:= '';
+  ext:='.bat';
+  {$IFDEF linux}
+  ext:='';
+  {$Endif}
+
+  {$IFDEF darwin}
+     ext:='';
+  {$Endif}
+  gradle:= 'gradle'  + ext;
+  AStringList:= TStringList.Create;
+  AProcess := TProcess.Create(nil);
+  AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
+  AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
+  AProcess.Parameters.Add('-version');
+  AProcess.Parameters.Add('>');
+  AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Execute;
+
+  AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
+  i:= 0;
+  while (version='') and (i < AStringList.Count) do
+  begin
+     p:= Pos('Gradle', AStringList.Strings[i] );
+     if p > 0 then
+     begin
+        version:=  AStringList.Strings[i];
+     end;
+     i:= i +1;
+  end;
+  Result:= Trim(Copy(version, p+6, 10));
+  AStringList.Text:= Result;
+  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');  // This can be ommitted
+  AProcess.Free;
+  AStringList.Free;
+end;
+
 procedure ConvertToAppCompat(paramTheme: string);
 var
    Project: TLazProject;
@@ -609,8 +653,18 @@ begin
           gradlePath:= ReadString('NewProject','PathToGradle', '');
           if gradlePath <> '' then     // C:\adt32\gradle-4.4.1
           begin
-             p:= Pos('dle-', gradlePath);
-             gradleVersion:=  Copy(gradlePath, p+4, MaxInt);
+            //p:= Pos('dle-', gradlePath);
+            //gradleVersion:= Copy(gradlePath, p+4, MaxInt);
+            if not FileExists(gradlePath + PathDelim + 'version.txt') then
+            begin
+               gradleVersion:=  TryProduceGradleVersion(gradlePath);
+            end
+            else
+            begin
+              list.Clear;
+              list.LoadFromFile(gradlePath + PathDelim + 'version.txt');
+              gradleVersion:= Trim(list.Text);
+            end;
           end;
 
           list.Clear;

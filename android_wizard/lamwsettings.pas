@@ -25,7 +25,7 @@ type
 
   TLamwGlobalSettings = class
   public const
-    Version = '0.8.6.1';
+    Version = '0.8.6.3';
   private const
     IniFileName = 'LAMW.ini';
     IniFileSection = 'NewProject';
@@ -271,7 +271,7 @@ end;
 function TLamwGlobalSettings.GetPathToGradle: string;
 begin
   Result := GetPath(FPathToGradle, 'PathToGradle',
-    'Path to Gradle: [ex. C:\lamw\gradle-6.6.1]');
+    'Path to Gradle: [ex. C:\lamw\gradle-7.6.3]');
 end;
 
 function TLamwGlobalSettings.ReadIniString(const Key: string;
@@ -305,7 +305,7 @@ end;
 function TLamwGlobalSettings.GetPathToAndroidNDK: string;
 begin
   Result := GetPath(FPathToAndroidNDK, 'PathToAndroidNDK',
-    'Path to Android NDK:  [ex. C:\lamw\ndk10]');
+    'Path to Android NDK:  [ex. C:\lamw\ndk]');
 end;
 
 function TLamwGlobalSettings.GetPathToAndroidSDK: string;

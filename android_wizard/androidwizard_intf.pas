@@ -7,15 +7,13 @@ interface
 uses
   Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics, laz2_XMLRead, Laz2_DOM,
   LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf,
-  uFormAndroidProject, uformworkspace, FPimage, AndroidWidget, gdxform;
+  uFormAndroidProject, uformworkspace, FPimage, AndroidWidget;
 
 type
 
   TAndroidModule = class(jForm)            //support to Android Bridges [components]
   end;
 
-  TGdxModule = class(jGdxForm)            //support to Android libGDX [components]
-  end;
 
   TNoGUIAndroidModule = class(TDataModule) //raw JNI ".so"
   end;
@@ -93,6 +91,13 @@ type
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
      function GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
+     procedure DoReadme();
+     procedure DoHowToGetsignedReleaseApk;
+     procedure DoBuildGradle(strPack: string; androidPluginVersion: string;
+                             gradleVersion: string; isKotlinSupported: boolean;
+                             minSdkVersion: string; compileSdkVersion: string;
+                             instructionChip: string; isAppCompTheme: boolean; isGradleBuildSystem: boolean);
+
      function GetAppName(className: string): string;
 
      function GetFolderFromApi(api: integer): string;
@@ -112,6 +117,9 @@ type
 
      function GetVerAsString(aVers: integer): string;
 
+     function GetAndroidPluginVersion(gradleVersion: string): string;
+     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+
    public
      constructor Create; override;
      function GetLocalizedName: string; override;
@@ -124,16 +132,6 @@ type
   { TAndroidGUIProjectDescriptor }
 
   TAndroidGUIProjectDescriptor = class(TAndroidProjectDescriptor)
-  public
-    constructor Create; override;
-    function GetLocalizedName: string; override;
-    function GetLocalizedDescription: string; override;
-    function DoInitDescriptor: TModalResult; override;
-  end;
-
-  {TAndroidGdxProjectDescriptor}
-
-  TAndroidGdxProjectDescriptor = class(TAndroidProjectDescriptor)
   public
     constructor Create; override;
     function GetLocalizedName: string; override;
@@ -183,47 +181,14 @@ type
                                      const ResourceName : string): string; override;
   end;
 
-
-  TAndroidFileDescPascalUnitWithResourceGDX = class(TFileDescPascalUnitWithResource)
-  private
-    //
-  public
-    SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
-    PathToJNIFolder: string;
-    ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
-
-   //FSmallProjName: string;
-
-    constructor Create; override;
-
-    function CreateSource(const Filename     : string;
-                          const SourceName   : string;
-                          const ResourceName : string): string; override;
-
-    function GetInterfaceUsesSection: string; override;
-
-    function GetInterfaceSource(const Filename     : string;
-                                const SourceName   : string;
-                                const ResourceName : string): string; override;
-
-    function GetResourceType: TResourceType; override;
-    function GetLocalizedName: string; override;
-    function GetLocalizedDescription: string; override;
-    function GetImplementationSource(const Filename     : string;
-                                     const SourceName   : string;
-                                     const ResourceName : string): string; override;
-  end;
-
-   function IsAllCharNumber(pcString: PChar): Boolean;
+  function IsAllCharNumber(pcString: PChar): Boolean;
 
 var
   AndroidProjectDescriptor: TAndroidProjectDescriptor;
 
   AndroidFileDescriptor: TAndroidFileDescPascalUnitWithResource;  //GUI
-  AndroidFileDescriptorGDX: TAndroidFileDescPascalUnitWithResourceGDX;
 
   AndroidGUIProjectDescriptor: TAndroidGUIProjectDescriptor;
-  AndroidGdxProjectDescriptor: TAndroidGdxProjectDescriptor;
 
   AndroidNoGUIExeProjectDescriptor: TAndroidNoGUIExeProjectDescriptor;
 
@@ -242,10 +207,8 @@ procedure Register;
 begin
   FormEditingHook.RegisterDesignerMediator(TAndroidWidgetMediator);
   AndroidFileDescriptor := TAndroidFileDescPascalUnitWithResource.Create;
-  AndroidFileDescriptorGDX := TAndroidFileDescPascalUnitWithResourceGDX.Create;
 
   RegisterProjectFileDescriptor(AndroidFileDescriptor);
-  RegisterProjectFileDescriptor(AndroidFileDescriptorGDX);
 
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidProjectDescriptor);
@@ -253,285 +216,16 @@ begin
   AndroidGUIProjectDescriptor:= TAndroidGUIProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidGUIProjectDescriptor);
 
-  AndroidGdxProjectDescriptor:= TAndroidGdxProjectDescriptor.Create;
-  RegisterProjectDescriptor(AndroidGdxProjectDescriptor);
 
   AndroidNoGUIExeProjectDescriptor:= TAndroidNoGUIExeProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidNoGUIExeProjectDescriptor);
 
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
-  FormEditingHook.RegisterDesignerBaseClass(TGdxModule);
 
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TAndroidConsoleDataForm);
 
   LamwSmartDesigner.Init;
-end;
-
-{ TAndroidGdxProjectDescriptor }
-
-constructor TAndroidGdxProjectDescriptor.Create;
-begin
-  inherited Create;
-  Name := 'Create a new LAMW [libGDX] Android Project';
-end;
-
-function TAndroidGdxProjectDescriptor.GetLocalizedName: string;
-begin
-  //Result:=inherited GetLocalizedName;
-   Result:= 'LAMW [libGDX] Android Module';
-end;
-
-function TAndroidGdxProjectDescriptor.GetLocalizedDescription: string;
-begin
-  //Result:=inherited GetLocalizedDescription;
-  Result:=  'WARNING!!! A Proof of Concept!!!!'+ LineEnding +
-            'LAMW [libGDX] Android loadable module (.so)'+ LineEnding +
-            'with Form and Android libGDX Components.'+ LineEnding +
-            'The project and library file are maintained by Lazarus.';
-  ActivityModeDesign:= actMain;  //main
-end;
-
-function TAndroidGdxProjectDescriptor.DoInitDescriptor: TModalResult;
-var
-  strAfterReplace, strPackName, aux: string;
-  auxList, ControlsJava: TStringList;
-  outTag, i: integer;
-begin
-
-  ShowMessage('WARNING!!! libGDX Proof of Concept!! Go to "...demos/libGDX" !!');
-  Exit;
-
-  try
-    FModuleType := -1; //-1: gdx 0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
-    FJavaClassName := 'Controls';
-    FPathToClassName := '';
-    if GetWorkSpaceFromForm(-1, outTag) then //Gdx
-    begin
-      strPackName := FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
-      with TStringList.Create do
-        try
-          LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'Controls.java');
-          Strings[0] := 'package ' + strPackName + ';';  //replace dummy - Controls.java
-          aux:=  StringReplace(Text, '/*libsmartload*/' ,
-                 'try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}',
-                 [rfReplaceAll,rfIgnoreCase]);
-          Text:= aux;
-          SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
-
-          Clear;
-
-          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java') then
-          begin
-              LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'App.java');
-              Strings[0] := 'package ' + strPackName + ';';
-              SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'App.java');
-          end;
-
-          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java') then
-          begin
-            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'MyGdxGame.java');
-            Strings[0] := 'package ' + strPackName + ';'; //replace dummy
-            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'MyGdxGame.java');
-          end;
-
-          if FileExists(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.java') then
-          begin
-            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.java');
-            Strings[0] := 'package ' + strPackName + ';'; //replace dummy
-            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jGdxForm.java');
-
-            ControlsJava:= TStringList.Create;
-            ControlsJava.LoadFromFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
-
-            LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.create');
-            auxList:= TStringList.Create;
-            auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'jGdxForm.native');
-            for i:= 0 to auxList.Count-1 do
-            begin
-              Add(auxList.Strings[i]);
-            end;
-            ControlsJava.Insert(ControlsJava.Count-1, Text);
-            ControlsJava.SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'Controls.java');
-            ControlsJava.Free;
-            auxList.Free;
-          end;
-
-          CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
-
-          if FileExists(FPathToJavaTemplates+DirectorySeparator + 'Controls.native') then
-          begin
-            CopyFile(FPathToJavaTemplates+DirectorySeparator + 'Controls.native',
-              FAndroidProjectName+DirectorySeparator+'lamwdesigner'+DirectorySeparator+'Controls.native');
-          end;
-
-          if FileExists(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java') then
-          begin
-            LoadFromFile(FPathToJavaTemplates+DirectorySeparator+ 'jCommons.java');
-            Strings[0] := 'package ' + strPackName + ';';  //replace dummy
-            SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'jCommons.java');
-          end;
-
-      finally
-          Free;
-      end;
-
-      FPathToJNIFolder := FAndroidProjectName;
-      AndroidFileDescriptorGDX.PathToJNIFolder:= FPathToJNIFolder;
-      AndroidFileDescriptorGDX.ModuleType:= -1;
-
-      with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
-      try         //"Controls.events" produced by FormWorkspace
-        FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'Controls.events');
-      finally
-        Free;
-      end;
-
-      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
-      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86_64');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
-
-      if  FModuleType < 2 then
-        CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
-
-      if FProjectModel = 'NEW' then  //new project
-      begin
-        auxList:= TStringList.Create;
-        //eclipe compatibility [Neon!]
-        CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
-        auxList.Add('eclipse.preferences.version=1');
-        auxList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.7');
-        auxList.Add('org.eclipse.jdt.core.compiler.compliance=1.7');
-        auxList.Add('org.eclipse.jdt.core.compiler.source=1.7');
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.settings'+DirectorySeparator+'org.eclipse.jdt.core.prefs');
-        auxList.Clear;
-        auxList.Add('<?xml version="1.0" encoding="UTF-8"?>');
-        auxList.Add('<classpath>');
-	auxList.Add('<classpathentry kind="src" path="src"/>');
-	auxList.Add('<classpathentry kind="src" path="gen"/>');
-	auxList.Add('<classpathentry kind="con" path="org.eclipse.andmore.ANDROID_FRAMEWORK"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.LIBRARIES"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.DEPENDENCIES"/>');
-	auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
-        auxList.Add('</classpath>');
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.classpath');
-
-        auxList.Clear;
-        auxList.Add('<projectDescription>');
-        auxList.Add('	<name>'+FSmallProjName+'</name>');
-        auxList.Add('	<comment></comment>');
-        auxList.Add('	<projects>');
-        auxList.Add('	</projects>');
-        auxList.Add('	<buildSpec>');
-        auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>org.eclipse.andmore.ResourceManagerBuilder</name>');
-        auxList.Add('			<arguments>');
-        auxList.Add('			</arguments>');
-        auxList.Add('		</buildCommand>');
-        auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>org.eclipse.andmore.PreCompilerBuilder</name>');
-        auxList.Add('			<arguments>');
-        auxList.Add('			</arguments>');
-        auxList.Add('		</buildCommand>');
-        auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>org.eclipse.jdt.core.javabuilder</name>');
-        auxList.Add('			<arguments>');
-        auxList.Add('			</arguments>');
-        auxList.Add('		</buildCommand>');
-        auxList.Add('		<buildCommand>');
-        auxList.Add('			<name>org.eclipse.andmore.ApkBuilder</name>');
-        auxList.Add('			<arguments>');
-        auxList.Add('			</arguments>');
-        auxList.Add(' 		</buildCommand>');
-        auxList.Add('	</buildSpec>');
-        auxList.Add('	<natures>');
-        auxList.Add('		<nature>org.eclipse.andmore.AndroidNature</nature>');
-        auxList.Add('		<nature>org.eclipse.jdt.core.javanature</nature>');
-        auxList.Add('	</natures>');
-        auxList.Add('</projectDescription>');
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.project');
-
-        auxList.Clear;
-        auxList.Add('# To enable ProGuard in your project, edit project.properties');
-        auxList.Add('# to define the proguard.config property as described in that file.');
-        auxList.Add('#');
-        auxList.Add('# Add project specific ProGuard rules here.');
-        auxList.Add('# By default, the flags in this file are appended to flags specified');
-        auxList.Add('# in ${sdk.dir}/tools/proguard/proguard-android.txt');
-        auxList.Add('# You can edit the include path and order by changing the ProGuard');
-        auxList.Add('# include property in project.properties.');
-        auxList.Add('#');
-        auxList.Add('# For more details, see');
-        auxList.Add('#   http://developer.android.com/guide/developing/tools/proguard.html');
-        auxList.Add(' ');
-        auxList.Add('# Add any project specific keep options here:');
-        auxList.Add(' ');
-        auxList.Add('# If your project uses WebView with JS, uncomment the following');
-        auxList.Add('# and specify the fully qualified class name to the JavaScript interface');
-        auxList.Add('# class:');
-        auxList.Add('#-keepclassmembers class fqcn.of.javascript.interface.for.webview {');
-        auxList.Add('#   public *;');
-        auxList.Add('#}');
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'proguard-project.txt');
-
-        auxList.Clear;
-        auxList.Add('# This file is automatically generated by Android Tools.');
-        auxList.Add('# Do not modify this file -- YOUR CHANGES WILL BE ERASED!');
-        auxList.Add('#');
-        auxList.Add('# This file must be checked in Version Control Systems.');
-        auxList.Add('#');
-        auxList.Add('# To customize properties used by the Ant build system edit');
-        auxList.Add('# "ant.properties", and override values to adapt the script to your');
-        auxList.Add('# project structure.');
-        auxList.Add('#');
-        auxList.Add('# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
-        auxList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
-        auxList.Add(' ');
-        auxList.Add('# Project target.');
-
-        auxList.Add('target=android-'+FTargetApi);
-
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
-        auxList.Free;
-      end;
-
-      //AndroidManifest.xml creation:
-      with TStringList.Create do
-      try
-
-        LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'gdx'+DirectorySeparator+'androidmanifest.txt');
-        strAfterReplace  := StringReplace(Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
-        strPackName:= strPackName+'.'+FMainActivity; {gApp}
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strPackName, [rfReplaceAll, rfIgnoreCase]);
-
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
-        strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
-
-        Clear;
-        Text:= strAfterReplace;
-        SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-
-      finally
-        Free;
-      end;
-
-      Result := mrOK
-    end else
-      Result := mrAbort;
-  except
-    on e: Exception do
-    begin
-      MessageDlg('Error', e.Message, mtError, [mbOk], 0);
-      Result := mrAbort;
-    end;
-  end;
 end;
 
 {TAndroidNoGUIExeProjectDescriptor}
@@ -1468,6 +1162,320 @@ begin
   end;
 end;
 
+procedure TAndroidProjectDescriptor.DoReadme();
+var
+    strList: TStringList;
+begin
+  strList:= TStringList.Create;
+  strList.Add('Tutorial: How to get your Android Application [Apk] using "Ant":');
+  strList.Add(' ');
+  strList.Add('   NEW! Go to Lazarus IDE menu "Run--> [LAMW] Build and Run"! Thanks to Anton!!!');
+  strList.Add(' ');
+  strList.Add('1. Double click "ant-build-debug.bat [.sh]" to build Apk');
+  strList.Add(' ');
+  strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
+  strList.Add('   2.1 double click "install-'+FAntBuildMode+'.bat" to install the Apk on the Emulator [or real device]');
+  strList.Add('   2.2 look for the App "'+FSmallProjName+'" in the Emulator [or real device] and click it!');
+  strList.Add(' ');
+  strList.Add('3. If AVD/Emulator is NOT running:');
+  strList.Add('   3.1 If AVD/Emulator NOT exist:');
+  strList.Add('        3.1.1 double click "paused_create-avd-default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
+  strList.Add('   3.2 double click "launch-avd-default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
+  strList.Add('   3.3 look for the App "'+FSmallProjName+'" in the Emulator and click it!');
+  strList.Add(' ');
+  strList.Add('4. Log/Debug');
+  strList.Add('   4.1 double click "logcat*.bat" to read logs and bugs! ['+DirectorySeparator+'utils folder]');
+  strList.Add(' ');
+  strList.Add('5. Uninstall Apk');
+  strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator [or real device]!');
+  strList.Add(' ');
+  strList.Add('6. To find your Apk look for the "'+FSmallProjName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
+  strList.Add(' ');
+  strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+FSmallProjName+'-'+FAntBuildMode+'.apk"');
+  strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
+  strList.Add(' ');
+  strList.Add('8. To see all available Android targets in your system ['+DirectorySeparator+'utils folder]');
+  strList.Add('   8.1 double click "paused_list_target.bat" ');
+  strList.Add(' ');
+  strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
+  strList.Add(' ');
+  strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
+  strList.Add('   WARNING: Yes, if after run  "ant-build-debug.*" the folder "...\bin" is still empty then try another target!' );
+  strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
+  strList.Add(' ');
+  strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "ant-build-debug.bat" and "install.bat" !');
+  strList.Add(' ');
+  strList.Add('12. Linux users: use "ant-build-debug.sh" , "install-'+FAntBuildMode+'.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
+  strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
+  strList.Add(' ');
+  strList.Add('13. WARNING, before to execute "ant-build-release.bat" [.sh]  you need execute "release-keystore.bat" [.sh] !');
+  strList.Add('    Please, read "How_To_Get_Your_Signed_Release_Apk.txt"');
+  strList.Add(' ');
+  strList.Add('14. Please, for more info, look for "How to use the Demos" in "LAMW: Lazarus Android Module Wizard" readme.txt!!');
+  strList.Add(' ');
+  strList.Add('....  Thank you!');
+  strList.Add(' ');
+  strList.Add('....  by jmpessoa_hotmail_com');
+  strList.Add(' ');
+  strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+  strList.Free;
+end;
+
+procedure TAndroidProjectDescriptor.DoHowToGetsignedReleaseApk;
+var
+    strList: TStringList;
+begin
+    strList:= TStringList.Create;
+    strList.Add('       Tutorial: How to get your "signed" release Apk ['+ FSmallProjName +']');
+    strList.Add(' ');
+    strList.Add('    NEW! ');
+    strList.Add('    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Apk  ..."');
+    strList.Add('    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Bundle ..."');
+    strList.Add(' ');
+    strList.Add(' ');
+    strList.Add(' OR: ');
+    strList.Add(' ');
+    strList.Add('1)Edit/change the project file "keytool_input.txt" to more representative informations:"');
+    strList.Add('');
+    strList.Add('.Your keystore password [--ks-pass pass] : 123456');
+    strList.Add('.Re-enter/confirm the keystore password: 123456');
+    strList.Add(' ');
+    strList.Add('.Your first and last name: MyFirstName MyLastName');
+    strList.Add('');
+    strList.Add('.Your Organizational unit: MyDevelopmentUnit');
+    strList.Add('');
+    strList.Add('.Your Organization name: MyCompany');
+    strList.Add('');
+    strList.Add('.Your City or Locality: MyCity');
+    strList.Add('');
+    strList.Add('.Your State or Province: MT' );
+    strList.Add('');
+    strList.Add('.The two-letter country code: BR');
+    strList.Add('');
+    strList.Add('.All correct: y');
+    strList.Add('');
+    strList.Add('.Your key password for this Apk alias [--key-pass pass]: 123456 ');
+    strList.Add('');
+    strList.Add('');
+    strList.Add('2)If you are using "Ant" then edit/change "ant.properties" according, too!');
+    strList.Add('');
+    strList.Add('');
+    strList.Add('3) Execute the [project] command "release-keystore.bat" or "release-keystore.sh" or "release-keystore-macos.sh" to get the "'+Lowercase(FSmallProjName)+'-release.keystore"');
+    strList.Add('           warning: the file "'+Lowercase(FSmallProjName)+'-release.keystore" should be created only once [per application] otherwise it will fail [and NEVER delete it!]');
+    strList.Add(' ');
+    strList.Add('4) [Gradle]: Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-apksigner.bat" [or .sh]  according "keytool_input.txt" file');
+    strList.Add('             Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-universal-apksigner.bat" [or .sh]  according "keytool_input.txt" file');
+    strList.Add('');
+    strList.Add('5) [Gradle]: Execute the [project] command "gradle-local-apksigner.bat" [.sh] to get the [release] signed Apk!');
+    strList.Add('             OR execute "gradle-local-universal-apksigner.bat" [.sh] if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
+    strList.Add('             hint: look for your generated "'+FSmallProjName+'-release.apk" in [project] folder "...\build\outputs\apk\release"');
+    strList.Add(' ');
+    strList.Add('');
+    strList.Add('6) [Ant]: Execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"');
+    strList.Add('          hint: look for your generated "'+FSmallProjName+'-release.apk" in [project] folder "...\bin"');
+    strList.Add('');
+    strList.Add('');
+    strList.Add('Success! You can now upload your nice "'+FSmallProjName+'-release.apk" to "Google Play" [or others stores...]!');
+    strList.Add('');
+    strList.Add('....  Thanks to All!');
+    strList.Add('....  Special thanks to ADiV/TR3E!');
+    strList.Add('');
+    strList.Add('....  by jmpessoa_hotmail_com');
+    strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'How_To_Get_Your_Signed_Release_Apk.txt');
+    strList.Free;
+end;
+
+procedure TAndroidProjectDescriptor.DoBuildGradle(strPack: string;
+                                 androidPluginVersion: string; gradleVersion: string;
+                                 isKotlinSupported: boolean; minSdkVersion: string; compileSdkVersion: string;
+                                 instructionChip: string; isAppCompTheme: boolean; isGradleBuildSystem: boolean);
+var
+  strList: TStringList;
+  directive: string;
+  aAppCompatLib: TAppCompatLib;
+  aSupportLib: TSupportLib;
+begin
+  strList:= TStringList.Create;
+  strList.Add('buildscript {');
+  if isKotlinSupported then
+    strList.Add('    ext.kotlin_version = ''1.6.10''');
+  strList.Add('    repositories {');
+  strList.Add('        mavenCentral()');
+  strList.Add('        google()');
+  strList.Add('    }');
+  strList.Add('    dependencies {');
+  strList.Add('        classpath ''com.android.tools.build:gradle:'+androidPluginVersion+''' '); //7.1.3
+  if isKotlinSupported then
+    strList.Add('        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"');
+
+  strList.Add('    }');
+  strList.Add('}');
+  strList.Add('allprojects {');
+  strList.Add('    repositories {');
+  strList.Add('       google()');
+  strList.Add('       mavenCentral()');
+  strList.Add('       maven {url ''https://jitpack.io''}');
+  strList.Add('    }');
+  strList.Add('}');
+  strList.Add('apply plugin: ''com.android.application''');
+
+  if isKotlinSupported then
+   strList.Add('apply plugin: ''kotlin-android''');
+
+  strList.Add('android {');
+  strList.Add('    lintOptions {');
+  strList.Add('       abortOnError false');
+  strList.Add('    }');
+  strList.Add('    splits {');
+  strList.Add('        abi {');
+  strList.Add('            enable true');
+  strList.Add('            reset()');
+  strList.Add('            include '''+instructionChip+'''');
+  strList.Add('            universalApk false');
+  strList.Add('        }');
+  strList.Add('    }');
+  strList.Add('    compileOptions {');
+  strList.Add('        sourceCompatibility 1.8');
+  strList.Add('        targetCompatibility 1.8');
+  strList.Add('    }');
+  strList.Add('    compileSdk '+compileSdkVersion+'');
+
+  strList.Add('    defaultConfig {');
+  strList.Add('            minSdkVersion '+minSdkVersion+'');
+  strList.Add('            targetSdkVersion '+compileSdkVersion+'');
+  strList.Add('            versionCode 6682784');
+  strList.Add('            versionName "1.0"');
+  strList.Add('            multiDexEnabled true');
+  strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
+  strList.Add('    }');
+  strList.Add('    sourceSets {');
+  strList.Add('        main {');
+  strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
+  strList.Add('            java.srcDirs = [''src'']');
+  strList.Add('            resources.srcDirs = [''src'']');
+  strList.Add('            aidl.srcDirs = [''src'']');
+  strList.Add('            renderscript.srcDirs = [''src'']');
+  strList.Add('            res.srcDirs = [''res'']');
+  strList.Add('            assets.srcDirs = [''assets'']');
+  strList.Add('            jniLibs.srcDirs = [''libs'']');
+  strList.Add('        }');
+  strList.Add('        debug.setRoot(''build-types/debug'')');
+  strList.Add('        release.setRoot(''build-types/release'')');
+  strList.Add('    }');
+  strList.Add('    buildTypes {');
+  strList.Add('        debug {');
+  strList.Add('            minifyEnabled false');
+  strList.Add('            debuggable true');
+  strList.Add('            jniDebuggable true');
+  strList.Add('        }');
+  strList.Add('        release {');
+  strList.Add('            minifyEnabled false');
+  strList.Add('            debuggable false');
+  strList.Add('            jniDebuggable false');
+  strList.Add('        }');
+  strList.Add('    }');
+  strList.Add('}');
+  strList.Add('dependencies {');
+  strList.Add('    implementation  fileTree(include: [''*.jar''], dir: ''libs'')');
+
+  directive:= 'implementation';
+  if isAppCompTheme then
+  begin
+    for aAppCompatLib in AppCompatLibs do
+    begin
+       strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
+       if aAppCompatLib.MinAPI > StrToInt(compileSdkVersion) then
+             ShowMessage('Warning: AppCompat theme need Android SDK >= ' + IntToStr(aAppCompatLib.MinAPI));
+    end;
+    if isKotlinSupported then
+    begin
+       strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
+       strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
+    end;
+  end
+  else if isGradleBuildSystem then//only gradle not AppCompat
+  begin
+    for aSupportLib in SupportLibs do
+    begin
+       strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
+       if aSupportLib.MinAPI > StrToInt(compileSdkVersion) then
+             ShowMessage('Warning: Support library need Android SDK >= ' + IntToStr(aSupportLib.MinAPI));
+    end;
+  end;
+
+
+  strList.Add('}');
+
+  strList.Add('tasks.register(''run'', Exec) {');
+  strList.Add(' dependsOn '':installDebug''');
+  strList.Add('	if (System.properties[''os.name''].toLowerCase().contains(''windows'')) {');
+  strList.Add('	    commandLine ''cmd'', ''/c'', ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+strPack+'/.App"');
+  strList.Add('	} else {');
+  strList.Add('	    commandLine ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+strPack+'/.App"');
+  strList.Add('	}');
+  strList.Add('}');
+  strList.Add(' ');
+  strList.Add('wrapper {');
+  strList.Add('    gradleVersion = '''+gradleVersion+''' ');  //7.6.3
+  strList.Add('}');
+  strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
+  strList.Free;
+end;
+
+{
+Versão do plug-in	Versão mínima necessária do Gradle
+8.2.0
+8.1.4
+8.0.2
+7.4.2
+7.3.1
+7.2.2
+7.1.3
+7.0.4 Gradle versão 7.x.
+4.2.2
+4.1.3  Gradle versão 6.6.1
+}
+function TAndroidProjectDescriptor.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+var
+  auxStr: string;
+  lenAuxStr: integer;
+begin
+  auxStr:= StringReplace(gradleVersionAsString,'.', '', [rfReplaceAll]); //6.6.1
+  lenAuxStr:=  Length(auxStr);
+  if lenAuxStr < 3 then auxStr:= auxStr + '0';   //6.8 -> 680
+  Result:= StrToInt(Trim(auxStr));  //661
+end;
+
+function TAndroidProjectDescriptor.GetAndroidPluginVersion(gradleVersion: string): string;
+var
+  strGV: string;
+  intGV: integer;
+  bigNumber: integer;
+begin
+   bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
+                                            //JDK 11 - "6.7.1" to "7.6.3"'
+   Result:= '4.1.3';
+   strGV:= SplitStr(gradleVersion,  '.');
+   intGV:= StrToInt(strGV);
+   if intGV >= 8 then
+   begin
+      ShowMessage(' warning: LAMW don''t support Gradle > 7.6.3 yet...');
+      Result:= '7.1.3'; //8 -> Result:= '8.1.4';
+   end;
+   if intGV = 7 then  Result:= '7.1.3';
+   if intGV = 6 then
+   begin
+      if bigNumber <  671 then
+        Result:= '4.1.3'
+      else
+        Result:= '4.2.2';
+   end;
+   if intGV < 6 then
+   begin
+     Result:= '3.4.1';
+   end;
+end;
+
 function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
 
   function MakeUniqueName(const Orig: string; sl: TStrings): string;
@@ -1495,8 +1503,6 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 var
   frm: TFormWorkspace;
   strList: TStringList;
-  aAppCompatLib: TAppCompatLib;
-  aSupportLib: TSupportLib;
   i, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
@@ -1509,16 +1515,9 @@ var
   linuxPathToAntBin: string;
   apk_aliaskey, strText: string;
   strPack: string;
-  sdkBuildTools, pluginVersion: string;
-  compileSdkVersion: string;
-  androidPluginNumber: integer;
-  gradleCompatible, outgradleCompatible: string;
-  gradleCompatibleAsNumber: integer;
-  directive: string;
-  FVersionCode : integer;
-  FVersionName : string;
-  xmlAndroidManifest: TXMLDocument;
+  sdkBuildTools, androidPluginVersion: string;
   outTheme: string;
+  isAppCompatTheme, isGradleBuildSystem: boolean;
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1543,28 +1542,6 @@ begin
     frm.CheckBoxGeneric.Visible:= False; //support to Kotlin need "AppCompat" theme and Gradle
     if FModuleType = 0 then //GUI
       frm.CheckBoxGeneric.Caption:= 'Add support to Kotlin'; //bad reuse ... sorry
-
-
-    if FModuleType = -1 then //Gdx
-    begin
-      frm.Color:= clWhite;
-      frm.PanelButtons.Color:= clWhite;
-
-      frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWGdxProject', frm.ComboSelectProjectName.Items);
-
-      frm.LabelTheme.Caption:= 'App LAMW [libGDX] Project';
-
-      frm.cbBuildSystem.Clear;
-      frm.cbBuildSystem.Items.Add('Gradle');
-      frm.cbBuildSystem.Text:= 'Gradle';
-
-      frm.ComboBoxTheme.Clear;
-      frm.ComboBoxTheme.Items.Add('GDXGame');
-      frm.ComboBoxTheme.Text:= 'GDXGame';
-      FAndroidTheme:= 'GDXGame';
-      //frm.ComboBoxTheme.Visible:= False;
-      frm.SpeedButtonHintTheme.Visible:= False;
-    end;
 
     if FModuleType = 1 then //No GUI
     begin
@@ -1810,11 +1787,6 @@ begin
                 CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+FAndroidTheme+'.xml',
                           FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
             end
-            else if Pos('GDXGame', FAndroidTheme) > 0 then
-            begin
-                CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+FAndroidTheme+'.xml',
-                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'styles.xml');
-            end
             else
             begin
                CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'styles.xml',
@@ -1857,7 +1829,7 @@ begin
 
             //replace "dummyTheme" ..res\values-v21
             strList.Clear;
-            if (Pos('AppCompat', FAndroidTheme) <= 0) and (Pos('GDXGame', FAndroidTheme) <= 0) then  //not AppCompat
+            if Pos('AppCompat', FAndroidTheme) <= 0  then  //not AppCompat
             begin
               CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
               //replace "dummyTheme" ..res\values-v21
@@ -1992,26 +1964,7 @@ begin
                strList.Add('    </application>');
                strList.Add('</manifest>');
                strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-
-               FVersionCode := 1;
-               FVersionName := '1.0';
              end;
-
-             (*
-             else
-             begin
-              ReadXMLFile(xmlAndroidManifest, FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-
-              if (xmlAndroidManifest = nil) or (xmlAndroidManifest.DocumentElement = nil) then
-                 Exit;
-              with xmlAndroidManifest.DocumentElement do
-              begin
-                FVersionCode := StrToIntDef(AttribStrings['android:versionCode'], 1);
-                FVersionName := AttribStrings['android:versionName'];
-                if FVersionName = '' then  FVersionName:= '1.0';
-              end;
-             end;
-             *)
 
              strList.Clear;
              strList.Add(FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
@@ -2023,6 +1976,7 @@ begin
         if FModuleType < 2 then    {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
         begin
           strList.Clear;
+          //begin_cmd_tools
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('cd '+FAndroidProjectName);
@@ -2037,34 +1991,6 @@ begin
           strList.Add('call ant clean release');
           strList.Add('if errorlevel 1 pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-build-release.bat'); //build Apk using "Ant"
-
-              //*.bat utils...
-          CreateDir(FAndroidProjectName+ DirectorySeparator + 'utils');
-
-          {"android list targets" to see the available targets...}
-          strList.Clear;
-          strList.Add('cd '+FPathToAndroidSDK+'tools');
-          strList.Add('android list targets');
-          strList.Add('cd '+FAndroidProjectName);
-          strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list-target.bat');
-
-          //need to pause on double-click use...
-          strList.Clear;
-          strList.Add('cmd /K list-target.bat');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-list-target.bat');
-
-          strList.Clear;
-          strList.Add('cd '+FPathToAndroidSDK+'tools');
-          strList.Add('android create avd -n avd_default -t 1 -c 32M');
-          strList.Add('cd '+FAndroidProjectName);
-          strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create-avd-default.bat');
-
-          //need to pause on double-click use...
-          strList.Clear;
-          strList.Add('cmd /k create-avd-default.bat');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-create-avd-default.bat');
 
           strList.Clear;
           strList.Add('cd '+FPathToAndroidSDK+'tools');
@@ -2102,6 +2028,34 @@ begin
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
 
+          //utils
+          CreateDir(FAndroidProjectName+ DirectorySeparator + 'utils');
+
+          {"android list targets" to see the available targets...}
+          strList.Clear;
+          strList.Add('cd '+FPathToAndroidSDK+'tools');
+          strList.Add('android list targets');
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list-target.bat');
+
+          //need to pause on double-click use...
+          strList.Clear;
+          strList.Add('cmd /K list-target.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-list-target.bat');
+
+          strList.Clear;
+          strList.Add('cd '+FPathToAndroidSDK+'tools');
+          strList.Add('android create avd -n avd_default -t 1 -c 32M');
+          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('pause');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create-avd-default.bat');
+
+          //need to pause on double-click use...
+          strList.Clear;
+          strList.Add('cmd /k create-avd-default.bat');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-create-avd-default.bat');
+
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
@@ -2114,26 +2068,9 @@ begin
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat-app-perform.bat');
 
-          (*//causes instability in the simulator! why ?
-          strList.Clear;
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
-                     'adb shell am start -a android.intent.action.MAIN -n '+
-                      FAntPackageName+'.'+LowerCase(projName)+'/.'+FMainActivity);
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch-apk.bat');
-          *)
+          //end_utils
 
-          strList.Clear;
-          {
-          strList.Add('cd '+FAndroidProjectName+DirectorySeparator+'bin');
-          strList.Add(FPathToAndroidSDK+
-                     'build-tools'+DirectorySeparator+ GetFolderFromApi(StrToInt(FMinApi))+
-                     DirectorySeparator + 'aapt list '+FSmallProjName+'-'+FAntBuildMode+'.apk');
-          strList.Add('cd ..');
-          strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'aapt.bat'); //Android Asset Packaging Tool
-          }
-
+          //build.xml
           strList.Clear;
           strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
           strList.Add('<project name="'+FSmallProjName+'" default="help">');
@@ -2194,61 +2131,13 @@ begin
           strList.Add('  </filterset>');
           strList.Add('</copy>');
           // end tk
+
           strList.Add('</project>');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
 
-          strList.Clear;
-          strList.Add('Tutorial: How to get your Android Application [Apk] using "Ant":');
-          strList.Add(' ');
-          strList.Add('   NEW! Go to Lazarus IDE menu "Run--> [LAMW] Build and Run"! Thanks to Anton!!!');
-          strList.Add(' ');
-          strList.Add('1. Double click "ant-build-debug.bat [.sh]" to build Apk');
-          strList.Add(' ');
-          strList.Add('2. If Android Virtual Device[AVD]/Emulator [or real device] is running then:');
-          strList.Add('   2.1 double click "install-'+FAntBuildMode+'.bat" to install the Apk on the Emulator [or real device]');
-          strList.Add('   2.2 look for the App "'+FSmallProjName+'" in the Emulator [or real device] and click it!');
-          strList.Add(' ');
-          strList.Add('3. If AVD/Emulator is NOT running:');
-          strList.Add('   3.1 If AVD/Emulator NOT exist:');
-          strList.Add('        3.1.1 double click "paused_create-avd-default.bat" to create the AVD ['+DirectorySeparator+'utils folder]');
-          strList.Add('   3.2 double click "launch-avd-default.bat" to launch the Emulator ['+DirectorySeparator+'utils  folder]');
-          strList.Add('   3.3 look for the App "'+FSmallProjName+'" in the Emulator and click it!');
-          strList.Add(' ');
-          strList.Add('4. Log/Debug');
-          strList.Add('   4.1 double click "logcat*.bat" to read logs and bugs! ['+DirectorySeparator+'utils folder]');
-          strList.Add(' ');
-          strList.Add('5. Uninstall Apk');
-          strList.Add('   5.1 double click "uninstall.bat" to remove Apk from the Emulator [or real device]!');
-          strList.Add(' ');
-          strList.Add('6. To find your Apk look for the "'+FSmallProjName+'-'+FAntBuildMode+'.apk" in '+DirectorySeparator+'bin folder!');
-          strList.Add(' ');
-          strList.Add('7. Android Asset Packaging Tool: to know which files were packed in "'+FSmallProjName+'-'+FAntBuildMode+'.apk"');
-          strList.Add('   7.1 double click "aapt.bat" ['+DirectorySeparator+'utils folder]' );
-          strList.Add(' ');
-          strList.Add('8. To see all available Android targets in your system ['+DirectorySeparator+'utils folder]');
-          strList.Add('   8.1 double click "paused_list_target.bat" ');
-          strList.Add(' ');
-          strList.Add('9. Hint 1: you can edit "*.bat" to extend/modify some command or to fix some incorrect info/path!');
-          strList.Add(' ');
-          strList.Add('10.Hint 2: you can edit "build.xml" to set another Android target. ex. "android-18" or "android-19" etc.');
-          strList.Add('   WARNING: Yes, if after run  "ant-build-debug.*" the folder "...\bin" is still empty then try another target!' );
-          strList.Add('   WARNING: If you changed the target in "build.xml" change it in "AndroidManifest.xml" too!' );
-          strList.Add(' ');
-          strList.Add('11.WARNING: After a new [Lazarus IDE]-> "run->build" do not forget to run again: "ant-build-debug.bat" and "install.bat" !');
-          strList.Add(' ');
-          strList.Add('12. Linux users: use "ant-build-debug.sh" , "install-'+FAntBuildMode+'.sh" , "uninstall.sh" and "logcat.sh" [thanks to Stephano!]');
-          strList.Add('    WARNING: All demos Apps was generate on my windows system! So, please,  edit its to correct paths...!');
-          strList.Add(' ');
-          strList.Add('13. WARNING, before to execute "ant-build-release.bat" [.sh]  you need execute "release-keystore.bat" [.sh] !');
-          strList.Add('    Please, read "How_To_Get_Your_Signed_Release_Apk.txt"');
-          strList.Add(' ');
-          strList.Add('14. Please, for more info, look for "How to use the Demos" in "LAMW: Lazarus Android Module Wizard" readme.txt!!');
-          strList.Add(' ');
-          strList.Add('....  Thank you!');
-          strList.Add(' ');
-          strList.Add('....  by jmpessoa_hotmail_com');
-          strList.Add(' ');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+          //end_build.xml
+
+          DoReadme;
 
           apk_aliaskey:= LowerCase(FSmallProjName)+'.keyalias';
 
@@ -2304,18 +2193,8 @@ begin
           strList.Add('set PATH=%JAVA_HOME%'+PathDelim+'bin;%PATH%');
           strList.Add('set JAVA_TOOL_OPTIONS=-Duser.language=en');
           strList.Add('cd '+FAndroidProjectName);
-          //strList.Add('if exist "'+Lowercase(FSmallProjName)+'-release.keystore" goto Error');
-
-          //https://forum.lazarus.freepascal.org/index.php/topic,56830.0.html  [by guaracy]
-          {
-          strList.Add('LC_ALL=C keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
-                      FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
-          }
-          //roolback
-          //https://forum.lazarus.freepascal.org/index.php/topic,57735.0.html
           strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                       FAndroidProjectName+DirectorySeparator+'keytool_input.txt');
-
           strList.Add(':Error');
           strList.Add('echo off');
           strList.Add('cls');
@@ -2324,6 +2203,7 @@ begin
           strList.Add('echo.');
           strList.Add('pause');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
+
 
           strList.Clear;
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
@@ -2339,64 +2219,7 @@ begin
           strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'build'+DirectorySeparator+'outputs'+DirectorySeparator+'apk'+DirectorySeparator+'release'+DirectorySeparator+FSmallProjName+'-release.apk');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'gradle-jarsigner-verify.bat');
 
-          strList.Clear;
-
-          strList.Add('       Tutorial: How to get your "signed" release Apk ['+ FSmallProjName +']');
-          strList.Add(' ');
-          strList.Add('    NEW! ');
-          strList.Add('    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Apk  ..."');
-          strList.Add('    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Bundle ..."');
-          strList.Add(' ');
-          strList.Add(' ');
-          strList.Add(' OR: ');
-          strList.Add(' ');
-          strList.Add('1)Edit/change the project file "keytool_input.txt" to more representative informations:"');
-          strList.Add('');
-          strList.Add('.Your keystore password [--ks-pass pass] : 123456');
-          strList.Add('.Re-enter/confirm the keystore password: 123456');
-          strList.Add(' ');
-          strList.Add('.Your first and last name: MyFirstName MyLastName');
-          strList.Add('');
-          strList.Add('.Your Organizational unit: MyDevelopmentUnit');
-          strList.Add('');
-          strList.Add('.Your Organization name: MyCompany');
-          strList.Add('');
-          strList.Add('.Your City or Locality: MyCity');
-          strList.Add('');
-          strList.Add('.Your State or Province: MT' );
-          strList.Add('');
-          strList.Add('.The two-letter country code: BR');
-          strList.Add('');
-          strList.Add('.All correct: y');
-          strList.Add('');
-          strList.Add('.Your key password for this Apk alias [--key-pass pass]: 123456 ');
-          strList.Add('');
-          strList.Add('');
-          strList.Add('2)If you are using "Ant" then edit/change "ant.properties" according, too!');
-          strList.Add('');
-          strList.Add('');
-          strList.Add('3) Execute the [project] command "release-keystore.bat" or "release-keystore.sh" or "release-keystore-macos.sh" to get the "'+Lowercase(FSmallProjName)+'-release.keystore"');
-          strList.Add('           warning: the file "'+Lowercase(FSmallProjName)+'-release.keystore" should be created only once [per application] otherwise it will fail [and NEVER delete it!]');
-          strList.Add(' ');
-          strList.Add('4) [Gradle]: Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-apksigner.bat" [or .sh]  according "keytool_input.txt" file');
-          strList.Add('             Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-universal-apksigner.bat" [or .sh]  according "keytool_input.txt" file');
-          strList.Add('');
-          strList.Add('5) [Gradle]: Execute the [project] command "gradle-local-apksigner.bat" [.sh] to get the [release] signed Apk!');
-          strList.Add('             OR execute "gradle-local-universal-apksigner.bat" [.sh] if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) ');
-          strList.Add('             hint: look for your generated "'+FSmallProjName+'-release.apk" in [project] folder "...\build\outputs\apk\release"');
-          strList.Add(' ');
-          strList.Add('');
-          strList.Add('6) [Ant]: Execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"');
-          strList.Add('          hint: look for your generated "'+FSmallProjName+'-release.apk" in [project] folder "...\bin"');
-          strList.Add('');
-          strList.Add('');
-          strList.Add('Success! You can now upload your nice "'+FSmallProjName+'-release.apk" to "Google Play" [or others stores...]!');
-          strList.Add('');
-          strList.Add('....  Thanks to All!');
-          strList.Add('....  Special thanks to ADiV/TR3E!');
-          strList.Add('');
-          strList.Add('....  by jmpessoa_hotmail_com');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'How_To_Get_Your_Signed_Release_Apk.txt');
+          DoHowToGetSignedReleaseApk;
 
           linuxDirSeparator:= DirectorySeparator;
           linuxPathToJavaJDK:= FPathToJavaJDK;
@@ -2576,654 +2399,206 @@ begin
           //Add GRADLE support ... [... initial code ...]
           //Building "build.gradle" file    -- for gradle we need "sdk/build-tools" >= 21.1.1
 
-          compileSdkVersion:= IntToStr(FMaxSdkPlatform);
-          sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
-
-          if sdkBuildTools = '' then
-          begin
-            sdkBuildTools:= FCandidateSdkBuild;
-            compileSdkVersion:= Copy(sdkBuildTools,1,2);
-          end;
-
-          if sdkBuildTools <> '' then
-          begin
-
-            if StrToInt(compileSdkVersion) > 25 then
-              pluginVersion:= GetPluginVersion(sdkBuildTools)
-            else
-              pluginVersion:= '2.3.3';
-
-            if pluginVersion <> '' then
-            begin
-                outgradleCompatible:= '';
-                gradleCompatible:= FGradleVersion;
-                if not TryGradleCompatibility(pluginVersion, FGradleVersion, outgradleCompatible) then
-                begin
-                    if MessageDlg('Warning ','plugin "'+pluginVersion+'", "build-tools "'+sdkBuildTools+ '" require Gradle "'+outgradleCompatible+'"' +sLineBreak + '[current: "'+FGradleVersion+'"]',
-                       mtConfirmation, [mbOk, mbIgnore], 0) = mrOk then
-                       begin
-                          gradleCompatible:= outgradleCompatible;
-                          ShowMessage('Please, update to Gradle "'+outgradleCompatible+'" ' + sLineBreak + 'https://gradle.org/releases/');
-                       end
-                       else
-                          pluginVersion:= TryPluginCompatibility(FGradleVersion);
-                end;
-
-                androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
-                gradleCompatibleAsNumber:= GetVerAsNumber(TryPluginCompatibility(FGradleVersion));
-                if gradleCompatibleAsNumber>androidPluginNumber then
-                begin
-                  pluginVersion:= TryPluginCompatibility(FGradleVersion);
-                  androidPluginNumber:= GetVerAsNumber(pluginVersion);  //ex. 3.0.0 --> 3000
-                end;
-
-                strList.Clear;
-                strList.Add('buildscript {');
-
-                if FIsKotlinSupported then
-                   strList.Add('    ext.kotlin_version = ''1.6.10''');
-
-                strList.Add('    repositories {');
-                strList.Add('        mavenCentral()');
-                strList.Add('        //android plugin version >= 3.0.0 [in classpath] need gradle version >= 4.1 and google() method');
-                if androidPluginNumber >= 3000 then
-                   strList.Add('        google()')
-                else
-                   strList.Add('        //google()');
-                strList.Add('    }');
-                strList.Add('    dependencies {');
-                strList.Add('        classpath ''com.android.tools.build:gradle:'+pluginVersion+'''');
-
-                if FIsKotlinSupported then
-                  strList.Add('        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"');
-
-                strList.Add('    }');
-                strList.Add('}');
-
-                strList.Add('allprojects {');
-                strList.Add('    repositories {');
-
-                if androidPluginNumber >= 3000 then
-                  strList.Add('       google()')
-                else
-                  strList.Add('     //google()');
-
-                strList.Add('       mavenCentral()');
-
-                if Pos('GDXGame', FAndroidTheme) > 0 then
-                begin
-                  strList.Add('       mavenLocal()');
-                  strList.Add('       maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }');
-                  strList.Add('       maven { url "https://oss.sonatype.org/content/repositories/releases/" }');
-                end;
-
-                strList.Add('       maven { url ''https://jitpack.io'' }');
-
-                strList.Add('    }');
-                strList.Add('}');
-
-                strList.Add('apply plugin: ''com.android.application''');
-                if FIsKotlinSupported then
-                  strList.Add('apply plugin: ''kotlin-android''');
-
-                strList.Add('android {');
-                strList.Add('    lintOptions {');
-                strList.Add('       abortOnError false');
-                strList.Add('    }');
-
-                if (Length(instructionChip)>0) then
-                begin
-                strList.Add('    splits {');
-                strList.Add('        abi {');
-                strList.Add('            enable true');
-                strList.Add('            reset()');
-                strList.Add('            include '''+instructionChip+'''');
-                  //strList.Add('            include ''x86'', ''x86_64'', ''armeabi'', ''armeabi-v7a'', ''mips'', ''mips64'', ''arm64-v8a''');
-                strList.Add('            universalApk false');
-                strList.Add('        }');
-                strList.Add('    }');
-                end;
-                strList.Add('    compileOptions {');
-                strList.Add('        sourceCompatibility 1.8');
-                strList.Add('        targetCompatibility 1.8');
-                strList.Add('    }');
-                if Pos('AppCompat', FAndroidTheme) > 0 then
-                begin
-                  if StrToInt(compileSdkVersion) < 34 then
-                    strList.Add('    compileSdkVersion '+compileSdkVersion)
-                  else
-                    strList.Add('    compileSdkVersion "'+GetVerAsString(StrToInt(compileSdkVersion))+'"');
-
-                  if androidPluginNumber < 3000 then
-                  begin
-                     strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
-                  end
-                  //else: each version of the Android Gradle Plugin now has a default version of the build tools
-
-               end
-               else
-               begin
-                 strList.Add('    compileSdkVersion '+compileSdkVersion);
-                 if androidPluginNumber < 3000 then
-                    strList.Add('    buildToolsVersion "'+sdkBuildTools+'"');
-                 //else: each version of the Android Gradle Plugin now has a default version of the build tools
-               end;
-
-                strList.Add('    defaultConfig {');
-
-                if Pos('AppCompat', FAndroidTheme) > 0 then
-                begin
-
-                  if StrToInt(FMinApi) >= 14 then
-                     strList.Add('            minSdkVersion '+FMinApi)
-                  else
-                     strList.Add('            minSdkVersion 14');
-
-                  if StrToInt(FTargetApi) <= StrToInt(compileSdkVersion)  then
-                    strList.Add('            targetSdkVersion '+ FTargetApi)  //compileSdkVersion
-                  else
-                    strList.Add('            targetSdkVersion '+compileSdkVersion);
-
-                end
-                else
-                begin
-                  strList.Add('            minSdkVersion '+FMinApi);
-
-                  if StrToInt(FTargetApi) <= StrToInt(compileSdkVersion)  then
-                    strList.Add('            targetSdkVersion '+ FTargetApi)  //compileSdkVersion
-                  else
-                    strList.Add('            targetSdkVersion '+compileSdkVersion);
-
-                end;
-
-                //strList.Add('            versionCode 1');
-                //strList.Add('            versionName "1.0"');
-                if FVersionCode =  0 then
-                begin
-                  FVersionCode:= 1;
-                  FVersionName:= '1.0';
-                end;
-
-                if FVersionName = '' then  FVersionName:= '1.0';
-                strList.Add('            versionCode ' + intToStr(FVersionCode));
-                strList.Add('            versionName "' + FVersionName + '"');
-
-                //if Pos('AppCompat', FAndroidTheme) > 0 then
-                strList.Add('            multiDexEnabled true');
-
-                strList.Add('            ndk { debugSymbolLevel ''FULL'' }');
-                strList.Add('    }');
-                strList.Add('    sourceSets {');
-                strList.Add('        main {');
-                strList.Add('            manifest.srcFile ''AndroidManifest.xml''');
-                strList.Add('            java.srcDirs = [''src'']');
-                strList.Add('            resources.srcDirs = [''src'']');
-                strList.Add('            aidl.srcDirs = [''src'']');
-                strList.Add('            renderscript.srcDirs = [''src'']');
-                strList.Add('            res.srcDirs = [''res'']');
-                strList.Add('            assets.srcDirs = [''assets'']');
-                strList.Add('            jni.srcDirs = []');
-                strList.Add('            jniLibs.srcDirs = [''libs'']');
-                strList.Add('        }');
-                strList.Add('        debug.setRoot(''build-types/debug'')');
-                strList.Add('        release.setRoot(''build-types/release'')');
-                strList.Add('    }');
-                strList.Add('    buildTypes {');
-                strList.Add('        debug {');
-                strList.Add('            minifyEnabled false');
-                strList.Add('            debuggable true');
-                strList.Add('            jniDebuggable true');
-                strList.Add('        }');
-                strList.Add('        release {');
-                strList.Add('            minifyEnabled false');
-                strList.Add('            debuggable false');
-                strList.Add('            jniDebuggable false');
-                strList.Add('        }');
-	        strList.Add('    }');
-                strList.Add('}');
-                strList.Add('dependencies {');
-
-                if androidPluginNumber < 3000 then
-                  directive:='compile'
-                else
-                  directive:='implementation';
-
-                strList.Add('    '+directive+' fileTree(include: [''*.jar''], dir: ''libs'')');
-
-                if Pos('AppCompat', FAndroidTheme) > 0 then
-                begin
-                  for aAppCompatLib in AppCompatLibs do
-                  begin
-                     strList.Add('    '+directive+' '''+aAppCompatLib.Name+'''');
-                     if aAppCompatLib.MinAPI > StrToInt(compileSdkVersion) then
-                           ShowMessage('Warning: AppCompat theme need Android SDK >= ' + IntToStr(aAppCompatLib.MinAPI));
-                  end;
-                  if FIsKotlinSupported then
-                  begin
-                     strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
-                     strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
-                  end;
-                end
-                else if Pos('Gradle',  FBuildSystem) > 0 then  //only gradle not AppCompat
-                begin
-                  for aSupportLib in SupportLibs do
-                  begin
-                     strList.Add('    '+directive+' '''+aSupportLib.Name+'''');
-                     if aSupportLib.MinAPI > StrToInt(compileSdkVersion) then
-                           ShowMessage('Warning: Support library need Android SDK >= ' + IntToStr(aSupportLib.MinAPI));
-                  end;
-                end;
-
-
-
-                if Pos('GDXGame', FAndroidTheme) > 0 then     //just a conceptual project....
-                begin
-                   if androidPluginNumber >=  3000 then directive:= 'api';
-                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx:1.9.10''');
-                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
-                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-backend-android:1.9.10''');
-                   strList.Add('    '+directive+' ''com.badlogicgames.gdx:gdx-box2d:1.9.10''');
-                end;
-
-                strList.Add('}');
-                strList.Add(' ');
-                strList.Add('task run(type: Exec, dependsOn: '':installDebug'') {');
-                strList.Add('	if (System.properties[''os.name''].toLowerCase().contains(''windows'')) {');
-                strList.Add('	    commandLine ''cmd'', ''/c'', ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+strPack+'/.App"');
-                strList.Add('	} else {');
-                strList.Add('	    commandLine ''adb'', ''shell'', ''am'', ''start'', ''-n'', "'+strPack+'/.App"');
-                strList.Add('	}');
-                strList.Add('}');
-                strList.Add(' ');
-
-                gradleCompatibleAsNumber:= Self.GetVerAsNumber(gradleCompatible);
-
-                if  gradleCompatibleAsNumber < 5000 then
-                begin
-                  strList.Add('task wrapper(type: Wrapper) {');
-                  strList.Add('    gradleVersion = '''+ TryUndoFakeVersion(gradleCompatible)+'''');
-                  strList.Add('}');
-                end
-                else
-                begin
-                  strList.Add('wrapper {');
-                  strList.Add('    gradleVersion = '''+ TryUndoFakeVersion(gradleCompatible)+'''');
-                  strList.Add('}');
-                end;
-                strList.Add('//how to use: look for "gradle_readme.txt"');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
-
-                strList.Clear;
-                strList.Add(' ');
-                strList.Add(' ');
-                strList.Add('HOW TO use "gradle.build" file');
-                strList.Add(' ');
-                strList.Add('       ::by jmpessoa');
-                strList.Add(' ');
-                strList.Add('references:');
-                strList.Add('   http://spring.io/guides/gs/gradle-android/');
-                strList.Add('   https://paulemtz.blogspot.com.br/2013/04/automating-android-builds-with-gradle.html');
-                strList.Add(' ');
-                strList.Add('   WARNING: you will need INTERNET CONNECTION!!');
-                strList.Add(' ');
-                strList.Add('***SYSTEM INFRASTRUCTURE');
-                strList.Add(' ');
-                strList.Add('(1) Look for the highest "...\sdk\build-tools" version');
-                strList.Add('        The table point out gradle and "sdk\build-tools" versions compatibility');
-                strList.Add(' ');
-                strList.Add('        plugin [in classpath]           gradle        sdk\build-tools');
-                strList.Add('                   2.0.0                2.10          21.1.2');
-                strList.Add('                   2.2.0                2.14.1        23.0.2');
-                strList.Add('                   2.3.3                3.3           25.0.3');
-                strList.Add('                   3.0.1                4.1           26.0.2');
-                strList.Add(' ');
-                strList.Add('        Note 1. You can interpolate to some value other than these.');
-                strList.Add('        Ex. If in your system the highest "sdk\build-tools" is "22.0.1", so downloaded/Installed gradle 2.1.0, etc..');
-                strList.Add(' ');
-                strList.Add('        Note 2. In "build.gradle" file, the gradle version is set to be compatible with the highest "sdk\build-tools" found in your system');
-                strList.Add('        as a consequence, it is this version of gradle that you must download/install.');
-                strList.Add(' ');
-                strList.Add('        reference:');
-                strList.Add('           https://developer.android.com/studio/releases/gradle-plugin.html#2-3-0');
-                strList.Add('           https://gradle.org/releases/');
-                strList.Add('           Hint: downloading just "binary-only" is OK!');
-                strList.Add(' ');
-                strList.Add('        Note 3. You should set the gradle path in Lazarus menu "Tools --> LAMW --> Paths Settings..."');
-                strList.Add(' ');
-                strList.Add('        Note 4. If your connection has a proxy, edit the "gradle.properties" file content. Example: ');
-                strList.Add(' ');
-                strList.Add('             systemProp.http.proxyHost=10.0.16.1');
-                strList.Add('             systemProp.http.proxyPort=3128');
-                strList.Add('             systemProp.https.proxyHost=10.0.16.1');
-                strList.Add('             systemProp.https.proxyPort=3128');
-                strList.Add(' ');
-                strList.Add('        Note 5. Java Jdk 1.8, Android SDK "platform" 30 [or up],  "build-tools" 30.0.2, Android SDK Extra "support library/repository" and "Gradle 6.6.1" are "must have" to support AppCompat material theme in LAMW 0.8.6.2');
-                strList.Add(' ');
-                strList.Add(' ');
-                strList.Add('***SETTING ENVIRONMENT VARIABLES...');
-                strList.Add(' ');
-                strList.Add('[windows] cmd line prompt:');
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                   strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                   strList.Add('set GRADLE_HOME='+FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add(' ');
-
-                strList.Add('[linux] cmd line prompt:');
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                   strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                strList.Add(' ');
-                strList.Add('WARNING: The following tasks assume that you have:');
-                strList.Add('         .Internet connection;');
-                strList.Add('         .Set the environment variables;');
-                strList.Add('         .Installed gradle version compatible with your highest "sdk\build-tools"');
-                strList.Add(' ');
-                strList.Add('***BUILDING AND RUNNING APK ....');
-                strList.Add(' ');
-                strList.Add('.METHOD - I.');
-                strList.Add('    Running installed local version of gradle');
-                strList.Add(' ');
-                strList.Add('    ::Go to your project folder....');
-                strList.Add(' ');
-                strList.Add('[windows] cmd line prompt:');
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools'); //
-                if FPathToGradle = '' then
-                   strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add(' ');
-                strList.Add('[windows] cmd line prompt:');
-                strList.Add('gradle clean build --info');
-                strList.Add('gradle run');
-                strList.Add(' ');
-                strList.Add(' ');
-                strList.Add('[linux] cmd line prompt:');
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                  strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('export GRADLE_HOME='+linuxPathToGradle);
-
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                strList.Add(' ');
-                strList.Add('[linux] cmd line prompt:');
-                //strList.Add('.\gradle clean build --info');
-                strList.Add('gradle clean build --info');
-                //strList.Add('.\gradle run');
-                strList.Add('gradle run');
-                strList.Add(' ');
-                strList.Add('Congratulation!');
-                strList.Add(' ');
-                strList.Add('    :: Where is my Apk? here: "'+FAndroidProjectName+'\build\outputs\apk"!');
-                strList.Add('       IMPORTANT: You need to sign your [release] apk for "Google Play" store!');
-                strList.Add('                  Please, read the "How_To_Get_Your_Signed_Release_Apk.txt"');
-                strList.Add(' ');
-                strList.Add('hint: you can try edit and run:');
-                strList.Add('[windows] "gradle-local-build.bat"');
-                strList.Add('[linux] "gradle-local-build.sh"');
-
-                strList.Add('[windows] "gradle-local-run.bat"');
-                strList.Add('[linux] "gradle-local-run.sh"');
-
-                strList.Add(' ');
-                strList.Add(' ');
-                strList.Add('.METHOD - II.');
-                strList.Add(' ');
-                strList.Add('(1) Making "gradlew" (gradle wrapper) available for building your project');
-                strList.Add('    ::Go to your project folder....');
-                strList.Add(' ');
-                strList.Add('[windows] cmd line prompt:');
-                strList.Add('gradle wrapper');
-                strList.Add(' ');
-                strList.Add('[linux] cmd line prompt:');
-                strList.Add('./gradle wrapper');
-                strList.Add(' ');
-                strList.Add('hint: you can try edit and run:');
-                strList.Add('[windows] "gradle-making-wrapper.bat"');
-                strList.Add('[linux] "gradle-making-wrapper.sh"');
-
-                strList.Add(' ');
-                strList.Add('(2) Building your project with "gradlew" [gradle wrapper]');
-                strList.Add(' ');
-                strList.Add('[windows] cmd line prompt:');
-                strList.Add('gradlew build');
-                strList.Add(' ');
-                strList.Add('[linux] cmd line prompt:');
-                strList.Add('./gradlew build');
-                strList.Add(' ');
-                strList.Add('hint: you can try edit and "build" with gradle wrapper:');
-                strList.Add('      [windows] "gradlew-build.bat"');
-                strList.Add('      [linux]   "gradlew-build.sh"');
-                strList.Add(' ');
-                strList.Add('(3) Installing and Runing Apk');
-                strList.Add(' ');
-                strList.Add('[windows] cmd line prompt:');
-                strList.Add('gradlew install');
-                strList.Add(' ');
-                strList.Add('[linux] cmd line prompt:');
-                strList.Add('./gradlew run');
-                strList.Add(' ');
-                strList.Add('Congratulation!');
-                strList.Add(' ');
-                strList.Add('hint: where is my Apk? here: "'+FAndroidProjectName+'\build\outputs\apk"');
-                strList.Add(' ');
-                strList.Add('hint: you can try edit and "run" with gradle wrapper:');
-                strList.Add('      [windows] "gradlew-run.bat"');
-                strList.Add('      [linux] "gradlew-run.sh"');
-                strList.Add(' ');
-                strList.Add(' ');
-                strList.Add('hint: how can I  produce a signed release Apk? read "How_To_Get_Your_Signed_Release_Apk.txt');
-                strList.Add(' ');
-                strList.Add('Thanks to All!');
-                strList.Add(' ');
-                strList.Add('by jmpessoa_hotmail_com');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle_readme.txt');
-
-                //Drafts Making gradlew (= gradle warapper)
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('gradle wrapper');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-making-wrapper.bat');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                  strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                //strList.Add('./gradle wrapper');
-                strList.Add('gradle wrapper');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-making-wrapper.sh');
-
-                //Drafts Method II
-
-                //build
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+ FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('gradlew build');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-build.bat');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                   strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                   strList.Add('export GRADLE_HOME='+linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                //strList.Add('./gradlew build');
-                strList.Add('gradlew build');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-build.sh');
-
-                //run
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+ FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('gradlew run');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-run.bat');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                   strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                   strList.Add('export GRADLE_HOME='+linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                //strList.Add('./gradlew run');
-                strList.Add('gradlew run');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-run.sh');
-
-                //Drafts Method I
-
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+ FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('gradle clean build --info');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build.bat');
-
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+ FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('gradle clean bundle --info');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build-bundle.bat');
-
-                //thanks to TR3E!
-                strList.Clear;
-                sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
-                strList.Add('set GRADLE_HOME='+FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-
-                //fixed! thanks do @pasquale!
-                apkName:= FSmallProjName+ '-' + instructionChip;
-
-                strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
-
-                strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
-                strList.Add('set GRADLE_HOME='+FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.bat');
-
-                strList.Clear;
-                strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
-                if FPathToGradle = '' then
-                  strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('set GRADLE_HOME='+ FPathToGradle);
-                strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
-                strList.Add('gradle run');
-                strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-run.bat');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                  strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                strList.Add('gradle clean build --info');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build.sh');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                if FPathToGradle = '' then
-                  strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                strList.Add('gradle clean bundle --info');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build-bundle.sh');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
-                strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
-
-                strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
-                strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
-
-                strList.Clear;
-                strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
-
-                if FPathToGradle = '' then
-                  strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
-                else
-                  strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
-
-                strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
-                strList.Add('. ~/.bashrc');
-                //strList.Add('.\gradle run');
-                strList.Add('gradle run');
-                SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-run.sh');
-            end  //gradle support ...
-            else
-            begin
-              // TODO
-            end;
-          end
+          //FGradleVersion:='7.6.3'  --> '7.1.3';
+          androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion); //'7.1.3';
+
+          isAppCompatTheme:= False;
+          if Pos('AppCompat', FAndroidTheme) > 0  then isAppCompatTheme:= True;
+
+          isGradleBuildSystem:= False;
+          if Pos('Gradle',  FBuildSystem) > 0 then isGradleBuildSystem:= True;
+          DoBuildGradle(strPack, androidPluginVersion, FGradleVersion,
+                        FisKotlinSupported, FMinApi, IntToStr(FMaxSdkPlatform),
+                        instructionChip, isAppCompatTheme, isGradleBuildSystem);
+
+          //Drafts Making gradlew (= gradle warapper)
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+          if FPathToGradle = '' then
+            strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
           else
-          begin
-             ShowMessage('Fail! Sorry... You need install SDK "build-tools" ' +IntToStr(Self.FMaxSdkPlatform)+'.x.y');
-          end;
-        end;
+            strList.Add('set GRADLE_HOME='+FPathToGradle);
+
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('gradle wrapper');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-making-wrapper.bat');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          if FPathToGradle = '' then
+            strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('. ~/.bashrc');
+          //strList.Add('./gradle wrapper');
+          strList.Add('gradle wrapper');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-making-wrapper.sh');
+
+          //Drafts Method II
+
+          //build
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+          if FPathToGradle = '' then
+            strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('set GRADLE_HOME='+ FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('gradlew build');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-build.bat');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          if FPathToGradle = '' then
+             strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+          else
+             strList.Add('export GRADLE_HOME='+linuxPathToGradle);
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('. ~/.bashrc');
+          //strList.Add('./gradlew build');
+          strList.Add('gradlew build');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-build.sh');
+
+          //run
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+          if FPathToGradle = '' then
+            strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('set GRADLE_HOME='+ FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('gradlew run');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-run.bat');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          if FPathToGradle = '' then
+             strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+          else
+             strList.Add('export GRADLE_HOME='+linuxPathToGradle);
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('. ~/.bashrc');
+          //strList.Add('./gradlew run');
+          strList.Add('gradlew run');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-run.sh');
+
+          //Drafts Method I
+
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+          if FPathToGradle = '' then
+            strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('set GRADLE_HOME='+ FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('gradle clean build --info');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build.bat');
+
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+          if FPathToGradle = '' then
+            strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('set GRADLE_HOME='+ FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('gradle clean bundle --info');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build-bundle.bat');
+
+          //thanks to TR3E!
+          strList.Clear;
+          sdkBuildTools:= GetBuildTool(FMaxSdkPlatform);
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
+          strList.Add('set GRADLE_HOME='+FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+
+          //fixed! thanks do @pasquale!
+          apkName:= FSmallProjName+ '-' + instructionChip;
+
+          strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
+          strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
+
+          strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
+          strList.Add('set GRADLE_HOME='+FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+          strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.bat');
+
+          strList.Clear;
+          strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
+          if FPathToGradle = '' then
+            strList.Add('set GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('set GRADLE_HOME='+ FPathToGradle);
+          strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
+          strList.Add('gradle run');
+          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-run.bat');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          if FPathToGradle = '' then
+            strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('. ~/.bashrc');
+          strList.Add('gradle clean build --info');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build.sh');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          if FPathToGradle = '' then
+            strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('. ~/.bashrc');
+          strList.Add('gradle clean bundle --info');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build-bundle.sh');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
+          strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
+          strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
+
+          strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'build-tools/'+sdkBuildTools+':$PATH');
+          strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+          strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
+
+          strList.Clear;
+          strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
+
+          if FPathToGradle = '' then
+            strList.Add('export GRADLE_HOME=path_to_your_local_gradle')
+          else
+            strList.Add('export GRADLE_HOME='+ linuxPathToGradle);
+
+          strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
+          strList.Add('. ~/.bashrc');
+          //strList.Add('.\gradle run');
+          strList.Add('gradle run');
+          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-run.sh');
+        end; //FModuleType < 2 {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
         Result := True;
       except
         on e: Exception do
           MessageDlg('Error',e.Message,mtError,[mbOK],0);
       end;
-    end;
+    end; //frm.ShowModal = mrOK
   finally
     strList.Free;
     frm.Free;
@@ -3442,13 +2817,7 @@ begin
   else
      projDir:= FPathToJNIFolder+DirectorySeparator;
 
-  if FModuleType = -1 then    {-1: gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
-  begin
-    AProject.CustomData.Values['LAMW'] := 'GDX';
-    AProject.CustomData.Values['Theme']:= 'GDXGame';
-    AProject.CustomData['StartModule'] := 'GdxModule1';
-  end
-  else if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+  if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
   begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
 
@@ -3619,18 +2988,7 @@ begin
 
   if FModuleType < 3 then sourceList.Add('begin');
 
-  if FModuleType = -1 then  //Gdx Android Bridges controls...
-  begin
-    sourceList.Add('  gApp:= jApp.Create(nil);');
-    sourceList.Add('  gApp.Title:= ''LAMW GDX Android Bridges Library'';');
-    sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';'); //com.example.appasynctaskdemo1
-    sourceList.Add('  gjClassName:= '''+FPathToClassName+''';');           //com/example/appasynctaskdemo1/Controls
-    sourceList.Add('  gApp.AppName:=gjAppName;');
-    sourceList.Add('  gApp.ClassName:=gjClassName;');
-    sourceList.Add('  gApp.Initialize;');
-    sourceList.Add('  gApp.CreateForm(TGdxModule1, GdxModule1);');
-  end
-  else if FModuleType = 0 then  //GUI Android Bridges controls...
+  if FModuleType = 0 then  //GUI Android Bridges controls...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);');
     sourceList.Add('  gApp.Title:= ''LAMW JNI Android Bridges Library'';');
@@ -3713,7 +3071,7 @@ begin
   osys:= FPrebuildOSys;
 
   {Set compiler options for Android requirements}
-  if FNDKIndex < 6 then
+  if FNDKIndex < 6 then   //NDK < 22
   begin
     androidPlatformApi:= 'android-'+FNdkApi;
     PathToNdkPlatformsArm:= FPathToAndroidNDK+'platforms'+DirectorySeparator+
@@ -3931,15 +3289,6 @@ begin
   if auxInstr = 'x86_64' then auxStr:='x86_64';
   if auxInstr = 'mipsel' then auxStr:='mips';
   if auxInstr = 'armv8'  then auxStr:='arm64-v8a';
-
-  if Self.FAndroidTheme = 'GDXGame' then
-  begin
-    CopyFile(FPathToJavaTemplates+DirectorySeparator+'gdx'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx.so',
-             FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx.so');
-
-    CopyFile(FPathToJavaTemplates+DirectorySeparator+'gdx'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx-box2d.so',
-             FPathToJNIFolder+DirectorySeparator+'libs'+DirectorySeparator+auxStr+DirectorySeparator+'libgdx-box2d.so');
-  end;
 
   AProject.LazCompilerOptions.TargetCPU:= 'arm';    {-P}
   AProject.LazCompilerOptions.Libraries:= libraries_arm;  { -Fl}
@@ -4373,58 +3722,12 @@ begin
       templateFiles.Free;
     end;
 
-    {
-     ReadXMLFile(xmlAndroidManifest, FPathToJNIFolder + DirectorySeparator+'AndroidManifest.xml');
-     if (xmlAndroidManifest <> nil) then
-     begin
-        with xmlAndroidManifest.DocumentElement do
-        begin
-          projectPackage := AttribStrings['package'];
-        end;
-     end;
-     }
-
-     {  not need ...
-     ReadXMLFile(xmlAndroidManifest, pathToTemplate + DirectorySeparator+'AndroidManifest.xml');
-     if (xmlAndroidManifest <> nil) then
-     begin
-       with xmlAndroidManifest.DocumentElement do
-       begin
-         templatePackage := AttribStrings['package'];
-         aux:=  StringReplace(templatePackage, '.' , PathDelim, [rfReplaceAll,rfIgnoreCase]);
-         pathToTemplateSrc:= pathToTemplate + PathDelim + 'src' + PathDelim + aux;
-         //C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner\templates\AppCompat.Light.NoActionBar.NavigationDrawer\src\org\lamw\appcompatnavigationdrawerdemo1
-       end;
-     end;
-     }
-
-     { not need ...
-     //java src
-     templateFiles:= TStringList.Create;
-     try
-       FindAllFiles(templateFiles, pathToTemplateSrc, '*.java', False);
-       count:=  templateFiles.Count;
-       for i:= 0 to count-1 do
-       begin
-          fileName:= ExtractFileName(templateFiles.Strings[i]);
-          auxList.Clear;
-          auxList.LoadFromFile(templateFiles.Strings[i]);
-          auxList.Strings[0]:= 'package '+ projectPackage+';';
-          auxList.SaveToFile(FFullJavaSrcPath + PathDelim + fileName);
-       end;
-     finally
-       templateFiles.Free;
-     end;
-     }
-
      LazarusIDE.DoSaveProject([]); // TODO: change hardcoded "controls"
 
      Exit;
   end; //Template project
 
   case FModuleType of
-  -1: // Gdx Controls
-    AndroidFileDescriptor.ResourceClass:= TGdxModule;
    0: // GUI Controls
     AndroidFileDescriptor.ResourceClass:= TAndroidModule;  //GUI
    1: // NoGUI Controls
@@ -4453,19 +3756,6 @@ begin
       end;
   end;
 
-  if FModuleType = -1 then // Gdx
-  begin
-    // refresh theme
-    with LazarusIDE do
-      if ActiveProject.FileCount > 1 then
-      begin
-        s := ActiveProject.Files[1];
-        d := GetDesignerWithProjectFile(s, True);
-        c := d.LookupRoot;
-        (TGdxModule(c).Designer as TAndroidWidgetMediator).UpdateTheme;
-      end;
-  end;
-
   LazarusIDE.DoSaveProject([]); // save prompt for unit1
 
   Result := mrOK;
@@ -4481,12 +3771,7 @@ begin
   begin
     Name:= 'AndroidDataModule';
 
-    if ModuleType = -1 then
-    begin
-      Name:= 'AndroidGDXDataModule';
-      ResourceClass := TGdxModule;
-    end
-    else if ModuleType = 0 then
+    if ModuleType = 0 then
     begin
       Name:= 'AndroidDataModule';
       ResourceClass := TAndroidModule
@@ -4505,23 +3790,7 @@ begin
   end;
 end;
 
-constructor TAndroidFileDescPascalUnitWithResourceGDX.Create;
-begin
-  inherited Create;
-    //if ModuleType = -1 then
-    //begin
-      Name:= 'AndroidGDXDataModule';
-      ResourceClass := TGdxModule;
-    //end
-    UseCreateFormStatements:= True;
-end;
-
 function TAndroidFileDescPascalUnitWithResource.GetResourceType: TResourceType;
-begin
-   Result:= rtRes;
-end;
-
-function TAndroidFileDescPascalUnitWithResourceGDX.GetResourceType: TResourceType;
 begin
    Result:= rtRes;
 end;
@@ -4531,10 +3800,6 @@ begin
    Result := 'LAMW [GUI] Android jForm';
 end;
 
-function TAndroidFileDescPascalUnitWithResourceGDX.GetLocalizedName: string;
-begin
-    Result := 'LAMW [libGDX] Android jGdxForm';
-end;
 
 function TAndroidFileDescPascalUnitWithResource.GetLocalizedDescription: string;
 begin
@@ -4542,11 +3807,6 @@ begin
     ActivityModeDesign:= actRecyclable;  //secondary GUI jForm
 end;
 
-function TAndroidFileDescPascalUnitWithResourceGDX.GetLocalizedDescription: string;
-begin
-   Result := 'Create a new LAMW [libGDX] Android jGdxForm';
-   ActivityModeDesign:= actGdxScreen; //actRecyclable;  //secondary jGdxForm
-end;
 
 function TAndroidFileDescPascalUnitWithResource.CreateSource(const Filename     : string;
                                                        const SourceName   : string;
@@ -4634,107 +3894,15 @@ begin
    sourceList.Free;
 end;
 
-function TAndroidFileDescPascalUnitWithResourceGDX.CreateSource(const Filename     : string;
-                                                       const SourceName   : string;
-                                                       const ResourceName : string): string;
-var
-   sourceList: TStringList;
-   uName:  string;
-begin
-   uName:= FileName;
-   uName:= SplitStr(uName,'.');
-   sourceList:= TStringList.Create;
-
-   if ModuleType < 2 then
-     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder+DirectorySeparator+'jni }')
-     //sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }')
-   else
-     sourceList.Add('{Hint: save all files to location: ' +PathToJNIFolder +'}');
-     //sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }');
-
-   sourceList.Add('unit '+uName+';');
-   sourceList.Add('');
-   if SyntaxMode = smDelphi then
-      sourceList.Add('{$mode delphi}');
-   if SyntaxMode = smObjFpc then
-     sourceList.Add('{$mode objfpc}{$H+}');
-   sourceList.Add('');
-   sourceList.Add('interface');
-   sourceList.Add('');
-
-   if ModuleType = 3 then    sourceList.Add('{');
-
-   sourceList.Add('uses');
-
-   sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
-   sourceList.Add('  cthreads,');
-   sourceList.Add('  {$ENDIF}{$ENDIF}');
-
-
-   sourceList.Add('  ' + GetInterfaceUsesSection);
-
-   if ModuleType = 3 then    sourceList.Add('}');
-
-   if ModuleType = 1 then //no GUI
-   begin
-    sourceList.Add('');
-    sourceList.Add('const');
-    sourceList.Add('  gNoGUIjClassPath: string='''';');
-    sourceList.Add('  gNoGUIjClass: JClass=nil;');
-    sourceList.Add('  gNoGUIPDalvikVM: PJavaVM=nil;');
-   end;
-
-   if ModuleType < 3 then
-   begin
-     sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
-   end
-   else
-   begin
-      sourceList.Add(' ');
-     sourceList.Add('function SumAB(A: longint; B: longint): longint;');
-     sourceList.Add(' ');
-   end;
-
-   sourceList.Add('implementation');
-   sourceList.Add(' ');
-
-   if ModuleType < 3 then
-   begin
-      sourceList.Add(GetImplementationSource(Filename, SourceName, ResourceName));
-   end
-   else
-   begin
-      sourceList.Add('function SumAB(A: longint; B: longint): longint;');
-      sourceList.Add('begin');
-      sourceList.Add('  Result:= A + B;');
-      sourceList.Add('end;');
-      sourceList.Add(' ');
-   end;
-
-   sourceList.Add('end.');
-
-   Result:= sourceList.Text;
-
-   sourceList.Free;
-end;
-
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
 
-  if ModuleType = -1 then //GDX or GUI controls module
-     Result := 'Classes, SysUtils, AndroidWidget, GdxForm;'
-  else if ModuleType = 0 then //GDX or GUI controls module
+  if ModuleType = 0 then // GUI controls module
      Result := 'Classes, SysUtils, AndroidWidget;'
   else if ModuleType = 1  then  //generic module: No GUI Controls
      Result := 'Classes, SysUtils, jni;'
   else // console app or generic library
      Result := 'Classes, SysUtils;'
-end;
-
-function TAndroidFileDescPascalUnitWithResourceGDX.GetInterfaceUsesSection: string;
-begin
-    //GDX or GUI controls module
-     Result := 'Classes, SysUtils, AndroidWidget, GdxForm;'
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;
@@ -4748,14 +3916,7 @@ begin
 
   strList.Add(' ');
   strList.Add('type');
-  if ModuleType = -1 then //Gdx controls module
-  begin
-    if ResourceName <> '' then
-       strList.Add('  T' + ResourceName + ' = class(jGdxForm)')
-    else
-       strList.Add('  TGdxModuleXX = class(jGdxForm)');
-  end
-  else if ModuleType = 0 then //GUI controls module
+  if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
        strList.Add('  T' + ResourceName + ' = class(jForm)')
@@ -4785,14 +3946,7 @@ begin
   strList.Add('');
   strList.Add('var');
 
-  if ModuleType = -1 then //GUI controls module
-  begin
-    if ResourceName <> '' then
-       strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
-    else
-       strList.Add('  GdxModuleXX: TDataMoule');
-  end
-  else if ModuleType = 0 then //GUI controls module
+  if ModuleType = 0 then //GUI controls module
   begin
     if ResourceName <> '' then
        strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
@@ -4822,37 +3976,6 @@ begin
   strList.Free;
 end;
 
-function TAndroidFileDescPascalUnitWithResourceGDX.GetInterfaceSource(const Filename     : string;
-                                                             const SourceName   : string;
-                                                           const ResourceName : string): string;
-var
-  strList: TStringList;
-begin
-  strList:= TStringList.Create;
-
-  strList.Add(' ');
-  strList.Add('type');
-    if ResourceName <> '' then
-       strList.Add('  T' + ResourceName + ' = class(jGdxForm)')
-    else
-       strList.Add('  TGdxModuleXX = class(jGdxForm)');
-  strList.Add('  private');
-  strList.Add('    {private declarations}');
-  strList.Add('  public');
-  strList.Add('    {public declarations}');
-  strList.Add('  end;');
-  strList.Add('');
-  strList.Add('var');
-
-  if ResourceName <> '' then
-    strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
-  else
-    strList.Add('  GdxModuleXX: TDataMoule');
-
-  Result := strList.Text;
-
-  strList.Free;
-end;
 
 function TAndroidFileDescPascalUnitWithResource.GetImplementationSource(
                                            const Filename     : string;
@@ -4867,20 +3990,6 @@ begin
 
   sttList.Add(' ');
 
-  Result:= sttList.Text;
-  sttList.Free;
-end;
-
-function TAndroidFileDescPascalUnitWithResourceGDX.GetImplementationSource(
-                                           const Filename     : string;
-                                           const SourceName   : string;
-                                           const ResourceName : string): string;
-var
-  sttList: TStringList;
-begin
-  sttList:= TStringList.Create;
-  sttList.Add('{$R *.lfm}');
-  sttList.Add(' ');
   Result:= sttList.Text;
   sttList.Free;
 end;

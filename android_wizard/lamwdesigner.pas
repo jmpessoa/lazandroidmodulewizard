@@ -49,7 +49,7 @@ type
     FTheme: TAndroidTheme;
     FSplashExists: boolean;
 
-    function GetAndroidForm: TandroidForm; //jForm;   //jGdxForm
+    function GetAndroidForm: TandroidForm; //jForm;
 
     //Smart Designer helpers
     procedure InitSmartDesignerHelpers;
