@@ -77,8 +77,6 @@ type
     function TryProduceGradleVersion(pathToGradle: string): string;
     function GetGradleVersion(pathToGradle: string): string;
 
-    function GetGradleVersionFromGradle(path: string): string;
-
     function GetLprStartModuleVarName: string;
     function TryChangePrebuildOSY(path: string): string;
     function TryChangeTo49x(path: string): string;
@@ -94,7 +92,7 @@ type
     function GetNDKVersion(ndkRelease: string): integer;
 
     procedure TryUpdateMipmap();
-    function GetVerAsString(aVers: integer): string;   //android
+    function GetVerAsString(aVers: integer): string;   //?? android
 
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
@@ -323,66 +321,71 @@ var
   pathToJavaTemplates: string;
 begin
 
-  pathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
-
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxxhdpi') then
+  if MessageDlg('Question', 'Do you wish to Create res/mipmap folders?',
+                 mtConfirmation, [mbYes, mbNo], 0) = mrYes then { Execute rest of Program }
   begin
-    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
-        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
-    begin
-      CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
-      CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
-    end;
-  end;
+      pathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
 
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxhdpi') then
-  begin
-    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
-        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
-    begin
-      CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
-      CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
-    end;
-  end;
+      if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxxhdpi') then
+      begin
+        if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+            (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
+        begin
+          CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
+          CopyFile(pathToJavaTemplates +'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+        end;
+      end;
 
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xhdpi') then
-  begin
-    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
-        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
-    begin
-       CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
-       CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp',
-             FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp');
-    end;
-  end;
+      if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xxhdpi') then
+      begin
+        if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+            (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xxhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
+        begin
+          CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
+          CopyFile(pathToJavaTemplates +'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+        end;
+      end;
 
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-hdpi') then
-  begin
-    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp')) and
-        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.png'))) then
-    begin
-        CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
-                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
-        CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp',
-                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp');
-    end;
-  end;
+      if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-xhdpi') then
+      begin
+        if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+            (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-xhdpi' +DirectorySeparator + 'ic_launcher.png'))) then
+        begin
+           CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
+           CopyFile(pathToJavaTemplates +'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp');
+        end;
+      end;
 
-  if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi') then
-  begin
-    if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.webp')) and
-        (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.png'))) then
-    begin
-        CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp',
-                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp');
-        CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp',
-                 FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp');
-    end;
+      if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-hdpi') then
+      begin
+        if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+            (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-hdpi' +DirectorySeparator + 'ic_launcher.png'))) then
+        begin
+            CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
+                     FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
+            CopyFile(pathToJavaTemplates +'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                     FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp');
+        end;
+      end;
+
+      if ForceDirectories(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi') then
+      begin
+        if ((not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.webp')) and
+            (not FileExists(FPathToAndroidProject + 'res' + DirectorySeparator + 'mipmap-mdpi' +DirectorySeparator + 'ic_launcher.png'))) then
+        begin
+            CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp',
+                     FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher.webp');
+            CopyFile(pathToJavaTemplates +'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp',
+                     FPathToAndroidProject + 'res'+DirectorySeparator+'mipmap-mdpi'+DirectorySeparator+'ic_launcher_round.webp');
+        end;
+      end;
+
   end;
 
 end;
@@ -1342,75 +1345,6 @@ begin
    strList.Free;
 end;
 
-//by af0815
-//https://forum.lazarus.freepascal.org/index.php/topic,53097.0.html
-{
-With this fix, the old behavior is presaved and new behavior is added. I have to test this more.
-A goo idea is, to test gradle first by hand. Because it is possible to get errors from gradle,
-if something is misconfigured. And the you also get no version information.
-a call to gradle have to give a good result in the terminal/commandline first.
-}
-function TLamwSmartDesigner.GetGradleVersionFromGradle(path: string): string;
-var
-   Proc: TProcess;
-   FN: string;
-   CharBuffer: array [0..511] of char;
-   p, ReadCount: integer;
-   strExt, strTemp: string;
-begin
-    Result:='';
-    if path = '' then Exit;
-    strExt:= '';
-    {$IFDEF WINDOWS}
-    strExt:= '.bat';
-    {$ENDIF}
-
-    try
-      Proc := TProcess.Create(nil);
-      Proc.Options := [poUsePipes];
-      //Proc.Options:= Proc.Options + [poWaitOnExit];
-      Proc.Parameters.Add('-v');
-      FN:= AppendPathDelim(path) + 'gradle' + strExt;
-      if not FileExistsUTF8(FN) then begin
-        FN:= AppendPathDelim(path) + 'bin' + pathDelim + 'gradle' + strExt;
-        if not FileExistsUTF8(FN) then begin
-          FN:= path + 'bin' + pathDelim + 'gradle' + strExt;
-        end;
-      end;
-      Proc.Executable:= FN;
-      IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Info...Used expanded Gradle Path: ' + Proc.Executable);
-      Proc.Execute();
-      while (Proc.Running) or (Proc.Output.NumBytesAvailable > 0) or
-        (Proc.Stderr.NumBytesAvailable > 0) do
-      begin
-        // read stdout and write to our stdout
-        while Proc.Output.NumBytesAvailable > 0 do
-        begin
-          ReadCount := Min(512, Proc.Output.NumBytesAvailable); //Read up to buffer, not more
-          Proc.Output.Read(CharBuffer, ReadCount);
-          strTemp:= Copy(CharBuffer, 0, ReadCount);
-          if Pos('Gradle', strTemp) > 0 then
-          begin
-             Result:= Trim(strTemp);
-             break;
-          end;
-        end;
-        application.ProcessMessages;
-      end;
-      ExitCode := Proc.ExitStatus;
-    finally
-      Proc.Free;
-      if Result <> '' then
-      begin
-        p:= Pos(' ', Result);  //Gradle 3.3
-        Result:= Copy(Result, p+1, MaxInt); //3.3
-        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Success!! Found Gradle version: ' + Result);
-      end
-      else
-        IDEMessagesWindow.AddCustomMessage(mluVerbose, 'Sorry... Fail to find Gradle version from Gradle path ... Reason:'+ strTemp);
-
-    end;
-end;
 
 function TLamwSmartDesigner.TryProduceGradleVersion(pathToGradle: string): string;
 var
