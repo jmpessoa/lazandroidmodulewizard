@@ -15,7 +15,7 @@ TKToyShapeType = (kstRectangle, kstCircle);
 
 {jVisualControl template}
 
-KToyButton = class(jVisualControl)
+KToyButton = class(jVisualControl)  //conceptual
  private
     FShapeType: TKToyShapeType;
     FPressedColor: TARGBColorBridge;
