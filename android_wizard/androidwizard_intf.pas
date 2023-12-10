@@ -120,6 +120,7 @@ type
 
      function GetAndroidPluginVersion(gradleVersion: string): string;
      function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+     function TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
 
    public
      constructor Create; override;
@@ -1423,19 +1424,34 @@ begin
   strList.Free;
 end;
 
-{
-Versão do plug-in	Versão mínima necessária do Gradle
-8.2.0
-8.1.4
-8.0.2
-7.4.2
-7.3.1
-7.2.2
-7.1.3
-7.0.4 Gradle versão 7.x.
-4.2.2
-4.1.3  Gradle versão 6.6.1
-}
+function TAndroidProjectDescriptor.TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
+var
+  list: TStringList;
+  i, p, len: integer;
+  version, aux, aux2: string;
+begin
+   list:= TStringList.Create;
+   //list.LoadFromFile('C:\Program Files\Eclipse Adoptium\jdk-11.0.21.9-hotspot\release');
+   //list.LoadFromFile('C:\Program Files\Java\jdk1.8.0_151\release');
+   list.LoadFromFile(pathToJDK + PathDelim + 'release');
+   version:='';
+   i:= 0;
+   while (version = '') and (i < list.Count) do
+   begin
+      p:= Pos('JAVA_VERSION=', list.Strings[i]);
+      if p > 0 then
+        version:= list.Strings[i];
+      i:= i + 1;
+   end;
+   len:= Length('JAVA_VERSION=');
+   aux:= Trim(Copy(version, p+len, 100));
+   aux:= TrimChar(aux, '"');    //11.0.21  or 1.8.0_151
+   javaVersionBigNumber:= aux;
+   aux2:= SplitStr(aux, '.');  //11 or ... 1
+   Result:=Trim(aux2);
+   list.Free;
+end;
+
 function TAndroidProjectDescriptor.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
 var
   auxStr: string;
@@ -1447,34 +1463,77 @@ begin
   Result:= StrToInt(Trim(auxStr));  //661
 end;
 
+{
+//https://developer.android.com/studio/releases/gradle-plugin?hl=pt-br
+Android
+plug-in
+8.2.0  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.6?
+8.1.4  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.4 or  8.5
+8.0.2  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
+8.0.0  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
+7.4.2  <--> Android Gradle plugin requires Java 11  //Gradle versão 8.1.1
+7.3.1  <--> Gradle versão 8.1.1   //https://docs.gradle.org/8.1.1/userguide/compatibility.html
+7.2.2  <--> Gradle versão 7.6.3
+7.1.3  <--> Gradle versão 7.6.3  //https://docs.gradle.org/7.6.3/userguide/compatibility.html
+7.0.4  <--> Gradle versão 7.6.2  //7.0, 7.1, 7.2, 7.3 and 7.4
+4.2.2  <--> Gradle versão 6.9.4
+4.1.3  <--> Gradle versão 6.6.1    //3.4, 3.5, 3.6 and 4.0
+}
+
+(*About Android Studio "Hedgehog")
+JDK 17
+Nível da API 34
+Versão mínima do "Android Plugin" 8.1.1 (requiresJava 17)
+*)
+
 function TAndroidProjectDescriptor.GetAndroidPluginVersion(gradleVersion: string): string;
 var
-  strGV: string;
+  strGV, auxGrVer: string;
   intGV: integer;
   bigNumber: integer;
 begin
-   bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
-                                            //JDK 11 - "6.7.1" to "7.6.3"'
-   Result:= '4.1.3';
-   strGV:= SplitStr(gradleVersion,  '.');
-   intGV:= StrToInt(strGV);
-   if intGV >= 8 then
-   begin
-      ShowMessage(' warning: LAMW don''t support Gradle > 7.6.3 yet...');
-      Result:= '7.1.3'; //8 -> Result:= '8.1.4';
-   end;
-   if intGV = 7 then  Result:= '7.1.3';
-   if intGV = 6 then
-   begin
-      if bigNumber <  671 then
-        Result:= '4.1.3'
-      else
+
+  bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
+  auxGrVer:= gradleVersion;
+  strGV:= SplitStr(auxGrVer,  '.');
+  intGV:= StrToInt(strGV);
+
+  if intGV = 8 then  //JDK 11 - Java 11 need Gradle version >=  6.7.1 -- targetApi 33
+  begin
+
+    if (bigNumber >= 800) and (bigNumber < 820) then          //Tested: Gradle 8.1.1
+         Result:= '7.4.2' //JDK 11
+    else if (bigNumber >= 820) and (bigNumber < 830) then     //Tested: Gradle 8.2.1
+       Result:= '7.4.2'   //JDK 11                                   //'8.0.2' --> JDK 17  -> targetApi 34
+    else if (bigNumber >= 830) and (bigNumber < 840) then     //Tested: Gradle 8.3
+        Result:=  '7.4.2' //JDK 11                                    //'8.1.4' --> JDK 17  -> targetApi 34
+    else if bigNumber >= 840 then                             //Tested: Gradle 8.4  and Gradle 8.5
+       Result:= '7.4.2'; //JDK 11                             //'8.2.0' --> JDK 17 -> targetApi 34
+
+  end;
+
+  if intGV = 7 then   //JDK 11
+  begin
+     Result:= '7.2.2'; //Tested Gradle 7.6.3
+  end;
+
+  if intGV = 6 then     //JDK 1.8 need Gradle version <=  6.7 .... and JDK 11 >= 6.7.1
+  begin
+     if  bigNumber >= 671 then //JDK 11   //Tested Gradle 6.7.1
+     begin
         Result:= '4.2.2';
-   end;
-   if intGV < 6 then
-   begin
+     end
+     else                      //JDK 1.8
+     begin
+        Result:= '4.1.3'
+     end;
+  end;
+
+  if intGV < 6 then             //JDK 1.8
+  begin
      Result:= '3.4.1';
-   end;
+  end;
+
 end;
 
 function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;

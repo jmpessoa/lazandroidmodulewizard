@@ -629,8 +629,7 @@ procedure TFormSettingsPaths.SpeedButtonAntClick(Sender: TObject);
 begin
      MessageDlg('About Java and Gradle:' +  sLineBreak +
                      '  Java JDK 1.8 need Gradle version <=  6.7' + sLineBreak +
-                     '  Java 11 need Gradle version >=  6.7.1 to 7.6.3' + sLineBreak +
-                     '      warning: LAMW don''t support Gradle > 7.6.3 yet...' + sLineBreak +  sLineBreak +
+                     '  Java 11 need Gradle version >=  6.7.1' + sLineBreak + sLineBreak +
                 'About Java and Ant:' +  sLineBreak +
                      '  Ant need java JDK 1.8 and Android SDK r25.2.5'
                   , mtInformation, [mbOk], 0);
@@ -641,8 +640,7 @@ begin
   ShowMessage('Warning/Recomendation:'+
            sLineBreak+
            sLineBreak+'[LAMW 0.8.6.3] recomentations:'+
-           sLineBreak+' 1. Java JDK 11 + Gradle version: "6.7.1" to "7.6.3"' +
-           sLineBreak+'     warning: LAMW don''t support Gradle > 7.6.3 yet...'+
+           sLineBreak+' 1. Java JDK 11 + Gradle version >= 6.7.1' +
            sLineBreak+' 2. Android SDK "plataforms" 33 + "build-tools" 33.0.2'+
            sLineBreak+' 3. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 4. Android SDK/Extra  "Support Library"'+

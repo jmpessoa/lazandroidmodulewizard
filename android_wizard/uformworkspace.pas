@@ -174,6 +174,9 @@ type
     function GetNDKVersion(ndkRelease: string): integer;
     function TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+    procedure CheckingSettingsCompatibility;
+    procedure WarningCheckingJDK_11(javaVersionBigNumber: string; grVersion:string);
+    procedure WarningCheckingJDK_8(javaVersionBigNumber: string; grVersion:string);
 
     property PathToWorkspace: string read FPathToWorkspace write FPathToWorkspace;
     property InstructionSet: string read FInstructionSet write FInstructionSet;
@@ -1261,6 +1264,71 @@ begin
   else Result:= FPathToSmartDesigner;
 end;
 
+procedure TFormWorkspace.WarningCheckingJDK_11(javaVersionBigNumber: string; grVersion:string);
+begin
+   MessageDlg('Inconsistent settings:' + sLineBreak +
+              '  Java JDK '+ javaVersionBigNumber + sLineBreak +
+              '  Can''t run Gradle Version < 6.7.1' + sLineBreak + sLineBreak +
+              '  Solution: -> upgrade Gradle ['+grVersion+'] to  Version >= 6.7.1'  + sLineBreak +
+              '               or ' + sLineBreak +
+              '            -> downgrade to JDK 1.8', mtWarning, [mbOk], 0);
+
+end;
+procedure TFormWorkspace.WarningCheckingJDK_8(javaVersionBigNumber: string; grVersion:string); //JDK 1.8
+begin
+
+MessageDlg('Inconsistent settings::' + sLineBreak +
+            '  Java JDK '+ javaVersionBigNumber + sLineBreak +
+            '  Can''t run Gradle Version > 6.7 ' + sLineBreak + sLineBreak +
+            '  Solution: -> upgrade to JDK 11' + sLineBreak +
+            '               or' + sLineBreak +
+            '            -> downgrade Gradle ['+grVersion+'] to Version <= 6.7', mtWarning, [mbOk], 0);
+end;
+
+procedure TFormWorkspace.CheckingSettingsCompatibility;
+var
+  strGV, auxGrVer: string;
+  intGV: integer;
+  gvBigNumber: integer;
+  mainJDKVersionAsString, outJavaVersionBigNumber: string;
+begin
+
+  gvBigNumber:= GetGradleVersionAsBigNumber(FGradleVersion);
+  auxGrVer:= FGradleVersion;
+  strGV:= SplitStr(auxGrVer,  '.');
+  intGV:= StrToInt(strGV);
+  mainJDKVersionAsString:= TryGetJavaVersion(FPathToJavaJDK,  outJavaVersionBigNumber);
+
+  if intGV = 8 then  //JDK 11 - Java 11 need Gradle version >=  6.7.1 -- targetApi 33
+  begin
+    if mainJDKVersionAsString = '1' then WarningCheckingJDK_8(outJavaVersionBigNumber, FGradleVersion); //jdk 1.8
+  end;
+
+  if intGV = 7 then   //JDK 11
+  begin
+    if mainJDKVersionAsString = '1' then WarningCheckingJDK_8(outJavaVersionBigNumber, FGradleVersion); //1.8
+
+  end;
+
+  if intGV = 6 then     //JDK 1.8 need Gradle version <=  6.7 .... and JDK 11 >= 6.7.1
+  begin
+     if  gvBigNumber >= 671 then //JDK 11   //Tested Gradle 6.7.1
+     begin
+        if mainJDKVersionAsString = '1' then WarningCheckingJDK_8(outJavaVersionBigNumber, FGradleVersion); //1.8
+     end
+     else                      //JDK 1.8
+     begin
+        if mainJDKVersionAsString = '11' then WarningCheckingJDK_11(outJavaVersionBigNumber, FGradleVersion);
+     end;
+  end;
+
+  if intGV < 6 then  //JDK 1.8
+  begin
+     if mainJDKVersionAsString = '11' then WarningCheckingJDK_11(outJavaVersionBigNumber, FGradleVersion);
+  end;
+
+end;
+
 procedure TFormWorkspace.FormActivate(Sender: TObject);
 var
   listDirectories: TStringList;
@@ -1277,6 +1345,8 @@ begin
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
   ListBoxMinSDK.ItemIndex:= 1;
+  if cbBuildSystem.Text = 'Gradle' then ListBoxMinSDK.ItemIndex:= 10;
+
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
   StatusBarInfo.Panels.Items[1].Text:= '[MinSdk] '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
 
@@ -1301,7 +1371,6 @@ begin
 
   Self.RGInstruction.ItemIndex:= FInstructionSetIndex;
 
-
   //NEW! App Templates!
   listDirectories:= TStringList.Create;
   try
@@ -1320,6 +1389,8 @@ begin
   ComboBoxThemeColor.Enabled:= False;
 
   FSupport:= False; //[old] supporte library need "gradle" and "targetApi >= 29"
+
+  CheckingSettingsCompatibility;   //0.8.6.3
 
 end;
 
@@ -1552,8 +1623,7 @@ begin
  ShowMessage('Warning/Recomendation:'+
            sLineBreak+
            sLineBreak+'[LAMW 0.8.6.3] recomentations:'+
-           sLineBreak+' 1. Java JDK 11 + Gradle version: "6.7.1" to "7.6.3"' +
-           sLineBreak+'     warning: LAMW don''t support Gradle > 7.6.3 yet...'+
+           sLineBreak+' 1. Java JDK 11 + Gradle version >= 6.7.1' +
            sLineBreak+' 2. Android SDK "plataforms" 33 + "build-tools" 33.0.2'+
            sLineBreak+' 3. Android SDK/Extra  "Support Repository"'+
            sLineBreak+' 4. Android SDK/Extra  "Support Library"'+
@@ -1576,8 +1646,7 @@ begin
                   '  Gradle: ' + FGradleVersion + sLineBreak +  sLineBreak +
                'About Java and Gradle:' +  sLineBreak +
                      '  Java JDK 1.8 need Gradle version <=  6.7' + sLineBreak +
-                     '  Java 11 need Gradle version >=  6.7.1  to 7.6.3'  + sLineBreak +
-                     '      warning: LAMW don''t support Gradle > 7.6.3 yet...' + sLineBreak + sLineBreak +
+                     '  Java 11 need Gradle version >=  6.7.1'  + sLineBreak +  sLineBreak +
                'About Java and Ant:' +  sLineBreak +
                      '  Ant need java JDK 1.8 and Android SDK r25.2.5'
                   , mtInformation, [mbOk], 0);
@@ -1839,9 +1908,7 @@ begin
     end;
 
     if cbBuildSystem.Items.Count > 0 then
-    begin
        cbBuildSystem.ItemIndex:= 0;
-    end;
 
     FNDKRelease:= ReadString('NewProject','NDKRelease', '');
     if FNDKRelease <> '' then

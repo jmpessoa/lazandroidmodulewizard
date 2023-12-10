@@ -13,7 +13,7 @@ uses
 
 const
   cMinAPI = 10;
-  cMaxAPI = 34;
+  cMaxAPI = 35;
 
 type
 
@@ -370,7 +370,7 @@ var
   pathToAndroidSDK: string;
   locationSrc: string;
   tempStr, findString, oldTargetStr, oldCompileSdkVersion: string;
-  p: integer;
+  p, p2: integer;
   cpuTarget:string;
   includeList: TStringList;
   universalApk: boolean;
@@ -594,12 +594,25 @@ begin
       strList.Text := tempStr;
     end;
 
-    p := Pos('compileSdkVersion ', strList.Text);
-    tempStr := Trim(Copy(strList.Text, p, Length('compileSdkVersion ') + 2));
+    p := Pos('compileSdkVersion ', strList.Text);  //0.8.6.2
+    if p > 0 then
+    begin
+      tempStr := Trim(Copy(strList.Text, p, Length('compileSdkVersion ') + 2));
     //compileSdkVersion 25
 
-    p := Pos(' ', tempStr);
-    oldCompileSdkVersion:= Trim(Copy(tempStr, p + 1, 2));
+      p2 := Pos(' ', tempStr);
+      oldCompileSdkVersion:= Trim(Copy(tempStr, p2 + 1, 2));
+      findString:='compileSdkVersion ';
+    end
+    else
+    begin
+       p := Pos('compileSdk ', strList.Text);  //0.8.6.3
+     //compileSdk 25
+
+      p2 := Pos(' ', tempStr);
+      oldCompileSdkVersion:= Trim(Copy(tempStr, p2 + 1, 2));
+      findString:='compileSdk ';
+    end;
 
     if IsAllCharNumber(PChar(oldCompileSdkVersion)) then
     begin
@@ -608,7 +621,6 @@ begin
 
         tempStr := strList.Text;
 
-        findString:='compileSdkVersion ';
         if (Pos(findString,tempStr)>0) then
           tempStr := StringReplace(tempStr, findString+oldCompileSdkVersion, findString+IntToStr(FTargetSdkVersion), [rfIgnoreCase]);
 

@@ -600,6 +600,29 @@ begin
   Result:= StrToInt(Trim(auxStr));  //661
 end;
 
+{
+//https://developer.android.com/studio/releases/gradle-plugin?hl=pt-br
+Android
+plug-in
+8.2.0  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.6?
+8.1.4  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.4 or  8.5
+8.0.2  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
+8.0.0  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
+7.4.2  <--> Android Gradle plugin requires Java 11  //Gradle versão 8.1.1
+7.3.1  <--> Gradle versão 8.1.1   //https://docs.gradle.org/8.1.1/userguide/compatibility.html
+7.2.2  <--> Gradle versão 7.6.3
+7.1.3  <--> Gradle versão 7.6.3  //https://docs.gradle.org/7.6.3/userguide/compatibility.html
+7.0.4  <--> Gradle versão 7.6.2  //7.0, 7.1, 7.2, 7.3 and 7.4
+4.2.2  <--> Gradle versão 6.9.4
+4.1.3  <--> Gradle versão 6.6.1    //3.4, 3.5, 3.6 and 4.0
+}
+
+(*About Android Studio "Hedgehog")
+JDK 17
+Nível da API 34
+Versão mínima do "Android Plugin" 8.1.1 (requiresJava 17)
+*)
+
 function TLamwSmartDesigner.GetAndroidPluginVersion(gradleVersion: string): string;
 var
   strGV: string;
@@ -607,22 +630,35 @@ var
   bigNumber: integer;
 begin
    bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
-
-   Result:= '3.4.1';
    strGV:= SplitStr(gradleVersion,  '.');
    intGV:= StrToInt(strGV);
-   if intGV >= 8 then
+
+   if intGV = 8 then  //JDK 11 -  targetApi 33
    begin
-       ShowMessage(' warning: LAMW don''t support Gradle > 7.6.3 yet...');
-       Result:= '7.1.3'; //8 -> Result:= '8.1.4';
+     //https://docs.gradle.org/8.5/userguide/compatibility.html
+     if (bigNumber >= 800) and (bigNumber < 820) then          //Tested: Gradle 8.1.1
+          Result:= '7.4.2' //JDK 11
+     else if (bigNumber >= 820) and (bigNumber < 830) then     //Tested: Gradle 8.2.1
+        Result:= '7.4.2'   //JDK 11                                   //'8.0.2' --> JDK 17  -> targetApi 34
+     else if (bigNumber >= 830) and (bigNumber < 840) then     //Tested: Gradle 8.3
+         Result:=  '7.4.2' //JDK 11                                    //'8.1.4' --> JDK 17  -> targetApi 34
+     else if bigNumber >= 840 then                             //Tested: Gradle 8.4  and Gradle 8.5
+        Result:= '7.4.2'; //JDK 11                                     //'8.2.0' --> JDK 17 -> targetApi 34
    end;
-   if intGV = 7 then  Result:= '7.1.3';
-   if intGV = 6 then
+   if intGV = 7 then     //JDK 11
    begin
-      if bigNumber <  671 then
-        Result:= '4.1.3'
-      else
+      Result:= '7.2.2'; //'7.1.3'; //Tested Gradle 7.6.3
+   end;
+   if intGV = 6 then //JDK 1.8 need Gradle version <=  6.7
+   begin
+      if  bigNumber >= 671 then //JDK 11   //Tested Gradle 6.7.1
+     begin
         Result:= '4.2.2';
+     end
+     else                      //JDK 1.8
+     begin
+         Result:= '4.1.3'
+     end;
    end;
    if intGV < 6 then
    begin
@@ -1461,7 +1497,7 @@ end;
 
 procedure TLamwSmartDesigner.Init4Project(AProject: TLazProject);
 var
-  tempStr: string;
+  tempStr, auxFNdkApi: string;
   p: integer;
   isProjectImported: boolean;
   sdkTargetApi: string;
@@ -1511,7 +1547,8 @@ begin
     FProjFile := AProject.MainFile; //save ...
 
     FNdkApi:= AProject.CustomData['NdkApi']; //android-22
-    tempStr:= SplitStr(FNdkApi, '-');   //now  FNdkApi = 22 !
+    auxFNdkApi:= FNdkApi;
+    tempStr:= SplitStr(auxFNdkApi, '-');   //now  FNdkApi = 22 !
 
     isBrandNew:= False;
 
@@ -1524,7 +1561,6 @@ begin
       AProject.CustomData['LamwVersion'] := LamwGlobalSettings.Version;
       UpdateAllJControls(AProject);
     end;
-
 
     //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
     FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
