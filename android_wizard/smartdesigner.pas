@@ -321,6 +321,9 @@ var
   pathToJavaTemplates: string;
 begin
 
+  if DirectoryExists(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi')
+     then Exit;
+
   if MessageDlg('Question', 'Do you wish to Create res/mipmap folders?',
                  mtConfirmation, [mbYes, mbNo], 0) = mrYes then { Execute rest of Program }
   begin
