@@ -28,10 +28,10 @@
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
             - amw_ide_tools.lpk		(in "..../ide_tools" folder)
-      - Go to "2. Infrastructure Setup ".  
+      - Go to section "2. Infrastructure Setup".  
 
 - Option b) [LAMW Manager](https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html) 
-   - All in One! LAMW Manage produces a complete Lazarus for Android environment by automating the step "2. Infrastructure"!   
+   - All in One! LAMW Manage produces a complete Lazarus for Android environment by automating the step "2. Infrastructure Setup"!   
       - [LAMW Manager Installer for Linux](https://github.com/dosza/LAMWManager-linux)
       - [LAMW Manager Installer for Windows](https://github.com/dosza/LAMWManager-win)
 
@@ -87,7 +87,7 @@
 
 ##### 2.1 Get [Java JDK](https://adoptium.net/temurin/releases/) and [Gradle](https://gradle.org/releases/) system Apk builder
 - recommended:  Java JDK 11 + Gradle version >=  6.7.1
-  - be patient Java JDK 17 will be supported in next LAMW 0.8.6.4 revision!   
+  - be patient, Java JDK 17 will be full supported in next LAMW 0.8.6.4 revision! [but you can try it just now using Gradle Version >= 8.1.1 !]   
 - alternative:  Java JDK 1.8  + Gradle version <=  6.7
   - JDK 1.8 support the  limited but light [Ant](http://ant.apache.org/bindownload.cgi) system Apk build
 
