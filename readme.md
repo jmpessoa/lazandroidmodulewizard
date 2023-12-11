@@ -87,7 +87,7 @@
 
 ##### 2.1 Get [Java JDK](https://adoptium.net/temurin/releases/) and [Gradle](https://gradle.org/releases/) system Apk builder
 - recommended:  Java JDK 11 + Gradle version >=  6.7.1
-       - be patient Java JDK 17 will be supported in next LAMW 0.8.6.4 revision!   
+          - be patient Java JDK 17 will be supported in next LAMW 0.8.6.4 revision!   
 - alternative:  Java JDK 1.8  + Gradle version <=  6.7
   - JDK 1.8 support the limited but light [Ant](http://ant.apache.org/bindownload.cgi) system Apk build
 
