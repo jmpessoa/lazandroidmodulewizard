@@ -4,31 +4,31 @@
 ##### RAD Android! Form Designer and Components Development Model!
 - LAMW is a wizard to create JNI Android loadable module (.so) and Android Apk using Lazarus/Free Pascal.
 
-[![Version](https://img.shields.io/badge/Version-0.8.6.2-blue)](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
+[![Version](https://img.shields.io/badge/Version-0.8.6.3-lgreen)](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
 
 ##### Features
 - Native Android GUI
-- - AppCompat and Material Design supported!
+  - AppCompat and Material Design supported!
 - RAD! Form designer and drag&drop component development model!
-- - More than 140 components! 
+  - More than 140 components! 
 
 # [Getting Started](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 
 ### 1. Get Lazarus for Android
-- Option a) [Laz4Android 2.0.12](http://sourceforge.net/projects/laz4android/files/?source=navbar) (Windows) 
+- Option a) [Laz4Android 2.2.2](http://sourceforge.net/projects/laz4android/files/?source=navbar) (Windows) 
    - All cross-android compilers already installed!
       - arm-android/aarch64-android/i386-android/x86_64-android/jvm-android
-     - hint: Install here: "C:\laz4android2.0.12"   (not "Program Files" !!!)
+     - hint: Install here: "C:\laz4android2.2.2"   (not "Program Files" !!!)
    - How to:
-      - Install [Laz4Android2.0.12](http://sourceforge.net/projects/laz4android/files/?source=navbar)
+      - Install [Laz4Android2.2.2](http://sourceforge.net/projects/laz4android/files/?source=navbar)
       - Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
          - Download LAMW and unzip it in some folder 
-            - recommended folder: "C:\laz4android2.0.12\components"
+            - recommended folder: "C:\laz4android2.2.2\components"
          - Packages installations order/sequence:
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
             - amw_ide_tools.lpk		(in "..../ide_tools" folder)
-      - Go to "2. Infrastructure".  
+      - Go to "2. Infrastructure Setup ".  
 
 - Option b) [LAMW Manager](https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html) 
    - All in One! LAMW Manage produces a complete Lazarus for Android environment by automating the step "2. Infrastructure"!   
@@ -36,13 +36,12 @@
       - [LAMW Manager Installer for Windows](https://github.com/dosza/LAMWManager-win)
 
 - Option c) [Fpcupdeluxe](https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases) (Linux and Windows) 
-  - [Linux + Fpcupdeluxe + LAMW](https://wiki.freepascal.org/LAMW_install_linux_fpcupdeluxe)
-  - [Windows + Fpcupdeluxe + LAMW](https://wiki.freepascal.org/LAMW_install_windows_fpcupdeluxe)
+  - [Linux + Fpcupdeluxe + LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/linux/tutorial_by_waynesherman)
 - Option d) How to: Do It Yourself! 
-    - d.1) Get [Lazarus 2.0.12](https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.0.12/lazarus-2.0.12-fpc-3.2.0-win64.exe/download)
+    - d.1) Get [Lazarus 2.2.2](https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.0.12/lazarus-2.0.12-fpc-3.2.0-win64.exe/download)
     - d.2) Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
          - Download LAMW and unzip it in some folder 
-            - recommended folder "C:\lazarus2.0.12\components"
+            - recommended folder "C:\lazarus2.2.2\components"
          - Packages installations order/sequence:
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
@@ -84,10 +83,13 @@
                        $(LazarusDir)fpc\3.2.0\source
                ```
 
-### 2. Infrastructure  :: only for non-users of  "LAMW Manager" !!
+### 2. Infrastructure Setup  :: only for non-users of  "LAMW Manager" !!
 
-##### 2.1 Get [Java JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-- warning:  Java JDK > 8 don't support [anymore] "Ant" Apk builder!
+##### 2.1 Get [Java JDK](https://adoptium.net/temurin/releases/) and [Gradle](https://gradle.org/releases/) system Apk builder
+- recommended:  Java JDK 11 + Gradle version >=  6.7.1
+       - be patient Java JDK 17 will be supported in next LAMW 0.8.6.4 revision!   
+- alternative:  Java JDK 1.8  + Gradle version <=  6.7
+  - JDK 1.8 support the limited but light [Ant](http://ant.apache.org/bindownload.cgi) system Apk build
 
 ##### 2.2 Get Android SDK
 - recommended version for supporting "Ant" and "Gradle" Apk builders
@@ -111,23 +113,22 @@
           - (x)Google Repository
           - (x)Google Play Services
        - Install 7 package!
-    - on command line terminal go to folder "sdk/tools/bin"
+    - IMPORTANT: on command line terminal go to folder "sdk/tools/bin"
        - run the command  >>sdkmanager --update
-       - run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-30"
+       - run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"
        
 ##### 2.3 Get [Android NDK](https://developer.android.com/ndk/downloads/index.html)
 - recommended version
-   - [r19c](https://github.com/android/ndk/wiki/Unsupported-Downloads)
+   - [r21e](https://github.com/android/ndk/wiki/Unsupported-Downloads)
 
 ##### 2.4 Get [Ant](http://ant.apache.org/bindownload.cgi) builder 
 - Simply extract the zip file to a convenient location...
 
 ##### 2.5 Get [Gradle](https://gradle.org/releases/) builder
-- recommended version
-  - [6.6.1](https://gradle.org/next-steps/?version=6.6.1&format=bin)
-    - Use the option "extract here" to produce the folder "gradle-6.6.1" in a convenient location...
-    - warning: Gradle >= 7  don't supported by LAMW, yet! 
-    - warning: Gradle 6.x.y  don't support Java > 13!
+- recommended versions
+  - Java JDK 11: [Gradle 7.6.3](https://gradle.org/next-steps/?version=7.6.3&format=bin) or up
+  - Java JDK 1.8: [Gradle 6.7](https://gradle.org/next-steps/?version=6.7&format=bin) or down
+    - Use the option "extract here" to produce the folder "gradle-x.y.z" in a convenient location...
     - warning: Gradle build process need internet connection!!!
 
 ### 3. Using LAMW
@@ -155,4 +156,3 @@
 ###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
 
 [![N|Solid](https://i.imgur.com/xlfiR4A.png)](https://www.lazarus-ide.org/)
-
