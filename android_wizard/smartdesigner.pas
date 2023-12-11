@@ -321,11 +321,11 @@ var
   pathToJavaTemplates: string;
 begin
 
-  if DirectoryExists(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi')
-     then Exit;
+  if DirectoryExists(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi')  then Exit;
+  if LazarusIDE.ActiveProject.CustomData['CanCreateResMipmapFolder'] = 'NO' then Exit;
 
   if MessageDlg('Question', 'Do you wish to Create res/mipmap folders?',
-                 mtConfirmation, [mbYes, mbNo], 0) = mrYes then { Execute rest of Program }
+                 mtConfirmation, [mbYes, mbNo], 0) = mrYes then
   begin
       pathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
 
@@ -389,7 +389,8 @@ begin
         end;
       end;
 
-  end;
+  end
+  else LazarusIDE.ActiveProject.CustomData['CanCreateResMipmapFolder']:= 'NO';
 
 end;
 
