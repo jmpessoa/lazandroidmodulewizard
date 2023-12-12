@@ -240,13 +240,9 @@ var
    i, p, len: integer;
 begin
   version:= '';
+  ext:='.sh';
+  {$IFDEF windows}
   ext:='.bat';
-  {$IFDEF linux}
-    ext:='';
-  {$Endif}
-
-  {$IFDEF darwin}
-     ext:='';
   {$Endif}
 
   gradle:= 'gradle'  + ext;
