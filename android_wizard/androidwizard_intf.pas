@@ -1226,7 +1226,6 @@ begin
     end;
   end;
 
-
   strList.Add('}');
 
   strList.Add('tasks.register(''run'', Exec) {');
@@ -1243,6 +1242,7 @@ begin
   strList.Add('}');
   strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
   strList.Free;
+
 end;
 
 function TAndroidProjectDescriptor.TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
