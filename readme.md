@@ -15,7 +15,7 @@
 # [Getting Started](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 
 ### 1. Get Lazarus for Android
-- Option a) [Laz4Android 2.2.2](http://sourceforge.net/projects/laz4android/files/?source=navbar) (Windows) 
+- Option a) [Laz4Android 2.2.2](http://sourceforge.net/projects/laz4android/files/?source=navba) (Windows) 
    - All cross-android compilers already installed!
       - arm-android/aarch64-android/i386-android/x86_64-android/jvm-android
      - hint: Install here: "C:\laz4android2.2.2"   (not "Program Files" !!!)
@@ -28,20 +28,20 @@
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
             - amw_ide_tools.lpk		(in "..../ide_tools" folder)
-      - Go to section "2. Infrastructure Setup".  
+      - Go to "2. Infrastructure Setup ".  
 
 - Option b) [LAMW Manager](https://forum.lazarus.freepascal.org/index.php/topic,45361.0.html) 
-   - All in One! LAMW Manage produces a complete Lazarus for Android environment by automating the step "2. Infrastructure Setup"!   
+   - All in One! LAMW Manage produces a complete Lazarus for Android environment by automating the step "2. Infrastructure"!   
       - [LAMW Manager Installer for Linux](https://github.com/dosza/LAMWManager-linux)
       - [LAMW Manager Installer for Windows](https://github.com/dosza/LAMWManager-win)
 
 - Option c) [Fpcupdeluxe](https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases) (Linux and Windows) 
   - [Linux + Fpcupdeluxe + LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/tree/master/docs/linux/tutorial_by_waynesherman)
 - Option d) How to: Do It Yourself! 
-    - d.1) Get [Lazarus 2.2.2](https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.0.12/lazarus-2.0.12-fpc-3.2.0-win64.exe/download)
+    - d.1) Get [Lazarus2.x.y](https://sourceforge.net/projects/lazarus/files/)
     - d.2) Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
          - Download LAMW and unzip it in some folder 
-            - recommended folder "C:\lazarus2.2.2\components"
+            - recommended folder "C:\lazarus2.x.y\components"
          - Packages installations order/sequence:
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
@@ -57,20 +57,20 @@
         - Install
 
       - hint: After "build" and "install" the cross-compilers and after to do  all "2. Infrastructure" go to "3. Using LAMW" and try to create your first [New] LAMW project!
-      - If you get an error "Fatal: Cannot find unit system used by fcllaz of package FCL." when trying "Run" --> "Build"  your project then go to "fpc.cfg"  (ex. "C:\lazarus2.0.12\fpc\3.2.0\bin") and:
+      - If you get an error "Fatal: Cannot find unit system used by fcllaz of package FCL." when trying "Run" --> "Build"  your project then go to "fpc.cfg"  (ex. "C:\lazarus2.x.y\fpc\3.2.2\bin") and:
          - change:
             ```cfg
                     #searchpath for units and other system dependent things
-                    -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget 
-                    -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/*  
-                    -FuC:\lazarus2.0.12\fpc\$FPCVERSION/units/$fpctarget/rtl
+                    -FuC:\lazarus2.x.y\fpc\$FPCVERSION/units/$fpctarget 
+                    -FuC:\lazarus2.x.y\fpc\$FPCVERSION/units/$fpctarget/*  
+                    -FuC:\lazarus2.x.y\fpc\$FPCVERSION/units/$fpctarget/rtl
             ```
          - to:        
             ```cfg
                    #searchpath for units and other system dependent things
-                   -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget 
-                   -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/*  
-                   -FuC:\lazarus2.0.12\fpc\3.2.0/units/$fpctarget/rtl
+                   -FuC:\lazarus2.x.y\fpc\3.2.2/units/$fpctarget 
+                   -FuC:\lazarus2.x.y\fpc\3.2.2/units/$fpctarget/*  
+                   -FuC:\lazarus2.x.y\fpc\3.2.2/units/$fpctarget/rtl
            ```
          - and go to Lazarus IDE menu "Tools" -> "Options" -> "Environment"
            - "FPC Source"
@@ -80,7 +80,7 @@
                ```
              - to:
                ```cfg             
-                       $(LazarusDir)fpc\3.2.0\source
+                       $(LazarusDir)fpc\3.2.2\source
                ```
 
 ### 2. Infrastructure Setup  :: only for non-users of  "LAMW Manager" !!
@@ -92,13 +92,24 @@
   - JDK 1.8 support the  limited but light [Ant](http://ant.apache.org/bindownload.cgi) system Apk build
 
 ##### 2.2 Get Android SDK
-- recommended version for supporting "Ant" and "Gradle" Apk builders
-  - [r25.2.5-windows](https://dl.google.com/android/repository/tools_r25.2.5-windows.zip)
-   - [r25.2.5-linux](https://dl.google.com/android/repository/tools_r25.2.5-linux.zip)
-   - [r25.2.5-macosx](https://dl.google.com/android/repository/tools_r25.2.5-macosx.zip)
-- hints:
-    - unpacked/install to a "sdk" folder
-    - open a command line terminal and go to folder "sdk/tools"
+- recommended: supporting JDK 11 + Gradle version >= 6.7.1
+  - download [commandlinetools-win](https://dl.google.com/android/repository/commandlinetools-win-9123335_latest.zip)
+   - download [commandlinetools-linux](https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip)
+   - download [commandlinetools-mac](https://dl.google.com/android/repository/commandlinetools-mac-9123335_latest.zip)
+ - how To:
+    - unpacked command line tools ".zip" to a "temporary" folder
+    - create a directory tree like: C:\android\sdkJ11\cmdline-tools\latest
+    - Copy all content from "temporary" folder to exactly "...\sdkJ11\cmdline-tools\latest"
+    - Open a terminal or cmd and go to "...\sdkJ11\cmdline-tools\latest\bin"
+       - run the command  >> sdkmanager "build-tools;33.0.2" "platforms;android-33" "platform-tools"
+       - hint: you can get others android components by sdkmanager...
+- alternative: supporting JDK 1.8 + Ant + Gradle <= 6.7
+  - download  [r25.2.5-windows](https://dl.google.com/android/repository/tools_r25.2.5-windows.zip)
+   - download [r25.2.5-linux](https://dl.google.com/android/repository/tools_r25.2.5-linux.zip)
+   - download [r25.2.5-macosx](https://dl.google.com/android/repository/tools_r25.2.5-macosx.zip)
+- how to:
+    - unpacked/install the ".zip" file to a folder like "sdkJ1.8"
+    - open a command line terminal or cmd and go to folder the "sdkJ1.8\tools"
     - run the command  >>android update sdk    //to open a GUI [SDK Manager](https://i.imgur.com/UbdoENt.png) 
        - go to [Tools](https://i.imgur.com/UbdoENt.png) and keep as is
           - Android SDK Tools  (installed)
@@ -112,8 +123,8 @@
           - (x)Google USB Drive	(Windows only...)
           - (x)Google Repository
           - (x)Google Play Services
-       - Install 7 package!
-    - IMPORTANT: on command line terminal go to folder "sdk/tools/bin"
+       - Install 7 or up package!
+    - IMPORTANT: on command line terminal or cmd go to folder "sdkJ1.8\tools\bin"
        - run the command  >>sdkmanager --update
        - run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"
        
@@ -156,3 +167,4 @@
 ###### [Getting Help: Lazarus Forum](https://forum.lazarus.freepascal.org/index.php/board,43.0.html)
 
 [![N|Solid](https://i.imgur.com/xlfiR4A.png)](https://www.lazarus-ide.org/)
+

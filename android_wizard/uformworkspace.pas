@@ -1782,14 +1782,11 @@ var
    i, p, len: integer;
 begin
   version:= '';
-  ext:='.bat';
-  {$IFDEF linux}
-    ext:='';
+  ext:='.sh';
+  {$IFDEF windows}
+    ext:='.bat';
   {$Endif}
 
-  {$IFDEF darwin}
-     ext:='';
-  {$Endif}
 
   gradle:= 'gradle'  + ext;
   AStringList:= TStringList.Create;

@@ -1358,13 +1358,9 @@ var
    i, p, len: integer;
 begin
   version:= '';
-  ext:='.bat';
-  {$IFDEF linux}
-    ext:='';
-  {$Endif}
-
-  {$IFDEF darwin}
-     ext:='';
+  ext:='.sh';
+  {$IFDEF windows}
+    ext:='.bat';
   {$Endif}
 
   gradle:= 'gradle'  + ext;
