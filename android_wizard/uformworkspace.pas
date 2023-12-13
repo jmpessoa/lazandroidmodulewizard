@@ -1782,11 +1782,10 @@ var
    i, p, len: integer;
 begin
   version:= '';
-  ext:='.sh';
+  ext:='';
   {$IFDEF windows}
     ext:='.bat';
   {$Endif}
-
 
   gradle:= 'gradle'  + ext;
   AStringList:= TStringList.Create;
@@ -1794,27 +1793,30 @@ begin
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
   AProcess.Parameters.Add('-version');
-  AProcess.Parameters.Add('>');
+  AProcess.Parameters.Add('>'); //redirect output to file
   AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
   AProcess.Execute;
 
-  AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
-  i:= 0;
-  while (version='') and (i < AStringList.Count) do
+  if FileExists(pathToGradle + PathDelim + 'version.txt') then
   begin
-     p:= Pos('Gradle', AStringList.Strings[i] );
-     if p > 0 then
-     begin
-        version:=  AStringList.Strings[i];
-     end;
-     i:= i +1;
+    AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
+    i:= 0;
+    while (version='') and (i < AStringList.Count) do
+    begin
+       p:= Pos('Gradle', AStringList.Strings[i] );
+       if p > 0 then
+       begin
+          version:=  AStringList.Strings[i];
+       end;
+       i:= i +1;
+    end;
+    len:= Length('Gradle');
+    aux:= Trim(Copy(version, p+len, 10));
+    Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1!
+    AStringList.Clear;
+    AStringList.Text:= Result;
+    AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
   end;
-  len:= Length('Gradle');
-  aux:= Trim(Copy(version, p+len, 10));
-  Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1!
-  AStringList.Clear;
-  AStringList.Text:= Result;
-  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
   AProcess.Free;
   AStringList.Free;
 end;
