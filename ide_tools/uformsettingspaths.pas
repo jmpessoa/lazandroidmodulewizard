@@ -251,9 +251,12 @@ begin
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
   AProcess.Parameters.Add('-version');
-  AProcess.Parameters.Add('>'); //redirect to file
-  AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
+  //AProcess.Parameters.Add('>'); //redirect to file
+  //AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
   AProcess.Execute;
+
+  AStringList.LoadFromStream(AProcess.Output);
+  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
 
   if FileExists(pathToGradle + PathDelim + 'version.txt') then
   begin

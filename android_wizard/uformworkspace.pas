@@ -1297,6 +1297,7 @@ begin
   auxGrVer:= FGradleVersion;
   strGV:= SplitStr(auxGrVer,  '.');
   intGV:= StrToInt(strGV);
+
   mainJDKVersionAsString:= TryGetJavaVersion(FPathToJavaJDK,  outJavaVersionBigNumber);
 
   if intGV = 8 then  //JDK 11 - Java 11 need Gradle version >=  6.7.1 -- targetApi 33
@@ -1793,9 +1794,10 @@ begin
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
   AProcess.Parameters.Add('-version');
-  AProcess.Parameters.Add('>'); //redirect output to file
-  AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
   AProcess.Execute;
+
+  AStringList.LoadFromStream(AProcess.Output);
+  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
 
   if FileExists(pathToGradle + PathDelim + 'version.txt') then
   begin
@@ -1812,7 +1814,7 @@ begin
     end;
     len:= Length('Gradle');
     aux:= Trim(Copy(version, p+len, 10));
-    Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1!
+    Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1   striped version!
     AStringList.Clear;
     AStringList.Text:= Result;
     AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
