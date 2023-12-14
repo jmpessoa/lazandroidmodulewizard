@@ -287,13 +287,27 @@ procedure TFormSettingsPaths.FormClose(Sender: TObject; var CloseAction: TCloseA
 var
    fName: string;
    outBuildTool: string;
+   list: TStringList;
 begin
 
   if Self.ModalResult = mrCancel then Exit;
 
   if EditPathToGradle.Text <> '' then
+  begin
      if FGradleVersion = '' then
          FGradleVersion:= TryProduceGradleVersion(EditPathToGradle.Text);
+
+    if FGradleVersion = '' then
+    begin
+        list:=TStringList.Create;
+
+        list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
+        if Pos('.', list.Text)  > 0 then
+             list.SaveToFile(EditPathToGradle.Text+PathDelim+'version.txt');
+
+        list.Free;
+    end;
+  end;
 
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
   if FOk then

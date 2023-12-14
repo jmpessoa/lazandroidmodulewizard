@@ -1346,7 +1346,12 @@ begin
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
   ListBoxMinSDK.ItemIndex:= 1;
-  if cbBuildSystem.Text = 'Gradle' then ListBoxMinSDK.ItemIndex:= 10;
+  if cbBuildSystem.Text = 'Gradle' then
+  begin
+     ListBoxMinSDK.ItemIndex:= 10;  //api 23
+     ComboBoxTheme.ItemIndex:= 2;   //AppCompat.Light.NoActionBar
+  end;
+
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
   StatusBarInfo.Panels.Items[1].Text:= '[MinSdk] '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
@@ -1431,6 +1436,21 @@ begin
 
     ComboBoxThemeColor.ItemIndex:= 0;
     ComboBoxThemeColor.Enabled:= False;
+  end;
+
+  if cbBuildSystem.Text = 'Gradle' then
+  begin
+    if Pos('DeviceDefault', ComboBoxTheme.Text) > 0 then
+      ShowMessage('hint: '+SLineBreak+
+                  '  Select "AppCompat" theme to match the' + SLineBreak+
+                  '  modern "Material Design" look and feel...');
+
+    if Pos('Holo', ComboBoxTheme.Text) > 0 then
+    ShowMessage('hint: '+SLineBreak+
+                '  Select "AppCompat" theme to match the' + SLineBreak+
+                '  modern "Material Design" look and feel...');
+
+
   end;
 
 end;
@@ -1836,8 +1856,20 @@ begin
         list:=TStringList.Create;
         list.LoadFromFile(pathGradle+PathDelim+'version.txt');
         Result:= Trim(list.Text);
+
+    end;
+
+    if Result = '' then
+    begin
+        list:=TStringList.Create;
+
+        list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
+        if Pos('.', list.Text)  > 0 then
+             list.SaveToFile(pathGradle+PathDelim+'version.txt');
+
         list.Free;
     end;
+
 end;
 
 

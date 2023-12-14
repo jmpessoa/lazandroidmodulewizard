@@ -1415,6 +1415,17 @@ begin
         Result:= Trim(list.Text);
         list.Free;
     end;
+
+    if Result = '' then
+    begin
+        list:=TStringList.Create;
+
+        list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
+        if Pos('.', list.Text)  > 0 then
+             list.SaveToFile(pathToGradle+PathDelim+'version.txt');
+
+        list.Free;
+    end;
 end;
 
 function TLamwSmartDesigner.IsLaz4Android(): boolean;
