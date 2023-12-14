@@ -84,7 +84,7 @@ type
     function GetPrebuiltDirectory: string;
     function TryGetNDKRelease(pathNDK: string): string;
     function GetNDKVersionItemIndex(ndkRelease: string): integer;
-    function TryProduceGradleVersion(pathToGradle: string): string;
+    procedure TryProduceGradleVersion(pathToGradle: string);
 
   end;
 
@@ -98,6 +98,26 @@ uses LamwSettings;
 {$R *.lfm}
 
 { TFormSettingsPaths }
+
+function TrimChar(query: string; delimiter: char): string;
+var
+  auxStr: string;
+  count: integer;
+  newchar: char;
+begin
+  newchar:=' ';
+  if query <> '' then
+  begin
+      auxStr:= Trim(query);
+      count:= Length(auxStr);
+      if count >= 2 then
+      begin
+         if auxStr[1] = delimiter then  auxStr[1] := newchar;
+         if auxStr[count] = delimiter then  auxStr[count] := newchar;
+      end;
+      Result:= Trim(auxStr);
+  end;
+end;
 
 function IsAllCharNumber(pcString: PChar): Boolean;
 begin
@@ -231,54 +251,56 @@ begin
     else Result := 2; //unknown
 end;
 
-
-function TFormSettingsPaths.TryProduceGradleVersion(pathToGradle: string): string;
+procedure TFormSettingsPaths.TryProduceGradleVersion(pathToGradle: string);
 var
    AProcess: TProcess;
    AStringList: TStringList;
    gradle, ext, version, aux: string;
-   i, p, len: integer;
+   i, p, len, posFinal, count: integer;
 begin
-  version:= '';
   ext:='';
   {$IFDEF windows}
-  ext:='.bat';
+    ext:='.bat';
   {$Endif}
+  gradle:= 'gradle'  + ext;
 
-  gradle:= 'gradle' + ext;
   AStringList:= TStringList.Create;
+
   AProcess := TProcess.Create(nil);
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
   AProcess.Parameters.Add('-version');
-  //AProcess.Parameters.Add('>'); //redirect to file
-  //AProcess.Parameters.Add(pathToGradle + PathDelim + 'version.txt');
   AProcess.Execute;
 
   AStringList.LoadFromStream(AProcess.Output);
-  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Free;
 
-  if FileExists(pathToGradle + PathDelim + 'version.txt') then
+  if AStringList.Count > 0 then
   begin
-    AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
+    version:= '';
     i:= 0;
-    while (version='') and (i < AStringList.Count) do
+    while i < AStringList.Count do
     begin
        p:= Pos('Gradle', AStringList.Strings[i] );
        if p > 0 then
        begin
           version:=  AStringList.Strings[i];
+          i:= AStringList.Count; //exit while
        end;
        i:= i +1;
     end;
+    posFinal:= LastDelimiter('.', version) + 1; //posFinal
     len:= Length('Gradle');
-    aux:= Trim(Copy(version, p+len, 10));
-    Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1!
+    count:= posFinal - len;
+    aux:= Copy(version, p+len, count);
+
+    FGradleVersion:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //mess ??
+
     AStringList.Clear;
-    AStringList.Text:= Result;
+    AStringList.Text:= FGradleVersion; //6.6.1    striped version!
+
     AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
   end;
-  AProcess.Free;
   AStringList.Free;
 end;
 
@@ -292,20 +314,18 @@ begin
 
   if Self.ModalResult = mrCancel then Exit;
 
+  list:=TStringList.Create;
+
   if EditPathToGradle.Text <> '' then
   begin
      if FGradleVersion = '' then
-         FGradleVersion:= TryProduceGradleVersion(EditPathToGradle.Text);
+         TryProduceGradleVersion(EditPathToGradle.Text);
 
     if FGradleVersion = '' then
     begin
-        list:=TStringList.Create;
-
         list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
         if Pos('.', list.Text)  > 0 then
              list.SaveToFile(EditPathToGradle.Text+PathDelim+'version.txt');
-
-        list.Free;
     end;
   end;
 
@@ -330,9 +350,8 @@ begin
                  '.run the command> sdkmanager --update'+ sLineBreak +
                  '.run the command> sdkmanager "build-tools;33.0.2" "platforms;android-33"');
   end;
-
+  list.Free;
   CloseAction := caFree;
-
 end;
 
 procedure TFormSettingsPaths.FormShow(Sender: TObject);
@@ -590,7 +609,7 @@ begin
 
     if EditPathToGradle.Text <> '' then
       if FGradleVersion = '' then
-         FGradleVersion:= TryProduceGradleVersion(EditPathToGradle.Text);
+         TryProduceGradleVersion(EditPathToGradle.Text);
   end;
 end;
 

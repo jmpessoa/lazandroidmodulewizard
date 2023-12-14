@@ -115,7 +115,6 @@ type
 
      function GetAndroidPluginVersion(gradleVersion: string): string;
      function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
-     function TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
 
    public
      constructor Create; override;
@@ -1245,34 +1244,6 @@ begin
 
 end;
 
-function TAndroidProjectDescriptor.TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
-var
-  list: TStringList;
-  i, p, len: integer;
-  version, aux, aux2: string;
-begin
-   list:= TStringList.Create;
-   //list.LoadFromFile('C:\Program Files\Eclipse Adoptium\jdk-11.0.21.9-hotspot\release');
-   //list.LoadFromFile('C:\Program Files\Java\jdk1.8.0_151\release');
-   list.LoadFromFile(pathToJDK + PathDelim + 'release');
-   version:='';
-   i:= 0;
-   while (version = '') and (i < list.Count) do
-   begin
-      p:= Pos('JAVA_VERSION=', list.Strings[i]);
-      if p > 0 then
-        version:= list.Strings[i];
-      i:= i + 1;
-   end;
-   len:= Length('JAVA_VERSION=');
-   aux:= Trim(Copy(version, p+len, 100));
-   aux:= TrimChar(aux, '"');    //11.0.21  or 1.8.0_151
-   javaVersionBigNumber:= aux;
-   aux2:= SplitStr(aux, '.');  //11 or ... 1
-   Result:=Trim(aux2);
-   list.Free;
-end;
-
 function TAndroidProjectDescriptor.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
 var
   auxStr: string;
@@ -1465,7 +1436,6 @@ begin
       frm.SaveSettings(SettingsFilename); //LAMW.ini
 
       FBuildSystem:= frm.BuildSystem;
-
       FAndroidTheme:= frm.AndroidTheme;
 
       FKeepMyBuildGradleWhenReopen:= frm.KeepMyBuildGradleWhenReopen;

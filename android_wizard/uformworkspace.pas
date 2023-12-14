@@ -137,6 +137,8 @@ type
 
     FIsKotlinSupported: boolean;
     FKeepMyBuildGradleWhenReopen: boolean;
+    FJavaMainVersion: string;
+    FJavaBigVersion: string;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -172,7 +174,7 @@ type
 
     function TryGetNDKRelease(pathNDK: string): string;
     function GetNDKVersion(ndkRelease: string): integer;
-    function TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
+    procedure TryProduceJavaVersion(pathToJDK: string);
     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
     procedure CheckingSettingsCompatibility;
     procedure WarningCheckingJDK_11(javaVersionBigNumber: string; grVersion:string);
@@ -219,6 +221,8 @@ type
   //  property LAMWHintChecked: boolean read FLAMWHintChecked write FLAMWHintChecked;
     property IsKotlinSupported: boolean read FIsKotlinSupported write FIsKotlinSupported;
     property KeepMyBuildGradleWhenReopen: boolean read FKeepMyBuildGradleWhenReopen write FKeepMyBuildGradleWhenReopen;
+    property JavaMainVersion: string read FJavaMainVersion write FJavaMainVersion;
+    property JavaBigVersion: string read FJavaBigVersion write FJavaBigVersion;
 
   end;
 
@@ -1290,7 +1294,6 @@ var
   strGV, auxGrVer: string;
   intGV: integer;
   gvBigNumber: integer;
-  mainJDKVersionAsString, outJavaVersionBigNumber: string;
 begin
 
   gvBigNumber:= GetGradleVersionAsBigNumber(FGradleVersion);
@@ -1298,16 +1301,14 @@ begin
   strGV:= SplitStr(auxGrVer,  '.');
   intGV:= StrToInt(strGV);
 
-  mainJDKVersionAsString:= TryGetJavaVersion(FPathToJavaJDK,  outJavaVersionBigNumber);
-
   if intGV = 8 then  //JDK 11 - Java 11 need Gradle version >=  6.7.1 -- targetApi 33
   begin
-    if mainJDKVersionAsString = '1' then WarningCheckingJDK_8(outJavaVersionBigNumber, FGradleVersion); //jdk 1.8
+    if FJavaMainVersion = '1' then WarningCheckingJDK_8(FJavaBIgVersion, FGradleVersion); //jdk 1.8
   end;
 
   if intGV = 7 then   //JDK 11
   begin
-    if mainJDKVersionAsString = '1' then WarningCheckingJDK_8(outJavaVersionBigNumber, FGradleVersion); //1.8
+    if FJavaMainVersion = '1' then WarningCheckingJDK_8(FJavaBIgVersion, FGradleVersion); //1.8
 
   end;
 
@@ -1315,17 +1316,17 @@ begin
   begin
      if  gvBigNumber >= 671 then //JDK 11   //Tested Gradle 6.7.1
      begin
-        if mainJDKVersionAsString = '1' then WarningCheckingJDK_8(outJavaVersionBigNumber, FGradleVersion); //1.8
+        if FJavaMainVersion = '1' then WarningCheckingJDK_8(FJavaBIgVersion, FGradleVersion); //1.8
      end
      else                      //JDK 1.8
      begin
-        if mainJDKVersionAsString = '11' then WarningCheckingJDK_11(outJavaVersionBigNumber, FGradleVersion);
+        if FJavaMainVersion = '11' then WarningCheckingJDK_11(FJavaBIgVersion, FGradleVersion);
      end;
   end;
 
   if intGV < 6 then  //JDK 1.8
   begin
-     if mainJDKVersionAsString = '11' then WarningCheckingJDK_11(outJavaVersionBigNumber, FGradleVersion);
+     if FJavaMainVersion = '11' then WarningCheckingJDK_11(FJavaBIgVersion, FGradleVersion);
   end;
 
 end;
@@ -1522,42 +1523,46 @@ begin
 
 end;
 
-function TFormWorkspace.TryGetJavaVersion(pathToJDK: string; out javaVersionBigNumber: string): string;
+procedure TFormWorkspace.TryProduceJavaVersion(pathToJDK: string);
 var
   list: TStringList;
   i, p, len: integer;
-  version, aux, aux2: string;
+  version, aux, mainVersion: string;
 begin
    list:= TStringList.Create;
    //list.LoadFromFile('C:\Program Files\Eclipse Adoptium\jdk-11.0.21.9-hotspot\release');
    //list.LoadFromFile('C:\Program Files\Java\jdk1.8.0_151\release');
    list.LoadFromFile(pathToJDK + PathDelim + 'release');
-   version:='';
+   aux:='';
    i:= 0;
-   while (version = '') and (i < list.Count) do
+   while (aux = '') and (i < list.Count) do
    begin
       p:= Pos('JAVA_VERSION=', list.Strings[i]);
       if p > 0 then
-        version:= list.Strings[i];
+      begin
+        aux:= list.Strings[i];
+        i:= list.Count; //exit while
+      end;
       i:= i + 1;
    end;
-   len:= Length('JAVA_VERSION=');
-   aux:= Trim(Copy(version, p+len, 100));
-   aux:= TrimChar(aux, '"');    //11.0.21  or 1.8.0_151
-   javaVersionBigNumber:= aux;
-   aux2:= SplitStr(aux, '.');  //11 or ... 1
-   Result:=Trim(aux2);
+   if p > 0 then
+   begin
+     len:= Length('JAVA_VERSION=');
+     version:= Trim(Copy(aux, p+len, 15));
+     aux:= TrimChar(version, '"');
+     FJavaBigVersion:= aux;  //11.0.21  or 1.8.0_151
+     mainVersion:= SplitStr(aux, '.');  //main number: 11 or 17 or 21 or 1 (ex.: 1.8)
+     FJavaMainVersion:=Trim(mainVersion);
+   end;
    list.Free;
 end;
 
 procedure TFormWorkspace.cbBuildSystemCloseUp(Sender: TObject);
 var
-  auxStr, auxStrJavaVersion, javaVersionBigNumber: string;
+  auxStr: string;
   numberVersion: integer;
   bigNumber: integer;
 begin
-  auxStrJavaVersion:= TryGetJavaVersion(FPathToJavaJDK, javaVersionBigNumber);
-
   if (cbBuildSystem.Text = 'Gradle') then
   begin
      ListBoxMinSDK.ItemIndex:= 10; //api 23
@@ -1569,14 +1574,14 @@ begin
        numberVersion:= StrToInt(SplitStr(auxStr,'.'));
        if numberVersion > 6 then
        begin
-          if auxStrJavaVersion = '1' then  //1.8
+          if FJavaMainVersion = '1' then  //1.8
               MessageDlg('warning: "Gradle ['+FGradleVersion+']" need java JDK 11', mtWarning, [mbOk], 0);
        end;
        if numberVersion < 7 then   //6.6.1
        begin
           if bigNumber < 671 then
           begin
-              if auxStrJavaVersion = '11' then
+              if FJavaMainVersion = '11' then
                  MessageDlg('warning: Gradle ['+FGradleVersion+']'+sLineBreak+'-> Gradle Version < "6.7.1" need java JDK 1.8', mtWarning, [mbOk], 0);
           end;
        end;
@@ -1585,7 +1590,7 @@ begin
   end
   else if (cbBuildSystem.Text = 'Ant') then
   begin
-     if auxStrJavaVersion = '11' then
+     if FJavaMainVersion = '11' then
         MessageDlg('warning: "Ant" need java JDK 1.8', mtWarning, [mbOk], 0);
   end;
 end;
@@ -1656,14 +1661,12 @@ end;
 
 procedure TFormWorkspace.SpeedButtonSettingsClick(Sender: TObject);
 var
-  auxStr, auxStrJavaVersion, javaVersionBigNumber: string;
+  auxStr: string;
   numberVersion: integer;
   bigNumber: integer;
 begin
-  auxStrJavaVersion:= TryGetJavaVersion(FPathToJavaJDK, javaVersionBigNumber);
-
   MessageDlg('System Settings:' + sLineBreak +
-                  '  Java JDK: '+ javaVersionBigNumber + sLineBreak +
+                  '  Java JDK: '+ FJavaBigVersion + sLineBreak +
                   '  Gradle: ' + FGradleVersion + sLineBreak +  sLineBreak +
                'About Java and Gradle:' +  sLineBreak +
                      '  Java JDK 1.8 need Gradle version <=  6.7' + sLineBreak +
@@ -1682,14 +1685,14 @@ begin
        numberVersion:= StrToInt(SplitStr(auxStr,'.'));
        if numberVersion > 6 then
        begin
-          if auxStrJavaVersion = '1' then  //1.8
+          if FJavaMainVersion = '1' then  //1.8
               MessageDlg('warning: "Gradle ['+FGradleVersion+']" need java JDK 11', mtWarning, [mbOk], 0);
        end;
        if numberVersion < 7 then   //6.6.1
        begin
           if bigNumber < 671 then
           begin
-              if auxStrJavaVersion = '11' then
+              if FJavaMainVersion = '11' then
                  MessageDlg('warning: Gradle ['+FGradleVersion+']'+sLineBreak+'-> Gradle Version < "6.7.1" need java JDK 1.8', mtWarning, [mbOk], 0);
           end;
        end;
@@ -1698,7 +1701,7 @@ begin
   end
   else if (cbBuildSystem.Text = 'Ant') then
   begin
-     if auxStrJavaVersion = '11' then
+     if FJavaMainVersion = '11' then
         MessageDlg('warning: "Ant" need java JDK 1.8', mtWarning, [mbOk], 0);
   end;
 end;
@@ -1766,7 +1769,6 @@ end;
 
 function TFormWorkspace.GetBuildSystem: string;
 var
-  jdk, javaVersionBigNumber : string;
   bigNumber: integer;
 begin
   if cbBuildSystem.Text <> '' then
@@ -1776,14 +1778,14 @@ begin
   else
   begin
      bigNumber:= GetGradleVersionAsBigNumber(FGradleVersion);
-     jdk:=  Self.TryGetJavaVersion(FPathToJavaJDK, {out} javaVersionBigNumber);
-     if jdk = '11' then
+
+     if FJavaMainVersion = '11' then
      begin
         Result:= 'Gradle';
         if bigNumber < 671 then
           ShowMessage('warning: Java SDK 11 need gradle version >= 6.7.1');
      end
-     else //jdk = '1'  ->  1.8
+     else //FJavaMainVersion= '1'  ->  1.8
      begin
         if IsSdkToolsAntEnable then
         begin
@@ -1800,16 +1802,16 @@ var
    AProcess: TProcess;
    AStringList: TStringList;
    gradle, ext, version, aux: string;
-   i, p, len: integer;
+   i, p, len, posFinal, count: integer;
 begin
-  version:= '';
   ext:='';
   {$IFDEF windows}
     ext:='.bat';
   {$Endif}
-
   gradle:= 'gradle'  + ext;
+
   AStringList:= TStringList.Create;
+
   AProcess := TProcess.Create(nil);
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
@@ -1817,29 +1819,34 @@ begin
   AProcess.Execute;
 
   AStringList.LoadFromStream(AProcess.Output);
-  AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
+  AProcess.Free;
 
-  if FileExists(pathToGradle + PathDelim + 'version.txt') then
+  if AStringList.Count > 0 then
   begin
-    AStringList.LoadFromFile(pathToGradle + PathDelim + 'version.txt');
+    version:= '';
     i:= 0;
-    while (version='') and (i < AStringList.Count) do
+    while i < AStringList.Count do
     begin
        p:= Pos('Gradle', AStringList.Strings[i] );
        if p > 0 then
        begin
           version:=  AStringList.Strings[i];
+          i:= AStringList.Count; //exit while
        end;
        i:= i +1;
     end;
+    posFinal:= LastDelimiter('.', version) + 1; //posFinal
     len:= Length('Gradle');
-    aux:= Trim(Copy(version, p+len, 10));
-    Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //6.6.1   striped version!
+    count:= posFinal - len;
+    aux:= Copy(version, p+len, count);
+
+    Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //mess ??
+
     AStringList.Clear;
-    AStringList.Text:= Result;
+    AStringList.Text:= Result; //6.6.1    striped version!
+
     AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
   end;
-  AProcess.Free;
   AStringList.Free;
 end;
 
@@ -1856,7 +1863,6 @@ begin
         list:=TStringList.Create;
         list.LoadFromFile(pathGradle+PathDelim+'version.txt');
         Result:= Trim(list.Text);
-
     end;
 
     if Result = '' then
@@ -1878,86 +1884,79 @@ procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
   auxInstSet: string;
   i: integer;
-  javaVersion, javaVersionBigNumber: string;
+  lamwIni: TIniFile;
 begin
   //run before "OnFormActive"
 
   FFileName:= pFilename; //full filename
-
   Self.LoadPathsSettings(FFileName); // //verify if some was missing ...
 
-  with TIniFile.Create(pFilename) do
-  try
+  lamwIni:= TIniFile.Create(FFileName);
+  DoNewPathToJavaTemplate();
 
-    DoNewPathToJavaTemplate();
+  FPathToWorkspace:= lamwIni.ReadString('NewProject','PathToWorkspace', '');
+  FPackagePrefaceName:= lamwIni.ReadString('NewProject','PackagePrefaceName', '');
+  if FPackagePrefaceName = '' then FPackagePrefaceName:=  'org.lamw';
 
-    FPathToWorkspace:= ReadString('NewProject','PathToWorkspace', '');
+  FAntBuildMode:= 'debug';    //default...
+  FTouchtestEnabled:= 'True'; //default
 
-    FPackagePrefaceName:= ReadString('NewProject','PackagePrefaceName', '');
+  FMainActivity:= lamwIni.ReadString('NewProject','MainActivity', '');  //dummy
+  if FMainActivity = '' then FMainActivity:= 'App';
 
-    if FPackagePrefaceName = '' then FPackagePrefaceName:=  'org.lamw';
+  auxInstSet:= lamwIni.ReadString('NewProject','InstructionSet', '');
 
-    FAntBuildMode:= 'debug';    //default...
-    FTouchtestEnabled:= 'True'; //default
+  if not IsAllCharNumber(PChar(auxInstSet)) then
+    auxInstSet:= '1';
 
-    FMainActivity:= ReadString('NewProject','MainActivity', '');  //dummy
-    if FMainActivity = '' then FMainActivity:= 'App';
+  if auxInstSet = '' then auxInstSet:= '1';
+  if auxInstSet = '0' then auxInstSet:='1';
 
-    auxInstSet:= ReadString('NewProject','InstructionSet', '');
+  FInstructionSetIndex:= StrToInt(auxInstSet);
 
-    if not IsAllCharNumber(PChar(auxInstSet)) then
-      auxInstSet:= '1';
+  ComboSelectProjectName.Items.Clear;
 
-    if auxInstSet = '' then auxInstSet:= '1';
-    if auxInstSet = '0' then auxInstSet:='1';
+  if  FPathToWorkspace <> '' then
+    FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
 
-    FInstructionSetIndex:= StrToInt(auxInstSet);
+  FPrebuildOSYS:= lamwIni.ReadString('NewProject','PrebuildOSYS', '');
+  FPathToGradle:= lamwIni.ReadString('NewProject','PathToGradle', '');
 
-    ComboSelectProjectName.Items.Clear;
-
-    if  FPathToWorkspace <> '' then
-      FindAllDirectories(ComboSelectProjectName.Items, FPathToWorkspace, False);
-
-    FPrebuildOSYS:= ReadString('NewProject','PrebuildOSYS', '');
-    FPathToGradle:= ReadString('NewProject','PathToGradle', '');
-
-    //cbBuildSystem   is sorted!
-    if FPathToAndroidSDK <> '' then
-    begin
-        if IsSdkToolsAntEnable then
+  TryProduceJavaVersion(FPathToJavaJDK);
+  //cbBuildSystem   is sorted!
+  if FPathToAndroidSDK <> '' then
+  begin
+      if IsSdkToolsAntEnable then
+      begin
+        if FJavaMainVersion = '1'  then //1.8
         begin
-          javaVersion:= TryGetJavaVersion(FPathToJavaJDK, {out}javaVersionBigNumber);
-          if javaVersion = '1'  then //1.8
-          begin
-              cbBuildSystem.Items.Add('Ant');
-          end;
+            cbBuildSystem.Items.Add('Ant');
         end;
-    end;
-
-    if FPathToGradle <> '' then
-    begin
-       FGradleVersion:= GetGradleVersion(FPathToGradle);
-       cbBuildSystem.Items.Add('Gradle');
-    end;
-
-    if cbBuildSystem.Items.Count > 0 then
-       cbBuildSystem.ItemIndex:= 0;
-
-    FNDKRelease:= ReadString('NewProject','NDKRelease', '');
-    if FNDKRelease <> '' then
-    begin
-       FNDKVersion:= GetNDKVersion(FNDKRelease);
-    end
-    else
-    begin
-       FNDKRelease:= TryGetNDKRelease(FPathToAndroidNDK);
-       FNDKVersion:= GetNDKVersion(FNDKRelease); //18
-       WriteString('NewProject','NDKRelease', FNDKRelease);
-    end;
-
-  finally
-    Free;
+      end;
   end;
+
+  if FPathToGradle <> '' then
+  begin
+     FGradleVersion:= GetGradleVersion(FPathToGradle);
+     cbBuildSystem.Items.Add('Gradle');
+  end;
+
+  if cbBuildSystem.Items.Count > 0 then
+     cbBuildSystem.ItemIndex:= 0;
+
+  FNDKRelease:= lamwIni.ReadString('NewProject','NDKRelease', '');
+  if FNDKRelease <> '' then
+  begin
+     FNDKVersion:= GetNDKVersion(FNDKRelease);
+  end
+  else
+  begin
+     FNDKRelease:= TryGetNDKRelease(FPathToAndroidNDK);
+     FNDKVersion:= GetNDKVersion(FNDKRelease); //18
+     lamwIni.WriteString('NewProject','NDKRelease', FNDKRelease);
+  end;
+
+  lamwIni.Free;
 
   if FInstructionSetIndex < 0 then  FInstructionSetIndex:= 1;
   FFPUSet:= '';
