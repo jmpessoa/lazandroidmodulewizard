@@ -684,6 +684,9 @@ var
   versionCode, versionName: string;
 begin
 
+  if FPathToGradle <> '' then
+    FGradleVersion:= GetGradleVersion(FPathToGradle);
+
   androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion); //'7.1.3';
 
   isAppCompatTheme:= False;
@@ -1418,15 +1421,15 @@ begin
         Result:= Trim(list.Text);
         list.Free;
     end;
-
     if Result = '' then
     begin
         list:=TStringList.Create;
-
         list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
         if Pos('.', list.Text)  > 0 then
-             list.SaveToFile(pathToGradle+PathDelim+'version.txt');
-
+        begin
+          Result:= list.Text;
+          list.SaveToFile(pathToGradle+PathDelim+'version.txt');
+        end;
         list.Free;
     end;
 end;
@@ -1537,9 +1540,6 @@ begin
 
     FPathToGradle:= LamwGlobalSettings.PathToGradle;  //C:\adt32\gradle-3.3\
     LamwGlobalSettings.QueryPaths:= True; // reset to default...
-
-    if FPathToGradle <> '' then
-       FGradleVersion:= GetGradleVersion(FPathToGradle);
 
     if not isBrandNew then
     begin

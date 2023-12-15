@@ -642,6 +642,15 @@ var
   aList: TStringList;
 begin
 
+  if FGradleVersion <> '' then
+  begin
+    aList:= TStringList.Create;
+    aList.Text:= FGradleVersion;
+    if not FileExists(FPathToGradle+PathDelim+'version.txt') then
+        aList.SaveToFile(FPathToGradle + PathDelim + 'version.txt'); //so you don't miss the opportunity
+    aList.Free;
+  end;
+
   if ModalResult = mrCancel  then Exit;
 
   FMainActivity:= 'App'; //TODO: need flexibility here...
@@ -728,8 +737,9 @@ begin
      aList.Delimiter:= DirectorySeparator;
      aList.DelimitedText:= TrimChar(FAndroidProjectName, DirectorySeparator);
      FSmallProjName:=  aList.Strings[aList.Count-1];; //ex. "AppTest1"
-     FPackagePrefaceName:= '';
      aList.Free;
+
+     FPackagePrefaceName:= '';
      if FModuleType > 0 then  //NoGUI
        FJavaClassName:=  FSmallProjName //ex. "AppTest1"
   end;
@@ -841,7 +851,6 @@ begin
     end;
 
   end;
-
   //CloseAction := caFree;
 
 end;
@@ -1346,14 +1355,6 @@ begin
   ListBoxTargetAPI.ItemIndex:= 0;
   StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
 
-  ListBoxMinSDK.ItemIndex:= 1;
-  if cbBuildSystem.Text = 'Gradle' then
-  begin
-     ListBoxMinSDK.ItemIndex:= 10;  //api 23
-     ComboBoxTheme.ItemIndex:= 2;   //AppCompat.Light.NoActionBar
-  end;
-
-
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
   StatusBarInfo.Panels.Items[1].Text:= '[MinSdk] '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
 
@@ -1396,6 +1397,36 @@ begin
   ComboBoxThemeColor.Enabled:= False;
 
   FSupport:= False; //[old] supporte library need "gradle" and "targetApi >= 29"
+
+  //cbBuildSystem   is sorted!
+  if FHasSdkToolsAnt then
+  begin
+    cbBuildSystem.Items.Add('Ant');
+  end;
+
+  if FPathToGradle <> '' then
+  begin
+     cbBuildSystem.Items.Add('Gradle');
+  end;
+
+  if cbBuildSystem.Items.Count > 0 then
+     cbBuildSystem.ItemIndex:= 0;
+
+  ListBoxMinSDK.ItemIndex:= 1;
+
+  if cbBuildSystem.Text = 'Gradle' then
+  begin
+     ListBoxMinSDK.ItemIndex:= 10;  //api 23
+     ComboBoxTheme.ItemIndex:= 2;   //AppCompat.Light.NoActionBar
+     ComboBoxThemeColor.Enabled:= True;
+     ComboBoxThemeColor.ItemIndex:= 1; //blue
+  end;
+
+  if FPathToJavaJDK <> '' then
+    TryProduceJavaVersion(FPathToJavaJDK);
+
+  if FPathToGradle <> '' then
+     FGradleVersion:= GetGradleVersion(FPathToGradle);
 
   CheckingSettingsCompatibility;   //0.8.6.3
 
@@ -1814,11 +1845,12 @@ begin
 
   AProcess := TProcess.Create(nil);
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
-  AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
+  AProcess.Options:=AProcess.Options + [poUsePipes, poWaitOnExit, poNoConsole];
   AProcess.Parameters.Add('-version');
   AProcess.Execute;
 
   AStringList.LoadFromStream(AProcess.Output);
+
   AProcess.Free;
 
   if AStringList.Count > 0 then
@@ -1839,13 +1871,7 @@ begin
     len:= Length('Gradle');
     count:= posFinal - len;
     aux:= Copy(version, p+len, count);
-
     Result:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //mess ??
-
-    AStringList.Clear;
-    AStringList.Text:= Result; //6.6.1    striped version!
-
-    AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
   end;
   AStringList.Free;
 end;
@@ -1863,19 +1889,20 @@ begin
         list:=TStringList.Create;
         list.LoadFromFile(pathGradle+PathDelim+'version.txt');
         Result:= Trim(list.Text);
+        list.Free;
     end;
 
     if Result = '' then
     begin
         list:=TStringList.Create;
-
         list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
         if Pos('.', list.Text)  > 0 then
-             list.SaveToFile(pathGradle+PathDelim+'version.txt');
-
+        begin
+           Result:= list.Text;
+           list.SaveToFile(pathGradle+PathDelim+'version.txt');
+        end;
         list.Free;
     end;
-
 end;
 
 
@@ -1921,28 +1948,6 @@ begin
 
   FPrebuildOSYS:= lamwIni.ReadString('NewProject','PrebuildOSYS', '');
   FPathToGradle:= lamwIni.ReadString('NewProject','PathToGradle', '');
-
-  TryProduceJavaVersion(FPathToJavaJDK);
-  //cbBuildSystem   is sorted!
-  if FPathToAndroidSDK <> '' then
-  begin
-      if IsSdkToolsAntEnable then
-      begin
-        if FJavaMainVersion = '1'  then //1.8
-        begin
-            cbBuildSystem.Items.Add('Ant');
-        end;
-      end;
-  end;
-
-  if FPathToGradle <> '' then
-  begin
-     FGradleVersion:= GetGradleVersion(FPathToGradle);
-     cbBuildSystem.Items.Add('Gradle');
-  end;
-
-  if cbBuildSystem.Items.Count > 0 then
-     cbBuildSystem.ItemIndex:= 0;
 
   FNDKRelease:= lamwIni.ReadString('NewProject','NDKRelease', '');
   if FNDKRelease <> '' then

@@ -295,11 +295,6 @@ begin
     aux:= Copy(version, p+len, count);
 
     FGradleVersion:= Trim(StringReplace(aux,'!', '', [rfReplaceAll])); //mess ??
-
-    AStringList.Clear;
-    AStringList.Text:= FGradleVersion; //6.6.1    striped version!
-
-    AStringList.SaveToFile(pathToGradle + PathDelim + 'version.txt');
   end;
   AStringList.Free;
 end;
@@ -311,6 +306,15 @@ var
    outBuildTool: string;
    list: TStringList;
 begin
+
+  if FGradleVersion <> '' then
+  begin
+    list:= TStringList.Create;
+    list.Text:= FGradleVersion;
+    if not FileExists(FPathToGradle+PathDelim+'version.txt') then
+        list.SaveToFile(FPathToGradle + PathDelim + 'version.txt'); //so you don't miss the opportunity
+    list.Free;
+  end;
 
   if Self.ModalResult = mrCancel then Exit;
 
@@ -351,6 +355,7 @@ begin
                  '.run the command> sdkmanager "build-tools;33.0.2" "platforms;android-33"');
   end;
   list.Free;
+
   CloseAction := caFree;
 end;
 
