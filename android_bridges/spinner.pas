@@ -77,6 +77,8 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
     procedure SetFontSizeUnit(_unit: TFontSizeUnit);
     procedure SetTextAlignment(_alignment: TTextAlignment);
 
+    procedure SetFont(_fontName: string);
+
     function GetText(): string;  override;
     procedure SetText(_index: integer);  overload;
     procedure SetSelectedIndex(_index: integer);
@@ -122,6 +124,7 @@ TOnItemSelected = procedure(Sender: TObject; itemCaption: string; itemIndex: int
 
 function jSpinner_jCreate(env: PJNIEnv; this: JObject;_Self: int64): jObject;
 procedure jSpinner_SetItem(env: PJNIEnv; _jspinner: JObject; _index: integer; _item: string; _strTag: string);
+procedure jSpinner_SetFont(env: PJNIEnv; _jspinner: JObject; _fontName: string);
 
 
 implementation
@@ -561,6 +564,13 @@ begin
   jni_proc_i(gApp.jni.jEnv, FjObject, 'SetTextAlignment', Ord(_alignment));
 end;
 
+procedure jSpinner.SetFont(_fontName: string);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jSpinner_SetFont(gApp.jni.jEnv, FjObject, _fontName);
+end;
+
 procedure jSpinner.SetFontFace(AValue: TFontFace);
 begin
  FFontFace:= AValue;
@@ -774,5 +784,29 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+procedure jSpinner_SetFont(env: PJNIEnv; _jspinner: JObject; _fontName: string);
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jspinner = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jspinner);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetFont', '(Ljava/lang/String;)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fontName));
+
+  env^.CallVoidMethodA(env, _jspinner, jMethod, @jParams);
+env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 end.
