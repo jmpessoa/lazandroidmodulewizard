@@ -1428,7 +1428,7 @@ begin
   if FPathToGradle <> '' then
      FGradleVersion:= GetGradleVersion(FPathToGradle);
 
-  CheckingSettingsCompatibility;   //0.8.6.3
+  CheckingSettingsCompatibility;   //LAMW 0.8.6.3
 
 end;
 
@@ -1847,11 +1847,16 @@ begin
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poUsePipes, poWaitOnExit, poNoConsole];
   AProcess.Parameters.Add('-version');
-  AProcess.Execute;
 
-  AStringList.LoadFromStream(AProcess.Output);
-
-  AProcess.Free;
+  Application.ProcessMessages;
+  Screen.Cursor:= crHourGlass;
+  try
+    AProcess.Execute;
+    AStringList.LoadFromStream(AProcess.Output);
+  finally
+    AProcess.Free;
+    Screen.Cursor:= crDefault;
+  end;
 
   if AStringList.Count > 0 then
   begin

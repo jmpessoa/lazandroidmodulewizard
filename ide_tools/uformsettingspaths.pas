@@ -270,10 +270,16 @@ begin
   AProcess.Executable := pathToGradle + PathDelim + 'bin' + PathDelim + gradle;  //C:\android\gradle-6.8.3\bin\gradle.bat
   AProcess.Options:=AProcess.Options + [poWaitOnExit, poUsePipes, poNoConsole];
   AProcess.Parameters.Add('-version');
-  AProcess.Execute;
 
-  AStringList.LoadFromStream(AProcess.Output);
-  AProcess.Free;
+  Application.ProcessMessages;
+  Screen.Cursor:= crHourGlass;
+  try
+    AProcess.Execute;
+    AStringList.LoadFromStream(AProcess.Output);
+  finally
+    AProcess.Free;
+    Screen.Cursor:= crDefault;
+  end;
 
   if AStringList.Count > 0 then
   begin
@@ -307,30 +313,33 @@ var
    list: TStringList;
 begin
 
-  if FGradleVersion <> '' then
+  if EditPathToGradle.Text <> '' then
   begin
     list:= TStringList.Create;
-    list.Text:= FGradleVersion;
+
     if not FileExists(FPathToGradle+PathDelim+'version.txt') then
-        list.SaveToFile(FPathToGradle + PathDelim + 'version.txt'); //so you don't miss the opportunity
+    begin
+      if FGradleVersion = '' then
+          TryProduceGradleVersion(EditPathToGradle.Text);
+    end;
+
+    if FGradleVersion <> '' then
+    begin
+       list.Text:= FGradleVersion;
+       list.SaveToFile(FPathToGradle + PathDelim + 'version.txt'); //so you don't miss the opportunity
+    end;
+
     list.Free;
   end;
 
   if Self.ModalResult = mrCancel then Exit;
 
   list:=TStringList.Create;
-
-  if EditPathToGradle.Text <> '' then
+  if FGradleVersion = '' then
   begin
-     if FGradleVersion = '' then
-         TryProduceGradleVersion(EditPathToGradle.Text);
-
-    if FGradleVersion = '' then
-    begin
-        list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
-        if Pos('.', list.Text)  > 0 then
-             list.SaveToFile(EditPathToGradle.Text+PathDelim+'version.txt');
-    end;
+      list.Text:= Trim(InputBox('warning: Missing Gradle Version', 'Enter Gradle version [ex. 7.6.3]',''));
+      if Pos('.', list.Text)  > 0 then
+           list.SaveToFile(EditPathToGradle.Text+PathDelim+'version.txt');
   end;
 
   fName:= IncludeTrailingPathDelimiter(LazarusIDE.GetPrimaryConfigPath) + 'LAMW.ini';
