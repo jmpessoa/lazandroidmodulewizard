@@ -109,13 +109,17 @@ procedure jTextView_SetSingleLine(env: PJNIEnv; _jtextview: JObject; _value: boo
 procedure jTextView_SetHorizontallyScrolling(env: PJNIEnv; _jtextview: JObject; _value: boolean);
 procedure jTextView_SetEllipsize(env: PJNIEnv; _jtextview: JObject; _mode: integer);
 procedure jTextView_SetTextAllCaps(env: PJNIEnv; _jtextview: JObject; _text: string);
+procedure jTextView_SetScrollingMovementMethod(env: PJNIEnv; _jtextview: JObject);
+procedure jTextView_SetVerticalScrollBarEnabled(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+procedure jTextView_SetHorizontalScrollBarEnabled(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+procedure jTextView_SetVerticalScrollbarPosition(env: PJNIEnv; _jtextview: JObject; _value: integer);
+
 
 //-----------------------------------
-// EditText  :: changed by jmpessoa [support Api > 13]
+// EditText
 //--------------------------------------
 
 function  jEditText_Create(env:PJNIEnv; this:jobject; SelfObj: TObject ): jObject;
-
 procedure jEditText_GetCursorPos(env:PJNIEnv; EditText : jObject; Var x,y : Integer);
 procedure jEditText_SetImeKeyEnterLabel(env: PJNIEnv; _jedittext: JObject; _label: string);
 
@@ -628,6 +632,102 @@ env^.DeleteLocalRef(env,jParams[0].l);
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
+
+  procedure jTextView_SetScrollingMovementMethod(env: PJNIEnv; _jtextview: JObject);
+  var
+    jMethod: jMethodID=nil;
+    jCls: jClass=nil;
+  label
+    _exceptionOcurred;
+  begin
+
+    if (env = nil) or (_jtextview = nil) then exit;
+    jCls:= env^.GetObjectClass(env, _jtextview);
+    if jCls = nil then goto _exceptionOcurred;
+    jMethod:= env^.GetMethodID(env, jCls, 'SetScrollingMovementMethod', '()V');
+    if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+    env^.CallVoidMethod(env, _jtextview, jMethod);
+
+    env^.DeleteLocalRef(env, jCls);
+
+    _exceptionOcurred: jni_ExceptionOccurred(env);
+  end;
+
+
+  procedure jTextView_SetVerticalScrollBarEnabled(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+  var
+    jParams: array[0..0] of jValue;
+    jMethod: jMethodID=nil;
+    jCls: jClass=nil;
+  label
+    _exceptionOcurred;
+  begin
+
+    if (env = nil) or (_jtextview = nil) then exit;
+    jCls:= env^.GetObjectClass(env, _jtextview);
+    if jCls = nil then goto _exceptionOcurred;
+    jMethod:= env^.GetMethodID(env, jCls, 'SetVerticalScrollBarEnabled', '(Z)V');
+    if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+    jParams[0].z:= JBool(_value);
+
+    env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+    env^.DeleteLocalRef(env, jCls);
+
+    _exceptionOcurred: jni_ExceptionOccurred(env);
+  end;
+
+
+  procedure jTextView_SetHorizontalScrollBarEnabled(env: PJNIEnv; _jtextview: JObject; _value: boolean);
+  var
+    jParams: array[0..0] of jValue;
+    jMethod: jMethodID=nil;
+    jCls: jClass=nil;
+  label
+    _exceptionOcurred;
+  begin
+
+    if (env = nil) or (_jtextview = nil) then exit;
+    jCls:= env^.GetObjectClass(env, _jtextview);
+    if jCls = nil then goto _exceptionOcurred;
+    jMethod:= env^.GetMethodID(env, jCls, 'SetHorizontalScrollBarEnabled', '(Z)V');
+    if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+    jParams[0].z:= JBool(_value);
+
+    env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+    env^.DeleteLocalRef(env, jCls);
+
+    _exceptionOcurred: jni_ExceptionOccurred(env);
+  end;
+
+
+  procedure jTextView_SetVerticalScrollbarPosition(env: PJNIEnv; _jtextview: JObject; _value: integer);
+  var
+    jParams: array[0..0] of jValue;
+    jMethod: jMethodID=nil;
+    jCls: jClass=nil;
+  label
+    _exceptionOcurred;
+  begin
+
+    if (env = nil) or (_jtextview = nil) then exit;
+    jCls:= env^.GetObjectClass(env, _jtextview);
+    if jCls = nil then goto _exceptionOcurred;
+    jMethod:= env^.GetMethodID(env, jCls, 'SetVerticalScrollbarPosition', '(I)V');
+    if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+    jParams[0].i:= _value;
+
+    env^.CallVoidMethodA(env, _jtextview, jMethod, @jParams);
+
+    env^.DeleteLocalRef(env, jCls);
+
+    _exceptionOcurred: jni_ExceptionOccurred(env);
+  end;
 
 
 //------------------------------------------------------------------------------

@@ -1252,8 +1252,18 @@ begin
    begin
      strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
 
-     if pos('android.useAndroidX', strList.text) = 0 then
-       strList.Add('android.useAndroidX=true');
+     //gradle.properties
+      (*
+        the ideal would be to use only AndroidX dependencies but you can do
+        "android.enableJetifier=true"  in the gradle.properties file
+        while you migrate your entire project and its dependencies to AndroidX
+        (see https://developer.android.com/jetpack/androidx/migrate).
+      *)
+      if pos('android.enableJetifier=true', strList.text) = 0 then
+        strList.Add('android.enableJetifier=true');
+
+      if pos('android.useAndroidX', strList.text) = 0 then
+        strList.Add('android.useAndroidX=true');
 
      //apply change suggested by DonAlfred
      if Pos('org.gradle.java.home=', strList.Text ) <= 0 then

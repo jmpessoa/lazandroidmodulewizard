@@ -2012,7 +2012,16 @@ begin
           //strList.Add('RELEASE_STORE_PASSWORD=123456');
           //strList.Add('RELEASE_KEY_PASSWORD=123456');
 
-          //if Pos('AppCompat', FAndroidTheme) > 0 then
+
+          //gradle.properties
+          (*
+            the ideal would be to use only AndroidX dependencies but you can do
+            "android.enableJetifier=true"  in the gradle.properties file
+            while you migrate your entire project and its dependencies to AndroidX
+            (see https://developer.android.com/jetpack/androidx/migrate).
+          *)
+
+          strList.Add('android.enableJetifier=true'); //temporary...
           strList.Add('android.useAndroidX=true');
 
           if DirectoryExists(FPathToJavaJDK) then

@@ -1,4 +1,4 @@
-package org.lamw.appcompatarduinoaflakserialdemo1;
+package org.lamw.apptextviewverticalscrolling;
 
 import java.lang.reflect.Field;
 import android.content.ClipData;

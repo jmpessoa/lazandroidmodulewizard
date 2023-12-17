@@ -1177,7 +1177,10 @@ type
     procedure SetHorizontallyScrolling(_value: boolean);
     procedure SetEllipsize(_mode: TEllipsizeMode);
     procedure SetTextAllCaps(_text: string);
-
+    procedure SetScrollingMovementMethod();
+    procedure SetVerticalScrollBarEnabled(_value: boolean);
+    procedure SetHorizontalScrollBarEnabled(_value: boolean);
+    procedure SetVerticalScrollbarPosition(_value: integer);
 
   published
     property Text: string read GetText write SetText;
@@ -5504,6 +5507,34 @@ begin
   //in designing component state: set value here...
   if FInitialized then
     jTextView_SetTextAllCaps(gApp.jni.jEnv, FjObject, _text);
+end;
+
+procedure jTextView.SetScrollingMovementMethod();
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetScrollingMovementMethod(gApp.jni.jEnv, FjObject);
+end;
+
+procedure jTextView.SetVerticalScrollBarEnabled(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetVerticalScrollBarEnabled(gApp.jni.jEnv, FjObject, _value);
+end;
+
+procedure jTextView.SetHorizontalScrollBarEnabled(_value: boolean);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetHorizontalScrollBarEnabled(gApp.jni.jEnv, FjObject, _value);
+end;
+
+procedure jTextView.SetVerticalScrollbarPosition(_value: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jTextView_SetVerticalScrollbarPosition(gApp.jni.jEnv, FjObject, _value);
 end;
 
 //------------------------------------------------------------------------------
