@@ -1,0 +1,5 @@
+public native void pOnArduinoAflakSerialAttached(long pasobj, UsbDevice usb);
+public native void pOnArduinoAflakSerialDetached(long pasobj);
+public native void pOnArduinoAflakSerialMessageReceived(long pasobj, byte[] bytesReceived);
+public native void pOnArduinoAflakSerialOpened(long pasobj);
+public native void pOnArduinoAflakSerialStatusChanged(long pasobj, String statusMessage);

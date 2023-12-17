@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget,
-  process, math, SourceChanger, propedits, LCLClasses;
+  process, SourceChanger, propedits, LCLClasses;
 
 //tk min and max API versions for build.xml
 const
@@ -770,6 +770,7 @@ begin
   strList.Add('}');
   strList.Add('allprojects {');
   strList.Add('    repositories {');
+  //strList.Add('       jcenter()');
   strList.Add('       google()');
   strList.Add('       mavenCentral()');
   strList.Add('       maven {url ''https://jitpack.io''}');
@@ -900,6 +901,14 @@ begin
   strList.Free;
   includeList.Free;
 
+  if MessageDlg('Question', '"build.gradle" success updated!'+sLineBreak+
+                            '"Do you wish to update it again when re-open?',
+                             mtConfirmation, [mbYes, mbNo],0) = mrNo then
+  begin
+     LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= 'YES';
+     LazarusIDE.ActiveProject.Modified:= True;
+  end;
+
 end;
 
 //https://community.oracle.com/blogs/schaefa/2005/01/20/how-do-conditional-compilation-java
@@ -918,8 +927,6 @@ var
 begin
 
   strTargetApi:= IntTostr(targetApi);
-
-  //buildSystem:= LazarusIDE.ActiveProject.CustomData['BuildSystem'];
 
   strList:= TStringList.Create;
 
@@ -1219,7 +1226,10 @@ begin
   FKeepMyBuildGradleWhenReopen:= LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen'];
 
   if FKeepMyBuildGradleWhenReopen = 'NO' then
+  begin
       DoBuildGradle(IntToStr(minSdkApi), strTargetApi);
+  end;
+  //Keep my "build.gradle" when re-open
 
   if FKeepMyBuildGradleWhenReopen = '' then //before LAMW 0.8.6.3
   begin
@@ -2520,7 +2530,7 @@ begin
         gradleList.Free;
       end;
    end;
-   //-----
+
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin') then
    begin                                                                                  //jsFirebasePushNotificationListener.plugin
       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.plugin');  //apply plugin: 'com.google.gms.google-services'
@@ -2547,7 +2557,59 @@ begin
         gradleList.Free;
       end;
    end;
-//--------
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.repositories') then
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.repositories'); // jcenter()
+      if auxList.Text <> '' then
+      begin
+        gradleList:=TStringList.Create;
+        gradleList.LoadFromFile(FPathToAndroidProject+'build.gradle');
+        aux:= gradleList.Text;
+
+        insertRef:= 'maven {url ''https://jitpack.io''}';
+
+        for i:= 0 to auxList.Count-1 do
+        begin
+           auxStr:=auxList.Strings[i];
+           if Pos(auxStr, aux) <= 0 then
+           begin
+             p1:= Pos(insertRef, aux);
+             Insert(sLineBreak+'       '+auxList.Strings[i] , aux, p1+Length(insertRef) );
+           end;
+        end;
+        gradleList.Text:= aux;
+        gradleList.SaveToFile(FPathToAndroidProject+'build.gradle'); //buildgradletList
+        gradleList.Free;
+      end;
+   end;
+
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.gradleproperties') then
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.gradleproperties');
+      if auxList.Text <> '' then
+      begin
+        gradleList:=TStringList.Create;
+        gradleList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
+        aux:= gradleList.Text;
+
+        insertRef:= 'android.useAndroidX=true';
+
+        for i:= 0 to auxList.Count-1 do    //android.enableJetifier=true
+        begin
+           auxStr:=auxList.Strings[i];
+           if Pos(auxStr, aux) <= 0 then
+           begin
+             p1:= Pos(insertRef, aux);
+             Insert(sLineBreak+auxList.Strings[i] , aux, p1+Length(insertRef) );
+           end;
+        end;
+        gradleList.Text:= aux;
+        gradleList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+        gradleList.Free;
+      end;
+   end;
+
    manifestList.Free;
    list.Free;
    auxList.Free;

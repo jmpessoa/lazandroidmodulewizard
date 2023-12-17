@@ -1,6 +1,6 @@
-package com.example.appopenfiledialogdemo1;
+package org.lamw.appcompatarduinoaflakserialdemo1;
 
-//LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [splited jForm]
+//LAMW: Lazarus Android Module Wizard - version 0.8.6.3 - 17 December - 2021
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -50,7 +50,8 @@ package com.example.appopenfiledialogdemo1;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
-
+//IMPORTANT! Don't cleanup imports !!!
+import android.hardware.usb.UsbDevice;
 import android.provider.DocumentsContract;
 import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
@@ -197,7 +198,7 @@ public class Controls {
   //Load Pascal Library - Please, do not edit the static content commented in the template file
   // -------------------------------------------------------------------------------------------
   static {
-    /*libsmartload*/
+     /*libsmartload*/
   }
 
   //
@@ -994,11 +995,16 @@ public  int Image_getWH (String filename ) {
     }
   }
 
+  /*
+  Apps targeting Android 12 and higher must specify either FLAG_IMMUTABLE or FLAG_MUTABLE
+  when constructing a PendingIntent.
+  FLAG_IMMUTABLE is available since target SDK 23,
+   */
   //improved by CC
   //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
   public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
-    String SMS_DELIVERED = packageDeliveredAction;
-    PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), PendingIntent.FLAG_CANCEL_CURRENT);
+    //String SMS_DELIVERED = packageDeliveredAction;
+    PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(packageDeliveredAction), PendingIntent.FLAG_IMMUTABLE); //PendingIntent.FLAG_CANCEL_CURRENT
     SmsManager sms = SmsManager.getDefault();
     
     if (sms == null)  return 0;

@@ -295,6 +295,13 @@ uses
    procedure Java_Event_pWebSocketClientOnException(env:PJNIEnv;this:JObject;Sender:TObject;exceptionMessage:jString);
    procedure Java_Event_pWebSocketClientOnCloseReceived(env:PJNIEnv;this:JObject;Sender:TObject);
 
+   //jsArduinoAflakSerial
+   procedure Java_Event_pOnArduinoAflakSerialAttached(env:PJNIEnv;this:JObject;Sender:TObject;usb:JObject);
+   procedure Java_Event_pOnArduinoAflakSerialDetached(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnArduinoAflakSerialMessageReceived(env:PJNIEnv;this:JObject;Sender:TObject;jbytesReceived:jbyteArray);
+   procedure Java_Event_pOnArduinoAflakSerialOpened(env:PJNIEnv;this:JObject;Sender:TObject);
+   procedure Java_Event_pOnArduinoAflakSerialStatusChanged(env:PJNIEnv;this:JObject;Sender:TObject;statusMessage:jString);
+
 implementation
 
 uses
@@ -310,7 +317,8 @@ uses
    midimanager, copenmapview, csignaturepad, soundpool, cmail, sftpclient,
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
    cbillingclient, ctoytimerservice, bluetoothlowenergy,
-   sfirebasepushnotificationlistener, batterymanager, modbus, cwebsocketclient, uktoybutton;
+   sfirebasepushnotificationlistener, batterymanager, modbus,
+   cwebsocketclient, uktoybutton, ujsarduinoaflakserial;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3167,6 +3175,53 @@ begin
   if Sender is jcWebSocketClient then
   begin
     jcWebSocketClient(Sender).GenEvent_WebSocketClientOnCloseReceived(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnArduinoAflakSerialAttached(env:PJNIEnv;this:JObject;Sender:TObject;usb:JObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jsArduinoAflakSerial then
+  begin
+    jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialAttached(Sender,usb);
+  end;
+end;
+procedure Java_Event_pOnArduinoAflakSerialDetached(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jsArduinoAflakSerial then
+  begin
+    jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialDetached(Sender);
+  end;
+end;
+procedure Java_Event_pOnArduinoAflakSerialMessageReceived(env:PJNIEnv;this:JObject;Sender:TObject;jbytesReceived:jbyteArray);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jsArduinoAflakSerial then
+  begin
+    jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialMessageReceived(Sender,GetDynArrayOfJByte(env,jbytesReceived));
+  end;
+end;
+procedure Java_Event_pOnArduinoAflakSerialOpened(env:PJNIEnv;this:JObject;Sender:TObject);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jsArduinoAflakSerial then
+  begin
+    jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialOpened(Sender);
+  end;
+end;
+
+procedure Java_Event_pOnArduinoAflakSerialStatusChanged(env:PJNIEnv;this:JObject;Sender:TObject;statusMessage:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jsArduinoAflakSerial then
+  begin
+    jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialStatusChanged(Sender,GetString(env,statusMessage));
   end;
 end;
 

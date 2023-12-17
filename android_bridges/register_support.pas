@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  ujsarduinoaflakserial,
   ujsescposthermalprinter,
   uktoybutton,
   sfirebasepushnotificationlistener,
@@ -38,6 +39,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jsarduinoaflakserial_icon.lrs}
   {$I jsescposthermalprinter_icon.lrs}
   {$I ktoybutton_icon.lrs}
   {$I jsfirebasepushnotificationlistener_icon.lrs}
@@ -59,6 +61,7 @@ begin
   {$I jstextinput_icon.lrs}
   RegisterComponents('Android Bridges AppCompat',
     [
+      jsArduinoAflakSerial,
       jsEscPosThermalPrinter,
       KToyButton,
       jsFirebasePushNotificationListener,

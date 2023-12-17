@@ -1,7 +1,6 @@
-package org.lamw.applistviewdemo8;
+package org.lamw.appcompatarduinoaflakserialdemo1;
 
 import java.lang.reflect.Field;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -561,6 +560,19 @@ public class jTextView extends  TextView { //androidx.appcompat.widget.AppCompat
 		}
 		this.setHorizontallyScrolling(false);
 		this.setSingleLine();
+	}
+
+	public void SetTextAllCaps(String _text) {
+		this.setAllCaps(true);
+		this.setText(_text);
+	}
+
+	public void SetVerticalScrollBarEnabled(boolean _value) {
+		this.setVerticalScrollBarEnabled(_value);
+	}
+
+	public void SetMovementMethod() {
+		this.setMovementMethod(new ScrollingMovementMethod());
 	}
 
 }

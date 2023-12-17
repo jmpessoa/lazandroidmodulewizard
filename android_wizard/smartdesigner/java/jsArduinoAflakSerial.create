@@ -1,0 +1,3 @@
+public java.lang.Object jsArduinoAflakSerial_jCreate(long _self) {
+  return (java.lang.Object)(new jsArduinoAflakSerial(this,_self));
+}

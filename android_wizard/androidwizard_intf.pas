@@ -1121,6 +1121,7 @@ begin
   strList.Add('buildscript {');
   if isKotlinSupported then
     strList.Add('    ext.kotlin_version = ''1.6.10''');
+
   strList.Add('    repositories {');
   strList.Add('        mavenCentral()');
   strList.Add('        google()');
@@ -1134,6 +1135,7 @@ begin
   strList.Add('}');
   strList.Add('allprojects {');
   strList.Add('    repositories {');
+  strList.Add('       jcenter()');
   strList.Add('       google()');
   strList.Add('       mavenCentral()');
   strList.Add('       maven {url ''https://jitpack.io''}');

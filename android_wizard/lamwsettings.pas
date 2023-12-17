@@ -97,7 +97,8 @@ type
   end;
 
 const
-
+  //androidx.appcompat:appcompat than 1.3.1 is available: 1.6.1
+  //com.google.android.material:material than 1.2.1 is available: 1.11.0
   AppCompatLibs: TAppCompatLibs = (    //renamed by jmpessoa
     (MinAPI:28;Name:'androidx.appcompat:appcompat:1.3.1'),
     (MinAPI:28;Name:'androidx.multidex:multidex:2.0.1'),

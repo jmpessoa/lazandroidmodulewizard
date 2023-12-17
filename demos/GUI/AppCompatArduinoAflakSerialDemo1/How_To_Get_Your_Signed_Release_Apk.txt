@@ -1,0 +1,55 @@
+       Tutorial: How to get your "signed" release Apk [AppCompatArduinoAflakSerialDemo1]
+ 
+    NEW! 
+    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Apk  ..."
+    "Tools"  --> "[LAMW] ..." --> "Build Release Signed Bundle ..."
+ 
+ 
+ OR: 
+ 
+1)Edit/change the project file "keytool_input.txt" to more representative informations:"
+
+.Your keystore password [--ks-pass pass] : 123456
+.Re-enter/confirm the keystore password: 123456
+ 
+.Your first and last name: MyFirstName MyLastName
+
+.Your Organizational unit: MyDevelopmentUnit
+
+.Your Organization name: MyCompany
+
+.Your City or Locality: MyCity
+
+.Your State or Province: MT
+
+.The two-letter country code: BR
+
+.All correct: y
+
+.Your key password for this Apk alias [--key-pass pass]: 123456 
+
+
+2)If you are using "Ant" then edit/change "ant.properties" according, too!
+
+
+3) Execute the [project] command "release-keystore.bat" or "release-keystore.sh" or "release-keystore-macos.sh" to get the "appcompatarduinoaflakserialdemo1-release.keystore"
+           warning: the file "appcompatarduinoaflakserialdemo1-release.keystore" should be created only once [per application] otherwise it will fail [and NEVER delete it!]
+ 
+4) [Gradle]: Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-apksigner.bat" [or .sh]  according "keytool_input.txt" file
+             Edit/change the values [123456] "--ks-pass pass:" and "--key-pass pass:" in project file "gradle-local-universal-apksigner.bat" [or .sh]  according "keytool_input.txt" file
+
+5) [Gradle]: Execute the [project] command "gradle-local-apksigner.bat" [.sh] to get the [release] signed Apk!
+             OR execute "gradle-local-universal-apksigner.bat" [.sh] if your are supporting multi-architecture (ex.: armeabi-v7a + arm64-v8a + ...) 
+             hint: look for your generated "AppCompatArduinoAflakSerialDemo1-release.apk" in [project] folder "...\build\outputs\apk\release"
+ 
+
+6) [Ant]: Execute the [project] command "ant-build-release.bat" [.sh] to get the [release] signed Apk!"
+          hint: look for your generated "AppCompatArduinoAflakSerialDemo1-release.apk" in [project] folder "...\bin"
+
+
+Success! You can now upload your nice "AppCompatArduinoAflakSerialDemo1-release.apk" to "Google Play" [or others stores...]!
+
+....  Thanks to All!
+....  Special thanks to ADiV/TR3E!
+
+....  by jmpessoa_hotmail_com
