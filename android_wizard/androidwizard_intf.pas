@@ -83,7 +83,6 @@ type
 
      FBuildSystem: string;
      FMaxSdkPlatform: integer;
-     FCandidateSdkBuild: string;
      FIniFileName: string;
      FIniFileSection: string;
      FKeepMyBuildGradleWhenReopen: boolean;
@@ -920,49 +919,12 @@ begin
 end;
 
 function TAndroidProjectDescriptor.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
-var
-  lisDir: TStringList;
-  numberAsString, auxStr: string;
-  i, builderNumber: integer;
-  savedBuilder: integer;
 begin
-  Result:= False;
-  savedBuilder:= 0;
-  lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
-  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
-  if lisDir.Count > 0 then
-  begin
-    for i:=0 to lisDir.Count-1 do
-    begin
-       auxStr:= ExtractFileName(lisDir.Strings[i]);
-       lisDir.Strings[i]:=auxStr;
-    end;
-    lisDir.Sorted:=True;
-    for i:= 0 to lisDir.Count-1 do
-    begin
-       auxStr:= lisDir.Strings[i];
-       if auxStr <> '' then    //19.1.0
-       begin
-           numberAsString:= Copy(auxStr, 1 , 2);  //19
-           if IsAllCharNumber(PChar(numberAsString)) then
-           begin
-             builderNumber:=  StrToInt(numberAsString);
-             if savedBuilder < builderNumber then
-             begin
-               savedBuilder:= builderNumber;
-               if builderNumber > platform then FCandidateSdkBuild:= auxStr;
-             end;
-             if  platform <= builderNumber then
-             begin
-               outBuildTool:= auxStr; //25.0.3
-               Result:= True;
-               break;
-             end;
-           end;
-       end;
-    end;
-  end;
-  lisDir.free;
+  Result:= True;
+  if  platform < 30 then
+     outBuildTool:= '29.0.3'
+  else
+     outBuildTool:= '30.0.3';
 end;
 
 function TAndroidProjectDescriptor.GetBuildTool(sdkApi: integer): string;

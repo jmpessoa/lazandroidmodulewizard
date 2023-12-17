@@ -103,7 +103,7 @@
     - Open a terminal or cmd and go to "...\sdkJ11\cmdline-tools\latest\bin"
        - run the command  >> sdkmanager "build-tools;33.0.2" "platforms;android-33" "platform-tools"
        - hint: you can get others android components by sdkmanager...
-- alternative: supporting JDK 1.8 + Ant + Gradle <= 6.7
+- alternative: supporting JDK 1.8 + Ant + Gradle <= 6.7  + build-tools <= 30.0.3
   - download  [r25.2.5-windows](https://dl.google.com/android/repository/tools_r25.2.5-windows.zip)
    - download [r25.2.5-linux](https://dl.google.com/android/repository/tools_r25.2.5-linux.zip)
    - download [r25.2.5-macosx](https://dl.google.com/android/repository/tools_r25.2.5-macosx.zip)
@@ -126,7 +126,8 @@
        - Install 7 or up package!
     - IMPORTANT: on command line terminal or cmd go to folder "sdkJ1.8\tools\bin"
        - run the command  >>sdkmanager --update
-       - run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"
+       - run the command  >>sdkmanager "build-tools;30.0.3" "platforms;android-33"
+    - IMPORTANT: build-tools = 30.0.3 is the maximum supported in this setup!
        
 ##### 2.3 Get [Android NDK](https://developer.android.com/ndk/downloads/index.html)
 - recommended version

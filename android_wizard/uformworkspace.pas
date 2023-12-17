@@ -1211,42 +1211,12 @@ begin
 end;
 
 function TFormWorkspace.HasBuildTools(platform: integer;  out outBuildTool: string): boolean;
-var
-  lisDir: TStringList;
-  numberAsString, auxStr: string;
-  i, builderNumber: integer;
 begin
-  Result:= False;
-  lisDir:= TStringList.Create;   //C:\adt32\sdk\build-tools\19.1.0
-  FindAllDirectories(lisDir, IncludeTrailingPathDelimiter(FPathToAndroidSDK)+'build-tools', False);
-  if lisDir.Count > 0 then
-  begin
-    for i:=0 to lisDir.Count-1 do
-    begin
-       auxStr:= ExtractFileName(lisDir.Strings[i]);
-       lisDir.Strings[i]:=auxStr;
-    end;
-    lisDir.Sorted:=True;
-    for i:= 0 to lisDir.Count-1 do
-    begin
-       auxStr:= lisDir.Strings[i];
-       if auxStr <> '' then    //19.1.0
-       begin
-           numberAsString:= Copy(auxStr, 1 , 2);  //19
-           if IsAllCharNumber(PChar(numberAsString)) then
-           begin
-             builderNumber:=  StrToInt(numberAsString);
-             if  platform <= builderNumber then
-             begin
-               outBuildTool:= auxStr; //25.0.3
-               Result:= True;
-               break;
-             end;
-           end;
-       end;
-    end;
-  end;
-  lisDir.free;
+  Result:= True;
+  if  platform < 30 then
+     outBuildTool:= '29.0.3'
+  else
+     outBuildTool:= '30.0.3';
 end;
 
 function TFormWorkspace.IsSdkToolsAntEnable: boolean;
@@ -1763,7 +1733,7 @@ begin
              begin
                if HasBuildTools(intApi, outBuildTool) then
                begin
-                    ListBoxTargetAPI.Items.Add(strApi);
+                 ListBoxTargetAPI.Items.Add(strApi);
                end;
              end;
          end;
