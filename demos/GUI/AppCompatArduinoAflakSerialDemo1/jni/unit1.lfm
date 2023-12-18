@@ -7,7 +7,7 @@ object AndroidModule1: TAndroidModule1
   Left = 396
   Top = 23
   Width = 320
-  Height = 400
+  Height = 459
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
@@ -15,6 +15,7 @@ object AndroidModule1: TAndroidModule1
   AnimationDurationIn = 1500
   AnimationDurationOut = 1500
   AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
   object TextView1: jTextView
     MarginLeft = 5
     MarginTop = 5
@@ -158,13 +159,13 @@ object AndroidModule1: TAndroidModule1
     Left = 5
     Top = 229
     Width = 310
-    Height = 26
+    Height = 153
     Visible = True
     Anchor = TextView3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
-    LayoutParamHeight = lpWrapContent
+    LayoutParamHeight = lpOneThirdOfParent
     Text = 'TextView4'
     Alignment = taLeft
     BackgroundColor = colbrDefault

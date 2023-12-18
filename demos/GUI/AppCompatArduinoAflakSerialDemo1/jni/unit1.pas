@@ -23,6 +23,7 @@ type
     TextView2: jTextView;
     TextView3: jTextView;
     TextView4: jTextView;
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure ArduinoAflakSerial1Attached(Sender: TObject; usb: JObject);
     procedure ArduinoAflakSerial1Detached(Sender: TObject);
     procedure ArduinoAflakSerial1MessageReceived(Sender: TObject;
@@ -47,10 +48,36 @@ implementation
 
 { TAndroidModule1 }
 
+//ref
+//https://hingxyu.medium.com/arduino-android-serial-communication-b72b124142fb
+
+(*  Arduino Side: echoes back whatever it receives on the serial port
+
+void setup() {
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+}
+void loop() {
+  char incomingByte;
+   // If there is a data stored in the serial receive buffer, read it and print it to the serial port as human-readable ASCII text.
+  if(Serial.available()){
+    incomingByte = Serial.read();
+    Serial.print(incomingByte);
+  }
+}
+
+*)
+
 //arduino plugged in. Here you should call arduino.open(device)
 procedure TAndroidModule1.ArduinoAflakSerial1Attached(Sender: TObject; usb: JObject);
 begin
    ArduinoAflakSerial1.Open(usb);
+end;
+
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+   TextView4.SetScrollingMovementMethod();
+   TextView4.SetVerticalScrollBarEnabled(True);
 end;
 
 //arduino plugged out
@@ -62,7 +89,8 @@ end;
 //arduino sent a message through Serial.print()
 procedure TAndroidModule1.ArduinoAflakSerial1MessageReceived(Sender: TObject; jbytesReceived: TDynArrayOfJByte);  //array of shortint
 begin
-  TextView4.Append(ArduinoAflakSerial1.JBytesToString(jbytesReceived));
+  TextView4.AppendLn('');
+  TextView4.AppendLn(ArduinoAflakSerial1.JBytesToString(jbytesReceived));
 end;
 
 //connection with arduino opened
