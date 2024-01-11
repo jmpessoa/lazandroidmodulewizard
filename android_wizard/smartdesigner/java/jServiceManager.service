@@ -1,1 +1,1 @@
-<service android:name=".jServiceManager"/>
+<service android:name=".jServiceManager" android:exported="true"/>

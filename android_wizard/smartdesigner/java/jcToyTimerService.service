@@ -1,1 +1,1 @@
-<service android:name=".ToyTimerService"/>
+<service android:name=".ToyTimerService" android:exported="true"/>

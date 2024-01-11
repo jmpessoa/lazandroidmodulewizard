@@ -1,1 +1,1 @@
-<service android:name=".jDownloadService"/>
+<service android:name=".jDownloadService android:exported="true""/>

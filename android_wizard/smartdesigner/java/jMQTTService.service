@@ -1,1 +1,1 @@
-<service android:name=".Mqttservice"/>
+<service android:name=".Mqttservice" android:exported="true"/>

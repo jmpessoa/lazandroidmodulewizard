@@ -2309,11 +2309,12 @@ begin
      if auxList.Text <> '' then
      begin
        tempStr:= Trim(auxList.Text);
+       p:= Pos('".',tempStr);
+       auxStr:= Copy(tempStr, p, 10);
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       //listRequirements.Add(tempStr);  //Add service
-       if Pos(tempStr , aux) <= 0 then
+       if Pos(auxStr , aux) <= 0 then   //Add service
        begin
          p1:= Pos(insertRef, aux);
          Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );
@@ -2380,10 +2381,12 @@ begin
      begin
        aux:= Trim(auxList.Text);
        tempStr:= StringReplace(aux,'WPACKAGENAME', FPackageName, [rfIgnoreCase]);
+       p:= Pos('".',tempStr);
+       auxStr:= Copy(tempStr, p, 10);
        insertRef:= '</activity>'; //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
-       if Pos(tempStr , aux) <= 0 then
+       if Pos(auxStr , aux) <= 0 then
        begin
          p1:= Pos(insertRef, aux);
          Insert(sLineBreak + tempStr, aux, p1+Length(insertRef) );

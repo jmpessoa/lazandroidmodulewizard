@@ -1,1 +1,1 @@
-<service android:name=".LAMWFirebaseMessagingService" android:stopWithTask="false"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT"/></intent-filter></service>
+<service android:name=".LAMWFirebaseMessagingService" android:stopWithTask="false" android:exported="true"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT"/></intent-filter></service>
