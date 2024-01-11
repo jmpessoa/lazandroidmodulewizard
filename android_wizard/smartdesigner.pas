@@ -47,6 +47,9 @@ type
     FIsKotlinSupported: boolean;
     FKeepMyBuildGradleWhenReopen: string;
 
+    FJavaBigVersion: string;
+    FJavaMainVersion: string;
+
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
     procedure AddSupportToFCLControls(chipArch: string);
@@ -117,8 +120,12 @@ type
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
     procedure DoBuildGradle(minSdkApi: string; targetApi: string);
 
-    function GetAndroidPluginVersion(gradleVersion: string): string;  //new!
+    function GetAndroidPluginVersion(gradleVersion: string; mainJavaVersion: string): string;  //new!
     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+    function GetAndroidPluginVersionAsBigNumber(androidPluginVersionAsString: string): integer;
+
+
+    procedure TryProduceJavaVersion(pathToJDK: string);
 
   end;
 
@@ -126,6 +133,8 @@ type
   function ReplaceChar(const query: string; oldchar, newchar: char): string;
   // end tk
   function IsAllCharNumber(pcString: PChar): Boolean;
+
+  function TrimChar(query: string; delimiter: char): string;
 
 var
   LamwSmartDesigner: TLamwSmartDesigner;
@@ -263,7 +272,9 @@ begin
        AComponentClass.ClassNameIs('jsContinuousScrollableImageView') or
        AComponentClass.ClassNameIs('jsAdMod') or
        AComponentClass.ClassNameIs('jsFirebasePushNotificationListener') or
-       AComponentClass.ClassNameIs('KToyButton')  then
+       AComponentClass.ClassNameIs('jsEscPosThermalPrinter') or
+       AComponentClass.ClassNameIs('jsArduinoAflakSerial') or
+       AComponentClass.ClassNameIs('KToyButton') then
      begin
        ShowMessage('[Undoing..] "'+AComponentClass.ClassName+'" need AppCompat theme...' +sLIneBreak+
                    'Hint:  You can convert the project to AppCompat theme:'  +sLIneBreak+
@@ -549,6 +560,17 @@ begin
   end;
 end;
 
+function TLamwSmartDesigner.GetAndroidPluginVersionAsBigNumber(androidPluginVersionAsString: string): integer;
+var
+  auxStr: string;
+  lenAuxStr: integer;
+begin
+  auxStr:= StringReplace(androidPluginVersionAsString,'.', '', [rfReplaceAll]); //8.1.1
+  lenAuxStr:=  Length(auxStr);
+  if lenAuxStr < 3 then auxStr:= auxStr + '0';   //8.4 -> 840
+  Result:= StrToInt(Trim(auxStr));  //811
+end;
+
 function TLamwSmartDesigner.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
 var
   auxStr: string;
@@ -564,8 +586,8 @@ end;
 //https://developer.android.com/studio/releases/gradle-plugin?hl=pt-br
 Android
 plug-in
-8.2.0  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.6?
-8.1.4  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.4 or  8.5
+8.2.0  <--> Android Gradle plugin requiresJava 21   //Gradle versão 8.5
+8.1.4  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.4
 8.0.2  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
 8.0.0  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
 7.4.2  <--> Android Gradle plugin requires Java 11  //Gradle versão 8.1.1
@@ -582,48 +604,109 @@ JDK 17
 Nível da API 34
 Versão mínima do "Android Plugin" 8.1.1 (requiresJava 17)
 *)
-
-function TLamwSmartDesigner.GetAndroidPluginVersion(gradleVersion: string): string;
+//https://docs.gradle.org/8.4/userguide/compatibility.html#java
+function TLamwSmartDesigner.GetAndroidPluginVersion(gradleVersion: string; mainJavaVersion: string): string;
 var
-  strGV: string;
+  strGV, auxGrVer: string;
   intGV: integer;
   bigNumber: integer;
 begin
-   bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
-   strGV:= SplitStr(gradleVersion,  '.');
-   intGV:= StrToInt(strGV);
 
-   if intGV = 8 then  //JDK 11 -  targetApi 33
-   begin
-     //https://docs.gradle.org/8.5/userguide/compatibility.html
-     if (bigNumber >= 800) and (bigNumber < 820) then          //Tested: Gradle 8.1.1
-          Result:= '7.4.2' //JDK 11
-     else if (bigNumber >= 820) and (bigNumber < 830) then     //Tested: Gradle 8.2.1
-        Result:= '7.4.2'   //JDK 11                                   //'8.0.2' --> JDK 17  -> targetApi 34
-     else if (bigNumber >= 830) and (bigNumber < 840) then     //Tested: Gradle 8.3
-         Result:=  '7.4.2' //JDK 11                                    //'8.1.4' --> JDK 17  -> targetApi 34
-     else if bigNumber >= 840 then                             //Tested: Gradle 8.4  and Gradle 8.5
-        Result:= '7.4.2'; //JDK 11                                     //'8.2.0' --> JDK 17 -> targetApi 34
-   end;
-   if intGV = 7 then     //JDK 11
-   begin
-      Result:= '7.2.2'; //'7.1.3'; //Tested Gradle 7.6.3
-   end;
-   if intGV = 6 then //JDK 1.8 need Gradle version <=  6.7
-   begin
-      if  bigNumber >= 671 then //JDK 11   //Tested Gradle 6.7.1
+  bigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
+  auxGrVer:= gradleVersion;
+  strGV:= SplitStr(auxGrVer,  '.');
+  intGV:= StrToInt(strGV);
+
+  if intGV = 8 then  //JDK 11 - need Gradle version >=  6.7.1 -- targetApi 33
+  begin              //JDK 17 - need Gradle version >=  8.1.1 -- targetApi 34
+    if (bigNumber >= 800) and (bigNumber < 820) then
+    begin
+         if mainJavaVersion = '11' then
+           Result:= '7.4.2' //JDK 11               //Tested: Jdk11 + Gradle 8.1.1
+         else
+           Result:= '7.4.2'; //JDK 17
+    end
+    else if (bigNumber >= 820) and (bigNumber < 830) then
+    begin
+        if mainJavaVersion = '11' then
+           Result:= '7.4.2'   //JDK 11                        //Tested: Jdk11 + Gradle 8.2.1
+        else
+           Result:= '8.0.2';   //JDK 17                          //'8.0.2' --> JDK 17  -> targetApi 34
+    end
+    else if (bigNumber >= 830) and (bigNumber < 840) then
+    begin
+        if mainJavaVersion = '11' then
+            Result:=  '7.4.2' //JDK 11                           //Tested: Jdk11 + Gradle 8.3
+        else
+            Result:=  '8.1.4'; //JDK 17                           //'8.1.4' --> JDK 17  -> targetApi 34
+    end
+    else if bigNumber >= 840 then
+    begin
+       if mainJavaVersion = '11' then
+          Result:= '7.4.2' //JDK 11                /Tested: Jdk11 + Gradle 8.4  and Jdk11 + Gradle 8.5
+       else if mainJavaVersion = '17' then
+          Result:= '8.1.4' //JDK 17              //or '8.2.0' --> JDK 17 (??) -> targetApi 34
+       else  //21
+          Result:= '8.2.0' //JDK 21              //'8.2.0' --> JDK 21 -> targetApi 34
+    end;
+  end;
+
+  if intGV = 7 then   //JDK 11
+  begin
+     Result:= '7.2.2'; //Tested Gradle 7.6.3
+  end;
+
+  if intGV = 6 then     //JDK 1.8 need Gradle version <=  6.7 .... and JDK 11 >= 6.7.1
+  begin
+     if  bigNumber >= 671 then //JDK 11   //Tested Gradle 6.7.1
      begin
         Result:= '4.2.2';
      end
      else                      //JDK 1.8
      begin
-         Result:= '4.1.3'
+        Result:= '4.1.3'
      end;
-   end;
-   if intGV < 6 then
-   begin
+  end;
+
+  if intGV < 6 then             //JDK 1.8
+  begin
      Result:= '3.4.1';
+  end;
+
+end;
+
+procedure TLamwSmartDesigner.TryProduceJavaVersion(pathToJDK: string);
+var
+  list: TStringList;
+  i, p, len: integer;
+  version, aux, mainVersion: string;
+begin
+   list:= TStringList.Create;
+   //list.LoadFromFile('C:\Program Files\Eclipse Adoptium\jdk-11.0.21.9-hotspot\release');
+   //list.LoadFromFile('C:\Program Files\Java\jdk1.8.0_151\release');
+   list.LoadFromFile(pathToJDK + PathDelim + 'release');
+   aux:='';
+   i:= 0;
+   while (aux = '') and (i < list.Count) do
+   begin
+      p:= Pos('JAVA_VERSION=', list.Strings[i]);
+      if p > 0 then
+      begin
+        aux:= list.Strings[i];
+        i:= list.Count; //exit while
+      end;
+      i:= i + 1;
    end;
+   if p > 0 then
+   begin
+     len:= Length('JAVA_VERSION=');
+     version:= Trim(Copy(aux, p+len, 15));
+     aux:= TrimChar(version, '"');
+     FJavaBigVersion:= aux;  //11.0.21  or 1.8.0_151
+     mainVersion:= SplitStr(aux, '.');  //main number: 11 or 17 or 21 or 1 (ex.: 1.8)
+     FJavaMainVersion:=Trim(mainVersion);
+   end;
+   list.Free;
 end;
 
 procedure TLamwSmartDesigner.DoBuildGradle(minSdkApi: string; targetApi: string);
@@ -640,7 +723,9 @@ begin
   if FPathToGradle <> '' then
     FGradleVersion:= GetGradleVersion(FPathToGradle);
 
-  androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion); //'7.1.3';
+  TryProduceJavaVersion(FPathToJavaJDK);
+
+  androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion, FJavaMainVersion); //'7.1.3';
 
   isAppCompatTheme:= False;
   if Pos('AppCompat', FAndroidTheme) > 0  then isAppCompatTheme:= True;
@@ -723,7 +808,7 @@ begin
   strList.Add('}');
   strList.Add('allprojects {');
   strList.Add('    repositories {');
-  //strList.Add('       jcenter()');
+  strList.Add('       jcenter()');
   strList.Add('       google()');
   strList.Add('       mavenCentral()');
   strList.Add('       maven {url ''https://jitpack.io''}');
@@ -735,6 +820,13 @@ begin
    strList.Add('apply plugin: ''kotlin-android''');
 
   strList.Add('android {');
+
+  if FJavaMainVersion <> '' then
+  begin
+    if StrToInt(FJavaMainVersion) >= 21 then
+       if GetAndroidPluginVersionAsBigNumber(androidPluginVersion) >= 820 then
+           strList.Add('    namespace "'+FPackageName+'"'); //org.lamw.applamwproject1
+  end;
   strList.Add('    lintOptions {');
   strList.Add('       abortOnError false');
   strList.Add('    }');
@@ -880,7 +972,6 @@ var
 begin
 
   strTargetApi:= IntTostr(targetApi);
-
   strList:= TStringList.Create;
 
   if not FileExists(FPathToAndroidProject + 'gradle.properties') then
@@ -957,139 +1048,158 @@ begin
   sourcepath:=LamwGlobalSettings.PathToJavaTemplates+'androidmanifest.txt';
   targetpath:=FPathToAndroidProject+'AndroidManifest.xml';
 
-  if FileExists(sourcepath) AND (NOT FileExists(targetpath)) then
-  with strList do
+  if not FileExists(targetpath) then
   begin
-    LoadFromFile(sourcepath);
-    auxStr:=FPackageName + '.' + LowerCase(FSmallProjName);
-    tempStr  := StringReplace(Text, 'dummyPackage',auxStr, [rfReplaceAll, rfIgnoreCase]);
-    tempStr  := StringReplace(tempStr, 'dummyAppName','.App', [rfReplaceAll, rfIgnoreCase]);
-    Clear;
-    Text:= tempStr;
-    SaveToFile(targetpath);
+    if FileExists(sourcepath) then
+    with strList do
+    begin
+      LoadFromFile(sourcepath);
+      auxStr:=FPackageName + '.' + LowerCase(FSmallProjName);
+      tempStr  := StringReplace(Text, 'dummyPackage',auxStr, [rfReplaceAll, rfIgnoreCase]);
+      tempStr  := StringReplace(tempStr, 'dummyAppName','.App', [rfReplaceAll, rfIgnoreCase]);
+      Clear;
+      Text:= tempStr;
+      SaveToFile(targetpath);
+    end;
   end;
 
   strList.Clear;
-  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-
-  if LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle' then  // Delete <uses-sdk
+  //***
+  if FileExists(FPathToAndroidProject+'AndroidManifest.xml') then
   begin
-    if Pos('<uses-sdk', strList.Text) > 0 then
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    if LazarusIDE.ActiveProject.CustomData['BuildSystem'] = 'Gradle' then  // Delete <uses-sdk
     begin
-      for i := 0 to strList.Count - 1 do
+      if Pos('<uses-sdk', strList.Text) > 0 then
       begin
-        if Pos('<uses-sdk', strList.Strings[i]) > 0 then
+        for i := 0 to strList.Count - 1 do
         begin
-          strList.Delete(i);
-          strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-          break;
+          if Pos('<uses-sdk', strList.Strings[i]) > 0 then
+          begin
+            strList.Delete(i);
+            strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+            break;
+          end;
         end;
       end;
-    end;
-  end
-  else //Ant builder need it.....
-  begin
-    if Pos('<uses-sdk', strList.Text) <= 0 then
-    begin
-       for i := 0 to strList.Count - 1 do
-       begin
-         if Pos('<uses-permission', strList.Strings[i]) > 0 then
-         begin
-           strList.Insert(i, '    <uses-sdk android:minSdkVersion="'+IntToStr(minsdkApi)+'" android:targetSdkVersion="'+strTargetApi+'"/>');
-           strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-           break;
-         end;
-       end;
     end
+    else //Ant builder need it.....
+    begin
+      if Pos('<uses-sdk', strList.Text) <= 0 then
+      begin
+         for i := 0 to strList.Count - 1 do
+         begin
+           if Pos('<uses-permission', strList.Strings[i]) > 0 then
+           begin
+             strList.Insert(i, '    <uses-sdk android:minSdkVersion="'+IntToStr(minsdkApi)+'" android:targetSdkVersion="'+strTargetApi+'"/>');
+             strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+             break;
+           end;
+         end;
+      end
+    end;
   end;
 
   if (FSupport) or (Pos('AppCompat', FAndroidTheme) > 0) then
   begin
     strList.Clear;
-    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-
-    if Pos('android.support.v4.content.FileProvider', strList.Text) > 0 then //update to androidX
+    if FileExists(FPathToAndroidProject+'AndroidManifest.xml') then
     begin
-       tempStr:= StringReplace(strList.Text, 'android.support.v4.content.FileProvider','androidx.core.content.FileProvider', [rfReplaceAll, rfIgnoreCase]);
-       strList.Clear;
-       strList.Text:= tempStr;
-       strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-    end
-    else
-    begin
-       if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
-       begin
-         providerList:= TStringList.Create;
-         providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
-         supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
-         providerList.Free;
-         if Pos('androidx.core.content.FileProvider', strList.Text) <= 0 then
+      strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+      if Pos('android.support.v4.content.FileProvider', strList.Text) > 0 then //update to androidX
+      begin
+         tempStr:= StringReplace(strList.Text, 'android.support.v4.content.FileProvider','androidx.core.content.FileProvider', [rfReplaceAll, rfIgnoreCase]);
+         strList.Clear;
+         strList.Text:= tempStr;
+         strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+      end
+      else
+      begin
+         if FileExists(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt') then
          begin
-           tempStr:= strList.Text;  //manifest
-           insertRef:= '</activity>'; //insert reference point
-           p1:= Pos(insertRef, tempStr);
-           Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef) );
-           strList.Clear;
-           strList.Text:= tempStr;
-           strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+           providerList:= TStringList.Create;
+           providerList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates +'support'+DirectorySeparator+'manifest_support_provider.txt');
+           supportProvider  := StringReplace(providerList.Text, 'dummyPackage',FPackageName, [rfReplaceAll, rfIgnoreCase]);
+           providerList.Free;
+           if Pos('androidx.core.content.FileProvider', strList.Text) <= 0 then
+           begin
+             tempStr:= strList.Text;  //manifest
+             insertRef:= '</activity>'; //insert reference point
+             p1:= Pos(insertRef, tempStr);
+             Insert(sLineBreak + supportProvider, tempStr, p1+Length(insertRef) );
+             strList.Clear;
+             strList.Text:= tempStr;
+             strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+           end;
          end;
-       end;
+      end;
     end;
   end;
 
-  //Apply to "smartdesigner.pas" improvement by LongDirtyAnimAlf in "AndroidWizard_intf"
   strList.Clear;
-  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-  tempStr:= strList.Text;
-  if Pos('android:exported="true"', tempStr) <= 0 then
+  if FileExists(FPathToAndroidProject+'AndroidManifest.xml') then
   begin
-   tempStr:= StringReplace(tempStr, 'android:enabled="true"' , 'android:enabled="true" android:exported="true"', [rfReplaceAll,rfIgnoreCase]);
-   strList.Text:= tempStr;
-   strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-  end;
-  strList.Clear;
-
-  strList.Clear;
-  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-  if Pos('ScopedStorage', strList.Text) <= 0 then
-  begin
-    for i := 0 to strList.Count - 1 do
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    tempStr:= strList.Text;
+    if Pos('android:exported="true"', tempStr) <= 0 then
     begin
-        if Pos('<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE', strList.Strings[i]) > 0 then
-        begin
-          strList.Strings[i]:= '    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:remove="android:maxSdkVersion" tools:ignore="ScopedStorage"/>';
-
-          if Pos('MANAGE_EXTERNAL_STORAGE', strList.Text) <= 0 then
-          begin
-            strList.Insert(i, '    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>');
-          end;
-
-          strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
-          break;
-        end;
+     tempStr:= StringReplace(tempStr, 'android:enabled="true"' , 'android:enabled="true" android:exported="true"', [rfReplaceAll,rfIgnoreCase]);
+     strList.Text:= tempStr;
+     strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
     end;
   end;
 
   strList.Clear;
-  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-  tempStr:= strList.Text;
-  if Pos('xmlns:tools=', strList.Text) <= 0 then
+  if FileExists(FPathToAndroidProject+'AndroidManifest.xml') then
   begin
-    tempStr:= StringReplace(tempStr, 'xmlns:android="http://schemas.android.com/apk/res/android"', 'xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"', [rfReplaceAll,rfIgnoreCase]);
-    strList.Text:= tempStr;
-    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    if Pos('ScopedStorage', strList.Text) <= 0 then
+    begin
+      for i := 0 to strList.Count - 1 do
+      begin
+          if Pos('<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE', strList.Strings[i]) > 0 then
+          begin
+            strList.Strings[i]:= '    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:remove="android:maxSdkVersion" tools:ignore="ScopedStorage"/>';
+
+            if Pos('MANAGE_EXTERNAL_STORAGE', strList.Text) <= 0 then
+            begin
+              strList.Insert(i, '    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>');
+            end;
+
+            strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+            break;
+          end;
+      end;
+    end;
   end;
 
   strList.Clear;
-  strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
-  tempStr:= strList.Text;
-  if Pos('QUERY_ALL_PACKAGES', strList.Text) > 0 then
+  if FileExists(FPathToAndroidProject+'AndroidManifest.xml') then
   begin
-    tempStr:= StringReplace(tempStr, '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>', '', [rfReplaceAll,rfIgnoreCase]);
-    strList.Text:= tempStr;
-    strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    tempStr:= strList.Text;
+    if Pos('xmlns:tools=', strList.Text) <= 0 then
+    begin
+      tempStr:= StringReplace(tempStr, 'xmlns:android="http://schemas.android.com/apk/res/android"', 'xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"', [rfReplaceAll,rfIgnoreCase]);
+      strList.Text:= tempStr;
+      strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+    end;
   end;
 
+  strList.Clear;
+  if FileExists(FPathToAndroidProject+'AndroidManifest.xml') then
+  begin
+    strList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+    tempStr:= strList.Text;
+    if Pos('QUERY_ALL_PACKAGES', strList.Text) > 0 then
+    begin
+      tempStr:= StringReplace(tempStr, '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>', '', [rfReplaceAll,rfIgnoreCase]);
+      strList.Text:= tempStr;
+      strList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+    end;
+  end;
+
+  //ant build.xml
   strList.Clear;
   strList.Add('<?xml version="1.0" encoding="UTF-8"?>');
   strList.Add('<project name="'+FSmallProjName+'" default="help">');
@@ -1146,6 +1256,7 @@ begin
   strList.Add('</project>');
   strList.SaveToFile(FPathToAndroidProject+'build.xml');
 
+  //project.properties
   strList.Clear;
   strList.Add('# This file is automatically generated by Android Tools.');
   strList.Add('# Do not modify this file -- YOUR CHANGES WILL BE ERASED!');
@@ -1167,6 +1278,7 @@ begin
   strList.Add('sdk.dir=' + FPathToAndroidSDK);
   strList.Add('ndk.dir=' + FPathToAndroidNDK);
 
+  //local.properties
   {$IFDEF WINDOWS}
   tempStr:= strList.Text;
   tempStr:= StringReplace(tempStr, '\', '\\', [rfReplaceAll]);
@@ -3781,6 +3893,25 @@ begin
   Result:= True;
 end;
 
+ function TrimChar(query: string; delimiter: char): string;
+var
+  auxStr: string;
+  count: integer;
+  newchar: char;
+begin
+  newchar:=' ';
+  if query <> '' then
+  begin
+      auxStr:= Trim(query);
+      count:= Length(auxStr);
+      if count >= 2 then
+      begin
+         if auxStr[1] = delimiter then  auxStr[1] := newchar;
+         if auxStr[count] = delimiter then  auxStr[count] := newchar;
+      end;
+      Result:= Trim(auxStr);
+  end;
+end;
 
 initialization
   LamwSmartDesigner := TLamwSmartDesigner.Create;

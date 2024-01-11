@@ -76,6 +76,7 @@ type
      FFullJavaSrcPath: string;
      FSmallProjName:  string; //ex. 'AppDemo1'
      FGradleVersion: string;
+     FJavaMainVersion: string;
 
      FAndroidTheme: string;
      FAndroidThemeColor: string;       //new
@@ -112,8 +113,9 @@ type
 
      function GetVerAsString(aVers: integer): string;
 
-     function GetAndroidPluginVersion(gradleVersion: string): string;
+     function GetAndroidPluginVersion(gradleVersion: string; mainJavaVersion: string): string;
      function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+     function GetAndroidPluginVersionAsBigNumber(androidPluginVersionAsString: string): integer;
 
    public
      constructor Create; override;
@@ -680,10 +682,13 @@ begin
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
       end;
 
-      //AndroidManifest.xml creation:
-
       auxList.Clear;
-      auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
+
+      //AndroidManifest.xml setup....
+      if FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
+        auxList.LoadFromFile(FAndroidProjectName + DirectorySeparator + 'AndroidManifest.xml')
+      else
+        auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
 
       strAfterReplace  := StringReplace(auxList.Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
 
@@ -728,12 +733,9 @@ begin
            providerList.Free;
          end;
       end;
-
-
-
       auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-      auxList.Free;
 
+      auxList.Free;
       Result := mrOK
 
     end else
@@ -1109,6 +1111,13 @@ begin
    strList.Add('apply plugin: ''kotlin-android''');
 
   strList.Add('android {');
+
+  if FJavaMainVersion <> '' then
+  begin
+    if StrToInt(FJavaMainVersion) >= 21  then
+        if GetAndroidPluginVersionAsBigNumber(androidPluginVersion) >= 820 then
+            strList.Add('    namespace "'+strPack+'"'); //org.lamw.applamwproject1
+  end;
   strList.Add('    lintOptions {');
   strList.Add('       abortOnError false');
   strList.Add('    }');
@@ -1208,6 +1217,17 @@ begin
 
 end;
 
+function TAndroidProjectDescriptor.GetAndroidPluginVersionAsBigNumber(androidPluginVersionAsString: string): integer;
+var
+  auxStr: string;
+  lenAuxStr: integer;
+begin
+  auxStr:= StringReplace(androidPluginVersionAsString,'.', '', [rfReplaceAll]); //8.1.1
+  lenAuxStr:=  Length(auxStr);
+  if lenAuxStr < 3 then auxStr:= auxStr + '0';   //8.4 -> 840
+  Result:= StrToInt(Trim(auxStr));  //811
+end;
+
 function TAndroidProjectDescriptor.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
 var
   auxStr: string;
@@ -1221,13 +1241,17 @@ end;
 
 {
 //https://developer.android.com/studio/releases/gradle-plugin?hl=pt-br
+
 Android
 plug-in
-8.2.0  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.6?
-8.1.4  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.4 or  8.5
+
+8.2.0  <--> Android Gradle plugin requiresJava 17 ... 21   //Gradle versão 8.5
+8.1.4  <--> Android Gradle plugin requiresJava 17   //Gradle versão 8.4
 8.0.2  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
 8.0.0  <--> Android Gradle plugin requires Java 17. //Gradle versão 8.3
+
 7.4.2  <--> Android Gradle plugin requires Java 11  //Gradle versão 8.1.1
+
 7.3.1  <--> Gradle versão 8.1.1   //https://docs.gradle.org/8.1.1/userguide/compatibility.html
 7.2.2  <--> Gradle versão 7.6.3
 7.1.3  <--> Gradle versão 7.6.3  //https://docs.gradle.org/7.6.3/userguide/compatibility.html
@@ -1241,8 +1265,8 @@ JDK 17
 Nível da API 34
 Versão mínima do "Android Plugin" 8.1.1 (requiresJava 17)
 *)
-
-function TAndroidProjectDescriptor.GetAndroidPluginVersion(gradleVersion: string): string;
+//https://docs.gradle.org/8.4/userguide/compatibility.html#java
+function TAndroidProjectDescriptor.GetAndroidPluginVersion(gradleVersion: string; mainJavaVersion: string): string;
 var
   strGV, auxGrVer: string;
   intGV: integer;
@@ -1254,18 +1278,38 @@ begin
   strGV:= SplitStr(auxGrVer,  '.');
   intGV:= StrToInt(strGV);
 
-  if intGV = 8 then  //JDK 11 - Java 11 need Gradle version >=  6.7.1 -- targetApi 33
-  begin
-
-    if (bigNumber >= 800) and (bigNumber < 820) then          //Tested: Gradle 8.1.1
-         Result:= '7.4.2' //JDK 11
-    else if (bigNumber >= 820) and (bigNumber < 830) then     //Tested: Gradle 8.2.1
-       Result:= '7.4.2'   //JDK 11                                   //'8.0.2' --> JDK 17  -> targetApi 34
-    else if (bigNumber >= 830) and (bigNumber < 840) then     //Tested: Gradle 8.3
-        Result:=  '7.4.2' //JDK 11                                    //'8.1.4' --> JDK 17  -> targetApi 34
-    else if bigNumber >= 840 then                             //Tested: Gradle 8.4  and Gradle 8.5
-       Result:= '7.4.2'; //JDK 11                             //'8.2.0' --> JDK 17 -> targetApi 34
-
+  if intGV = 8 then  //JDK 11 - need Gradle version >=  6.7.1 -- targetApi 33
+  begin              //JDK 17 - need Gradle version >=  8.1.1 -- targetApi 34
+    if (bigNumber >= 800) and (bigNumber < 820) then
+    begin
+         if mainJavaVersion = '11' then
+           Result:= '7.4.2' //JDK 11               //Tested: Jdk11 + Gradle 8.1.1
+         else
+           Result:= '7.4.2'; //JDK 17
+    end
+    else if (bigNumber >= 820) and (bigNumber < 830) then
+    begin
+        if mainJavaVersion = '11' then
+           Result:= '7.4.2'   //JDK 11                        //Tested: Jdk11 + Gradle 8.2.1
+        else
+           Result:= '8.0.2';   //JDK 17                     //'8.0.2' --> JDK 17  -> targetApi 34
+    end
+    else if (bigNumber >= 830) and (bigNumber < 840) then
+    begin
+        if mainJavaVersion = '11' then
+            Result:=  '7.4.2' //JDK 11                           //Tested: Jdk11 + Gradle 8.3
+        else
+            Result:=  '8.1.4'; //JDK 17                           //'8.1.4' --> JDK 17  -> targetApi 34
+    end
+    else if bigNumber >= 840 then
+    begin
+        if mainJavaVersion = '11' then
+           Result:= '7.4.2' //JDK 11                /Tested: Jdk11 + Gradle 8.4  and Jdk11 + Gradle 8.5
+        else if mainJavaVersion = '17' then
+           Result:= '8.1.4' //JDK 17              //or '8.2.0' --> JDK 17 (??) -> targetApi 34
+        else  //21
+           Result:= '8.2.0' //JDK 21              //'8.2.0' --> JDK 21 -> targetApi 34
+    end;
   end;
 
   if intGV = 7 then   //JDK 11
@@ -1319,7 +1363,7 @@ function TAndroidProjectDescriptor.GetWorkSpaceFromForm(projectType: integer; ou
 var
   frm: TFormWorkspace;
   strList: TStringList;
-  i, intTargetApi, intMinApi: integer;
+  i, count, intTargetApi, intMinApi: integer;
   linuxDirSeparator: string;
   linuxPathToJavaJDK: string;
   linuxPathToAndroidSdk: string;
@@ -1357,7 +1401,9 @@ begin
     frm.CheckBoxPIE.Visible:= False;
     frm.CheckBoxGeneric.Visible:= False; //support to Kotlin need "AppCompat" theme and Gradle
     if FModuleType = 0 then //GUI
+    begin
       frm.CheckBoxGeneric.Caption:= 'Add support to Kotlin'; //bad reuse ... sorry
+    end;
 
     if FModuleType = 1 then //No GUI
     begin
@@ -1455,6 +1501,60 @@ begin
       FMaxSdkPlatform:= frm.MaxSdkPlatform;
 
       FGradleVersion:= frm.GradleVersion;
+      FJavaMainVersion:= frm.JavaMainVersion;
+
+      strList.Clear;
+      if frm.ManifestData <> nil then
+      begin
+        count:= frm.ManifestData.Count;  //custom manifest permissions...
+        if count > 0 then
+        begin
+          strList.Add('<?xml version="1.0" encoding="utf-8"?>');
+          strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="dummyPackage" android:versionCode="1" android:versionName="1.0">');
+          strList.Add('<!-- <uses-sdk android:minSdkVersion="dummySdkApi" android:targetSdkVersion="dummyTargetApi"/> -->');
+
+          for i:= 0 to count-1 do
+          begin
+            strList.Add('<uses-permission android:name="'+frm.ManifestData.Strings[i]+'"/>');
+          end;
+          frm.ManifestData.Clear;
+
+          strList.Add('<uses-feature android:name="android.hardware.camera" android:required="false"/>');
+          strList.Add('<uses-feature android:name="android.hardware.camera.flash" android:required="false"/>');
+          strList.Add('<uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>');
+          strList.Add('<uses-feature android:glEsVersion="0x00020000" android:required="true"/>');
+          strList.Add('<uses-feature android:name="android.hardware.telephony" android:required="false"/>');
+          strList.Add('<uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false"/>');
+          strList.Add('<uses-feature android:name="android.hardware.sensor.stepdetector" android:required="false"/>');
+          strList.Add('<supports-screens');
+          strList.Add('    android:smallScreens="true"');
+          strList.Add('    android:normalScreens="true"');
+          strList.Add('    android:largeScreens="true"');
+          strList.Add('    android:xlargeScreens="true"');
+          strList.Add('    android:anyDensity="true"/>');
+          strList.Add('<application');
+          strList.Add('    android:requestLegacyExternalStorage="true"');
+          strList.Add('	   android:usesCleartextTraffic="true"');
+          strList.Add('    android:allowBackup="true"');
+          strList.Add('    android:icon="@mipmap/ic_launcher"');
+          strList.Add('    android:label="@string/app_name"');
+          strList.Add('    android:theme="@style/AppTheme"');
+          strList.Add('    dummyMULTIDEX>');
+          strList.Add('    <activity');
+          strList.Add('        android:name="dummyAppName"');
+          strList.Add('        android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"');
+          strList.Add('        android:launchMode="standard" android:enabled="true" android:exported="true">');
+          strList.Add('        <intent-filter>');
+          strList.Add('            <action android:name="android.intent.action.MAIN"/>');
+          strList.Add('            <category android:name="android.intent.category.LAUNCHER"/>');
+          strList.Add('        </intent-filter>');
+          strList.Add('    </activity>');
+          strList.Add('</application>');
+          strList.Add('</manifest> ');
+          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
+          strList.Clear;
+        end;
+      end;
 
       if Pos('Library', frm.CheckBoxGeneric.Caption) >= 0 then  //bad CheckBox reuse... sorry!
       begin
@@ -1680,7 +1780,7 @@ begin
 
           end;
 
-          if FModuleType <= 0  then  //Android Bridges Controls... [GUI] and Gdx
+          if FModuleType <= 0  then  //Android Bridges Controls... [GUI]
           begin
             if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
             begin
@@ -1759,6 +1859,7 @@ begin
 
              strList.Clear;
 
+
              if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
              begin
                strList.Add('<?xml version="1.0" encoding="utf-8"?>');
@@ -1790,7 +1891,7 @@ begin
           end; //just Ant NoGUI project
         end; // Ant
 
-        if FModuleType < 2 then    {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+        if FModuleType < 2 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
         begin
           strList.Clear;
           //begin_cmd_tools
@@ -2225,8 +2326,8 @@ begin
           //Add GRADLE support ... [... initial code ...]
           //Building "build.gradle" file    -- for gradle we need "sdk/build-tools" >= 21.1.1
 
-          //FGradleVersion:='7.6.3'  --> '7.1.3';
-          androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion); //'7.1.3';
+          //FGradleVersion:='7.6.3'  --> plugin '7.1.3';
+          androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion, FJavaMainVersion); //'7.1.3';
 
           isAppCompatTheme:= False;
           if Pos('AppCompat', FAndroidTheme) > 0  then isAppCompatTheme:= True;
@@ -2418,7 +2519,7 @@ begin
           //strList.Add('.\gradle run');
           strList.Add('gradle run');
           SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-run.sh');
-        end; //FModuleType < 2 {-1: Gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+        end; //FModuleType < 2       //0: GUI; 1: NoGUI; 2: NoGUI EXE Console
         Result := True;
       except
         on e: Exception do
@@ -3372,7 +3473,6 @@ var
   d: TIDesigner;
   c: TComponent;
   s: TLazProjectFile;
-  //xmlAndroidManifest: TXMLDocument;
   templateFiles: TStringList;
   i, count: integer;
   fileName, pathToTemplate: string;

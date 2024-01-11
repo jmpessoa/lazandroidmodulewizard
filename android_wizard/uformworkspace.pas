@@ -7,7 +7,7 @@ interface
 uses
   inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   LazIDEIntf, StdCtrls, Buttons, ExtCtrls, ComCtrls, ComboEx,
-  FormPathMissing, PackageIntf, Process;
+  FormPathMissing, PackageIntf, Process, uformandroidmanifest;
 
 type
 
@@ -50,6 +50,7 @@ type
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
     SpeedButton1: TSpeedButton;
+    SpeedButtonManifest: TSpeedButton;
     SpeedButtonSettings: TSpeedButton;
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
@@ -67,6 +68,7 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
 
     procedure ListBoxMinSDKChange(Sender: TObject);
     procedure ListBoxMinSDKCloseUp(Sender: TObject);
@@ -78,6 +80,7 @@ type
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButtonManifestClick(Sender: TObject);
     procedure SpeedButtonSettingsClick(Sender: TObject);
     procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
@@ -139,7 +142,7 @@ type
     FKeepMyBuildGradleWhenReopen: boolean;
     FJavaMainVersion: string;
     FJavaBigVersion: string;
-
+    FManifestData: TStrings;
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetGradleVersion(pathGradle:string): string;
@@ -177,6 +180,8 @@ type
     procedure TryProduceJavaVersion(pathToJDK: string);
     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
     procedure CheckingSettingsCompatibility;
+    procedure WarningCheckingJDK_21(javaVersionBigNumber: string; grVersion:string);
+    procedure WarningCheckingJDK_17(javaVersionBigNumber: string; grVersion:string);
     procedure WarningCheckingJDK_11(javaVersionBigNumber: string; grVersion:string);
     procedure WarningCheckingJDK_8(javaVersionBigNumber: string; grVersion:string);
 
@@ -223,7 +228,7 @@ type
     property KeepMyBuildGradleWhenReopen: boolean read FKeepMyBuildGradleWhenReopen write FKeepMyBuildGradleWhenReopen;
     property JavaMainVersion: string read FJavaMainVersion write FJavaMainVersion;
     property JavaBigVersion: string read FJavaBigVersion write FJavaBigVersion;
-
+    property ManifestData: TStrings read FManifestData write FManifestData;
   end;
 
   function TrimChar(query: string; delimiter: char): string;
@@ -301,14 +306,6 @@ begin
        end;
     end;
   end;
-
-  if Result < 33 then
-       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
-                   'Please, update your android sdk/platforms folder!' + sLineBreak +
-                   'How to:'+ sLineBreak +
-                   '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
-                   '.run the command  >>sdkmanager --update'+ sLineBreak +
-                   '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
 
   lisDir.free;
 end;
@@ -852,7 +849,6 @@ begin
 
   end;
   //CloseAction := caFree;
-
 end;
 
 procedure TFormWorkspace.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -923,6 +919,12 @@ begin
        Self.DoNewPathToJavaTemplate();
     end;
   end;
+  FManifestData:= TStringList.Create;
+end;
+
+procedure TFormWorkspace.FormDestroy(Sender: TObject);
+begin
+  if FManifestData <> nil then FManifestData.Free;
 end;
 
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
@@ -1247,6 +1249,29 @@ begin
   else Result:= FPathToSmartDesigner;
 end;
 
+procedure TFormWorkspace.WarningCheckingJDK_21(javaVersionBigNumber: string; grVersion:string);
+begin
+   MessageDlg('Inconsistent settings:' + sLineBreak +
+              '  Java JDK '+ javaVersionBigNumber + sLineBreak +
+              '  Can''t run Gradle Version < 8.5' + sLineBreak + sLineBreak +
+              '  Solution: -> upgrade Gradle ['+grVersion+'] to  Version >= 8.5'  + sLineBreak +
+              '               or ' + sLineBreak +
+              '            -> downgrade to JDK 17', mtWarning, [mbOk], 0);
+
+end;
+
+
+procedure TFormWorkspace.WarningCheckingJDK_17(javaVersionBigNumber: string; grVersion:string);
+begin
+   MessageDlg('Inconsistent settings:' + sLineBreak +
+              '  Java JDK '+ javaVersionBigNumber + sLineBreak +
+              '  Can''t run Gradle Version < 8.1.1' + sLineBreak + sLineBreak +
+              '  Solution: -> upgrade Gradle ['+grVersion+'] to  Version >= 8.1.1'  + sLineBreak +
+              '               or ' + sLineBreak +
+              '            -> downgrade to JDK 11', mtWarning, [mbOk], 0);
+
+end;
+
 procedure TFormWorkspace.WarningCheckingJDK_11(javaVersionBigNumber: string; grVersion:string);
 begin
    MessageDlg('Inconsistent settings:' + sLineBreak +
@@ -1283,12 +1308,17 @@ begin
   if intGV = 8 then  //JDK 11 - Java 11 need Gradle version >=  6.7.1 -- targetApi 33
   begin
     if FJavaMainVersion = '1' then WarningCheckingJDK_8(FJavaBIgVersion, FGradleVersion); //jdk 1.8
+    if gvBigNumber < 850 then
+    begin
+      if FJavaMainVersion = '21' then WarningCheckingJDK_21(FJavaBIgVersion, FGradleVersion); //jdk 17
+    end;
   end;
 
   if intGV = 7 then   //JDK 11
   begin
-    if FJavaMainVersion = '1' then WarningCheckingJDK_8(FJavaBIgVersion, FGradleVersion); //1.8
-
+    if FJavaMainVersion = '1' then WarningCheckingJDK_8(FJavaBIgVersion, FGradleVersion)   //1.8
+    else if FJavaMainVersion = '17' then WarningCheckingJDK_17(FJavaBIgVersion, FGradleVersion) //17
+    else if FJavaMainVersion = '21' then WarningCheckingJDK_21(FJavaBIgVersion, FGradleVersion);
   end;
 
   if intGV = 6 then     //JDK 1.8 need Gradle version <=  6.7 .... and JDK 11 >= 6.7.1
@@ -1299,13 +1329,17 @@ begin
      end
      else                      //JDK 1.8
      begin
-        if FJavaMainVersion = '11' then WarningCheckingJDK_11(FJavaBIgVersion, FGradleVersion);
+        if FJavaMainVersion = '11' then WarningCheckingJDK_11(FJavaBIgVersion, FGradleVersion)
+        else if FJavaMainVersion = '17' then WarningCheckingJDK_17(FJavaBIgVersion, FGradleVersion)
+        else if FJavaMainVersion = '21' then WarningCheckingJDK_21(FJavaBIgVersion, FGradleVersion);
      end;
   end;
 
   if intGV < 6 then  //JDK 1.8
   begin
-     if FJavaMainVersion = '11' then WarningCheckingJDK_11(FJavaBIgVersion, FGradleVersion);
+     if FJavaMainVersion = '11' then WarningCheckingJDK_11(FJavaBIgVersion, FGradleVersion)
+     else if FJavaMainVersion = '17' then WarningCheckingJDK_17(FJavaBIgVersion, FGradleVersion)
+     else if FJavaMainVersion = '21' then WarningCheckingJDK_21(FJavaBIgVersion, FGradleVersion);
   end;
 
 end;
@@ -1647,17 +1681,38 @@ end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
- ShowMessage('Warning/Recomendation:'+
+   ShowMessage('Information:'+
            sLineBreak+
-           sLineBreak+'[LAMW 0.8.6.3] recomentations:'+
-           sLineBreak+' 1. Java JDK 11 + Gradle version >= 6.7.1' +
-           sLineBreak+' 2. Android SDK "plataforms" 33 + "build-tools" 33.0.2'+
-           sLineBreak+' 3. Android SDK/Extra  "Support Repository"'+
-           sLineBreak+' 4. Android SDK/Extra  "Support Library"'+
-           sLineBreak+' 5. Android SDK/Extra  "Google Repository"'+
-           sLineBreak+' 6. Android SDK/Extra  "Google Play Services"'+
-           sLineBreak+' '+
-           sLineBreak+' Hint: "Ctrl + C" to copy this content to Clipboard!');
+           sLineBreak+'[LAMW 0.8.6.4] recomentations:'+
+           sLineBreak+' a1. Java JDK 11 + Gradle version >= 6.7.1' +
+           sLineBreak+' a2. Android SDK "plataforms" 33 + "build-tools" 33.0.2'+ sLineBreak +
+           sLineBreak+' b1. Java JDK 17 + Gradle version >= 8.1.1' +
+           sLineBreak+' b2. Android SDK "plataforms" 34 + "build-tools" 34.0.0'+ sLineBreak +
+           sLineBreak+' c1. Java JDK 21 + Gradle version >= 8.5.0' +
+           sLineBreak+' c2. Android SDK "plataforms" 34 + "build-tools" 34.0.0');
+end;
+
+procedure TFormWorkspace.SpeedButtonManifestClick(Sender: TObject);
+var
+   frm: TFormAndroidManifest;
+   i, count: integer;
+
+begin
+  frm:= TFormAndroidManifest.Create(nil);
+  if frm.ShowModal = mrOK then
+  begin
+     if FManifestData = nil then
+         FManifestData:= TStringList.Create
+     else
+         FManifestData.Clear;
+
+     count:= frm.ListBoxManifestPermission.Count;
+     for i:= 0 to count-1 do
+     begin
+       FManifestData.Add(frm.ListBoxManifestPermission.Items.Strings[i]);
+     end;
+  end;
+  frm.Free;
 end;
 
 procedure TFormWorkspace.SpeedButtonSettingsClick(Sender: TObject);
@@ -1670,10 +1725,12 @@ begin
                   '  Java JDK: '+ FJavaBigVersion + sLineBreak +
                   '  Gradle: ' + FGradleVersion + sLineBreak +  sLineBreak +
                'About Java and Gradle:' +  sLineBreak +
-                     '  Java JDK 1.8 need Gradle version <=  6.7' + sLineBreak +
+                     '  Java 8 (JDK 1.8) need Gradle version <=  6.7' + sLineBreak +
                      '  Java 11 need Gradle version >=  6.7.1'  + sLineBreak +  sLineBreak +
-               'About Java and Ant:' +  sLineBreak +
-                     '  Ant need java JDK 1.8 and Android SDK r25.2.5'
+                     '  Java 17 need Gradle version >=  8.1.1'  + sLineBreak +  sLineBreak +
+                     '  Java 21 need Gradle version >=  8.5.0'  + sLineBreak +  sLineBreak +
+               'About Ant:' +  sLineBreak +
+                     '  Ant need Java 8 (JDK 1.8) and Android SDK r25.2.5'
                   , mtInformation, [mbOk], 0);
 
   if (cbBuildSystem.Text = 'Gradle') then
@@ -1765,7 +1822,10 @@ end;
 
 procedure TFormWorkspace.SpeedButtonHintThemeClick(Sender: TObject);
 begin
-  //TODO!
+  ShowMessage('Hint: You can export a Project as Theme/Template!' + sLineBreak + sLineBreak +
+  ' Go to IDE menu:  "Tools" -> '+ sLineBreak +
+  ' "[LAMW]..." -> "Export LAMW Project as Template/Theme..."' + sLineBreak + sLineBreak +
+  '                          Have Fun!');
 end;
 
 function TFormWorkspace.GetBuildSystem: string;
@@ -1957,6 +2017,15 @@ begin
 
   if FMaxSdkPlatform = 0 then    //  try fix "android-0"
       FMaxSdkPlatform:= FCandidateSdkPlatform;
+
+  if FMaxSdkPlatform < 33 then
+       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
+                   'Please, update your android sdk/platforms folder!' + sLineBreak +
+                   'How to:'+ sLineBreak +
+                   '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                   '.run the command  >>sdkmanager --update'+ sLineBreak +
+                   '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
+
 
   FMaxNdkPlatform:= Self.GetMaxNdkPlatform(FNDKVersion);
   ListBoxNdkPlatform.Clear;
