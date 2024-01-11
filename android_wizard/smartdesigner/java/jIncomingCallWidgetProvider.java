@@ -1,4 +1,4 @@
-package org.lamw.appincomingcallwidgetproviderdemo1;
+package org.lamw.applamwprojecttest1;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -126,7 +126,7 @@ public class jIncomingCallWidgetProvider extends AppWidgetProvider  {
 		  intent.putExtra("incoming_number", incomingNumber);
 		  ComponentName cn = new ComponentName(packageName, packageName+"."+appJavaClassName); 
 		  intent.setComponent(cn);
-		  return PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		  return PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 	}
 	
 	public static void pushWidgetUpdate(Context ctx, RemoteViews remoteViews) {

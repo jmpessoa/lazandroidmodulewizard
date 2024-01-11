@@ -15,7 +15,7 @@
         <CustomOptions Value="$(IDEBuildOptions)"/>
       </Other>
     </CompilerOptions>
-    <Files Count="20">
+    <Files Count="22">
       <Item1>
         <Filename Value="androidwizard_intf.pas"/>
         <HasRegisterProc Value="True"/>
@@ -97,6 +97,14 @@
         <Filename Value="ninepatchpng.pas"/>
         <UnitName Value="NinePatchPNG"/>
       </Item20>
+      <Item21>
+        <Filename Value="uformandroidmanifest.pas"/>
+        <UnitName Value="uformandroidmanifest"/>
+      </Item21>
+      <Item22>
+        <Filename Value="uformandroidmanifest.lfm"/>
+        <Type Value="LFM"/>
+      </Item22>
     </Files>
     <RequiredPkgs Count="5">
       <Item1>

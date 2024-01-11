@@ -1,19 +1,19 @@
-package org.lamw.appwebviewdemo1;
+package org.lamw.applamwprojecttest1;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.http.SslError;
 import android.os.Build;
-import android.util.Log;
+//import android.util.Log;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
+//import android.webkit.WebResourceRequest;
+//import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
-import android.webkit.WebView.FindListener; //LMB
+//import android.webkit.WebView.FindListener; //LMB
 import android.webkit.WebViewClient;
 
 //-------------------------------------------------------------------------
@@ -445,7 +445,8 @@ public class jWebView extends WebView {
     }
 
     public void SetAppCacheEnabled(boolean _cacheEnabled) {
-        this.getSettings().setAppCacheEnabled(_cacheEnabled);
+        //this.getSettings().setAppCacheEnabled(_cacheEnabled);
+        this.getSettings().setDatabaseEnabled(_cacheEnabled);
     }
 
     public void SetDisplayZoomControls(boolean _displayZoomControls) {

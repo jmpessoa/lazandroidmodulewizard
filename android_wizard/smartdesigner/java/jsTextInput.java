@@ -1,4 +1,4 @@
-package org.lamw.appcompatdemo1;
+package org.lamw.applamwprojecttest1;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -14,8 +14,6 @@ import android.util.TypedValue;
 import com.google.android.material.textfield.TextInputEditText;
 import android.graphics.PorterDuff;
 
-import org.wedus.ftp.Controls;
-import org.wedus.ftp.jCommons;
 /*Draft java code by "Lazarus Android Module Wizard" [12/30/2017 3:44:48]*/
 /*https://github.com/jmpessoa/lazandroidmodulewizard*/
 /*jVisualControl LAMW template*/

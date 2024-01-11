@@ -1,9 +1,7 @@
-package org.lamw.appcompatfmcpushdemo1;
-
+package org.lamw.applamwprojecttest1;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 //import com.google.firebase.FirebaseApp;

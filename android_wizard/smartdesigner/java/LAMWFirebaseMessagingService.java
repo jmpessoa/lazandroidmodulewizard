@@ -1,4 +1,4 @@
-package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
+package org.lamw.applamwprojecttest1;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -6,12 +6,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -33,7 +36,7 @@ public class LAMWFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(String s) {
         super.onNewToken(s);
-        Log.d("NEW_TOKEN",s);
+        Log.d("NEW_TOKEN", s);
     }
 
     @Override
@@ -42,14 +45,14 @@ public class LAMWFirebaseMessagingService extends FirebaseMessagingService {
         sendNotification(remoteMessage, this);
     }
 
-    private Intent GetIntent(RemoteMessage remoteMessage){
+    private Intent GetIntent(RemoteMessage remoteMessage) {
 
-        Intent  intent = new Intent(this, App.class);  //bind to LAMW "App" MainActivity class
+        Intent intent = new Intent(this, App.class);  //bind to LAMW "App" MainActivity class
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (remoteMessage.getData().size() > 0) {
             //Log.e(TAG, "Message data payload: " + remoteMessage.getData());
-            Map<String, String> map= remoteMessage.getData();
+            Map<String, String> map = remoteMessage.getData();
             for (String key : map.keySet()) {
                 String value = map.get(key);
                 intent.putExtra(key, value);
@@ -58,7 +61,7 @@ public class LAMWFirebaseMessagingService extends FirebaseMessagingService {
         return intent;
     }
 
-  //String messageTitle, String messageBody, Context context
+    //String messageTitle, String messageBody, Context context
     private void sendNotification(RemoteMessage remoteMessage, Context context) {
 
         String title = "";
@@ -92,7 +95,7 @@ public class LAMWFirebaseMessagingService extends FirebaseMessagingService {
         final int NOTIFY_ID = 0; // ID of notification
         String id = "lamwfmcchannel"; // default_channel_id
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         //Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         if (notifManager == null) {
@@ -104,8 +107,8 @@ public class LAMWFirebaseMessagingService extends FirebaseMessagingService {
             NotificationChannel mChannel = notifManager.getNotificationChannel(id);
             if (mChannel == null) {
                 mChannel = new NotificationChannel(id, title, importance);
-               // mChannel.enableVibration(true);
-               // mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                // mChannel.enableVibration(true);
+                // mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
                 notifManager.createNotificationChannel(mChannel);
             }
 
@@ -139,6 +142,20 @@ public class LAMWFirebaseMessagingService extends FirebaseMessagingService {
         }
         Notification notification = builder.build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast toast = Toast.makeText(this, "Sorry... android.Manifest.permission.POST_NOTIFICATIONS NOT GRANTED !!", Toast.LENGTH_SHORT);
+            if (toast != null) {
+                toast.show();
+            }
+            return;
+        }
         notificationManager.notify(NOTIFY_ID, notification);
     }
 }
