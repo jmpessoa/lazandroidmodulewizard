@@ -65,7 +65,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-<service android:name=".LAMWFirebaseMessagingService" android:stopWithTask="false"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT"/></intent-filter></service>
+<service android:name=".LAMWFirebaseMessagingService" android:stopWithTask="false" android:exported="true"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT"/></intent-filter></service>
 <provider android:name="androidx.core.content.FileProvider" android:authorities="org.lamw.appcompatfirebasepushnotificationlistenerdemo1.fileprovider" android:exported="false" android:grantUriPermissions="true"><meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/support_provider_paths"/></provider>
 
     </application>
