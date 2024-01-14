@@ -1,7 +1,6 @@
 package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
 
 import java.lang.reflect.Field;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -22,6 +21,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.Html;
 import android.text.TextUtils.TruncateAt;
@@ -34,7 +34,7 @@ import android.view.ViewGroup;
 import android.view.Gravity;
 import android.widget.TextView;
 
-public class jTextView extends TextView {
+public class jTextView extends  TextView { //androidx.appcompat.widget.AppCompatTextView
     //Java-Pascal Interface
     private Controls        controls = null;   // Control Class for Event
     private jCommons LAMWCommon;
@@ -50,6 +50,8 @@ public class jTextView extends TextView {
     private ClipboardManager mClipBoard = null;
     private ClipData mClipData = null;
     private int mRadius = 20;
+    
+    private int mAngle = 0;
     
     private int mFontFace     = 0; // Normal
     private int mFontTypeFace = 0; // Normal
@@ -356,7 +358,8 @@ public class jTextView extends TextView {
 			        if(background == null) return;
 			        if (background instanceof ColorDrawable) {
 			          color = ((ColorDrawable)this.getBackground()).getColor();
-				        shape.setColorFilter(color, Mode.SRC_ATOP);        		           		        		        
+				        shape.setColorFilter(color, Mode.SRC_ATOP);
+				        shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 				        //[ifdef_api16up]
 				  	    if(Build.VERSION.SDK_INT >= 16) 
 				             this.setBackground((Drawable)shape);
@@ -367,6 +370,11 @@ public class jTextView extends TextView {
 	
 	public void SetRadiusRoundCorner(int _radius) {
 		mRadius =  _radius;
+	}
+	
+	public void SetRotation( int angle ){
+		mAngle = angle;
+		this.setRotation(mAngle);		
 	}
 		
 	// https://blog.stylingandroid.com/gradient-text/
@@ -527,6 +535,49 @@ public class jTextView extends TextView {
 			this.setText(Html.fromHtml(_htmlText, Html.FROM_HTML_MODE_LEGACY));
 		}else //[endif_api24up]
 			this.setText(Html.fromHtml(_htmlText)); //Html.fromHtml("5x<sup>2</sup>")
+	}
+	
+	public void ApplyDrawableXML(String _xmlIdentifier) {	    
+		this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+    }
+
+    //https://stackoverflow.com/questions/8087555/programmatically-create-textview-with-ellipsis
+
+	public void SetSingleLine(boolean _value) {
+		this.setSingleLine(_value);
+	}
+
+	public void SetHorizontallyScrolling(boolean _value) {
+		this.setHorizontallyScrolling(_value);
+	}
+
+    public void SetEllipsize(int _mode) {
+		switch (_mode) {
+			case 0: 	{this.setEllipsize(TextUtils.TruncateAt.END); this.setHorizontallyScrolling(false); this.setSingleLine();  break;}
+			case 1: 	{this.setEllipsize(TextUtils.TruncateAt.MIDDLE); this.setHorizontallyScrolling(false); this.setSingleLine();  break;}
+			case 2: 	{this.setEllipsize(TextUtils.TruncateAt.MARQUEE); this.setHorizontallyScrolling(true);  this.setSingleLine();  break;}
+			case 3: 	{this.setEllipsize(TextUtils.TruncateAt.START); this.setHorizontallyScrolling(false); this.setSingleLine(); break;}
+		}
+		this.setHorizontallyScrolling(false);
+		this.setSingleLine();
+	}
+
+	public void SetTextAllCaps(String _text) {
+		this.setAllCaps(true);
+		this.setText(_text);
+	}
+
+	public void SetScrollingMovementMethod() {
+		this.setMovementMethod(new ScrollingMovementMethod());
+	}
+	public void SetVerticalScrollBarEnabled(boolean _value) {
+		this.setVerticalScrollBarEnabled(_value);
+	}
+	public void SetHorizontalScrollBarEnabled(boolean _value) {
+		this.setHorizontalScrollBarEnabled(_value);
+	}
+	public void SetVerticalScrollbarPosition(int _value) {
+		this.setVerticalScrollbarPosition(_value);
 	}
 
 }

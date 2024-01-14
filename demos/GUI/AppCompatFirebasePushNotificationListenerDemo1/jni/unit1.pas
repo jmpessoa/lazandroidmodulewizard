@@ -23,13 +23,18 @@ type
     jTextView1: jTextView;
     jTextView2: jTextView;
     procedure AndroidModule1ActivityCreate(Sender: TObject; intentData: jObject);
+    procedure AndroidModule1JNIPrompt(Sender: TObject);
     procedure AndroidModule1NewIntent(Sender: TObject; intentData: jObject);
+    procedure AndroidModule1RequestPermissionResult(Sender: TObject;
+      requestCode: integer; manifestPermission: string;
+      grantResult: TManifestPermissionResult);
     procedure jButton1Click(Sender: TObject);
     procedure jsFirebasePushNotificationListener1GetTokenComplete(
       Sender: TObject; token: string; isSuccessful: boolean;
       statusMessage: string);
   private
     {private declarations}
+    FPOSTNOTIFICATIONS: boolean;
   public
     {public declarations}
   end;
@@ -60,7 +65,10 @@ end;
 
 procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
-  jsFirebasePushNotificationListener1.GetFirebaseMessagingTokenAsync();
+  if FPOSTNOTIFICATIONS then
+    jsFirebasePushNotificationListener1.GetFirebaseMessagingTokenAsync()
+  else
+    ShowMessage('Sorry... "android.permission.POST_NOTIFICATIONS" not granted... ' );
 end;
 
 procedure TAndroidModule1.AndroidModule1ActivityCreate(Sender: TObject; intentData: jObject);
@@ -76,6 +84,15 @@ begin
   end;
 end;
 
+procedure TAndroidModule1.AndroidModule1JNIPrompt(Sender: TObject);
+begin
+  if IsRuntimePermissionNeed() then   // that is, if target API >= 23
+  begin
+    //ShowMessage('Requesting Runtime Permission....');
+    Self.RequestRuntimePermission(['android.permission.POST_NOTIFICATIONS'], 1110);   //handled by OnRequestPermissionResult
+  end;
+end;
+
 procedure TAndroidModule1.AndroidModule1NewIntent(Sender: TObject; intentData: jObject);
 var
   data: TDynArrayOfString;
@@ -86,6 +103,26 @@ begin
   for i:= 0 to count-1 do
   begin
      ShowMessage(data[i]);  //key=value
+  end;
+end;
+
+procedure TAndroidModule1.AndroidModule1RequestPermissionResult(
+  Sender: TObject; requestCode: integer; manifestPermission: string;
+  grantResult: TManifestPermissionResult);
+begin
+    case requestCode of
+    1110:begin
+           if grantResult = PERMISSION_GRANTED  then
+           begin
+             FPOSTNOTIFICATIONS:= True;
+             if manifestPermission = 'android.permission.POST_NOTIFICATIONS' then ShowMessage('"'+manifestPermission+'"  granted!');
+           end
+          else//PERMISSION_DENIED
+          begin
+              FPOSTNOTIFICATIONS:= False;
+              ShowMessage('Sorry... "['+manifestPermission+']" not granted... ' );
+          end;
+       end;
   end;
 end;
 

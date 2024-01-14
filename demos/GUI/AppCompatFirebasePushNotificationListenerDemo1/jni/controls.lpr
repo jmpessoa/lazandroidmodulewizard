@@ -19,7 +19,7 @@ procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
   layout: JObject; intent: JObject); cdecl;
 begin
   Java_Event_pAppOnCreate(PEnv, this, context, layout, intent); 
-    AndroidModule1.ReInit(gApp);
+    AndroidModule1.Reinit;
 end;
 
 { Class:     org_lamw_appcompatfirebasepushnotificationlistenerdemo1_Controls
@@ -297,6 +297,38 @@ begin
 end;
 
 { Class:     org_lamw_appcompatfirebasepushnotificationlistenerdemo1_Controls
+  Method:    pOnDone
+  Signature: (J)V }
+procedure pOnDone(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnDone(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatfirebasepushnotificationlistenerdemo1_Controls
+  Method:    pOnSearch
+  Signature: (J)V }
+procedure pOnSearch(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnSearch(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatfirebasepushnotificationlistenerdemo1_Controls
+  Method:    pOnNext
+  Signature: (J)V }
+procedure pOnNext(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnNext(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatfirebasepushnotificationlistenerdemo1_Controls
+  Method:    pOnGo
+  Signature: (J)V }
+procedure pOnGo(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnGo(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     org_lamw_appcompatfirebasepushnotificationlistenerdemo1_Controls
   Method:    pOnClose
   Signature: (J)V }
 procedure pOnClose(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
@@ -415,7 +447,7 @@ begin
     isSuccessful, statusMessage);
 end;
 
-const NativeMethods: array[0..45] of JNINativeMethod = (
+const NativeMethods: array[0..49] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -516,6 +548,18 @@ const NativeMethods: array[0..45] of JNINativeMethod = (
    (name: 'pOnBackPressed';
     signature: '(J)V';
     fnPtr: @pOnBackPressed; ),
+   (name: 'pOnDone';
+    signature: '(J)V';
+    fnPtr: @pOnDone; ),
+   (name: 'pOnSearch';
+    signature: '(J)V';
+    fnPtr: @pOnSearch; ),
+   (name: 'pOnNext';
+    signature: '(J)V';
+    fnPtr: @pOnNext; ),
+   (name: 'pOnGo';
+    signature: '(J)V';
+    fnPtr: @pOnGo; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -565,10 +609,7 @@ begin
   Result:= JNI_FALSE;
   curClass:= (PEnv^).FindClass(PEnv, className);
   if curClass <> nil then
-  begin
-    if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0 
-      then Result:= JNI_TRUE;
-  end;
+    result := (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods);
 end;
 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
@@ -581,15 +622,23 @@ function JNI_OnLoad(VM: PJavaVM; {%H-}reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
   curEnv: PJNIEnv;
+  rc: integer;
 begin
   PEnv:= nil;
   Result:= JNI_VERSION_1_6;
-  (VM^).GetEnv(VM, @PEnv, Result);
+  
+  if (VM^).GetEnv(VM, @PEnv, Result) <> JNI_OK then
+  begin
+   result := JNI_ERR;
+   exit;
+  end;
+  
   if PEnv <> nil then
   begin
      curEnv:= PJNIEnv(PEnv);
-     RegisterNativeMethods(curEnv, 'org/lamw/appcompatfirebasepushnotificationl'
-       +'istenerdemo1/Controls');
+     rc := RegisterNativeMethods(curEnv, 'org/lamw/appcompatfirebasepushnotific'
+       +'ationlistenerdemo1/Controls');
+     if (rc <> JNI_OK) then result := rc;
   end;
   gVM:= VM; {AndroidWidget.pas}
 end;
@@ -600,7 +649,9 @@ var
   curEnv: PJNIEnv;
 begin
   PEnv:= nil;
-  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);
+  
+  if (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6) <> JNI_OK then exit;
+  
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
@@ -681,6 +732,14 @@ exports
     +'Controls_pOnEnter',
   pOnBackPressed name 'Java_org_lamw_appcompatfirebasepushnotificationlistenerd'
     +'emo1_Controls_pOnBackPressed',
+  pOnDone name 'Java_org_lamw_appcompatfirebasepushnotificationlistenerdemo1_'
+    +'Controls_pOnDone',
+  pOnSearch name 'Java_org_lamw_appcompatfirebasepushnotificationlistenerdemo1'
+    +'_Controls_pOnSearch',
+  pOnNext name 'Java_org_lamw_appcompatfirebasepushnotificationlistenerdemo1_'
+    +'Controls_pOnNext',
+  pOnGo name 'Java_org_lamw_appcompatfirebasepushnotificationlistenerdemo1_'
+    +'Controls_pOnGo',
   pOnClose name 'Java_org_lamw_appcompatfirebasepushnotificationlistenerdemo1_'
     +'Controls_pOnClose',
   pAppOnViewClick name 'Java_org_lamw_appcompatfirebasepushnotificationlistener'

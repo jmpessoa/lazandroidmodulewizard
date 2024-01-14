@@ -7,7 +7,10 @@ package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
 //https://github.com/jmpessoa/lazandroidmodulewizard
 //http://forum.lazarus.freepascal.org/index.php/topic,21919.270.html
 
+import android.content.ContentValues;
+import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -77,6 +80,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -88,6 +92,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import java.io.*;
 import java.lang.Class;
+import java.lang.Math;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -98,6 +104,7 @@ import java.util.Iterator;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -135,6 +142,9 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
 
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
@@ -175,6 +185,9 @@ public class jForm {
     private int animationDurationOut = 1500;
     private int animationMode = 0; //none, fade, LeftToRight, RightToLeft
 
+    private ClipboardManager mClipBoard = null;
+    private ClipData mClipData = null;
+
     // Constructor
     public jForm(Controls ctrls, long pasobj) {
         PasObj = pasobj;
@@ -190,6 +203,8 @@ public class jForm {
         layparam = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         layout.setLayoutParams(layparam);
+
+        mClipBoard = (ClipboardManager) controls.activity.getSystemService(Context.CLIPBOARD_SERVICE);
 
         // Init Event
         onClickListener = new OnClickListener() {
@@ -344,154 +359,13 @@ public class jForm {
         animationMode = _animationMode;
     }
 
-    /// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
-    private void fadeInAnimation(final View view, int duration) {
-        Animation fadeIn = new AlphaAnimation(0, 1);
-        if (fadeIn == null) {
-            return;
-        }
-        fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(duration);
-        fadeIn.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                view.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-
-        view.startAnimation(fadeIn);
-    }
-
-    private void fadeOutAnimation(final View view, int duration) {
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        if (fadeOut == null) {
-            return;
-        }
-        fadeOut.setInterpolator(new AccelerateInterpolator());
-        fadeOut.setStartOffset(duration);
-        fadeOut.setDuration(duration);
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                view.setVisibility(View.INVISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-        view.startAnimation(fadeOut);
-    }
-
-    //https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
-    private void slidefromRightToLeft(View view, long duration) {
-        TranslateAnimation animate;
-        if (view.getHeight() == 0) {
-            //parent.getHeight(); // parent layout
-            animate = new TranslateAnimation(parent.getWidth(),
-                    0, 0, 0); //(xFrom,xTo, yFrom,yTo)
-        } else {
-            animate = new TranslateAnimation(view.getWidth(), 0, 0, 0); // View for animation
-        }
-        if (animate == null) {
-            return;
-        }
-        animate.setDuration(duration);
-        animate.setFillAfter(true);
-        view.startAnimation(animate);
-        view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-    }
-
-    private void slidefromLeftToRight(View view, long duration) {  //try
-
-        TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-        if (view.getHeight() == 0) {
-            //parent.getHeight(); // parent layout
-            animate = new TranslateAnimation(0,
-                    parent.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
-        } else {
-            animate = new TranslateAnimation(0, view.getWidth(), 0, 0); // View for animation
-        }
-        if (animate == null) {
-            return;
-        }
-        animate.setDuration(duration);
-        animate.setFillAfter(true);
-        view.startAnimation(animate);
-        view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-    }
-
-    private void slidefromRightToLeft3(View view, long duration) {
-        TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-        if (view.getHeight() == 0) {
-            //parent.getHeight(); // parent layout
-            animate = new TranslateAnimation(0, -parent.getWidth(),
-                    0, 0); //(xFrom,xTo, yFrom,yTo)
-        } else {
-            animate = new TranslateAnimation(0, -parent.getWidth(),
-                    0, 0); // View for animation
-        }
-        if (animate == null) {
-            return;
-        }
-        animate.setDuration(duration);
-        animate.setFillAfter(true);
-        view.startAnimation(animate);
-        view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-    }
-
-    private void slidefromLeftToRight3(View view, long duration) {  //try
-
-        TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
-        if (view.getHeight() == 0) {
-            //parent.getHeight(); // parent layout
-            animate = new TranslateAnimation(-parent.getWidth(),
-                    0, 0, 0); //(xFrom,xTo, yFrom,yTo)
-        } else {
-            animate = new TranslateAnimation(-parent.getWidth(), 0, 0, 0); // View for animation
-        }
-        if (animate == null) {
-            return;
-        }
-        animate.setDuration(duration);
-        animate.setFillAfter(true);
-        view.startAnimation(animate);
-        view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
-    }
-
     public void Show(int effect) {
 
         //fadeOutAnimation(layout, 2000);
         //fadeInAnimation(layout, 2000);
 
-        if (animationDurationIn > 0) {
-            switch (animationMode) {
-                case 1: {
-                    fadeInAnimation(layout, animationDurationIn);
-                    break;
-                }
-                case 2: {  //RightToLeft
-                    slidefromRightToLeft(layout, animationDurationIn);
-                    break;
-                }
-                case 3: {  //RightToLeft
-                    slidefromLeftToRight3(layout, animationDurationIn);
-                    break;
-                }
-            }
-        }
+        if (animationDurationIn > 0)
+        	Animate( true, 0, 0 );
 
         //controls.appLayout.addView(layout);
         //parent = controls.appLayout;
@@ -510,24 +384,36 @@ public class jForm {
     public void Close2() {
         //fadeOutAnimation(layout, 2000);
         // slidefromLeftToRight(layout, 2000);
-        if (animationDurationOut > 0) {
-            switch (animationMode) {
-                case 1: {
-                    fadeOutAnimation(layout, animationDurationOut);
-                    break;
-                }
-                case 2: {
-                    slidefromLeftToRight(layout, animationDurationOut);
-                    break;
-                }
-                case 3: {
-                    slidefromRightToLeft3(layout, animationDurationOut);
-                    break;
-                }
-            }
-        }
+        if (animationDurationOut > 0)
+        	Animate( false, 0, 0 );
+        
         parent.removeView(layout);
         controls.pOnClose(PasObj);
+    }
+    
+    // by ADiV
+    public void Animate( boolean animateIn, int _xFromTo, int _yFromTo ){
+	    if ( animationMode == 0 ) return;
+	    
+	    if( animateIn && (animationDurationIn > 0) )
+	    	switch (animationMode) {
+	    	 case 1: controls.fadeInAnimation(layout, animationDurationIn); break; // Fade
+	    	 case 2: controls.slidefromRightToLeftIn(layout, animationDurationIn); break; //RightToLeft
+	    	 case 3: controls.slidefromLeftToRightIn(layout, animationDurationIn); break; //LeftToRight
+	    	 case 4: controls.slidefromTopToBottomIn(layout, animationDurationIn); break; //TopToBottom
+	    	 case 5: controls.slidefromBottomToTopIn(layout, animationDurationIn); break; //BottomToTop
+	    	 case 6: controls.slidefromMoveCustomIn(layout, animationDurationIn, _xFromTo, _yFromTo); break; //MoveCustom
+	    	}
+	    
+	    if( !animateIn && (animationDurationOut > 0) )
+	    	switch (animationMode) {
+	    	 case 1: controls.fadeOutAnimation(layout, animationDurationOut); break; // Fade
+	    	 case 2: controls.slidefromRightToLeftOut(layout, animationDurationOut); break; //RightToLeft
+	    	 case 3: controls.slidefromLeftToRightOut(layout, animationDurationOut); break; //LeftToRight
+	    	 case 4: controls.slidefromTopToBottomOut(layout, animationDurationOut); break; //TopToBottom
+	    	 case 5: controls.slidefromBottomToTopOut(layout, animationDurationOut); break; //BottomToTop
+	    	 case 6: controls.slidefromMoveCustomOut(layout, animationDurationOut, _xFromTo, _yFromTo); break; //MoveCustom
+	    	}			
     }
 
     //by ADiV
@@ -654,34 +540,28 @@ public class jForm {
     }
 
     public String GetDateTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        if (formatter == null) {
-            return "";
-        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        
+        if (formatter == null) return "";        
 
         String r = formatter.format(new Date());
 
-        if (r == null) {
-            return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
     }
 
 
       // by ADiV
       public String GetDateTime(long millisDateTime) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        if (formatter == null) {
-          return "";
-        }
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        
+        if (formatter == null) return "";        
 
         String r = formatter.format(millisDateTime);
 
-        if (r == null) {
-          return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
       }
 
@@ -692,17 +572,14 @@ public class jForm {
 
   //by ADiV
   public String GetTimeHHssSS(long millisTime) {
-    SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS");
-    if (formatter == null) {
-      return "";
-    }
-
+    SimpleDateFormat formatter = new SimpleDateFormat("mm:ss:SS", Locale.US);
+    
+    if (formatter == null) return "";
+    
     String r = formatter.format(new Date(millisTime));
 
-    if (r == null) {
-      return "";
-    }
-
+    if (r == null) return "";
+    
     return r;
   }
 
@@ -722,7 +599,7 @@ public class jForm {
       }
     }
 
-    DateFormat formatter = new SimpleDateFormat(sPattern);
+    DateFormat formatter = new SimpleDateFormat(sPattern, Locale.US);
 
     if (formatter == null) {
       return 0;
@@ -749,11 +626,9 @@ public class jForm {
       public String GetDateTimeUTC(String _dateTime) {
         String sPattern = "yyyy-MM-dd HH:mm:ss";
 
-        SimpleDateFormat formatter = new SimpleDateFormat(sPattern);
+        SimpleDateFormat formatter = new SimpleDateFormat(sPattern, Locale.US);
 
-        if (formatter == null) {
-          return "";
-        }
+        if (formatter == null) return "";
 
         Date dateObject;
 
@@ -765,10 +640,14 @@ public class jForm {
           e.printStackTrace();
           return "";
         }
-
+        
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        return formatter.format(dateObject);
+        String r = formatter.format(dateObject);
+
+        if (r == null) return "";
+        
+        return r;
       }
 
     //Free object except Self, Pascal Code Free the class.
@@ -786,14 +665,11 @@ public class jForm {
     public String GetStringExtra(Intent data, String extraName) {
         String valueStr = "";
 
-        if (data != null) {
+        if (data != null) 
             valueStr = data.getStringExtra(extraName);
-        }
-
-        if (valueStr == null) {
-            return "";
-        }
-
+        
+        if (valueStr == null) return "";
+        
         return valueStr;
     }
 
@@ -870,37 +746,46 @@ public class jForm {
         return mobileDataEnabled;
     }
 
+   private File getMyEnvDir(String environmentDir) {
+       if (Build.VERSION.SDK_INT <=  29) {
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       }
+       else {
+           return controls.activity.getExternalFilesDir(environmentDir);
+       }
+   }
+
     public String GetEnvironmentDirectoryPath(int _directory) {
 
         File filePath = null;
         String absPath = "";   //fail!
 
-        //Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
+        //getMyEnvDir(Environment.DIRECTORY_DOCUMENTS);break; //only Api 19!
         if (_directory != 8) {
             switch (_directory) {
                 case 0:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS);
                     break;
                 case 1:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_DCIM);
                     break;
                 case 2:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_MUSIC);
                     break;
                 case 3:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_PICTURES);
                     break;
                 case 4:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_NOTIFICATIONS);
                     break;
                 case 5:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_MOVIES);
                     break;
                 case 6:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_PODCASTS);
                     break;
                 case 7:
-                    filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES);
+                    filePath = getMyEnvDir(Environment.DIRECTORY_RINGTONES);
                     break;
 
                 case 9:
@@ -920,6 +805,12 @@ public class jForm {
                     absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/cache";
                     break;
 
+                case 13:
+                    if (Build.VERSION.SDK_INT < 19)
+                        filePath = getMyEnvDir(Environment.DIRECTORY_DOWNLOADS);
+                    else
+                        filePath = getMyEnvDir(Environment.DIRECTORY_DOCUMENTS);
+                    break;
             }
 
             //Make sure the directory exists.
@@ -937,9 +828,7 @@ public class jForm {
             }
         }
 
-        if (absPath == null) {
-            return "";
-        }
+        if (absPath == null) return "";        
 
         return absPath;
     }
@@ -947,9 +836,7 @@ public class jForm {
     public String GetInternalAppStoragePath() { //GetAbsoluteDirectoryPath
         String PathDat = this.controls.activity.getFilesDir().getAbsolutePath();       //Result : /data/data/com/MyApp/files
 
-        if (PathDat == null) {
-            return "";
-        }
+        if (PathDat == null) return "";        
 
         return PathDat;
     }
@@ -1009,7 +896,7 @@ public class jForm {
     }
 
     //ref. https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
-//result: path to new storage [Internal App Storage]
+    //result: path to new storage [Internal App Storage]
     public String LoadFromAssets(String _filename) {
 
         String pathRes = "";
@@ -1083,37 +970,42 @@ public class jForm {
         }
     }
 
+    // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
     public String CreateDir(String _dirName) {
         this.controls.activity.getDir(_dirName, 0); //if not exist -->> CREATE!
         String absPath = this.controls.activity.getFilesDir().getPath();
-        if (absPath == null) {
-            return "";
-        }
+        
+        if (absPath == null) return "";
+        
         absPath = absPath.substring(0, absPath.lastIndexOf("/")) + "/" + _dirName;
         return absPath;
     }
 
+    // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
     public String CreateDir(int _environmentDir, String _dirName) {
+    	
         String baseDir = GetEnvironmentDirectoryPath(_environmentDir);
+        
         if (!baseDir.equalsIgnoreCase("")) {
             File file = new File(baseDir, _dirName);
-            if (file == null) {
-                return "";
-            }
-            file.mkdirs();
-            return file.getPath();
-        } else {
-            return "";
-        }
+            
+            if (file != null)                            
+             if( file.mkdirs() ) 
+              return file.getPath();
+        } 
+        
+        return "";        
     }
 
+    // Android SDK >=29 need <application android:requestLegacyExternalStorage="true" ... >
     public String CreateDir(String _fullPath, String _dirName) {
         File file = new File(_fullPath, _dirName);
-        if (file == null) {
-            return "";
-        }
-        file.mkdirs();
-        return file.getPath();
+        
+        if (file != null)                     
+         if( file.mkdirs() )
+          return file.getPath();
+        
+        return "";
     }
 
     /*
@@ -1151,34 +1043,11 @@ public class jForm {
     }
 
     public int GetDrawableResourceId(String _resName) {
-        try {
-            Class<?> res = R.drawable.class;
-            Field field = res.getField(_resName);  //"drawableName"
-            int drawableId = field.getInt(null);
-            return drawableId;
-        } catch (Exception e) {
-            Log.e("jForm", "Failure to get drawable id.", e);
-            return 0;
-        }
+        return controls.GetDrawableResourceId(_resName);
     }
 
     public Drawable GetDrawableResourceById(int _resID) {
-        if (_resID == 0) {
-            return null; // by ADiV
-        }
-
-        Drawable res = null;
-
-        if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
-            res = this.controls.activity.getResources().getDrawable(_resID);
-        }
-
-        //[ifdef_api21up]
-        if (Build.VERSION.SDK_INT >= 21) {
-            res = this.controls.activity.getResources().getDrawable(_resID, null);
-        }//[endif_api21up]
-
-        return res;
+        return controls.GetDrawableResourceById(_resID);
     }
 
     //BY ADiV
@@ -1188,7 +1057,7 @@ public class jForm {
             return;
         }
 
-        Drawable d = GetDrawableResourceById(GetDrawableResourceId(_imageIdentifier));
+        Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageIdentifier));
 
         switch (_scaleType) {
             case 0:
@@ -1253,14 +1122,12 @@ public class jForm {
     //by  thierrydijoux
     public String GetQuantityStringByName(String _resName, int _quantity) {
         int id = this.controls.activity.getResources().getIdentifier(_resName, "plurals", this.controls.activity.getPackageName());
-        if (id == 0) {
-            return "";
-        }
+        
+        if (id == 0) return "";
+        
         String value = this.controls.activity.getResources().getQuantityString(id, _quantity, _quantity);
 
-        if (value == null) {
-            return "";
-        }
+        if (value == null) return "";        
 
         return value;
     }
@@ -1268,11 +1135,11 @@ public class jForm {
     //by thierrydijoux
     public String GetStringResourceByName(String _resName) {
         int id = this.controls.activity.getResources().getIdentifier(_resName, "string", this.controls.activity.getPackageName());
-        if (id == 0) {
-            return "";
-        }
+        
+        if (id == 0) return "";        
 
         String value = "" + this.controls.activity.getResources().getText(id);
+        
         return value;
     }
 
@@ -1282,6 +1149,75 @@ public class jForm {
         } else {
             return null;
         }
+    }
+    
+    // By ADiV
+    public String GetStringReplace(String _strIn, String _strFind, String _strReplace){
+    	if(_strIn == null) return "";
+    	if( (_strIn.length() <= 0) || (_strIn.length() < _strFind.length()) ) return "";
+    	
+    	return _strIn.replace(_strFind, _strReplace);
+    }
+    
+    public int GetStringPos( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return -1;
+    	
+    	return _strData.indexOf(_strFind); 
+    }
+    
+    public int GetStringPosUpperCase( String _strFind, String _strData ){
+    	if((_strFind == null) || (_strData == null)) return -1;
+    	
+    	return _strData.toUpperCase(Locale.US).indexOf(_strFind.toUpperCase(Locale.US)); 
+    }
+    
+    public String GetStringCopy( String _strData, int _startIndex, int _endIndex ){
+    	if(_strData == null) return "";
+    	if(_startIndex > _endIndex) return "";
+    	
+    	return _strData.substring(_startIndex, _endIndex);
+    }
+    
+    public int GetStringLength( String _strData ){
+        if(_strData == null) return 0;
+    	
+    	return _strData.length();
+    }
+    
+    public String GetStringCapitalize(String _strIn) {
+        String retStr = _strIn;
+        
+        try { // We can face index out of bound exception if the string is null
+            retStr = _strIn.substring(0, 1).toUpperCase(Locale.getDefault()) + _strIn.substring(1);
+        }catch (Exception e){
+        	return _strIn;
+        }
+        
+        return retStr;
+    }
+    
+    public String GetStringUpperCase(String _strIn) {
+    	return _strIn.toUpperCase(Locale.getDefault());
+    }
+    
+    //by ADiV
+    public String GetStripAccents(String _str) {
+        _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
+        
+        if (_str == null) return "";
+        
+        _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return _str;
+    }
+    
+    //by ADiV
+    public String GetStripAccentsUpperCase(String _str) {
+        _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
+        
+        if (_str == null) return "";
+        
+        _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+        return _str.toUpperCase(Locale.getDefault());
     }
 
     // BY ADiV
@@ -1379,9 +1315,7 @@ public class jForm {
             }
         }
 
-        if (f == null) {
-            return "";
-        }
+        if (f == null) return "";        
 
         return f;
     }
@@ -1401,28 +1335,20 @@ public class jForm {
         try {
             TelephonyManager telephony = (TelephonyManager) this.controls.activity.getSystemService(Context.TELEPHONY_SERVICE);
 
-            if (telephony == null) {
-                return "";
-            }
+            if (telephony == null) return "";            
 
-            devid = telephony.getDeviceId();
+            // Need system app - android.permission.READ_PRIVILIGED_PHONE_STATE
+            //devid = telephony.getDeviceId();
 
-            if (devid == null) {
-                return "";
-            }
+            if (devid == "") return "";            
 
-            if (devid == "") {
-                devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);
-            }
+            if (devid == "")             
+        	 devid = Secure.getString(this.controls.activity.getContentResolver(), Secure.ANDROID_ID);            
 
         } catch (SecurityException e) //ExceptionExceptionException
         {
             e.printStackTrace();
-        }
-
-        if (devid == null) {
-            return "";
-        }
+        }        
 
         return devid;
     }
@@ -1463,7 +1389,7 @@ public class jForm {
 
     public void SetIconActionBar(String _iconIdentifier) {
 //[ifdef_api14up]
-        Drawable d = GetDrawableResourceById(GetDrawableResourceId(_iconIdentifier));
+        Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_iconIdentifier));
 
         if (d != null) // by ADiV
         {
@@ -1549,9 +1475,9 @@ public class jForm {
     //By ADiV
     public String GetVersionName() {
         PackageManager pm = controls.activity.getPackageManager();
-        if (pm == null) {
-            return "";
-        }
+        
+        if (pm == null) return "";
+        
         try {
             PackageInfo pinfo = pm.getPackageInfo(controls.activity.getPackageName(), 0);
             return pinfo.versionName;
@@ -1565,18 +1491,15 @@ public class jForm {
         try {
             //Create a pattern
             Pattern pattern = Pattern.compile(patternString);
-            if (null == pattern) {
-                return "";
-            }
+            
+            if (null == pattern) return "";            
 
             //Match the pattern string in provided string
             Matcher matcher = pattern.matcher(inputString);
             if (null != matcher && matcher.find()) {
                 String r = matcher.group(1);
 
-                if (r == null) {
-                    return "";
-                }
+                if (r == null) return "";                
 
                 return r;
             }
@@ -1606,15 +1529,14 @@ public class jForm {
             return "";
         }
 
-        if (url == null) {
-            return "";
-        }
-
+        if (url == null) return "";
+        
         try {
             uc = url.openConnection();
-            if (uc == null) {
+            
+            if (uc == null) 
                 return "";
-            }
+            
             uc.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
             inReader = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             if (null != inReader) {
@@ -1631,12 +1553,14 @@ public class jForm {
         // Get the current version pattern sequence
         String versionString = GetAppVersion(currentVersion_PatternSeq, urlData.toString());
 
-        if (versionString == "") {
-            return "";
-        }
+        if (versionString == "") return "";        
 
         // get version from "htlgb">X.X.X</span>
-        return GetAppVersion(appVersion_PatternSeq, versionString);
+        versionString = GetAppVersion(appVersion_PatternSeq, versionString);
+        
+        if (versionString == "") return "";
+        
+        return versionString;
     }
 
     public void CancelShowCustomMessage() {
@@ -1733,13 +1657,33 @@ public class jForm {
         controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.densityDpi;
     }
-
+    
+    public double GetScreenRealXdpi() {
+        double r = 0.0;
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (metrics == null) {
+            return 0;
+        }
+        controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.xdpi;
+    }
+    
+    public double GetScreenRealYdpi() {
+        double r = 0.0;
+        DisplayMetrics metrics = new DisplayMetrics();
+        if (metrics == null) {
+            return 0;
+        }
+        controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return metrics.ydpi;
+    }  	
+	
     public String GetScreenDensity() {
         String r = "";
         DisplayMetrics metrics = new DisplayMetrics();
-        if (metrics == null) {
-            return "";
-        }
+        
+        if (metrics == null) return "";
+        
         controls.activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int density = metrics.densityDpi;
 //[ifdef_api16up]
@@ -1833,17 +1777,19 @@ public class jForm {
 
     public String GetTitleActionBar() {
         ActionBar actionBar = this.controls.activity.getActionBar();
-        if (actionBar == null) {
+        
+        if (actionBar == null) 
             return "";
-        }
+        
         return (String) actionBar.getTitle();
     }
 
     public String GetSubTitleActionBar() {
         ActionBar actionBar = this.controls.activity.getActionBar();
-        if (actionBar == null) {
+        
+        if (actionBar == null) 
             return "";
-        }
+        
         return (String) actionBar.getSubtitle();
     }
 
@@ -1876,28 +1822,16 @@ public class jForm {
             e.printStackTrace();
         }
 
-        if (PathDat == null) {
-            return "";
-        }
+        if (PathDat == null) return "";        
 
         return PathDat + "/" + _filename2;
     }
 
-    //by ADiV
-    public String GetStripAccents(String _str) {
-        _str = Normalizer.normalize(_str, Normalizer.Form.NFD);
-        if (_str == null) {
-            return "";
-        }
-        _str = _str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
-        return _str;
-    }
-
     public String GetPathFromAssetsFile(String _assetsFileName) {
         String r = LoadFromAssets(_assetsFileName);
-        if (r == null) {
-            return "";
-        }
+        
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -1937,12 +1871,12 @@ public class jForm {
         if (imm == null) {
             return;
         }
-
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        /*
         if (controls.activity.getCurrentFocus() != null) {
             imm.hideSoftInputFromWindow(controls.activity.getCurrentFocus().getWindowToken(), 0);
             imm.hideSoftInputFromInputMethod(controls.activity.getCurrentFocus().getWindowToken(), 0);
-        }
-
+        }*/
     }
 
     public void HideSoftInput(View _view) {
@@ -1953,12 +1887,14 @@ public class jForm {
         imm.hideSoftInputFromWindow(_view.getWindowToken(), 0);
     }
 
+
     public void ShowSoftInput() {
         InputMethodManager imm = (InputMethodManager) controls.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm == null) {
             return;
         }
-        imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);
+        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
+        //imm.toggleSoftInput(InputMethodManager.RESULT_SHOWN, 0);;
     }
 
     public void SetSoftInputMode(int _inputMode) {
@@ -2038,16 +1974,12 @@ public class jForm {
     }
 
     public String UriToString(Uri _uri) {
-        if (_uri == null) {
-            return "";
-        }
+        if (_uri == null) return "";        
 
         String r = _uri.toString();
 
-        if (r == null) {
-            return "";
-        }
-
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -2127,10 +2059,9 @@ public class jForm {
     public String GetDeviceWifiIPAddress() {
         //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
         WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (mWifi == null) {
-            return "";
-        }
-
+        
+        if (mWifi == null) return "";
+        
         //String ip = Formatter.formatIpAddress(
         int ipAddress = mWifi.getConnectionInfo().getIpAddress();
         String sIP = String.format(Locale.ROOT, "%d.%d.%d.%d",
@@ -2139,10 +2070,8 @@ public class jForm {
                 (ipAddress >> 16 & 0xff),
                 (ipAddress >> 24 & 0xff));
 
-        if (sIP == null) {
-            return "";
-        }
-
+        if (sIP == null) return "";
+        
         return sIP;
     }
 
@@ -2150,18 +2079,16 @@ public class jForm {
      * Calculate the broadcast IP we need to send the packet along. ref. http://www.ece.ncsu.edu/wireless/MadeInWALAN/AndroidTutorial/
      */
     public String GetWifiBroadcastIPAddress() throws IOException {
-        String r = null;
+        String r = "";
         //WifiManager mWifi = (WifiManager) controls.activity.getSystemService(Context.WIFI_SERVICE);
         WifiManager mWifi = (WifiManager) this.controls.activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (mWifi == null) {
-            return "";
-        }
+        
+        if (mWifi == null) return "";
+        
         // DhcpInfo  is a simple object for retrieving the results of a DHCP request
         DhcpInfo dhcp = mWifi.getDhcpInfo();
 
-        if (dhcp == null) {
-            return "";
-        }
+        if (dhcp == null) return "";        
 
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
         byte[] quads = new byte[4];
@@ -2172,16 +2099,14 @@ public class jForm {
         // The high order byte is quads[0].
         r = InetAddress.getByAddress(quads).getHostAddress();
 
-        if (r == null) {
-            return "";
-        }
+        if (r == null)  return "";        
 
         return r;
     }
 
     //https://xjaphx.wordpress.com/2011/10/02/store-and-use-files-in-assets/
     public String LoadFromAssetsTextContent(String _filename) {
-        String str;
+        String str = "";
         // load text
         try {
             //Log.i("loadFromAssets", "name: "+_filename);
@@ -2198,9 +2123,7 @@ public class jForm {
             // set result to TextView
             str = new String(buffer);
             //Log.i("loadFromAssets", ":: "+ str);
-            if (str == null) {
-                return "";
-            }
+            if (str == null) return "";            
 
             return str.toString();
         } catch (IOException ex) {
@@ -2346,7 +2269,8 @@ public class jForm {
 
         //if (recentTask.get(i).baseActivity.toShortString().indexOf(this.controls.activity.getPackageName()) > -1) {
 
-        am.moveTaskToFront(controls.activity.getTaskId(), 0);
+        // Need system app - android.permission.REORDER_TASKS
+        //am.moveTaskToFront(controls.activity.getTaskId(), 0);
 
         //}
         //}
@@ -2379,34 +2303,33 @@ public class jForm {
             taskid = taskInfo.get(0).topActivity.getPackageName();
         }
 
-        if (taskid == null) {
-            return "";
-        }
-
+        if (taskid == null) return "";
+        
         return taskid;
     }
 
     public Bitmap GetApplicationIcon(String packageName) {
         Bitmap dw = null;
+        
         try {
             dw = drawableToBitmap(this.controls.activity.getPackageManager().getApplicationIcon(packageName));
         } catch (PackageManager.NameNotFoundException e) {
-            Log.i("GetApplicationIcon", "NameNotFoundException");
-            // Get a default icon
-            if (Build.VERSION.SDK_INT < 21) {    //for old device < 21
-                dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher));
-            }
-
-            //[ifdef_api21up]
-            if (Build.VERSION.SDK_INT >= 21) {
-                dw = drawableToBitmap(this.controls.activity.getResources().getDrawable(R.drawable.ic_launcher, null));
-            }//[endif_api21up]
+            Log.i("GetApplicationIcon", "NameNotFoundException");            
         }
+        
+        if( dw != null ) return dw;
+        
+        try {
+            dw = drawableToBitmap(this.controls.activity.getPackageManager().getApplicationIcon(this.controls.activity.getPackageName()));
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.i("GetApplicationIcon", "DefaultNameNotFoundException");            
+        }
+        
         return dw;
     }
 
     public String GetApplicationName(String packageName) {
-        String appname;
+        String appname = "";
         ApplicationInfo ai;
         try {
             PackageManager pm = this.controls.activity.getPackageManager();
@@ -2433,7 +2356,7 @@ public class jForm {
 
     //RequestRuntimePermission
     public void RequestUsageStatsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= 23 ) {  //Build.VERSION_CODES.M
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             if (intent == null) {
                 return;
@@ -2444,7 +2367,7 @@ public class jForm {
 
     //Check USAGE_STATS permission
     public boolean isUsageStatsAllowed() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < 23 ) {  //Build.VERSION_CODES.M
             return true;
         } else {
             AppOpsManager appOps = (AppOpsManager) controls.activity.getSystemService(Context.APP_OPS_SERVICE);
@@ -2459,24 +2382,23 @@ public class jForm {
 
     public void Restart(int _delay) {
         PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
-                new Intent(controls.activity.getIntent()),
-                controls.activity.getIntent().getFlags());
-        if (intent == null) {
-            return;
-        }
+                                new Intent(controls.activity.getIntent()), PendingIntent.FLAG_CANCEL_CURRENT);
+        
+        if (intent == null)   return;
+        
         AlarmManager manager = (AlarmManager) controls.activity.getSystemService(Context.ALARM_SERVICE);
-        if (manager == null) {
-            return;
-        }
+        
+        if (manager == null) return;
+        
         manager.set(AlarmManager.RTC, System.currentTimeMillis() + _delay, intent);
         System.exit(2);
     }
 
     public String UriEncode(String _message) {
         String r = Uri.encode(_message);
-        if (r == null) {
-            return "";
-        }
+        
+        if (r == null) return "";
+        
         return r;
     }
 
@@ -2503,9 +2425,9 @@ public class jForm {
     //https://developer.android.com/reference/android/provider/Settings.System
     public String GetSettingsSystemString(String _strKey) {
         String r = android.provider.Settings.System.getString(controls.activity.getContentResolver(), _strKey);
-        if (r == null) {
-            r = "";
-        }
+        
+        if (r == null) r = "";
+        
         return r;
     }
 
@@ -2626,6 +2548,22 @@ public class jForm {
         return displaymetrics.heightPixels;
     }
 
+    public double GetScreenRealSizeInInches() {
+        double r = 0.0;
+        double screen_width = 0.0;
+        double screen_height = 0.0;
+
+        if(GetScreenRealXdpi() != 0)
+        {screen_width = GetRealScreenWidth() / GetScreenRealXdpi();}
+		
+        if(GetScreenRealYdpi() != 0)
+        screen_height = GetRealScreenHeight() / GetScreenRealYdpi();		
+		
+        r = Math.sqrt(screen_width*screen_width + screen_height*screen_height);	
+		
+        return r;
+    } 	
+	
     //by ADiV
     public String GetSystemVersionString() {
         return android.os.Build.VERSION.RELEASE;
@@ -2717,9 +2655,7 @@ public class jForm {
     }
 
     public String GetRealPathFromURI(Uri _Uri) {
-        if (_Uri == null) {
-            return "";
-        }
+        if (_Uri == null) return "";        
 
         String path;
 
@@ -2729,10 +2665,8 @@ public class jForm {
             path = getRealPathFromURI_API19(_Uri);
         }
 
-        if (path == null) {
-            return "";
-        }
-
+        if (path == null) return "";
+        
         return path;
     }
 
@@ -2760,24 +2694,18 @@ public class jForm {
     }
 
     public String CopyFileFromUri(Uri _srcUri, String _outputDir) {
-        if (_srcUri == null) {
-            return "";
-        }
-
+        if (_srcUri == null) return "";
+        
         String fileName = "";
         ContentResolver cr = controls.activity.getContentResolver();
 
-        if (cr == null) {
-            return "";
-        }
-
+        if (cr == null) return "";
+        
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
         Cursor metaCursor = cr.query(_srcUri, projection, null, null, null);
 
-        if (metaCursor == null) {
-            return "";
-        }
-
+        if (metaCursor == null) return "";
+        
         try {
             if (metaCursor.moveToFirst()) {
                 fileName = metaCursor.getString(0);
@@ -2786,9 +2714,8 @@ public class jForm {
             metaCursor.close();
         }
 
-        if (fileName.equals("")) {  //fixed
-            return "";
-        }
+        if (fileName.equals("")) //fixed
+            return "";        
 
         try {
             InputStream input = cr.openInputStream(_srcUri);
@@ -2837,6 +2764,587 @@ public class jForm {
             //text.setText("" + millisUntilFinished / 1000);
             toast.show();
         }
+    }
+
+    public void CopyStringToClipboard(String _txt) {
+        ClipData cdata = ClipData.newPlainText("text", _txt);
+        
+        if(cdata == null) return;
+        
+        mClipBoard.setPrimaryClip(cdata);
+    }
+
+    public String PasteStringFromClipboard() {
+        ClipData cdata = mClipBoard.getPrimaryClip();
+        
+        if(cdata == null) return "";
+        
+        ClipData.Item item = cdata.getItemAt(0);
+        
+        if(item == null) return "";
+        
+        return item.getText().toString();
+    }
+
+    //Android 11: creating a document.
+    public void RequestCreateFile(String _uriAsString, String _fileMimeType, String _fileName, int _requestCode) {
+    	
+    	// Requires API level 19
+    	if( android.os.Build.VERSION.SDK_INT < 19 ) return;
+
+        Uri pickerInitialUri = Uri.parse(_uriAsString);
+        
+        // Requires API level 19
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(_fileMimeType); //"application/pdf"
+
+        //For use with ACTION_CREATE_DOCUMENT to specify an initial file name.
+        intent.putExtra(Intent.EXTRA_TITLE, _fileName); //"invoice.pdf"
+
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when your app creates the document.
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+            //[endif_api26up]
+        }
+        controls.activity.startActivityForResult(intent, _requestCode);
+    }
+
+    //Android 11:  Request code for selecting  document.
+    public void RequestOpenFile(String _uriAsString, String _fileMimeType, int _requestCode) {
+    	
+    	// Requires API level 19
+    	if( android.os.Build.VERSION.SDK_INT < 19 ) return;
+
+        Uri pickerInitialUri = Uri.parse(_uriAsString);
+
+        //Requires API level 19
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(_fileMimeType); //"application/pdf"
+
+        //For use with ACTION_CREATE_DOCUMENT to specify an initial file name.
+        //intent.putExtra(Intent.EXTRA_TITLE, _fileName); //"invoice.pdf"
+
+        if (Build.VERSION.SDK_INT >= 18) {
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+        }
+
+        // Optionally, specify a URI for the file that should appear in the
+        // system file picker when it loads.
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+            //[endif_api26up]
+        }
+
+        //final Intent chooserIntent = Intent.createChooser(intent, "Open File");
+
+        controls.activity.startActivityForResult(intent, _requestCode);
+    }
+
+    //Android 11:
+    public void RequestOpenDirectory(String _uriAsString, int _requestCode) {
+
+    	// Requires API level 21
+    	if( android.os.Build.VERSION.SDK_INT < 21 ) return;
+    	
+        Uri uriToLoad = Uri.parse(_uriAsString);
+
+        // Choose a directory using the system's file picker. Requires API level 21
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+        // Provide read access to files and sub-directories in the user-selected
+        // directory.
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when it loads.
+        if (Build.VERSION.SDK_INT >= 26) {
+            //[ifdef_api26up]
+            intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriToLoad);
+            //[endif_api26up]
+        }
+        controls.activity.startActivityForResult(intent, _requestCode);
+    }
+
+
+    //https://developer.android.com/training/data-storage/shared/documents-files#java
+    public String[] GetUriMetaData(Uri _treeUri) {
+
+        //listFiles(_treeUri);
+
+        Cursor cursor= null;
+
+        Uri uri = _treeUri;
+
+        ArrayList<String> data = new ArrayList<String>();
+        // The query, because it only applies to a single document, returns only
+        // one row. There's no need to filter, sort, or select fields,
+        // because we want all fields for one document.
+        if (Build.VERSION.SDK_INT >= 16) {   //android 4.1
+
+            if (Build.VERSION.SDK_INT >= 21) {
+                //[ifdef_api21up]
+                uri = DocumentsContract.buildDocumentUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+                //[ifdef_api21up]
+            }
+
+            try {
+                cursor = controls.activity.getContentResolver().query(_treeUri, null, null, null, null, null);
+                    // moveToFirst() returns false if the cursor has 0 rows. Very handy for
+                    // "if there's anything to look at, look at it" conditionals.
+                if (cursor != null && cursor.moveToFirst()) {
+
+                        cursor.moveToFirst();
+                        while (!cursor.isAfterLast()) {
+                            //your code to implement
+
+                           // Note it's called "Display Name". This is
+                           // provider-specific, and might not necessarily be the file name.
+                           String displayName = "";
+                           
+                           int iColum = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+                           if(iColum >= 0) displayName = cursor.getString(iColum);
+
+                           int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                            // If the size is unknown, the value stored is null. But because an
+                           // int can't be null, the behavior is implementation-specific,
+                           // and unpredictable. So as
+                           // a rule, check if it's null before assigning to an int. This will
+                            // happen often: The storage API allows for remote files, whose
+                            // size might not be locally known.
+                            String size = null;
+                            if (!cursor.isNull(sizeIndex)) {
+                                // Technically the column stores an int, but cursor.getString()
+                                // will do the conversion automatically.
+                                 size = cursor.getString(sizeIndex);
+                            } else {
+                                 size = "Unknown";
+                            }
+
+                            data.add(displayName);
+                            Log.i("LAMW", "displayName = " + displayName);
+                            cursor.moveToNext();
+                        }
+
+                    }
+            } finally {
+                    if (cursor != null) cursor.close();
+            }
+        }
+        return data.toArray(new String[data.size()]);
+    }
+
+    //Android 11:
+    public Bitmap GetBitmapFromUri(Uri _treeUri){
+       
+        Bitmap image=null;
+        ParcelFileDescriptor parcelFileDescriptor=null;
+        try {
+
+            parcelFileDescriptor = controls.activity.getContentResolver().openFileDescriptor(_treeUri, "r");
+
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+
+            image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+
+            parcelFileDescriptor.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+        
+    }
+    
+    
+    //Android 11:
+    public byte[] LoadBytesFromUri(Uri _toTreeUri) {
+
+        byte[] bytes = new byte[1];
+
+        try {
+
+            ParcelFileDescriptor pfd = controls.activity.getContentResolver().openFileDescriptor(_toTreeUri, "r");
+            
+            if(pfd == null) return null;            
+            if(pfd.getStatSize() > Integer.MAX_VALUE) return null;
+            
+            FileDescriptor fd = pfd.getFileDescriptor();
+            FileInputStream input_file_stream = new FileInputStream(fd);
+            bytes = new byte[input_file_stream.available()];
+            input_file_stream.read(bytes);
+            input_file_stream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bytes;
+    }    
+    
+    
+
+    //Android 11:
+    public String GetTextFromUri(Uri _treeUri) {
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        if(stringBuilder == null) return "";
+        
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+
+        try {
+             inputStream = controls.activity.getContentResolver().openInputStream(_treeUri);
+             reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
+             String line;
+             while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+        
+        return stringBuilder.toString();
+    }
+
+    //Android 11:
+    public String GetTextFromUriAsString(String _treeUriAsString) {
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        if(stringBuilder == null) return "";
+        
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+
+        Uri _treeUri = Uri.parse(_treeUriAsString);
+
+        try {
+            inputStream = controls.activity.getContentResolver().openInputStream(_treeUri);
+            reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return stringBuilder.toString();
+    }
+
+    //Android 11:
+    public void TakePersistableUriPermission(Uri _treeUri) {
+        final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+
+        // Check for the freshest data.
+        if (Build.VERSION.SDK_INT >= 19) {
+            //[ifdef_api19up]
+            controls.activity.getContentResolver().takePersistableUriPermission(_treeUri, takeFlags);
+            //[endif_api19up]
+        }
+    }
+
+    //Android 11:
+    public void CopyFile(Uri _fromTreeUri, Uri _toTreeUri)  {
+        InputStream in=null;
+        OutputStream out=null;
+        try {
+            in  = controls.activity.getContentResolver().openInputStream(_fromTreeUri);
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri);
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Android 11:
+    public void SaveImageToUri(Bitmap _bitmap, Uri _toTreeUri) {
+        OutputStream out;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+            _bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.close();
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+	
+    //Android 11:
+    public void SaveImageTypeToUri(Bitmap _bitmap, Uri _toTreeUri, int _type) {
+        OutputStream out;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+
+
+			if(_type == 1)
+            {_bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);}
+			else if(_type == 2)		
+            {	_bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);}
+			else if(_type == 3)		
+            {
+                //_bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out);
+                if (android.os.Build.VERSION.SDK_INT < 30)
+                {
+                   _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out); // Added in API level 14, Deprecated in API level 30
+                }
+                else // needs targetSdkVersion API 30
+                {
+                    _bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out);        // comment here for targetSdkVersion API >= 30!
+
+                    //[ifdef_api30up]
+
+                    // _bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 90, out);   //uncomment only here for targetSdkVersion API >= 30!
+
+                     //[endif_api30up]
+                }
+            } 
+				
+            out.close();
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }	
+	
+	
+    //Android 11:
+    public void SaveBytesToUri(byte[] _bytes, Uri _toTreeUri) {
+        OutputStream out=null;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+            out.write(_bytes);
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }	
+	
+    //Android 11:
+    public void SaveTextToUri(String _text, Uri _toTreeUri) {
+        OutputStream out=null;
+        try {
+            out = controls.activity.getContentResolver().openOutputStream(_toTreeUri, "w");
+            byte[] bytes = _text.getBytes();
+            out.write(bytes);
+            out.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Android 11:
+    public Uri CreateDirectory(Uri _treeUri, String _directoryName) {
+        ContentResolver contentResolver = controls.activity.getContentResolver();
+        Uri directoryUri = null;
+        try {
+            Uri docUri = null;
+            if (android.os.Build.VERSION.SDK_INT >= 21) {
+                //[ifdef_api21up]
+                docUri = DocumentsContract.buildDocumentUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+                directoryUri = DocumentsContract.createDocument(contentResolver, docUri, DocumentsContract.Document.MIME_TYPE_DIR, _directoryName);
+                //[endif_api21up]
+            }
+        } catch (IOException e) {
+            //Log.w(TAG, "IOException", e);
+        }
+        if (directoryUri != null) {
+
+        }
+        return directoryUri;
+    }
+
+    //Android 11:
+    public String[] GetFileList(Uri _treeUri) {
+
+        final ContentResolver resolver = controls.activity.getContentResolver();
+        final ArrayList<String> results = new ArrayList<String>();
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+
+            Cursor c = null;
+            try {
+                c = resolver.query(childrenUri, new String[]{DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                                DocumentsContract.Document.COLUMN_MIME_TYPE,
+                                DocumentsContract.Document.COLUMN_DISPLAY_NAME},
+                        null, null, null);
+                while (c.moveToNext()) {
+                    final String documentId = c.getString(0);
+                    final String mimeType = c.getString(1);
+                    final String displayName = c.getString(2);
+                    final Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(childrenUri, documentId);
+                    if (!DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType)) {
+                        results.add(displayName+"="+documentUri.toString());
+                    }
+                }
+            } catch (Exception e) {
+                // Log.w(TAG, "Failed query: " + e);
+            } finally {
+                // closeQuietly(c);
+            	c.close();
+            }
+        }
+        return results.toArray(new String[results.size()]);
+    }
+
+    public String[] GetFileList(Uri _treeUri, String _fileExtension) {
+
+        final ContentResolver resolver = controls.activity.getContentResolver();
+        final ArrayList<String> results = new ArrayList<String>();
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(_treeUri, DocumentsContract.getTreeDocumentId(_treeUri));
+
+            Cursor c = null;
+            try {
+                c = resolver.query(childrenUri, new String[]{DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                                DocumentsContract.Document.COLUMN_MIME_TYPE,
+                                DocumentsContract.Document.COLUMN_DISPLAY_NAME},
+                        null, null, null);
+                while (c.moveToNext()) {
+                    final String documentId = c.getString(0);
+                    final String mimeType = c.getString(1);
+                    final String displayName = c.getString(2);
+
+                    String ext = displayName.substring(displayName.lastIndexOf("."));
+
+                    String fixedExtension = _fileExtension;
+                    int lastIndex = _fileExtension.lastIndexOf(".");
+                    if (lastIndex < 0) fixedExtension = "." + fixedExtension;
+
+                    final Uri documentUri = DocumentsContract.buildDocumentUriUsingTree(childrenUri, documentId);
+                    if (!DocumentsContract.Document.MIME_TYPE_DIR.equals(mimeType)) {
+                        if (ext.equals(fixedExtension)) {
+                            results.add(displayName + "=" + documentUri.toString());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Log.w(TAG, "Failed query: " + e);
+            } finally {
+                // closeQuietly(c);
+            	c.close();
+            }
+        }
+        return results.toArray(new String[results.size()]);
+    }
+
+    //Android 11:
+    public boolean IsTreeUri(Uri _uri) {
+        boolean r = false;
+        if (Build.VERSION.SDK_INT >= 24) {
+            r = DocumentsContract.isTreeUri(_uri);
+        }
+        return r;
+    }
+
+    public String GetMimeTypeFromExtension(String _fileExtension) {
+        MimeTypeMap myMime = MimeTypeMap.getSingleton();
+        
+        if(myMime == null) return "";
+        
+        String r = myMime.getMimeTypeFromExtension(_fileExtension);
+        
+        if(r == null) return "";
+        
+        return r;
+    }
+
+    //Android 11:
+    public String GetFileNameByUri(Uri uri) {
+        String result = "";
+        
+        final ContentResolver resolver = controls.activity.getContentResolver();
+        
+        if(resolver == null) return "";
+        
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = resolver.query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                	int iColum = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if(iColum >= 0) result = cursor.getString(iColum);                    
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        
+        if (result == null) 
+            result = uri.getLastPathSegment();
+        
+        if (result == null) return "";
+        	
+        return result;
+    }
+
+    public Uri GetUriFromFile(String _fullFileName) {
+        Uri r = null;
+        try {
+            r = Uri.fromFile(new File(_fullFileName));
+        } catch (Exception e) {
+            Toast.makeText(controls.activity,"[GetUriFromFile] File Not found...",Toast.LENGTH_SHORT).show();
+        }
+        return r;
+    }
+
+    public boolean IsAirPlaneModeOn() {
+        boolean  r = false;
+        try {
+            if( android.provider.Settings.System.getInt(controls.activity.getContentResolver(), Settings.Global.AIRPLANE_MODE_ON) == 1 ) {
+                r = true;
+            }
+        } catch(android.provider.Settings.SettingNotFoundException e) {
+            r = false;
+        }
+        return r;
+    }
+
+    public boolean IsBluetoothOn() {
+        boolean  r = false;
+        try {
+            if(android.provider.Settings.System.getInt(controls.activity.getContentResolver(), Settings.Global.BLUETOOTH_ON) == 1 ) {
+                r = true;
+            }
+        } catch(android.provider.Settings.SettingNotFoundException e) {
+            r = false;
+        }
+        return r;
+    }
+
+    public int GetDeviceBuildVersionApi() {
+      return android.os.Build.VERSION.SDK_INT;   //android.os.Build.VERSION.PREVIEW_SDK_INT
+    }
+
+    public String GetDeviceBuildVersionRelease() {
+        return android.os.Build.VERSION.RELEASE;
     }
 
 }

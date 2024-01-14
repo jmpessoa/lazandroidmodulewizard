@@ -21,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class jButton extends Button {
+public class jButton extends Button { //androidx.appcompat.widget.AppCompatButton
 
 	private Controls controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
@@ -246,7 +246,7 @@ public class jButton extends Button {
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
 		
-		// by TR3E
+		// by ADiV
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;
@@ -268,7 +268,7 @@ public class jButton extends Button {
 		
 		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
 		
-		// by TR3E
+		// by ADiV
 		if( d == null ){
 			this.setCompoundDrawables(null, null, null, null);
 			return;
@@ -297,7 +297,8 @@ public class jButton extends Button {
 			   if (background instanceof ColorDrawable) {
 			     color = ((ColorDrawable)this.getBackground()).getColor();
 			     mBackgroundColor = color;
-		         shape.setColorFilter(color, Mode.SRC_ATOP);			        			        			         
+		         shape.setColorFilter(color, Mode.SRC_ATOP);
+		         shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 		          //[ifdef_api16up]
 		  	      if(Build.VERSION.SDK_INT >= 16) { 
 		             this.setBackground((Drawable)shape);
@@ -425,4 +426,13 @@ public class jButton extends Button {
    public void SetFocus() {
    	  this.requestFocus();
    }
+   
+   public void ApplyDrawableXML(String _xmlIdentifier) {
+	   this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+   }
+
+	public void Append(String _txt) {
+		this.append(_txt);
+	}
+
 }

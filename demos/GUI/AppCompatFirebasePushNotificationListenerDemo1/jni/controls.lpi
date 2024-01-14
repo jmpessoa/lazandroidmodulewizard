@@ -15,18 +15,21 @@
       <UseAppBundle Value="False"/>
       <ResourceType Value="res"/>
     </General>
-    <CustomData Count="11">
+    <CustomData Count="14">
       <Item0 Name="BuildSystem" Value="Gradle"/>
-      <Item1 Name="LAMW" Value="GUI"/>
-      <Item2 Name="LamwVersion" Value="0.8.6.1"/>
-      <Item3 Name="MinSdk" Value="18"/>
-      <Item4 Name="NdkApi" Value="android-22"/>
-      <Item5 Name="NdkPath" Value="C:\android\ndkr18b\"/>
-      <Item6 Name="Package" Value="org.lamw.appcompatfirebasepushnotificationlistenerdemo1"/>
-      <Item7 Name="SdkPath" Value="C:\android\sdkr25\"/>
-      <Item8 Name="StartModule" Value="AndroidModule1"/>
-      <Item9 Name="Support" Value="TRUE"/>
-      <Item10 Name="Theme" Value="AppCompat.Light.DarkActionBar"/>
+      <Item1 Name="CanCreateResMipmapFolder" Value="NO"/>
+      <Item2 Name="KeepMyBuildGradleWhenReopen" Value="NO"/>
+      <Item3 Name="LAMW" Value="GUI"/>
+      <Item4 Name="LamwVersion" Value="0.8.6.4"/>
+      <Item5 Name="MinSdk" Value="18"/>
+      <Item6 Name="NdkApi" Value="android-22"/>
+      <Item7 Name="NdkPath" Value="C:\android\android-ndk-r21e\"/>
+      <Item8 Name="Package" Value="org.lamw.appcompatfirebasepushnotificationlistenerdemo1"/>
+      <Item9 Name="SdkPath" Value="C:\android\sdkJ17\"/>
+      <Item10 Name="StartModule" Value="AndroidModule1"/>
+      <Item11 Name="Support" Value="TRUE"/>
+      <Item12 Name="TargetSdk" Value="34"/>
+      <Item13 Name="Theme" Value="AppCompat.Light.DarkActionBar"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -55,7 +58,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jForm;jIntentManager;jsFirebasePushNotificationListener;jTextView"/>
+          <Item0 Name="jControls" Value="jButton;jIntentManager;jsFirebasePushNotificationListener;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>
@@ -67,7 +70,7 @@
       <Filename Value="..\libs\armeabi-v7a\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm\usr\lib\;C:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
+      <Libraries Value="C:\android\android-ndk-r21e\platforms\android-22\arch-arm\usr\lib\;C:\android\android-ndk-r21e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -96,7 +99,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV7A -XParm-linux-androideabi- -FDC:\android\android-ndk-r21e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

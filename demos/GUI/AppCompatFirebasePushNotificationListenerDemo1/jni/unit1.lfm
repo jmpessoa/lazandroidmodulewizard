@@ -15,7 +15,9 @@ object AndroidModule1: TAndroidModule1
   AnimationDurationIn = 1500
   AnimationDurationOut = 1500
   AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
   OnActivityCreate = AndroidModule1ActivityCreate
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   OnNewIntent = AndroidModule1NewIntent
   object jTextView1: jTextView
     MarginLeft = 5
@@ -91,12 +93,12 @@ object AndroidModule1: TAndroidModule1
   end
   object jsFirebasePushNotificationListener1: jsFirebasePushNotificationListener
     OnGetTokenComplete = jsFirebasePushNotificationListener1GetTokenComplete
-    left = 128
-    top = 72
+    Left = 128
+    Top = 72
   end
   object jIntentManager1: jIntentManager
     IntentAction = iaNone
-    left = 231
-    top = 49
+    Left = 231
+    Top = 49
   end
 end

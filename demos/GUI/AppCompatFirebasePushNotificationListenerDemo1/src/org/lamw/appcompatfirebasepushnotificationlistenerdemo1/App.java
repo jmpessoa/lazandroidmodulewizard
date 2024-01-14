@@ -20,11 +20,13 @@ package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
 //	    Jose Marques Pessoa  /  josemarquespessoa@gmail.com
 
 import java.lang.Override;
+import java.lang.reflect.Method;
 //import android.app.Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.pm.ActivityInfo; 
+import android.content.pm.ActivityInfo;
+import android.view.Window;
 import android.widget.RelativeLayout;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -135,12 +137,15 @@ public class App extends AppCompatActivity {
    //[ifdef_api23up]
     @Override
     public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
-    	
+
+
         if ( (permissions.length > 0) && (grantResults.length > 0) ) {
             for (int i = 0; i < permissions.length; i++) {
                 controls.jAppOnRequestPermissionResult(permsRequestCode, permissions[i], grantResults[i]);
             }
         }
+
+        super.onRequestPermissionsResult(permsRequestCode, permissions, grantResults); //added....???
     } //[endif_api23up]
 
     @Override    
@@ -257,10 +262,27 @@ public class App extends AppCompatActivity {
        return super.onPrepareOptionsMenu(menu);
    }
    
-   @Override
+   /*Handle opened menu */
+  @Override     
    public boolean onMenuOpened(int featureId, Menu menu) {
-	   //TODO!!!!
-     return super.onMenuOpened(featureId, menu);
+	   //https://stackoverflow.com/questions/33820366/how-to-show-icon-with-menus-in-android
+      if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
+          if(menu.getClass().getSimpleName().equals("MenuBuilder")){
+              try{
+                  Method m = menu.getClass().getDeclaredMethod(
+                          "setOptionalIconsVisible", Boolean.TYPE);
+                  m.setAccessible(true);
+                  m.invoke(menu, true);
+              }
+              catch(NoSuchMethodException e){
+                  //Log.e(TAG, "onMenuOpened", e);
+              }
+              catch(Exception e){
+                  throw new RuntimeException(e);
+              }
+          }
+      }
+      return super.onMenuOpened(featureId, menu);
    }
    
    //https://abhik1987.wordpress.com/tag/android-disable-home-button/

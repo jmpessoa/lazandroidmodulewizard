@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="9">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="27"/>
+        <CursorPos X="38" Y="44"/>
+        <UsageCount Value="57"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jIntentManager;jsFirebasePushNotificationListener;jTextView"/>
+        </CustomData>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="62"/>
+        <CursorPos X="65" Y="71"/>
+        <UsageCount Value="57"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\sfirebasepushnotificationlistener.pas"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="19" Y="11"/>
+        <UsageCount Value="28"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2690"/>
+        <CursorPos X="12" Y="2693"/>
+        <UsageCount Value="16"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1126"/>
+        <CursorPos X="18" Y="1132"/>
+        <UsageCount Value="16"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_bridges\intentmanager.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="149"/>
+        <CursorPos X="14" Y="154"/>
+        <UsageCount Value="15"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\smartdesigner.pas"/>
+        <UnitName Value="SmartDesigner"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1869"/>
+        <CursorPos X="25" Y="1880"/>
+        <UsageCount Value="20"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="C:\laz4android2.0.0\components\androidmodulewizard\android_wizard\androidwizard_intf.pas"/>
+        <UnitName Value="AndroidWizard_intf"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3"/>
+        <CursorPos X="24"/>
+        <UsageCount Value="15"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="C:\laz4android2.0.12\components\androidmodulewizard\android_wizard\smartdesigner.pas"/>
+        <UnitName Value="SmartDesigner"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="944"/>
+        <CursorPos X="35" Y="948"/>
+        <UsageCount Value="10"/>
+      </Unit8>
+    </Units>
+    <JumpHistory Count="2" HistoryIndex="1">
+      <Position1>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="15" Column="12"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="88" Column="75" TopLine="83"/>
+      </Position2>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

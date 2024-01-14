@@ -1,0 +1,2 @@
+/android/sdkJ17/platform-tools/adb uninstall org.lamw.appcompatfirebasepushnotificationlistenerdemo1
+/android/sdkJ17/platform-tools/adb install -r /android/workspace/AppCompatFirebasePushNotificationListenerDemo1/bin/AppCompatFirebasePushNotificationListenerDemo1-debug.apk

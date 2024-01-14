@@ -791,6 +791,7 @@ begin
           isSignatureFound := True;
   end;
 
+  //try update build.gradle
   strList.Clear;
   strList.Add('buildscript {');
   if FisKotlinSupported then
@@ -950,7 +951,8 @@ begin
                             '"Do you wish to update it again when re-open?',
                              mtConfirmation, [mbYes, mbNo],0) = mrNo then
   begin
-     LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= 'YES';
+     FKeepMyBuildGradleWhenReopen:= 'YES';
+     LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= FKeepMyBuildGradleWhenReopen;
      LazarusIDE.ActiveProject.Modified:= True;
   end;
 
@@ -1292,20 +1294,20 @@ begin
 
   if FKeepMyBuildGradleWhenReopen = 'NO' then
   begin
-      DoBuildGradle(IntToStr(minSdkApi), strTargetApi);
+   DoBuildGradle(IntToStr(minSdkApi), strTargetApi);
   end;
-  //Keep my "build.gradle" when re-open
 
+  //Keep my "build.gradle" when re-open
   if FKeepMyBuildGradleWhenReopen = '' then //before LAMW 0.8.6.3
   begin
      if MessageDlg('Question', 'Do you wish update "build.gradle" automatically?',
          mtConfirmation, [mbYes, mbNo],0) = mrYes then
      begin
         DoBuildGradle(IntToStr(minSdkApi), strTargetApi);
-        LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= 'NO';
         FKeepMyBuildGradleWhenReopen:= 'NO';
      end
      else FKeepMyBuildGradleWhenReopen:= 'YES';
+
      LazarusIDE.ActiveProject.CustomData.Values['KeepMyBuildGradleWhenReopen']:= FKeepMyBuildGradleWhenReopen ;
      LazarusIDE.ActiveProject.Modified:= True;
   end;
@@ -2197,12 +2199,12 @@ begin
    end;
 
    //try insert reference required by the jControl in AndroidManifest ..
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission') and (not isGradle) then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission')then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.permission');
      if auxList.Count > 0 then
      begin
-       insertRef:= '<uses-permission android';   // <uses-sdk android:minSdkVersion'; //insert reference point
+       insertRef:= '<uses-permission android';   //insert reference point
        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
        aux:= manifestList.Text;
 
@@ -2211,7 +2213,6 @@ begin
        begin
          if Pos(Trim(auxList.Strings[i]), aux) <= 0 then list.Add(Trim(auxList.Strings[i])); //not duplicate..
        end;
-
        if list.Count > 0 then
        begin
          p1:= Pos(insertRef, aux);
@@ -2235,7 +2236,7 @@ begin
      end;
    end;
 
-   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') and (not isGradle) then
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature');
      if auxList.Count > 0 then
@@ -2594,7 +2595,7 @@ begin
         for i:= 0 to auxList.Count-1 do
         begin
            auxStr:=auxList.Strings[i];
-           SplitStr(auxStr, ' '); //--> 'com.google.gms:google-services:4.3.8'
+           SplitStr(auxStr, ' ');         //--> 'com.google.gms:google-services:4.3.8'
            p:= LastDelimiter(':',auxStr); //classpath 'com.google.gms:google-services:4.3.8'
            tempStr:= Copy(auxStr, 2, p - 2);
            if Pos(tempStr, aux) <= 0 then

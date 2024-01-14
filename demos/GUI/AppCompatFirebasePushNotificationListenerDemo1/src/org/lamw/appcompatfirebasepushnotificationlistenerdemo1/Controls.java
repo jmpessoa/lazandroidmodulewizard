@@ -1,6 +1,6 @@
 package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
 
-//LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [splited jForm]
+//LAMW: Lazarus Android Module Wizard - version 0.8.6.3 - 17 December - 2021
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
 
 //https://github.com/jmpessoa/lazandroidmodulewizard
@@ -50,7 +50,8 @@ package org.lamw.appcompatfirebasepushnotificationlistenerdemo1;
 //                              rename example Name
 //			12.2013 LAMW Started by jmpessoa
 
-
+//IMPORTANT! Don't cleanup imports !!!
+import android.hardware.usb.UsbDevice;
 import android.provider.DocumentsContract;
 import android.provider.Settings.Secure;
 import android.view.animation.AccelerateInterpolator;
@@ -179,6 +180,14 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.view.animation.RotateAnimation;
+
 //import android.os.StrictMode; //by Guser979 [try fix "jCamera_takePhoto"
 
 //**class entrypoint**//please, do not remove/change this line!
@@ -189,7 +198,7 @@ public class Controls {
   //Load Pascal Library - Please, do not edit the static content commented in the template file
   // -------------------------------------------------------------------------------------------
   static {
-    try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
+     try{System.loadLibrary("controls");} catch (UnsatisfiedLinkError e) {Log.e("JNI_Loading_libcontrols", "exception", e);}
   }
 
   //
@@ -274,6 +283,12 @@ public class Controls {
   public native void pOnEnter(long pasobj);
 
   public native void pOnBackPressed(long pasobj);
+  
+  public native void pOnDone(long pasobj);
+  public native void pOnSearch(long pasobj);
+  public native void pOnNext(long pasobj);
+  public native void pOnGo(long pasobj);
+
 
   public native void pOnClose(long pasobj);
 
@@ -433,35 +448,44 @@ public class Controls {
       Class<?> res = R.drawable.class;
       Field field = res.getField(_resName);  //"drawableName"
 
-      if (field != null) {
-        int drawableId = field.getInt(null);
-        return drawableId;
-      } else {
-        return 0;
-      }
+      if (field != null) 
+        return field.getInt(null);      
+      
     } catch (Exception e) {
-      //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
-      return 0;
+      //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);      
     }
+    
+    try {
+        Class<?> res = R.mipmap.class;
+        Field field = res.getField(_resName);  //"mipmapName"
+
+        if (field != null) {
+          return field.getInt(null);
+        } else {
+          return 0;
+        }
+      } catch (Exception e) {
+        //Log.e("GetDrawableResourceId", "Failure to get drawable id.", e);
+    	return 0;
+      }
   }
 
   public Drawable GetDrawableResourceById(int _resID) {
 
-    if (_resID == 0) {
-      return null;
-    }
+    if ((_resID == 0) || (this.activity == null)) return null;
 
     Drawable res = null;
 
-    if (android.os.Build.VERSION.SDK_INT < 21) {
-      res = activity.getResources().getDrawable(_resID);
+    if (android.os.Build.VERSION.SDK_INT < 22) {
+      res = this.activity.getResources().getDrawable(_resID);
     }
 
-    //[ifdef_api21up]
-    if (android.os.Build.VERSION.SDK_INT >= 21) {
-      res = activity.getResources().getDrawable(_resID, null);
+    //https://developer.android.com/reference/android/content/res/Resources#getDrawable(int,%20android.content.res.Resources.Theme)
+    //[ifdef_api22up]
+    if (android.os.Build.VERSION.SDK_INT >= 22) {
+      res = this.activity.getResources().getDrawable(_resID, null);
     }
-    //[endif_api21up]
+    //[endif_api22up]
 
     return res;
   }
@@ -473,16 +497,14 @@ public class Controls {
     System.gc();
   }
 
-  public void systemSetOrientation(int orientation) {
-    this.activity.setRequestedOrientation(orientation);
-  }
-
   public int getAPILevel() {
     return android.os.Build.VERSION.SDK_INT;
   }
 
   //by jmpessoa
   public int systemGetOrientation() {
+	if (this.activity == null) return 0;
+	
     return (this.activity.getResources().getConfiguration().orientation);
   }
 
@@ -491,14 +513,10 @@ public class Controls {
   }
 
   public void classChkNull(Class<?> object) {
-    if (object == null) {
-      Log.i("JAVA", "checkNull-Null");
-    }
-    ;
-    if (object != null) {
-      Log.i("JAVA", "checkNull-Not Null");
-    }
-    ;
+	  
+    if (object == null) Log.i("JAVA", "checkNull-Null");   
+    if (object != null) Log.i("JAVA", "checkNull-Not Null");    
+    
   }
 
   public Context GetContext() {
@@ -510,16 +528,20 @@ public class Controls {
 // -------------------------------------------------------------------------
 //
   public void appFinish() {
-    activity.finish();
+	if (this.activity != null)  
+		this.activity.finish();
+	
     System.exit(0); //<< ------- fix by jmpessoa
   }
 
   public void appRecreate() {
-    activity.recreate();
+	if (this.activity != null)
+		this.activity.recreate();
   }
 
   public void appKillProcess() {
-    this.activity.finish();
+	if (this.activity != null)
+		this.activity.finish();
   }
 
   // -------------------------------------------------------------------------
@@ -528,13 +550,16 @@ public class Controls {
 // src : codedata.txt
 // tgt : /data/data/com.kredix.control/data/codedata.txt
   public boolean assetSaveToFile(String src, String tgt) {
+	  
+	if (this.activity == null) return false;
+	
     InputStream is = null;
     FileOutputStream fos = null;
     String path = '/' + tgt.substring(1, tgt.lastIndexOf("/"));
     File outDir = new File(path);
-    if (outDir == null) {
-      return false;
-    }
+    
+    if (outDir == null) return false;
+    
     outDir.mkdirs();
     try {
       is = this.activity.getAssets().open(src);
@@ -547,10 +572,10 @@ public class Controls {
       }
       is.close();
       fos.close();
-      return (true);
+      return true;
     } catch (IOException e) {
       e.printStackTrace();
-      return (false);
+      return false;
     }
   }
 
@@ -559,23 +584,20 @@ public class Controls {
 // -------------------------------------------------------------------------
 
   public void view_SetVisible(View view, int state) {
-    if (view == null) {
-      return;
-    }
+    if (view == null) return;
+    
     view.setVisibility(state);
   }
 
   public void view_SetBackGroundColor(View view, int color) {
-    if (view == null) {
-      return;
-    }
+    if (view == null) return;
+    
     view.setBackgroundColor(color);
   }
 
   public void view_Invalidate(View view) {
-    if (view == null) {
-      return;
-    }
+    if (view == null) return;
+    
     view.invalidate();
   }
 
@@ -583,16 +605,16 @@ public class Controls {
 //  System Info
 // -------------------------------------------------------------------------
 // Result : Width(16bit) : Height (16bit)
-  public int getScreenWH(android.content.Context context) {
+  public int getScreenWH() {
     return ((screenWidth << 16) | screenHeight);
   }
 
   // LORDMAN - 2013-07-28
   public int getStrLength(String Txt) {  //fix by jmpessoa
     int len = 0;
-    if (Txt != null) {
+    if (Txt != null) 
       len = Txt.length();
-    }
+    
     return (len);
   }
 
@@ -719,38 +741,35 @@ public  String getStrDateTime() {
 //  Android path
 // -------------------------------------------------------------------------
 // Result : /data/app/com.kredix-1.apk
-  public String getPathApp(android.content.Context context, String pkgName) {
-    if (context == null) {
-      return "";
-    }
+  public String getPathApp(String pkgName) {
+	if (this.activity == null) return "";    
 
+	Context context = this.activity;	  
+    
     String PathApp = "";
 
     try {
-      PathApp = context.getPackageManager().getApplicationInfo(pkgName, 0).sourceDir;
+        PathApp = context.getPackageManager().getApplicationInfo(pkgName, 0).sourceDir;
     } catch (NameNotFoundException e) {
+    	return "";
     }
 
-    if (PathApp == null) {
-      return "";
-    }
-
+    if (PathApp == null) return "";
+    
     return PathApp;
   }
 
   // Result : /data/data/com/kredix/files
-  public String getPathDat(android.content.Context context) {
-    if (context == null) {
-      return "";
-    }
+  public String getPathDat() {
+    if (this.activity == null) return "";    
 
+	Context context = this.activity;
+    
     //String version = Build.VERSION.RELEASE;
     String PathDat = context.getFilesDir().getAbsolutePath();
 
-    if (PathDat == null) {
-      return "";
-    }
-
+    if (PathDat == null) return "";
+    
     return (PathDat);
   }
 
@@ -758,35 +777,39 @@ public  String getStrDateTime() {
   public String getPathExt() {
     File FileExt = Environment.getExternalStorageDirectory();
 
-    if (FileExt == null) {
-      return "";
-    }
+    if (FileExt == null) return "";
 
     return (FileExt.getPath());
   }
 
+  private File getMyEnvDir(String environmentDir) {
+	  
+	   if (this.activity == null) return null;
+	   
+       if (Build.VERSION.SDK_INT <=  29) 
+           return Environment.getExternalStoragePublicDirectory(environmentDir);
+       else 
+           return this.activity.getExternalFilesDir(environmentDir);       
+   }
+
   // Result : /storage/emulated/0/DCIM
   public String getPathDCIM() {
-    File FileDCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+    File FileDCIM = getMyEnvDir(Environment.DIRECTORY_DCIM);
 
-    if (FileDCIM == null) {
-      return "";
-    }
+    if (FileDCIM == null) return "";
 
     return FileDCIM.getPath();
   }
 
   //by jmpessoa
-  public String getPathDataBase(android.content.Context context) {
-    if (context == null) {
-      return "";
-    }
+  public String getPathDataBase() {
+	if (this.activity == null) return "";    
+
+	Context context = this.activity;    
 
     String destPath = context.getFilesDir().getAbsolutePath();
 
-    if (destPath == null) {
-      return "";
-    }
+    if (destPath == null) return "";    
 
     destPath = destPath.substring(0, destPath.lastIndexOf("/")) + "/databases";
     return destPath;
@@ -797,9 +820,7 @@ public  String getStrDateTime() {
 // -------------------------------------------------------------------------
 // thierrydijoux - get locale info
   public String getLocale(int localeType) {
-    if (this.activity == null) {
-      return "";
-    }
+    if (this.activity == null) return "";    
 
     Context context = this.activity;
 
@@ -831,9 +852,7 @@ public  String getStrDateTime() {
         break;
     }
 
-    if (value == null) {
-      return "";
-    }
+    if (value == null) return "";
 
     return value;
   }
@@ -911,7 +930,9 @@ public  int Image_getWH (String filename ) {
 // -------------------------------------------------------------------------
 //
   public void jToast(String str) {
-    Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
+	if (this.activity == null) return;
+	
+    Toast.makeText(this.activity, str, Toast.LENGTH_SHORT).show();
   }
 
   //by jmpessoa
@@ -923,14 +944,17 @@ public  int Image_getWH (String filename ) {
       String bcc,
       String subject,
       String message) {
+	  
+	if (this.activity == null) return;
+	  
     try {
       Intent email = new Intent(Intent.ACTION_SEND);
-      if (email == null) {
-        return;
-      }
-      email.putExtra(Intent.EXTRA_EMAIL, to);
-      email.putExtra(Intent.EXTRA_CC, cc);
-      email.putExtra(Intent.EXTRA_BCC, bcc);
+      
+      if (email == null) return;
+      
+      email.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+      email.putExtra(Intent.EXTRA_CC, new String[]{cc});
+      email.putExtra(Intent.EXTRA_BCC, new String[]{bcc});
       email.putExtra(Intent.EXTRA_SUBJECT, subject);
       email.putExtra(Intent.EXTRA_TEXT, message);
       // Use email client only
@@ -949,9 +973,9 @@ public  int Image_getWH (String filename ) {
 
   public int jSend_SMS(String phoneNumber, String msg, boolean multipartMessage) {
     SmsManager sms = SmsManager.getDefault();
-    if (sms == null) {
-      return 0;
-    }
+    
+    if (sms == null) return 0;
+    
     try {
       //SmsManager.getDefault().sendTextMessage(phoneNumber, null, msg, null, null);
       if (multipartMessage) {
@@ -971,15 +995,20 @@ public  int Image_getWH (String filename ) {
     }
   }
 
+  /*
+  Apps targeting Android 12 and higher must specify either FLAG_IMMUTABLE or FLAG_MUTABLE
+  when constructing a PendingIntent.
+  FLAG_IMMUTABLE is available since target SDK 23,
+   */
   //improved by CC
   //http://forum.lazarus-ide.org/index.php/topic,44775.msg315109/topicseen.html
   public int jSend_SMS(String phoneNumber, String msg, String packageDeliveredAction, boolean multipartMessage) {
-    String SMS_DELIVERED = packageDeliveredAction;
-    PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(SMS_DELIVERED), 0);
+    //String SMS_DELIVERED = packageDeliveredAction;
+    PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(this.GetContext(), 0, new Intent(packageDeliveredAction), PendingIntent.FLAG_IMMUTABLE); //PendingIntent.FLAG_CANCEL_CURRENT
     SmsManager sms = SmsManager.getDefault();
-    if (sms == null) {
-      return 0;
-    }
+    
+    if (sms == null)  return 0;
+    
     int partsCount = 1;
     try {
       if (multipartMessage) {
@@ -1029,6 +1058,8 @@ public  int Image_getWH (String filename ) {
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
   @SuppressLint("DefaultLocale")
   public String jContact_getMobileNumberByDisplayName(String contactName) {
+	  
+	if (this.activity == null) return "";
 
     String matchNumber = "";
     String username;
@@ -1038,15 +1069,28 @@ public  int Image_getWH (String filename ) {
     username = username.toLowerCase();
 
     Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-    if (phones == null) {
-      return "";
-    }
+    
+    if (phones == null) return "";
+    
+    String name = "";
+    String phoneNumber = "";
+    String phoneType = "";
+    int iColum = 0;
 
-    while (phones.moveToNext()) {
-      String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-      String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-      String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-
+    while (phones.moveToNext()) {           
+      name = "";
+      phoneNumber = "";
+      phoneType = "";
+      
+      iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+      if(iColum >= 0) name = phones.getString(iColum);
+      
+      iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+      if(iColum >= 0) phoneNumber = phones.getString(iColum);
+      
+      iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+      if(iColum >= 0) phoneType = phones.getString(iColum);
+           
       name = name.toLowerCase();
 
       if (name.equals(username)) {
@@ -1063,21 +1107,34 @@ public  int Image_getWH (String filename ) {
   //by jmpessoa
 //http://eagle.phys.utk.edu/guidry/android/readContacts.html
   public String jContact_getDisplayNameList(char delimiter) {
+	if (this.activity == null) return "";
+	
     String nameList = "";
     Cursor phones = this.activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-    if (phones == null) {
-      return "";
-    }
-
+    
+    if (phones == null) return "";
+    
+    String name = "";    
+    String phoneType = "";
+    int iColum = 0;
+    
     while (phones.moveToNext()) {
-      String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-      String phoneType = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+    	name = "";        
+        phoneType = "";
+        
+        iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+        if(iColum >= 0) name = phones.getString(iColum);                
+        
+        iColum = phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
+        if(iColum >= 0) phoneType = phones.getString(iColum);
 
-      if (phoneType.equals("2")) { //mobile
-        nameList = nameList + delimiter + name;
+        if (phoneType.equals("2")) { //mobile
+         nameList = nameList + delimiter + name;
       }
     }
+    
     phones.close();
+    
     return nameList;
   }
 
@@ -1086,9 +1143,9 @@ public  int Image_getWH (String filename ) {
 // -------------------------------------------------------------------------
   public int[] getBmpArray(String file) {
     Bitmap bmp = BitmapFactory.decodeFile(file);
-    if (bmp == null) {
-      return null;
-    }
+    
+    if (bmp == null) return null;
+    
     int length = bmp.getWidth() * bmp.getHeight();
     int[] pixels = new int[length + 2];
     bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
@@ -1098,16 +1155,16 @@ public  int Image_getWH (String filename ) {
   }
 
   private String getRealPathFromURI(Uri contentURI) {
-    String result;
+    String result = "";
     Cursor cursor = this.GetContext().getContentResolver().query(contentURI, null,
         null, null, null);
+    
     if (cursor == null) { // Source is Dropbox or other similar local file path
       result = contentURI.getPath();
     } else {
       cursor.moveToFirst();
       try {
-        int idx = cursor
-            .getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
         result = cursor.getString(idx);
       } catch (Exception e) {
         result = "";
@@ -1115,9 +1172,7 @@ public  int Image_getWH (String filename ) {
       cursor.close();
     }
 
-    if (result == null) {
-      return "";
-    }
+    if (result == null) return "";    
 
     return result;
   }
@@ -1131,6 +1186,8 @@ public  int Image_getWH (String filename ) {
    * you are browsing the files saved in the DCIM folder....
    */
   private void galleryAddPic(File image_uri) {
+	if (this.activity == null) return;
+	  
     if (Build.VERSION.SDK_INT < 19) {
       this.activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(image_uri)));
     } else {
@@ -1144,18 +1201,20 @@ public  int Image_getWH (String filename ) {
               Log.e("Camera", "File " + path + " was scanned successfully: " + uri);
             }
           });
-    }
+    }       
   }
 
   public String jCamera_takePhoto(String path, String filename, int requestCode, boolean addToGallery) {
 
     //StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder(); //by Guser97
     //StrictMode.setVmPolicy(builder.build()); //by Guser97
+	  
+	if (this.activity == null) return "";
 
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    if (intent == null) {
-      return "";
-    }
+    
+    if (intent == null) return "";
+    
     //String  image_path = (path+File.separator+filename);
     File newfile = new File(path, File.separator + filename);
     if (newfile == null) {
@@ -1213,14 +1272,253 @@ public  int Image_getWH (String filename ) {
 
   public void takePhoto(String filename) {  //HINT: filename = App.Path.DCIM + '/test.jpg
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    if (intent == null) {
-      return;
-    }
+    
+    if (intent == null) return;
+    
     Uri mImageCaptureUri = Uri.fromFile(new File("", filename));
     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
     intent.putExtra("return-data", true);
     activity.startActivityForResult(intent, 12345);
   }
+  
+  /// https://www.codexpedia.com/android/android-fade-in-and-fade-out-animation-programatically/
+	public void fadeInAnimation(final View view, int duration) {
+		
+		if (view == null) return;
+		
+		Animation fadeIn = new AlphaAnimation(0, 1);
+		
+		if(fadeIn == null) return;
+		
+		fadeIn.setInterpolator(new DecelerateInterpolator());
+		fadeIn.setDuration(duration);
+		fadeIn.setFillAfter(true);
+		fadeIn.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.VISIBLE);
+			}
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+
+		view.startAnimation(fadeIn);
+	}
+
+	public void fadeOutAnimation(final View view, int duration) {
+		
+		if (view == null) return;
+		
+		Animation fadeOut = new AlphaAnimation(1, 0);
+		
+		if(fadeOut == null) return;
+		
+		fadeOut.setInterpolator(new AccelerateInterpolator());
+		fadeOut.setStartOffset(duration);
+		fadeOut.setDuration(duration);
+		fadeOut.setFillAfter(true);
+		fadeOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				view.setVisibility(View.INVISIBLE);
+			}
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+		});
+		view.startAnimation(fadeOut);
+	}
+
+	//https://stackoverflow.com/questions/20696801/how-to-make-a-right-to-left-animation-in-a-layout/20696822
+	public void slidefromRightToLeftIn(View view, long duration) {
+		
+		if (view == null) return;
+		
+		TranslateAnimation animate;
+		
+		//animate = new TranslateAnimation(appLayout.getWidth(), 0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(appLayout.getWidth()-view.getX(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+		
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromRightToLeftOut(View view, long duration) {
+		
+		if (view == null) return;
+		
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		//animate = new TranslateAnimation(0,-appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,view.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+		
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromLeftToRightOut(View view, long duration) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		//animate = new TranslateAnimation(0, appLayout.getWidth(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0, -appLayout.getWidth()-view.getX(), 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromLeftToRightIn(View view, long duration) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		//animate = new TranslateAnimation(-appLayout.getWidth(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(-view.getWidth()-view.getX(),	0, 0, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromTopToBottomOut(View view, long duration) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromTopToBottomIn(View view, long duration) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		//animate = new TranslateAnimation(0,	0, -appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,	0, -view.getHeight()-view.getY(), 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromBottomToTopOut(View view, long duration) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		//animate = new TranslateAnimation(0, 0, 0, -appLayout.getHeight()); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0,	0, 0, view.getHeight()-view.getY()); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+
+	public void slidefromBottomToTopIn(View view, long duration) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		//animate = new TranslateAnimation(0,	0, appLayout.getHeight(), 0); //(xFrom,xTo, yFrom,yTo)
+		animate = new TranslateAnimation(0, 0, appLayout.getHeight()-view.getY(), 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromMoveCustomIn(View view, long duration, int _xFrom, int _yFrom) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(_xFrom, 0, _yFrom, 0); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void slidefromMoveCustomOut(View view, long duration, int _xTo, int _yTo) {  //try
+		
+		if (view == null) return;
+
+		TranslateAnimation animate;  //(0.0f, 0.0f, 1500.0f, 0.0f);
+		
+		animate = new TranslateAnimation(0, _xTo, 0, _yTo); //(xFrom,xTo, yFrom,yTo)
+		
+		if(animate == null) return;
+
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		view.startAnimation(animate);
+		view.setVisibility(View.VISIBLE); // Change visibility VISIBLE or GONE
+	}
+	
+	public void animateRotate( View view, long duration, int _angleFrom, int _angleTo ){
+		
+		if (view == null) return;
+		
+		RotateAnimation animate; 
+		
+		animate = new RotateAnimation(_angleFrom, _angleTo, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+		
+		if(animate == null) return;
+		
+		animate.setDuration(duration);
+		animate.setFillAfter(true);
+		
+		view.startAnimation(animate);		
+	}
 
   // -------------------------------------------------------------------------
   //  jForm Create - Please, Don't remove it!
