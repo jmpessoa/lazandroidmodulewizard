@@ -163,7 +163,7 @@
 ##### 2.5 Get [Gradle](https://gradle.org/releases/) builder
 - recommended versions
   - Java JDK 21: [Gradle 8.5](https://gradle.org/next-steps/?version=8.5&format=bin) or up
-  - Java JDK 17: [Gradle 8.1.1](https://gradle.org/next-steps/?version=8.1.1&format=bin) or up
+  - Java JDK 17: [Gradle 8.2.1](https://gradle.org/next-steps/?version=8.2.1&format=bin) or up
   - Java JDK 11: [Gradle 7.6.3](https://gradle.org/next-steps/?version=7.6.3&format=bin) or up
   - Java JDK 1.8: [Gradle 6.7](https://gradle.org/next-steps/?version=6.7&format=bin) or down
     - Use the option "extract here" to produce the folder "gradle-x.y.z" in a convenient location...

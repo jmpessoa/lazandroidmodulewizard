@@ -1,4 +1,4 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package org.lamw.applamwproject2;
 
 import java.lang.reflect.Field;
 import android.content.Context;
@@ -248,7 +248,8 @@ public class jsToolbar extends Toolbar /*dummy*/ { //please, fix what GUI object
    }
 
    public void SetTheme(int _theme) {
-       context.setTheme(R.style.ThemeOverlay_AppCompat_Dark_ActionBar);
+       context.setTheme(_theme);
+       //context.setTheme(R.style.AppTheme);  //example in file "style.xml"
        this.invalidate();
    }
 

@@ -67,7 +67,6 @@ type
      FAntBuildMode: string;
      FMainActivity: string;
      FPathToJavaSrc: string;
-     //FAndroidNDKPlatform: string;
      FNdkApi: string;
 
      FPrebuildOSys: string;
@@ -1071,6 +1070,17 @@ begin
     strList.Free;
 end;
 
+function TAndroidProjectDescriptor.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
+var
+  auxStr: string;
+  lenAuxStr: integer;
+begin
+  auxStr:= StringReplace(gradleVersionAsString,'.', '', [rfReplaceAll]); //6.6.1
+  lenAuxStr:=  Length(auxStr);
+  if lenAuxStr < 3 then auxStr:= auxStr + '0';   //6.8 -> 680
+  Result:= StrToInt(Trim(auxStr));  //661
+end;
+
 procedure TAndroidProjectDescriptor.DoBuildGradle(strPack: string;
                                  androidPluginVersion: string; gradleVersion: string;
                                  isKotlinSupported: boolean; minSdkVersion: string; compileSdkVersion: string;
@@ -1080,8 +1090,13 @@ var
   directive: string;
   aAppCompatLib: TAppCompatLib;
   aSupportLib: TSupportLib;
+  gradleVersionBigNumber: integer;
 begin
+  gradleVersionBigNumber:= GetGradleVersionAsBigNumber(gradleVersion);
+
   strList:= TStringList.Create;
+
+
   strList.Add('buildscript {');
   if isKotlinSupported then
     strList.Add('    ext.kotlin_version = ''1.6.10''');
@@ -1114,13 +1129,10 @@ begin
 
   if FJavaMainVersion <> '' then
   begin
-    if StrToInt(FJavaMainVersion) >= 21  then
+    if StrToInt(FJavaMainVersion) >= 17  then
         if GetAndroidPluginVersionAsBigNumber(androidPluginVersion) >= 820 then
             strList.Add('    namespace "'+strPack+'"'); //org.lamw.applamwproject1
   end;
-  strList.Add('    lintOptions {');
-  strList.Add('       abortOnError false');
-  strList.Add('    }');
   strList.Add('    splits {');
   strList.Add('        abi {');
   strList.Add('            enable true');
@@ -1169,7 +1181,23 @@ begin
   strList.Add('            jniDebuggable false');
   strList.Add('        }');
   strList.Add('    }');
+  if gradleVersionBigNumber >= 820 then
+  begin
+    strList.Add('    buildFeatures {');
+    strList.Add('        aidl true');
+    strList.Add('    }');
+    strList.Add('    lint {');
+    strList.Add('        abortOnError false');
+    strList.Add('    }');
+  end
+  else
+  begin
+    strList.Add('    lintOptions {');
+    strList.Add('       abortOnError false');
+    strList.Add('    }');
+  end;
   strList.Add('}');
+
   strList.Add('dependencies {');
   strList.Add('    implementation  fileTree(include: [''*.jar''], dir: ''libs'')');
 
@@ -1228,17 +1256,6 @@ begin
   Result:= StrToInt(Trim(auxStr));  //811
 end;
 
-function TAndroidProjectDescriptor.GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
-var
-  auxStr: string;
-  lenAuxStr: integer;
-begin
-  auxStr:= StringReplace(gradleVersionAsString,'.', '', [rfReplaceAll]); //6.6.1
-  lenAuxStr:=  Length(auxStr);
-  if lenAuxStr < 3 then auxStr:= auxStr + '0';   //6.8 -> 680
-  Result:= StrToInt(Trim(auxStr));  //661
-end;
-
 {
 //https://developer.android.com/studio/releases/gradle-plugin?hl=pt-br
 
@@ -1279,37 +1296,11 @@ begin
   intGV:= StrToInt(strGV);
 
   if intGV = 8 then  //JDK 11 - need Gradle version >=  6.7.1 -- targetApi 33
-  begin              //JDK 17 - need Gradle version >=  8.1.1 -- targetApi 34
-    if (bigNumber >= 800) and (bigNumber < 820) then
-    begin
-         if mainJavaVersion = '11' then
-           Result:= '7.4.2' //JDK 11               //Tested: Jdk11 + Gradle 8.1.1
-         else
-           Result:= '7.4.2'; //JDK 17
-    end
-    else if (bigNumber >= 820) and (bigNumber < 830) then
-    begin
-        if mainJavaVersion = '11' then
-           Result:= '7.4.2'   //JDK 11                        //Tested: Jdk11 + Gradle 8.2.1
-        else
-           Result:= '8.0.2';   //JDK 17                     //'8.0.2' --> JDK 17  -> targetApi 34
-    end
-    else if (bigNumber >= 830) and (bigNumber < 840) then
-    begin
-        if mainJavaVersion = '11' then
-            Result:=  '7.4.2' //JDK 11                           //Tested: Jdk11 + Gradle 8.3
-        else
-            Result:=  '8.1.4'; //JDK 17                           //'8.1.4' --> JDK 17  -> targetApi 34
-    end
-    else if bigNumber >= 840 then
-    begin
-        if mainJavaVersion = '11' then
-           Result:= '7.4.2' //JDK 11                /Tested: Jdk11 + Gradle 8.4  and Jdk11 + Gradle 8.5
-        else if mainJavaVersion = '17' then
-           Result:= '8.1.4' //JDK 17              //or '8.2.0' --> JDK 17 (??) -> targetApi 34
-        else  //21
-           Result:= '8.2.0' //JDK 21              //'8.2.0' --> JDK 21 -> targetApi 34
-    end;
+  begin              //JDK 17 - need Gradle version >=  8.2 -- targetApi 34
+     if mainJavaVersion = '11' then //targetApi 33
+       Result:= '7.4.2'   //JDK 11
+     else
+       Result:= '8.2.0';   //targetApi 34
   end;
 
   if intGV = 7 then   //JDK 11
@@ -1378,6 +1369,7 @@ var
   sdkBuildTools, androidPluginVersion: string;
   outTheme: string;
   isAppCompatTheme, isGradleBuildSystem: boolean;
+  addInfo: string;
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1515,7 +1507,12 @@ begin
 
           for i:= 0 to count-1 do
           begin
-            strList.Add('<uses-permission android:name="'+frm.ManifestData.Strings[i]+'"/>');
+            if Pos('BATTERY_STATS', frm.ManifestData.Strings[i]) > 0 then
+               strList.Add('<uses-permission android:name="'+frm.ManifestData.Strings[i]+'" tools:ignore="ProtectedPermissions"/>')
+            else if Pos('CHANGE_CONFIGURATION', frm.ManifestData.Strings[i]) > 0 then
+               strList.Add('<uses-permission android:name="'+frm.ManifestData.Strings[i]+'" tools:ignore="ProtectedPermissions"/>')
+            else
+               strList.Add('<uses-permission android:name="'+frm.ManifestData.Strings[i]+'"/>');
           end;
           frm.ManifestData.Clear;
 
@@ -2084,6 +2081,12 @@ begin
             (see https://developer.android.com/jetpack/androidx/migrate).
           *)
 
+          //TODO
+          {
+          strList.Add('android.defaults.buildfeatures.buildconfig=true');
+          strList.Add('android.nonFinalResIds=false');
+          strList.Add('android.nonTransitiveRClass=false');
+          }
           strList.Add('android.enableJetifier=true'); //temporary...
           strList.Add('android.useAndroidX=true');
 

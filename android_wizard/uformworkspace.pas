@@ -1696,7 +1696,6 @@ procedure TFormWorkspace.SpeedButtonManifestClick(Sender: TObject);
 var
    frm: TFormAndroidManifest;
    i, count: integer;
-
 begin
   frm:= TFormAndroidManifest.Create(nil);
   if frm.ShowModal = mrOK then
@@ -1709,7 +1708,8 @@ begin
      count:= frm.ListBoxManifestPermission.Count;
      for i:= 0 to count-1 do
      begin
-       FManifestData.Add(frm.ListBoxManifestPermission.Items.Strings[i]);
+       if frm.ListBoxManifestPermission.Items.Strings[i] <> '' then
+          FManifestData.Add(Trim(frm.ListBoxManifestPermission.Items.Strings[i]));
      end;
   end;
   frm.Free;

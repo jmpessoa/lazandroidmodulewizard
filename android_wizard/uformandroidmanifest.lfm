@@ -123,7 +123,6 @@ object FormAndroidManifest: TFormAndroidManifest
       'android.permission.MODIFY_AUDIO_SETTINGS'
       'android.permission.CHANGE_CONFIGURATION'
       'android.permission.BATTERY_STATS'
-      'android.permission.QUERY_ALL_PACKAGES'
       'android.permission.ACCESS_NOTIFICATION_POLICY'
     )
     ItemHeight = 20
@@ -339,7 +338,7 @@ object FormAndroidManifest: TFormAndroidManifest
     Items.Strings = (
       'android.permission.FLASHLIGHT'
       'android.permission.VIBRATE'
-      'android.permission.SET_ALARM'
+      'com.android.alarm.permission.SET_ALARM'
       'android.permission.SET_WALLPAPER'
       'android.permission.TRANSMIT_IR'
       'android.permission.USE_BIOMETRIC'

@@ -618,37 +618,11 @@ begin
   intGV:= StrToInt(strGV);
 
   if intGV = 8 then  //JDK 11 - need Gradle version >=  6.7.1 -- targetApi 33
-  begin              //JDK 17 - need Gradle version >=  8.1.1 -- targetApi 34
-    if (bigNumber >= 800) and (bigNumber < 820) then
-    begin
-         if mainJavaVersion = '11' then
-           Result:= '7.4.2' //JDK 11               //Tested: Jdk11 + Gradle 8.1.1
-         else
-           Result:= '7.4.2'; //JDK 17
-    end
-    else if (bigNumber >= 820) and (bigNumber < 830) then
-    begin
-        if mainJavaVersion = '11' then
-           Result:= '7.4.2'   //JDK 11                        //Tested: Jdk11 + Gradle 8.2.1
-        else
-           Result:= '8.0.2';   //JDK 17                          //'8.0.2' --> JDK 17  -> targetApi 34
-    end
-    else if (bigNumber >= 830) and (bigNumber < 840) then
-    begin
-        if mainJavaVersion = '11' then
-            Result:=  '7.4.2' //JDK 11                           //Tested: Jdk11 + Gradle 8.3
-        else
-            Result:=  '8.1.4'; //JDK 17                           //'8.1.4' --> JDK 17  -> targetApi 34
-    end
-    else if bigNumber >= 840 then
-    begin
-       if mainJavaVersion = '11' then
-          Result:= '7.4.2' //JDK 11                /Tested: Jdk11 + Gradle 8.4  and Jdk11 + Gradle 8.5
-       else if mainJavaVersion = '17' then
-          Result:= '8.1.4' //JDK 17              //or '8.2.0' --> JDK 17 (??) -> targetApi 34
-       else  //21
-          Result:= '8.2.0' //JDK 21              //'8.2.0' --> JDK 21 -> targetApi 34
-    end;
+  begin              //JDK 17 - need Gradle version >=  8.2 -- targetApi 34
+     if mainJavaVersion = '11' then //targetApi 33
+       Result:= '7.4.2'   //JDK 11
+     else
+       Result:= '8.2.0';   //targetApi 34
   end;
 
   if intGV = 7 then   //JDK 11
@@ -718,13 +692,15 @@ var
   androidPluginVersion, targetBuildFileName: string;
   isAppCompatTheme, isGradleBuildSystem, isUniversalApk, isSignatureFound: boolean;
   versionCode, versionName: string;
+  gradleVersionBigNumber: integer;
 begin
 
   if FPathToGradle <> '' then
     FGradleVersion:= GetGradleVersion(FPathToGradle);
 
-  TryProduceJavaVersion(FPathToJavaJDK);
+  gradleVersionBigNumber:= GetGradleVersionAsBigNumber(FGradleVersion);
 
+  TryProduceJavaVersion(FPathToJavaJDK);
   androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion, FJavaMainVersion); //'7.1.3';
 
   isAppCompatTheme:= False;
@@ -828,9 +804,6 @@ begin
        if GetAndroidPluginVersionAsBigNumber(androidPluginVersion) >= 820 then
            strList.Add('    namespace "'+FPackageName+'"'); //org.lamw.applamwproject1
   end;
-  strList.Add('    lintOptions {');
-  strList.Add('       abortOnError false');
-  strList.Add('    }');
   strList.Add('    splits {');
   strList.Add('        abi {');
   strList.Add('            enable true');
@@ -900,7 +873,24 @@ begin
   strList.Add('            jniDebuggable false');
   strList.Add('        }');
   strList.Add('    }');
+
+  if gradleVersionBigNumber >= 820 then
+  begin
+    strList.Add('    buildFeatures {');
+    strList.Add('        aidl true');
+    strList.Add('    }');
+    strList.Add('    lint {');
+    strList.Add('        abortOnError false');
+    strList.Add('    }');
+  end
+  else
+  begin
+    strList.Add('    lintOptions {');
+    strList.Add('       abortOnError false');
+    strList.Add('    }');
+  end;
   strList.Add('}');
+
   strList.Add('dependencies {');
   strList.Add('    implementation  fileTree(include: [''*.jar''], dir: ''libs'')');
 
@@ -1331,6 +1321,13 @@ begin
 
       if pos('android.useAndroidX', strList.text) = 0 then
         strList.Add('android.useAndroidX=true');
+
+      //TODO
+      {
+      strList.Add('android.defaults.buildfeatures.buildconfig=true');
+      strList.Add('android.nonFinalResIds=false');
+      strList.Add('android.nonTransitiveRClass=false');
+      }
 
      //apply change suggested by DonAlfred
      if Pos('org.gradle.java.home=', strList.Text ) <= 0 then

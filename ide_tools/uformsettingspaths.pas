@@ -596,6 +596,7 @@ begin
         ComboBoxPathToGradle.Items.Add(FPathToGradle);
     end;
   end;
+  Application.ProcessMessages;
 
   if FGradleVersion = '' then
        TryProduceGradleVersion(ComboBoxPathToGradle.Text);
