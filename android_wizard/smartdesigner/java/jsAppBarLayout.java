@@ -1,4 +1,4 @@
-package org.lamw.appcompatcollapsingtoolbardemo1;
+package org.lamw.applamwprojecttt1;
 
 import android.content.Context;
 import android.os.Build;
@@ -132,7 +132,8 @@ public class jsAppBarLayout extends AppBarLayout /*dummy*/ { //please, fix what 
    }
 
    public void SetTheme(int _theme) { //TODO Pascal
-       context.setTheme(R.style.ThemeOverlay_AppCompat_Dark_ActionBar);
+       context.setTheme(_theme);  //R.style.ThemeOverlay_AppCompat_Dark_ActionBar
+       //context.setTheme(R.style.AppTheme); //example in "style.xml file"
        this.invalidate();
    }
 

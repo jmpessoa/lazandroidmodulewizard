@@ -1,9 +1,10 @@
-package org.lamw.appjcenteropenstreetmapdemo1;
+package org.lamw.applamwprojecttt1;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.BuildConfig;
 import org.osmdroid.bonuspack.overlays.GroundOverlay;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -22,6 +24,7 @@ import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
@@ -116,8 +119,8 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
 
         mBufferGeoPointsList = new ArrayList<GeoPoint>();
 
-        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
-        mRoadManager = new OSRMRoadManager(controls.activity);
+        //Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+        mRoadManager = new OSRMRoadManager(controls.activity, BuildConfig.LIBRARY_PACKAGE_NAME);
         mThis = this;
         mapEventsOverlay = new MapEventsOverlay(this);
 
@@ -265,11 +268,11 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
         Polygon circle = new Polygon(this); //radiusInMetter
         circle.setPoints(Polygon.pointsAsCircle(geoPoint, _radiusInMetters)); //2000.0
         //And we adjust some design aspects:
-        circle.setFillColor(mFillColor);
-        circle.setStrokeColor(_strokeColor);  //Color.RED
-        circle.setStrokeWidth(_strokeWidth); //2
+        Paint paint = circle.getFillPaint();
+        paint.setColor(mFillColor);
+        paint.setStrokeWidth(_strokeWidth); //2
         //And as Polygon supports bubbles, let's add one:
-        circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, this));
+        circle.setInfoWindow(new BasicInfoWindow(org.osmdroid.bonuspack.R.layout.bonuspack_bubble, this)); //int layoutResId, MapView mapView
         //circle.setTitle("Centered on "+geoPoint.getLatitude()+","+geoPoint.getLongitude());
         circle.setTitle(_title);
         this.getOverlays().add(circle);
@@ -279,11 +282,12 @@ public class jcOpenMapView extends MapView implements MapEventsReceiver { //plea
     public void SetGroundImageOverlay(double _latitude, double _longitude, String _imageIdentifier, float _dimMetters) {
         int resId = controls.GetDrawableResourceId(_imageIdentifier);
         Drawable d = controls.GetDrawableResourceById(resId);
-        GeoPoint geoPoint = new GeoPoint(_latitude, _longitude);
+        GeoPoint geoPointTopLeft = new GeoPoint(_latitude, _longitude);
+        GeoPoint geoPointBottomRight = new GeoPoint(_latitude+_dimMetters, _longitude+_dimMetters);
         GroundOverlay myGroundOverlay = new GroundOverlay();
-        myGroundOverlay.setPosition(geoPoint);
-        myGroundOverlay.setImage(d.mutate()); //
-        myGroundOverlay.setDimensions(_dimMetters); //2000.0f
+        myGroundOverlay.setPositionFromBounds(geoPointTopLeft, geoPointBottomRight);
+        myGroundOverlay.setImage(((BitmapDrawable)d).getBitmap()); //d.mutate()
+        //myGroundOverlay.setDimensions(_dimMetters) or 2000.0f
         this.getOverlays().add(myGroundOverlay);
     }
 

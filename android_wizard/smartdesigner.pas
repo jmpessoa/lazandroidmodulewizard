@@ -800,7 +800,7 @@ begin
 
   if FJavaMainVersion <> '' then
   begin
-    if StrToInt(FJavaMainVersion) >= 21 then
+    if StrToInt(FJavaMainVersion) >= 17 then
        if GetAndroidPluginVersionAsBigNumber(androidPluginVersion) >= 820 then
            strList.Add('    namespace "'+FPackageName+'"'); //org.lamw.applamwproject1
   end;

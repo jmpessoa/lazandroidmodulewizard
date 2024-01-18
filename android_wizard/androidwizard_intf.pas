@@ -1238,7 +1238,7 @@ begin
   strList.Add('}');
   strList.Add(' ');
   strList.Add('wrapper {');
-  strList.Add('    gradleVersion = '''+gradleVersion+''' ');  //7.6.3
+  strList.Add('    gradleVersion = '''+gradleVersion+''' ');  //8.2.1
   strList.Add('}');
   strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
   strList.Free;
