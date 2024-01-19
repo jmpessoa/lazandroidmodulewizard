@@ -952,7 +952,7 @@ end;
 procedure TLamwSmartDesigner.KeepBuildUpdated(targetApi: integer);
 var
   strList, providerList: TStringList;
-  i, minSdkApi : integer;
+  i, count, minSdkApi : integer;
   strTargetApi, auxStr, tempStr : string;
   linuxPathToAndroidSdk: string;
   linuxPathToGradle: string;
@@ -1304,8 +1304,8 @@ begin
 
   //end "build.grade" update
 
-  strList.Clear;
-  if fileExists(FPathToAndroidProject+'gradle.properties') then
+   strList.Clear;
+   if fileExists(FPathToAndroidProject+'gradle.properties') then
    begin
      strList.LoadFromFile(FPathToAndroidProject+'gradle.properties');
 
@@ -1330,21 +1330,33 @@ begin
       }
 
      //apply change suggested by DonAlfred
+     tempStr:=FPathToJavaJDK;
+     {$ifdef MSWindows}
+     tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
+     tempStr:=StringReplace(tempStr,':','\:',[]);
+     {$endif}
      if Pos('org.gradle.java.home=', strList.Text ) <= 0 then
      begin
-       if DirectoryExists(FPathToJavaJDK) then
-       begin
-         tempStr:=FPathToJavaJDK;
-         {$ifdef MSWindows}
-         tempStr:=StringReplace(tempStr,'\','\\',[rfReplaceAll]);
-         tempStr:=StringReplace(tempStr,':','\:',[]);
-         //tempStr:=StringReplace(tempStr,' ','\ ',[rfReplaceAll]); //fix "invalid string escape"
-         {$endif}
          strList.Add('org.gradle.java.home='+tempStr);
+     end
+     else
+     begin
+       i:= 0;
+       count:= strList.Count;
+       while i < count do
+       begin
+          if Pos('org.gradle.java.home=', strList.Strings[i]) > 0 then
+          begin
+            strList.Strings[i]:= 'org.gradle.java.home='+tempStr;
+            i:= count;
+          end;
+          i:= i + 1;
        end;
      end;
+
+     strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
    end;
-   strList.SaveToFile(FPathToAndroidProject+'gradle.properties');
+
 
   //gradle build scripts;
 
