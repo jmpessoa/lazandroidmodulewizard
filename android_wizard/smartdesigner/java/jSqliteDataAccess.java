@@ -406,9 +406,9 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
             try {
                 Log.w(TAG, "processing upgrade: " + path);
                 InputStream is = mContext.getAssets().open(path);
-                String sql = Utils.convertStreamToString(is);
+                String sql = JUtils.convertStreamToString(is);
                 if (sql != null && sql.indexOf("#") == -1) { // escludo le righe coi commenti
-                    List<String> cmds = Utils.splitSqlScript(sql, ';');
+                    List<String> cmds = JUtils.splitSqlScript(sql, ';');
                     for (String cmd : cmds) {
                         Log.d(TAG, "cmd=" + cmd);
                         if (cmd.trim().length() > 0) {
@@ -571,13 +571,13 @@ class SQLiteAssetHelper extends SQLiteOpenHelper {
             File f = new File(DB_PATH + "/");
             if (!f.exists()) { f.mkdirs(); }
             if (isZip) {
-                ZipInputStream zis = Utils.getFileFromZip(is);
+                ZipInputStream zis = JUtils.getFileFromZip(is);
                 if (zis == null) {
                     throw new SQLiteAssetException("Archive is missing a SQLite database file");
                 }
-                Utils.writeExtractedFileToDisk(zis, new FileOutputStream(dest));
+                JUtils.writeExtractedFileToDisk(zis, new FileOutputStream(dest));
             } else {
-                Utils.writeExtractedFileToDisk(is, new FileOutputStream(dest));
+                JUtils.writeExtractedFileToDisk(is, new FileOutputStream(dest));
             }
 
             Log.w(TAG, "database copy complete");
@@ -2143,7 +2143,7 @@ class VersionComparator implements Comparator<String> {
 }
 
 //[by renabor]
-class Utils {
+class JUtils {
 
     private static final String TAG = SQLiteAssetHelper.class.getSimpleName();
 
