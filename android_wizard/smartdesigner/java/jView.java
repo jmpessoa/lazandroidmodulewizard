@@ -1,4 +1,4 @@
-package com.example.appdemo1;
+package org.lamw.applamwprojecttt1;
 
 import java.io.FileOutputStream;
 
@@ -67,8 +67,8 @@ public class jView extends View {
 	}
 
 	//
-	public void SetjCanvas(java.lang.Object canvas) {
-		jcanvas = (jCanvas)canvas;
+	public void SetjCanvas(java.lang.Object _canvas) {
+		jcanvas = (jCanvas)_canvas;
 	}
 	
 	public void SetLayerType(int _value) {
@@ -132,8 +132,10 @@ public class jView extends View {
 	//
 	@Override
 	public  void onDraw( Canvas canvas) {
-		jcanvas.setCanvas(canvas);
-		controls.pOnDraw(PasObj); // improvement required
+		if (jcanvas != null) {
+			jcanvas.setCanvas(canvas);
+			controls.pOnDraw(PasObj); // improvement required
+		}
 	}
 
 	public void saveView( String sFileName ) {

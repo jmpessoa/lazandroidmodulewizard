@@ -1,4 +1,4 @@
-package org.lamw.appdrawinginbitmap;
+package org.lamw.applamwprojecttt1;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -276,7 +276,7 @@ public class jCanvas {
 		
     	innerBitmap = Bitmap.createBitmap(_width,_height, Bitmap.Config.ARGB_8888); //Returns a mutable bitmap
     	
-    	if( innerBitmap == null ) return null;
+    	if( innerBitmap == null ){ return null;}
     	    	    
         mTextPaint.setTextSize(scale*mTextPaint.getTextSize()); //default 12    	
     	
