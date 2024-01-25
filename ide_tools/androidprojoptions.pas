@@ -1816,8 +1816,9 @@ begin
   if cbIndex >= 0 then
     cbChipset.ItemIndex := cbIndex;
 
-  CheckBoxSupport.Checked:=(LazarusIDE.ActiveProject.CustomData['Support']='TRUE');
-
+  //CheckBoxSupport.Checked:=(LazarusIDE.ActiveProject.CustomData['Support']='TRUE');
+  CheckBoxSupport.Checked := true;
+  
   FMinSdk       := proj.CustomData['MinSdk'];
   FTargetSdk    := proj.CustomData['TargetSdk'];
   FAndroidTheme := proj.CustomData['Theme'];
