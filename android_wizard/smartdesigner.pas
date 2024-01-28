@@ -2474,13 +2474,16 @@ begin
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar') then
    begin
-     auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar');
-     //ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
-     for i:= 0 to  auxList.Count-1 do
+     if (not isGradle) or (not FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.dependencies')) then
      begin
-       CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libjar' + DirectorySeparator + auxList.Strings[i],
-            FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
-     end;
+       auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates + jclassname+'.libjar');
+       //ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'anim');
+       for i:= 0 to  auxList.Count-1 do
+       begin
+         CopyFile(LamwGlobalSettings.PathToJavaTemplates + 'libjar' + DirectorySeparator + auxList.Strings[i],
+              FPathToAndroidProject+'libs'+DirectorySeparator+auxList.Strings[i]);
+       end;
+     end
    end;
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates + jclassname + '.libso') then //jBarcodeScannerView.libso
