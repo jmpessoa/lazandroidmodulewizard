@@ -3977,16 +3977,20 @@ function NextPos(delimiter: char; initialPos: integer; str: string): integer;
 var
  i, count: integer;
 begin
- i:= initialPos + 1;
- count:= Length(str);
- while (str[i] <> delimiter) and (i <= count) do
- begin
-     i:= i + 1;
- end;
- if str[i] = delimiter then
-   Result:=i
- else
-   Result:= initialPos;
+   i:= initialPos + 1;
+   count:= Length(str);
+   
+   if (str <> '') then
+   begin
+     while (str[i] <> delimiter) and (i <= count) do
+     begin
+       i:= i + 1;
+     end;
+     if str[i] = delimiter then
+       Result:=i
+     else
+       Result:= initialPos;
+   end;
 end;
 
 initialization
