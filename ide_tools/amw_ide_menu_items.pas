@@ -298,6 +298,10 @@ begin
         15: Result:= 'android-28';
         16: Result:= 'android-29';
         17: Result:= 'android-30';
+        18: Result:= 'android-31';
+        19: Result:= 'android-32';
+        20: Result:= 'android-33';
+        21: Result:= 'android-34';
      end;
   end;
 end;
@@ -741,9 +745,6 @@ var
   ini_string_result: string;
   
 begin
-
-
-
   Project:= LazarusIDE.ActiveProject;
   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '' ) then
   begin
@@ -769,8 +770,6 @@ begin
 		   libChip:= 'x86_64'
 		else   
 		libChip:= 'arm'; //dummy
-				
-
        end;
 
        pathToNdk:= Project.CustomData.Values['NdkPath'];  //<Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
@@ -779,10 +778,8 @@ begin
        p:= Pos(DirectorySeparator+'jni', Project.ProjectInfoFile);
        pathToProject:= Copy(Project.ProjectInfoFile, 1, p);
 
-
       with TIniFile.Create(pathToProject+'jni'+DirectorySeparator + 'ImportCStuff.ini') do
-      try	
-		
+      try
         ini_string_result := ReadString('ImportCStuff', 'EditImportC', '');
         if (CompareStr(FormImportCStuff.EditImportC.Text, ini_string_result) <> 0) then
         begin
@@ -807,7 +804,6 @@ begin
            WriteBool('ImportCStuff', 'CheckBoxAllH', FormImportCStuff.CheckBoxAllH.Checked);
         end;		
 
-		
         ini_string_result := ReadString('ImportCStuff', 'EditLibName', '');
         if (CompareStr(FormImportCStuff.EditLibName.Text, ini_string_result) <> 0) then
         begin
@@ -831,8 +827,6 @@ begin
         Free;
       end;
 
-
-
        pathToImportCcode:= Trim(FormImportCStuff.EditImportC.Text);
        pathToImportHCode:= Trim(FormImportCStuff.EditImportH.Text);
 
@@ -849,7 +843,7 @@ begin
        listBackup:= FindAllFiles(pathToNewLib, '*.so', False);
 
        listSaveTo:= TStringList.Create;
-       //------------------
+
        if pathToImportHcode <> '' then
        begin
           list:= FindAllFiles(pathToImportHcode, '*.h', False);
@@ -892,7 +886,7 @@ begin
           end;
           list.Free;
        end;
-       //--------------------------
+
        if pathToImportCcode <> '' then
        begin
          list:= FindAllFiles(pathToImportCcode, '*.c', False);
@@ -2417,15 +2411,12 @@ begin
         end;
       end;
     end;
-
     ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
                 'Hints:'+ sLineBreak +
                 '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +
                 '.(Re)"Open" the project to update the form display content ...' + sLineBreak +
                 '      Or close the form unit tab and reopen it [Project Inspector...]'+ sLineBreak +
                 '      to see the content changes...');
-
-
   end
   else
   begin
@@ -2489,7 +2480,6 @@ begin
                end;
            end;
          end;
-
          ShowMessage('Sucess!! Imported form LAMW Stuff !!' +sLineBreak +
                     'Hints:'+ sLineBreak +
                     '.For each import,  "Run --> Build" and accept "Reload checked files from disk" !' + sLineBreak +

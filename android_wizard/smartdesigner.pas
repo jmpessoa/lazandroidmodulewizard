@@ -129,12 +129,10 @@ type
 
   end;
 
-  // tk ReplaceChar made public
   function ReplaceChar(const query: string; oldchar, newchar: char): string;
-  // end tk
   function IsAllCharNumber(pcString: PChar): Boolean;
-
   function TrimChar(query: string; delimiter: char): string;
+  function NextPos(delimiter: char; initialPos: integer; str: string): integer;
 
 var
   LamwSmartDesigner: TLamwSmartDesigner;
@@ -1569,7 +1567,6 @@ var
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
-
     FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
     FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
     FPathToJavaJDK:=     LamwGlobalSettings.PathToJavaJDK;    //Included Path Delimiter!
@@ -2049,7 +2046,7 @@ var
   tempMinSdk: integer;
   isGradle : boolean;
   LenInsertRef, LenInsertRefVer: integer;
-
+  strTrim, msgIdeHint: string;
 begin
    nativeAdded:= False;
    Result:= False;
@@ -2243,6 +2240,52 @@ begin
          end;
        end;
      end;
+   end;
+
+   //try insert reference required by the jControl in AndroidManifest ..
+   if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dangerous')then  //dangerous permission
+   begin
+      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.dangerous');
+      if auxList.Count > 0 then
+      begin
+        insertRef:= '<uses-permission android';   //insert reference point
+        manifestList.LoadFromFile(FPathToAndroidProject+'AndroidManifest.xml');
+        aux:= manifestList.Text;
+
+        list.Clear;
+        for i:= 0 to auxList.Count-1 do
+        begin
+          strTrim:= Trim(auxList.Strings[i]);
+          p1:= Pos('"',strTrim);
+          p2:=NextPos('"', p1, strTrim);
+          msgIdeHint:= Copy(strTrim, p1+1, p2-(p1+1));
+          IDEMessagesWindow.AddCustomMessage(mluHint, 'Manifest dangerous permission: "' +
+                                             msgIdeHint + '" needs to be handled in the code...');
+
+          if Pos(strTrim, aux) <= 0 then  //not duplicate..
+              list.Add(strTrim);
+        end;
+        if list.Count > 0 then
+        begin
+          p1:= Pos(insertRef, aux);
+          p2:= p1 + Length(insertRef);
+          c:= aux[p2];
+          while c <> '>' do
+          begin
+             Inc(p2);
+             c:= aux[p2];
+          end;
+          Inc(p2);
+          insertRef:= Trim(Copy(aux, p1, p2-p1));
+          p1:= Pos(insertRef, aux);
+          if Length(list.Text) >  10 then  //dummy
+          begin
+            Insert(sLineBreak + Trim(list.Text), aux, p1+Length(insertRef) );
+            manifestList.Text:= aux;
+            manifestList.SaveToFile(FPathToAndroidProject+'AndroidManifest.xml');
+          end;
+        end;
+      end;
    end;
 
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.feature') then
@@ -3341,6 +3384,7 @@ begin
   end;
 
   UpdateProjectLpr(lprModuleName, FStartModuleVarName);
+
 end;
 
 destructor TLamwSmartDesigner.Destroy;
@@ -3927,6 +3971,22 @@ begin
       end;
       Result:= Trim(auxStr);
   end;
+end;
+
+function NextPos(delimiter: char; initialPos: integer; str: string): integer;
+var
+ i, count: integer;
+begin
+ i:= initialPos + 1;
+ count:= Length(str);
+ while (str[i] <> delimiter) and (i <= count) do
+ begin
+     i:= i + 1;
+ end;
+ if str[i] = delimiter then
+   Result:=i
+ else
+   Result:= initialPos;
 end;
 
 initialization
