@@ -3980,7 +3980,7 @@ begin
    i:= initialPos + 1;
    count:= Length(str);
    
-   if (str <> '') then
+   if not (str.IsEmpty) then
    begin
      while (str[i] <> delimiter) and (i <= count) do
      begin
