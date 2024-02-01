@@ -20,6 +20,7 @@ type
 
   TApkBuilder = class
   private
+    FSaveDevice: TStringList;
     FProj: TLazProject;
     FSdkPath, FJdkPath, FNdkPath: string;
     FAntPath, FGradlePath: string;
@@ -35,11 +36,15 @@ type
     {$ifdef Emulator}
     procedure BringToFrontEmulator;
     {$endif}
+    function GetAdbPath: String;
     function CheckAvailableDevices: Boolean;
     procedure CleanUp;
     function GetManifestSdkTarget(out SdkTarget: string): Boolean;
     procedure LoadPaths;
     function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
+    function GetModel(numberDevice: String): String;
+    function GetAbi(abi: String): String;
+    function GetManufacturer(manufacturerDevice: String): String;
     function TryFixPaths: TModalResult;
 
     function FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
@@ -312,43 +317,7 @@ begin
     FAntPath := LamwGlobalSettings.PathToAntBin;
 end;
 
-function TApkBuilder.RunAndGetOutput(const cmd, params: string;
-  Aout: TStrings): Integer;
-var
-  i, t: Integer;
-  ms: TMemoryStream;
-  buf: array [0..255] of Byte;
-begin
-  with TProcessUTF8.Create(nil) do
-  try
-    Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
-    Executable := cmd;
-    Parameters.Text := params;
-    ShowWindow := swoHIDE;
-    Execute;
-    ms := TMemoryStream.Create;
-    try
-      t := Output.NumBytesAvailable;
-      while t > 0 do
-      begin
-        i := Output.Read(buf{%H-}, SizeOf(buf));
-        if i > 0 then
-        begin
-          ms.Write(buf, i);
-          t := t - i
-        end else
-          Break;
-      end;
-      ms.Position := 0;
-      Aout.LoadFromStream(ms);
-    finally
-      ms.Free;
-    end;
-    Result := ExitCode;
-  finally
-    Free;
-  end;
-end;
+
 
 function TApkBuilder.GetManifestSdkTarget(out SdkTarget: string): Boolean;
 var
@@ -756,54 +725,212 @@ begin
 end;
 {$endif}
 
+function TApkBuilder.GetAdbPath: String;
+begin
+  Result := IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools'
+      + PathDelim + 'adb';
+end;
+
+function TApkBuilder.RunAndGetOutput(const cmd, params: string;
+  Aout: TStrings): Integer;
+var
+  i: Integer;
+  adb: TProcessUTF8;
+  devicesString: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
+  try
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := cmd;
+    adb.Parameters.Text := params;
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    Aout.LoadFromStream(adb.Output);
+    Aout.Delete(0);
+    Aout.Delete(Aout.Count-1);
+
+    for i:=0 to Aout.Count-1 do
+    begin
+      Aout[i] := StringReplace(Aout[i], 'device', '', [rfReplaceAll]);
+      Aout[i] := Trim(Aout[i]);
+    end;
+  finally
+    adb.Free;
+  end;
+end;
+
+function TApkBuilder.GetManufacturer(manufacturerDevice: String): String;
+var
+  adb: TProcessUTF8;
+  manufacturer: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
+  try
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := GetAdbPath;
+    adb.Parameters.Add('-s');
+    adb.Parameters.Add(manufacturerDevice);
+    adb.Parameters.Add('shell');
+    adb.Parameters.Add('getprop');
+    adb.Parameters.Add('ro.product.manufacturer');
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    manufacturer := TStringList.Create;
+    manufacturer.LoadFromStream(adb.Output);
+    Result := manufacturer[0];
+  finally
+    adb.Free;
+    manufacturer.Free;
+  end;
+end;
+
+function TApkBuilder.GetModel(numberDevice: String): String;
+var
+  adb: TProcessUTF8;
+  model: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
+  try
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := GetAdbPath;
+    adb.Parameters.Add('-s');
+    adb.Parameters.Add(numberDevice);
+    adb.Parameters.Add('shell');
+    adb.Parameters.Add('getprop');
+    adb.Parameters.Add('ro.product.model');
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    model := TStringList.Create;
+    model.LoadFromStream(adb.Output);
+    Result := model[0];
+  finally
+    adb.Free;
+    model.Free;
+  end;
+end;
+
+function TApkBuilder.GetAbi(abi: String): String;
+var
+  adb: TProcessUTF8;
+  model: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
+  try
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := GetAdbPath;
+    adb.Parameters.Add('-s');
+    adb.Parameters.Add(abi);
+    adb.Parameters.Add('shell');
+    adb.Parameters.Add('getprop');
+    adb.Parameters.Add('ro.product.cpu.abi');
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    model := TStringList.Create;
+    model.LoadFromStream(adb.Output);
+    Result := model[0];
+  finally
+    adb.Free;
+    model.Free;
+  end;
+end;
+
 function TApkBuilder.CheckAvailableDevices: Boolean;
 var
-  sl, devs: TStringList;
-  i: Integer;
-  dev, NeedReget: Boolean;
-  str: string;
+  devices: TStringList;
+  smallProjectName, deviceNumber, auxPath: String;
+  i, p, index: Integer;
+  choiceDevice: TTaskDialog;
+  adbInstall, adbUninstall: TProcessUTF8;
 begin
-  sl := TStringList.Create;
-  devs := TStringList.Create;
+  devices := TStringList.Create;
   try
-    repeat
-      NeedReget := False;
-      sl.Clear;
-      RunAndGetOutput(IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools'
-        + PathDelim + 'adb', 'devices', sl);
-      dev := False;
-      for i := 0 to sl.Count - 1 do
-      begin
-        str := Trim(sl[i]);
-        if str = '' then Continue;
-        if str[1] = '*' then
+    RunAndGetOutput(GetAdbPath, 'devices', devices);
+
+    if devices.Count = 0 then
+    begin
+      with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
+      try
+        if ShowModal = mrCancel then Exit(False);
+      finally
+        Free;
+      end
+    end;
+
+    if devices.Count = 1 then;
+    begin
+      FDevice := devices[0];
+    end;
+
+    if devices.Count > 1 then
+    begin
+      choiceDevice := TTaskDialog.Create(nil);
+      FSaveDevice := TStringList.Create;
+      try
+        for i:=0 to devices.Count -1 do
         begin
-          NeedReget := True;
-          Break;
+          FSaveDevice.AddPair(i.ToString, devices[i]);
+          choiceDevice.RadioButtons.Add.Caption := format('%s - %s', [GetManufacturer(devices[i]) ,GetModel(devices[i])]);
         end;
-        if dev then
-          devs.Add(str)
-        else
-        if Pos('List ', str) = 1 then
-          dev := True;
+
+        FSaveDevice.AddPair((i+1).ToString, 'all');
+        choiceDevice.RadioButtons.Add.Caption := 'All Devices';
+
+        if choiceDevice.Execute then
+        begin
+          if choiceDevice.ModalResult = mrOK then
+          begin
+            adbUninstall := TProcessUTF8.Create(nil);
+            adbInstall := TProcessUTF8.Create(nil);
+
+            index := choiceDevice.RadioButton.Index;
+            deviceNumber := FSaveDevice.ValueFromIndex[index];
+
+            auxPath:= Copy(FProjPath, 1, Length(FProjPath)-1);
+            p:= LastDelimiter(PathDelim,auxPath);
+            smallProjectName:= Copy(auxPath, p+1 , MaxInt);
+
+            adbUninstall.Options := [poUsePipes, poNoConsole];
+            adbUninstall.Executable := GetAdbPath;
+            adbUninstall.Parameters.Add('-s');
+            adbUninstall.Parameters.Add(deviceNumber);
+            adbUninstall.Parameters.Add('uninstall');;
+            adbUninstall.Parameters.Add(GetPackageName);
+            adbUninstall.Execute;
+
+            adbInstall.Options := [poUsePipes, poNoConsole];
+            adbInstall.Executable := GetAdbPath;
+            adbInstall.Parameters.Add('-s');
+            adbInstall.Parameters.Add(deviceNumber);
+            adbInstall.Parameters.Add('install');
+            adbInstall.Parameters.Add(FProjPath + 'build'+ PathDelim + 'outputs' + PathDelim + 'apk'
+            + PathDelim + 'debug' + PathDelim + smallProjectName + '-' + GetAbi(deviceNumber) + '-debug.apk');
+            adbInstall.Execute;
+
+            adbUninstall.Free;
+            adbInstall.Free;
+
+            Result := True;
+            Exit;
+          end;
+          if choiceDevice.ModalResult = mrCancel then
+          begin
+            Result := False;
+            Exit;
+          end;
+        end;
+      finally
+        FSaveDevice.Free;
+        choiceDevice.Free;
       end;
-      if NeedReget then Continue;
-      if devs.Count = 0 then
-        with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
-        try
-          if ShowModal = mrCancel then Exit(False);
-        finally
-          Free;
-        end
-      else
-      if devs.Count > 1 then
-        break;//todo: ChooseDevice(devs);
-    until devs.Count = 1;
-    FDevice := devs[0];
-    Result := True;
+      FDevice := devices[0];
+    end;
+    Result := False;
   finally
-    devs.Free;
-    sl.Free;
+    devices.Free;
   end;
 end;
 
@@ -897,8 +1024,10 @@ end;
 procedure TApkBuilder.RunAPK;
 begin
   if FProj.CustomData['BuildSystem'] = 'Gradle' then
+  begin
     RunByGradle
-  else begin
+  end else
+  begin
     if not InstallByAnt then
       raise Exception.Create('Cannot install APK');
     RunByAdb;
@@ -986,8 +1115,13 @@ procedure TApkBuilder.RunByGradle;
 var
   Tool: TIDEExternalToolOptions;
 begin
+  if CheckAvailableDevices then
+  begin
+    FApkRun := True;
+    Exit;
+  end;
+
   FApkRun := False;
-  if not CheckAvailableDevices then Exit;
   Tool := TIDEExternalToolOptions.Create;
   try
     Tool.Title := 'Starting APK (Gradle)... ';
@@ -1398,8 +1532,8 @@ begin
   end;
 end;
 
-function  TApkBuilder.PullAppsProc(PullNames:Array of String;
-                                   DestPath :         String):Boolean;
+function TApkBuilder.PullAppsProc(PullNames: array of String; DestPath: String
+  ): Boolean;
 var   I:Integer;
 begin
        Result := True;
@@ -1584,6 +1718,8 @@ begin
     end;
      abApkBuilder         := Nil;
 end;
+
+
 
 
 procedure RegisterExtToolParser;
