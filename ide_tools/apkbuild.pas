@@ -38,6 +38,7 @@ type
     {$endif}
     function GetAdbPath: String;
     function CheckAvailableDevices: Boolean;
+    function RunCommandAdb(deviceNumber: String): Boolean;
     procedure CleanUp;
     function GetManifestSdkTarget(out SdkTarget: string): Boolean;
     procedure LoadPaths;
@@ -160,7 +161,6 @@ var
   collectSdkPlatforms: boolean;
   api: string;
 begin
-
   collectSdkPlatforms:= False;
   if Pos('platforms'+PathDelim+'android-',PathMask) > 0 then collectSdkPlatforms:= True;
 
@@ -817,34 +817,58 @@ var
   adb: TProcessUTF8;
   model: TStringList;
 begin
-  adb := TProcessUTF8.Create(nil);
-  try
-    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
-    adb.Executable := GetAdbPath;
-    adb.Parameters.Add('-s');
-    adb.Parameters.Add(abi);
-    adb.Parameters.Add('shell');
-    adb.Parameters.Add('getprop');
-    adb.Parameters.Add('ro.product.cpu.abi');
-    adb.ShowWindow := swoHIDE;
-    adb.Execute;
+  //adb := TProcessUTF8.Create(nil);
+  //try
+  //  adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+  //  adb.Executable := GetAdbPath;
+  //  adb.Parameters.Add('-s');
+  //  adb.Parameters.Add(abi);
+  //  adb.Parameters.Add('shell');
+  //  adb.Parameters.Add('getprop');
+  //  adb.Parameters.Add('ro.product.cpu.abi');
+  //  adb.ShowWindow := swoHIDE;
+  //  adb.Execute;
+  //
+  //  model := TStringList.Create;
+  //  model.LoadFromStream(adb.Output);
+  //  Result := model[0];
+  //finally
+  //  adb.Free;
+  //  model.Free;
+  //end;
+end;
 
-    model := TStringList.Create;
-    model.LoadFromStream(adb.Output);
-    Result := model[0];
-  finally
-    adb.Free;
-    model.Free;
+function TApkBuilder.RunCommandAdb(deviceNumber: String): Boolean;
+var
+  s, smallProjectName, auxPath, apkPath: String;
+  p: integer;
+begin
+  auxPath:= Copy(FProjPath, 1, Length(FProjPath)-1);
+  p:= LastDelimiter(PathDelim,auxPath);
+  smallProjectName:= Copy(auxPath, p+1 , MaxInt);
+
+  apkPath := FProjPath + 'build'+ PathDelim + 'outputs' + PathDelim + 'apk'
+  + PathDelim + 'debug' + PathDelim + smallProjectName + '-' + 'armeabi-v7a' + '-debug.apk';
+
+  RunCommand(GetAdbPath, ['-s', deviceNumber, 'uninstall', GetPackageName],
+  s, [poUsePipes, poNoConsole]);
+
+  if RunCommand(GetAdbPath, ['-s', deviceNumber, 'install', apkPath],
+  s, [poUsePipes, poNoConsole]) then
+  begin
+    RunCommand(GetAdbPath, ['-s', deviceNumber, 'shell', 'monkey', '-p',
+    GetPackageName, '-c', 'android.intent.category.LAUNCHER', '1'], s,
+    [poUsePipes, poNoConsole]);
   end;
+
 end;
 
 function TApkBuilder.CheckAvailableDevices: Boolean;
 var
   devices: TStringList;
-  smallProjectName, deviceNumber, auxPath: String;
-  i, p, index: Integer;
+  deviceNumber: String;
+  i, index: Integer;
   choiceDevice: TTaskDialog;
-  adbInstall, adbUninstall: TProcessUTF8;
 begin
   devices := TStringList.Create;
   try
@@ -875,7 +899,6 @@ begin
           FSaveDevice.AddPair(i.ToString, devices[i]);
           choiceDevice.RadioButtons.Add.Caption := format('%s - %s', [GetManufacturer(devices[i]) ,GetModel(devices[i])]);
         end;
-
         FSaveDevice.AddPair((i+1).ToString, 'all');
         choiceDevice.RadioButtons.Add.Caption := 'All Devices';
 
@@ -883,39 +906,24 @@ begin
         begin
           if choiceDevice.ModalResult = mrOK then
           begin
-            adbUninstall := TProcessUTF8.Create(nil);
-            adbInstall := TProcessUTF8.Create(nil);
-
             index := choiceDevice.RadioButton.Index;
             deviceNumber := FSaveDevice.ValueFromIndex[index];
 
-            auxPath:= Copy(FProjPath, 1, Length(FProjPath)-1);
-            p:= LastDelimiter(PathDelim,auxPath);
-            smallProjectName:= Copy(auxPath, p+1 , MaxInt);
-
-            adbUninstall.Options := [poUsePipes, poNoConsole];
-            adbUninstall.Executable := GetAdbPath;
-            adbUninstall.Parameters.Add('-s');
-            adbUninstall.Parameters.Add(deviceNumber);
-            adbUninstall.Parameters.Add('uninstall');;
-            adbUninstall.Parameters.Add(GetPackageName);
-            adbUninstall.Execute;
-
-            adbInstall.Options := [poUsePipes, poNoConsole];
-            adbInstall.Executable := GetAdbPath;
-            adbInstall.Parameters.Add('-s');
-            adbInstall.Parameters.Add(deviceNumber);
-            adbInstall.Parameters.Add('install');
-            adbInstall.Parameters.Add(FProjPath + 'build'+ PathDelim + 'outputs' + PathDelim + 'apk'
-            + PathDelim + 'debug' + PathDelim + smallProjectName + '-' + GetAbi(deviceNumber) + '-debug.apk');
-            adbInstall.Execute;
-
-            adbUninstall.Free;
-            adbInstall.Free;
+            if deviceNumber = 'all' then
+            begin
+              for i:=0 to devices.Count-1 do
+              begin
+                RunCommandAdb(FSaveDevice.ValueFromIndex[i]);
+              end;
+            end else
+            begin
+              RunCommandAdb(deviceNumber);
+            end;
 
             Result := True;
             Exit;
           end;
+
           if choiceDevice.ModalResult = mrCancel then
           begin
             Result := False;
