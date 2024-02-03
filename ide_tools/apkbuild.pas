@@ -747,14 +747,25 @@ begin
     adb.Execute;
 
     Aout.LoadFromStream(adb.Output);
-    Aout.Delete(0);
     Aout.Delete(Aout.Count-1);
+
+    i := 0;
+    while (i < Aout.Count) do
+    begin
+      if Aout[i].Contains('*') or Aout[i].Contains('List') then
+      begin
+        Aout.Delete(i);
+        Continue;
+      end;
+      i := i + 1;
+    end;
 
     for i:=0 to Aout.Count-1 do
     begin
       Aout[i] := StringReplace(Aout[i], 'device', '', [rfReplaceAll]);
       Aout[i] := Trim(Aout[i]);
     end;
+
   finally
     adb.Free;
   end;
@@ -883,11 +894,12 @@ begin
         Free;
       end
     end;
-
-    if devices.Count = 1 then;
-    begin
-      FDevice := devices[0];
-    end;
+    //if devices.Count = 1 then;
+    //begin
+    //  ShowMessage('aqui - ' + devices.Count.ToString);
+    //  //FDevice := devices[0];
+    //  RunCommandAdb(devices[0]);
+    //end;
 
     if devices.Count > 1 then
     begin
@@ -926,7 +938,7 @@ begin
 
           if choiceDevice.ModalResult = mrCancel then
           begin
-            Result := False;
+            Result := True;
             Exit;
           end;
         end;
@@ -934,13 +946,58 @@ begin
         FSaveDevice.Free;
         choiceDevice.Free;
       end;
-      FDevice := devices[0];
+      //FDevice := devices[0];
     end;
     Result := False;
   finally
     devices.Free;
   end;
 end;
+
+
+procedure TApkBuilder.RunByGradle;
+var
+  Tool: TIDEExternalToolOptions;
+begin
+  if CheckAvailableDevices then
+  begin
+    FApkRun := True;
+    Exit;
+  end;
+
+  FApkRun := False;
+  Tool := TIDEExternalToolOptions.Create;
+  try
+    Tool.Title := 'Starting APK (Gradle)... ';
+    Tool.EnvironmentOverrides.Add('GRADLE_HOME=' + FGradlePath);
+    Tool.EnvironmentOverrides.Add('PATH=' + GetEnvironmentVariable('PATH')
+      + PathSep + FSdkPath + 'platform-tools'
+      + PathSep + FGradlePath + 'bin');
+    Tool.WorkingDirectory := FProjPath;
+    Tool.Executable := FGradlePath + 'bin' + PathDelim + 'gradle'{$ifdef windows}+'.bat'{$endif};
+    if not FileExists(Tool.Executable) then
+      raise Exception.CreateFmt('Gradle (%s) not found! Check path settings', [Tool.Executable]);
+    Tool.CmdLineParams := 'run';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolGradle);
+    {$ELSE}
+    Tool.Scanners.Add(SubToolGradle);
+    {$ENDIF}
+
+    If Not RunExternalTool(Tool) then raise Exception.Create('Cannot run APK!');
+    FApkRun := True;
+  finally
+    Tool.Free;
+    //total clean up!
+    CleanUp;
+  end;
+end;
+
 
 procedure TApkBuilder.CleanUp;
 var
@@ -1116,49 +1173,6 @@ begin
     Result := True;
   finally
     Tool.Free;
-  end;
-end;
-
-procedure TApkBuilder.RunByGradle;
-var
-  Tool: TIDEExternalToolOptions;
-begin
-  if CheckAvailableDevices then
-  begin
-    FApkRun := True;
-    Exit;
-  end;
-
-  FApkRun := False;
-  Tool := TIDEExternalToolOptions.Create;
-  try
-    Tool.Title := 'Starting APK (Gradle)... ';
-    Tool.EnvironmentOverrides.Add('GRADLE_HOME=' + FGradlePath);
-    Tool.EnvironmentOverrides.Add('PATH=' + GetEnvironmentVariable('PATH')
-      + PathSep + FSdkPath + 'platform-tools'
-      + PathSep + FGradlePath + 'bin');
-    Tool.WorkingDirectory := FProjPath;
-    Tool.Executable := FGradlePath + 'bin' + PathDelim + 'gradle'{$ifdef windows}+'.bat'{$endif};
-    if not FileExists(Tool.Executable) then
-      raise Exception.CreateFmt('Gradle (%s) not found! Check path settings', [Tool.Executable]);
-    Tool.CmdLineParams := 'run';
-    // tk Required for Lazarus >=1.7 to capture output correctly
-{$if lcl_fullversion >= 1070000}
-    Tool.ShowConsole := True;
-{$endif}
-    // end tk
-    {$IF LCL_FULLVERSION >= 2010000}
-    Tool.Parsers.Add(SubToolGradle);
-    {$ELSE}
-    Tool.Scanners.Add(SubToolGradle);
-    {$ENDIF}
-
-    If Not RunExternalTool(Tool) then raise Exception.Create('Cannot run APK!');
-    FApkRun := True;
-  finally
-    Tool.Free;
-    //total clean up!
-    CleanUp;
   end;
 end;
 
