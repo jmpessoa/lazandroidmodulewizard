@@ -152,7 +152,7 @@ procedure Register;
 
 implementation
 
-uses Forms, Laz2_XMLCfg;
+uses Forms, Laz2_XMLCfg {$if lcl_fullversion > 2020600}, LazDebuggerIntfBaseTypes {$endif};
 
 resourcestring
   GDBMiSNoAsyncMode = 'GDB does not support async mode';
