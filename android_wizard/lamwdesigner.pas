@@ -2191,7 +2191,8 @@ begin
   begin
     if Acomponent is jControl then
     begin
-      if AComponent.Name.StartsWith(AComponent.ClassName) then
+      //if AComponent.Name.StartsWith(AComponent.ClassName) then
+      if string(AComponent.Name).StartsWith(AComponent.ClassName) then
       begin
           if (AComponent.Name[1] = 'j') or (AComponent.Name[1] = 'J') or (AComponent.Name[1] = 'K') then
           begin
