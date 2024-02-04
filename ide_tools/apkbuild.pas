@@ -853,13 +853,17 @@ function TApkBuilder.RunCommandAdb(deviceNumber: String): Boolean;
 var
   s, smallProjectName, auxPath, apkPath: String;
   p: integer;
+  instructionChip: String;
 begin
   auxPath:= Copy(FProjPath, 1, Length(FProjPath)-1);
   p:= LastDelimiter(PathDelim,auxPath);
   smallProjectName:= Copy(auxPath, p+1 , MaxInt);
 
+  instructionChip:= ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+  instructionChip:= ExtractFileName(instructionChip);  //armeabi-v7a
+
   apkPath := FProjPath + 'build'+ PathDelim + 'outputs' + PathDelim + 'apk'
-  + PathDelim + 'debug' + PathDelim + smallProjectName + '-' + 'armeabi-v7a' + '-debug.apk';
+  + PathDelim + 'debug' + PathDelim + smallProjectName + '-' + instructionChip + '-debug.apk';
 
   RunCommand(GetAdbPath, ['-s', deviceNumber, 'uninstall', GetPackageName],
   s, [poUsePipes, poNoConsole]);
@@ -887,12 +891,12 @@ begin
 
     if devices.Count = 0 then
     begin
-      with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
-      try
-        if ShowModal = mrCancel then Exit(False);
-      finally
-        Free;
-      end
+      //with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
+      //try
+      //  if ShowModal = mrCancel then Exit(False);
+      //finally
+      //  Free;
+      //end
     end;
     //if devices.Count = 1 then;
     //begin
@@ -905,41 +909,68 @@ begin
     begin
       choiceDevice := TTaskDialog.Create(nil);
       FSaveDevice := TStringList.Create;
+
+      choiceDevice.Caption := 'LAMW';
+      choiceDevice.Title := 'Which smartphone do you want to install on?';
       try
         for i:=0 to devices.Count -1 do
         begin
           FSaveDevice.AddPair(i.ToString, devices[i]);
           choiceDevice.RadioButtons.Add.Caption := format('%s - %s', [GetManufacturer(devices[i]) ,GetModel(devices[i])]);
         end;
+
+        FSaveDevice.AddPair((i+1).ToString, 'emulator');
+        choiceDevice.RadioButtons.Add.Caption := 'Emulator';
+
         FSaveDevice.AddPair((i+1).ToString, 'all');
         choiceDevice.RadioButtons.Add.Caption := 'All Devices';
 
-        if choiceDevice.Execute then
+        choiceDevice.ModalResult := mrOk;
+        while choiceDevice.ModalResult <> mrCancel do
         begin
-          if choiceDevice.ModalResult = mrOK then
+          if choiceDevice.Execute then
           begin
-            index := choiceDevice.RadioButton.Index;
-            deviceNumber := FSaveDevice.ValueFromIndex[index];
+            if choiceDevice.ModalResult = mrOK then
+            begin
+              index := choiceDevice.RadioButton.Index;
+              deviceNumber := FSaveDevice.ValueFromIndex[index];
 
-            if deviceNumber = 'all' then
-            begin
-              for i:=0 to devices.Count-1 do
+              if deviceNumber = 'all' then
               begin
-                RunCommandAdb(FSaveDevice.ValueFromIndex[i]);
+                for i:=0 to devices.Count-1 do
+                begin
+                  if FSaveDevice.ValueFromIndex[i] = 'emulator' then
+                  begin
+                    Continue;
+                  end;
+                  RunCommandAdb(FSaveDevice.ValueFromIndex[i]);
+                end;
               end;
-            end else
-            begin
-              RunCommandAdb(deviceNumber);
+
+              if deviceNumber = 'emulator' then
+              begin
+                with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
+                try
+                  if ShowModal = mrCancel then
+                  begin
+                  end;
+                finally
+                  Free;
+                end
+              end else
+              begin
+                RunCommandAdb(deviceNumber);
+              end;
+
+              //Result := True;
+              //Exit;
             end;
 
-            Result := True;
-            Exit;
-          end;
-
-          if choiceDevice.ModalResult = mrCancel then
-          begin
-            Result := True;
-            Exit;
+            if choiceDevice.ModalResult = mrCancel then
+            begin
+              Result := True;
+              Exit;
+            end;
           end;
         end;
       finally
