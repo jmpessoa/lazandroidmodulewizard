@@ -36,71 +36,53 @@ type
     {$ifdef Emulator}
     procedure BringToFrontEmulator;
     {$endif}
+    procedure CleanUp;
+    procedure LoadPaths;
+    procedure RunByAdb;
+    procedure RunByGradle;
+    procedure DoBeforeBuildApk;
+    procedure DoAfterRunApk;
+    procedure StartNewGdbServer(Proj, Port : String);
+
     function GetAdbPath: String;
     function CheckAvailableDevices: Boolean;
     function RunCommandAdb(deviceNumber: String): Boolean;
-    procedure CleanUp;
     function GetManifestSdkTarget(out SdkTarget: string): Boolean;
-    procedure LoadPaths;
     function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
     function GetModel(numberDevice: String): String;
-    function GetAbi(abi: String): String;
+
     function GetManufacturer(manufacturerDevice: String): String;
     function TryFixPaths: TModalResult;
-
     function FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
     function FixAntConfig(ForceFixPaths: Boolean): TModalResult;
-
     function BuildByAnt: Boolean;
     function InstallByAnt: Boolean;
-    procedure RunByAdb;
-
     function BuildByGradle: Boolean;
-    procedure RunByGradle;
 
-    procedure DoBeforeBuildApk;
-    procedure DoAfterRunApk;
+    function  GetTargetCpuAbiList: Boolean;
+    function  GetTargetBuildVersionSdk(var VerSdk: Integer) : Boolean;
+    function  GetPackageName: String;
+    function  GetAdbExecutable: String;
+    function  GetGdbSolibSearchPath: String;
+    function  GetLibCtrlsFileName(var Name: String): Boolean;
+    function  DoAdbCommand(Title: String;Command: String; Parser: String): Boolean;
 
-    function  GetTargetCpuAbiList                                     : Boolean;
-    function  GetTargetBuildVersionSdk(var VerSdk : Integer)          : Boolean;
-    function  GetPackageName                      : String;
-    function  GetAdbExecutable                    : String;
-    function  GetGdbSolibSearchPath               : String;
-    function  GetLibCtrlsFileName     (var Name   : String)           : Boolean;
-
-    function  DoAdbCommand            (Title      : String;
-                                       Command    : String;
-                                       Parser     : String)           : Boolean;
-
-    function  CheckAdbCommand         (ChkCmd     : String)           : Boolean;
-
-    function  Call_PID_scan_pidof     (Proj       : String)           : Boolean;
-
-    function  Call_PID_scan_ps        (Proj       : String;
-                                       Server     : String;
-                                       NewPS      : Boolean)          : Boolean;
-
-    function  AdbPull                 (PullName,
-                                       DestPath   :  String)          : Boolean;
-    function  PullAppsProc            (PullNames  : Array of String;
-                                       DestPath   : String)           : Boolean;
-    function  CopyLibCtrls            (DestPath   : String)           : Boolean;
-    function  CopyGdbServerToLibsDir                                  : Boolean;
-
-    function  SetHostAppFileName      (AppName    : String)           : Boolean;
-
-    function  SetAdbForward           (SrvName    : String;
-                                       SrvPort    : String)           : Boolean;
-
-    function  KillLastGdbServer       (Proj       : String)           : Boolean;
-    procedure StartNewGdbServer       (Proj, Port : String);
-
+    function  CheckAdbCommand(ChkCmd: String): Boolean;
+    function  Call_PID_scan_pidof(Proj: String): Boolean;
+    function  Call_PID_scan_ps(Proj: String; Server: String; NewPS: Boolean): Boolean;
+    function  AdbPull(PullName, DestPath: String): Boolean;
+    function  PullAppsProc(PullNames: Array of String; DestPath: String): Boolean;
+    function  CopyLibCtrls(DestPath: String): Boolean;
+    function  CopyGdbServerToLibsDir: Boolean;
+    function  SetHostAppFileName(AppName: String): Boolean;
+    function  SetAdbForward(SrvName: String; SrvPort: String): Boolean;
+    function  KillLastGdbServer(Proj: String): Boolean;
   public
     constructor Create(AProj: TLazProject);
     function BuildAPK: Boolean;
     procedure RunAPK;
-    property  AdbExecutable                 : String read GetAdbExecutable;
-    property  PackageName                   : String read GetPackageName;
+    property  AdbExecutable: String read GetAdbExecutable;
+    property  PackageName: String read GetPackageName;
   end;
 
 procedure RegisterExtToolParser;
@@ -823,32 +805,6 @@ begin
   end;
 end;
 
-function TApkBuilder.GetAbi(abi: String): String;
-var
-  adb: TProcessUTF8;
-  model: TStringList;
-begin
-  //adb := TProcessUTF8.Create(nil);
-  //try
-  //  adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
-  //  adb.Executable := GetAdbPath;
-  //  adb.Parameters.Add('-s');
-  //  adb.Parameters.Add(abi);
-  //  adb.Parameters.Add('shell');
-  //  adb.Parameters.Add('getprop');
-  //  adb.Parameters.Add('ro.product.cpu.abi');
-  //  adb.ShowWindow := swoHIDE;
-  //  adb.Execute;
-  //
-  //  model := TStringList.Create;
-  //  model.LoadFromStream(adb.Output);
-  //  Result := model[0];
-  //finally
-  //  adb.Free;
-  //  model.Free;
-  //end;
-end;
-
 function TApkBuilder.RunCommandAdb(deviceNumber: String): Boolean;
 var
   s, smallProjectName, auxPath, apkPath: String;
@@ -888,22 +844,6 @@ begin
   devices := TStringList.Create;
   try
     RunAndGetOutput(GetAdbPath, 'devices', devices);
-
-    if devices.Count = 0 then
-    begin
-      //with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
-      //try
-      //  if ShowModal = mrCancel then Exit(False);
-      //finally
-      //  Free;
-      //end
-    end;
-    //if devices.Count = 1 then;
-    //begin
-    //  ShowMessage('aqui - ' + devices.Count.ToString);
-    //  //FDevice := devices[0];
-    //  RunCommandAdb(devices[0]);
-    //end;
 
     if devices.Count > 1 then
     begin
@@ -961,9 +901,6 @@ begin
               begin
                 RunCommandAdb(deviceNumber);
               end;
-
-              //Result := True;
-              //Exit;
             end;
 
             if choiceDevice.ModalResult = mrCancel then
@@ -977,7 +914,6 @@ begin
         FSaveDevice.Free;
         choiceDevice.Free;
       end;
-      //FDevice := devices[0];
     end;
     Result := False;
   finally
