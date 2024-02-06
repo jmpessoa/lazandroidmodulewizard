@@ -20,6 +20,7 @@ type
 
   TApkBuilder = class
   private
+    FSaveDevice: TStringList;
     FProj: TLazProject;
     FSdkPath, FJdkPath, FNdkPath: string;
     FAntPath, FGradlePath: string;
@@ -35,66 +36,53 @@ type
     {$ifdef Emulator}
     procedure BringToFrontEmulator;
     {$endif}
-    function CheckAvailableDevices: Boolean;
     procedure CleanUp;
-    function GetManifestSdkTarget(out SdkTarget: string): Boolean;
     procedure LoadPaths;
-    function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
-    function TryFixPaths: TModalResult;
-
-    function FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
-    function FixAntConfig(ForceFixPaths: Boolean): TModalResult;
-
-    function BuildByAnt: Boolean;
-    function InstallByAnt: Boolean;
     procedure RunByAdb;
-
-    function BuildByGradle: Boolean;
     procedure RunByGradle;
-
     procedure DoBeforeBuildApk;
     procedure DoAfterRunApk;
+    procedure StartNewGdbServer(Proj, Port : String);
 
-    function  GetTargetCpuAbiList                                     : Boolean;
-    function  GetTargetBuildVersionSdk(var VerSdk : Integer)          : Boolean;
-    function  GetPackageName                      : String;
-    function  GetAdbExecutable                    : String;
-    function  GetGdbSolibSearchPath               : String;
-    function  GetLibCtrlsFileName     (var Name   : String)           : Boolean;
+    function GetAdbPath: String;
+    function CheckAvailableDevices: Boolean;
+    function RunCommandAdb(deviceNumber: String): Boolean;
+    function GetManifestSdkTarget(out SdkTarget: string): Boolean;
+    function RunAndGetOutput(const cmd, params: string; Aout: TStrings): Integer;
+    function GetModel(numberDevice: String): String;
 
-    function  DoAdbCommand            (Title      : String;
-                                       Command    : String;
-                                       Parser     : String)           : Boolean;
+    function GetManufacturer(manufacturerDevice: String): String;
+    function TryFixPaths: TModalResult;
+    function FixBuildSystemConfig(ForceFixPaths: Boolean): TModalResult;
+    function FixAntConfig(ForceFixPaths: Boolean): TModalResult;
+    function BuildByAnt: Boolean;
+    function InstallByAnt: Boolean;
+    function BuildByGradle: Boolean;
 
-    function  CheckAdbCommand         (ChkCmd     : String)           : Boolean;
+    function  GetTargetCpuAbiList: Boolean;
+    function  GetTargetBuildVersionSdk(var VerSdk: Integer) : Boolean;
+    function  GetPackageName: String;
+    function  GetAdbExecutable: String;
+    function  GetGdbSolibSearchPath: String;
+    function  GetLibCtrlsFileName(var Name: String): Boolean;
+    function  DoAdbCommand(Title: String;Command: String; Parser: String): Boolean;
 
-    function  Call_PID_scan_pidof     (Proj       : String)           : Boolean;
-
-    function  Call_PID_scan_ps        (Proj       : String;
-                                       Server     : String;
-                                       NewPS      : Boolean)          : Boolean;
-
-    function  AdbPull                 (PullName,
-                                       DestPath   :  String)          : Boolean;
-    function  PullAppsProc            (PullNames  : Array of String;
-                                       DestPath   : String)           : Boolean;
-    function  CopyLibCtrls            (DestPath   : String)           : Boolean;
-    function  CopyGdbServerToLibsDir                                  : Boolean;
-
-    function  SetHostAppFileName      (AppName    : String)           : Boolean;
-
-    function  SetAdbForward           (SrvName    : String;
-                                       SrvPort    : String)           : Boolean;
-
-    function  KillLastGdbServer       (Proj       : String)           : Boolean;
-    procedure StartNewGdbServer       (Proj, Port : String);
-
+    function  CheckAdbCommand(ChkCmd: String): Boolean;
+    function  Call_PID_scan_pidof(Proj: String): Boolean;
+    function  Call_PID_scan_ps(Proj: String; Server: String; NewPS: Boolean): Boolean;
+    function  AdbPull(PullName, DestPath: String): Boolean;
+    function  PullAppsProc(PullNames: Array of String; DestPath: String): Boolean;
+    function  CopyLibCtrls(DestPath: String): Boolean;
+    function  CopyGdbServerToLibsDir: Boolean;
+    function  SetHostAppFileName(AppName: String): Boolean;
+    function  SetAdbForward(SrvName: String; SrvPort: String): Boolean;
+    function  KillLastGdbServer(Proj: String): Boolean;
   public
     constructor Create(AProj: TLazProject);
     function BuildAPK: Boolean;
     procedure RunAPK;
-    property  AdbExecutable                 : String read GetAdbExecutable;
-    property  PackageName                   : String read GetPackageName;
+    property  AdbExecutable: String read GetAdbExecutable;
+    property  PackageName: String read GetPackageName;
   end;
 
 procedure RegisterExtToolParser;
@@ -155,7 +143,6 @@ var
   collectSdkPlatforms: boolean;
   api: string;
 begin
-
   collectSdkPlatforms:= False;
   if Pos('platforms'+PathDelim+'android-',PathMask) > 0 then collectSdkPlatforms:= True;
 
@@ -312,43 +299,7 @@ begin
     FAntPath := LamwGlobalSettings.PathToAntBin;
 end;
 
-function TApkBuilder.RunAndGetOutput(const cmd, params: string;
-  Aout: TStrings): Integer;
-var
-  i, t: Integer;
-  ms: TMemoryStream;
-  buf: array [0..255] of Byte;
-begin
-  with TProcessUTF8.Create(nil) do
-  try
-    Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
-    Executable := cmd;
-    Parameters.Text := params;
-    ShowWindow := swoHIDE;
-    Execute;
-    ms := TMemoryStream.Create;
-    try
-      t := Output.NumBytesAvailable;
-      while t > 0 do
-      begin
-        i := Output.Read(buf{%H-}, SizeOf(buf));
-        if i > 0 then
-        begin
-          ms.Write(buf, i);
-          t := t - i
-        end else
-          Break;
-      end;
-      ms.Position := 0;
-      Aout.LoadFromStream(ms);
-    finally
-      ms.Free;
-    end;
-    Result := ExitCode;
-  finally
-    Free;
-  end;
-end;
+
 
 function TApkBuilder.GetManifestSdkTarget(out SdkTarget: string): Boolean;
 var
@@ -756,56 +707,264 @@ begin
 end;
 {$endif}
 
-function TApkBuilder.CheckAvailableDevices: Boolean;
-var
-  sl, devs: TStringList;
-  i: Integer;
-  dev, NeedReget: Boolean;
-  str: string;
+function TApkBuilder.GetAdbPath: String;
 begin
-  sl := TStringList.Create;
-  devs := TStringList.Create;
+  Result := IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools'
+      + PathDelim + 'adb';
+end;
+
+function TApkBuilder.RunAndGetOutput(const cmd, params: string;
+  Aout: TStrings): Integer;
+var
+  i: Integer;
+  adb: TProcessUTF8;
+  devicesString: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
   try
-    repeat
-      NeedReget := False;
-      sl.Clear;
-      RunAndGetOutput(IncludeTrailingPathDelimiter(FSdkPath) + 'platform-tools'
-        + PathDelim + 'adb', 'devices', sl);
-      dev := False;
-      for i := 0 to sl.Count - 1 do
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := cmd;
+    adb.Parameters.Text := params;
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    Aout.LoadFromStream(adb.Output);
+    Aout.Delete(Aout.Count-1);
+
+    i := 0;
+    while (i < Aout.Count) do
+    begin
+      if Aout[i].Contains('*') or Aout[i].Contains('List') then
       begin
-        str := Trim(sl[i]);
-        if str = '' then Continue;
-        if str[1] = '*' then
-        begin
-          NeedReget := True;
-          Break;
-        end;
-        if dev then
-          devs.Add(str)
-        else
-        if Pos('List ', str) = 1 then
-          dev := True;
+        Aout.Delete(i);
+        Continue;
       end;
-      if NeedReget then Continue;
-      if devs.Count = 0 then
-        with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
-        try
-          if ShowModal = mrCancel then Exit(False);
-        finally
-          Free;
-        end
-      else
-      if devs.Count > 1 then
-        break;//todo: ChooseDevice(devs);
-    until devs.Count = 1;
-    FDevice := devs[0];
-    Result := True;
+      i := i + 1;
+    end;
+
+    for i:=0 to Aout.Count-1 do
+    begin
+      Aout[i] := StringReplace(Aout[i], 'device', '', [rfReplaceAll]);
+      Aout[i] := Trim(Aout[i]);
+    end;
+
   finally
-    devs.Free;
-    sl.Free;
+    adb.Free;
   end;
 end;
+
+function TApkBuilder.GetManufacturer(manufacturerDevice: String): String;
+var
+  adb: TProcessUTF8;
+  manufacturer: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
+  try
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := GetAdbPath;
+    adb.Parameters.Add('-s');
+    adb.Parameters.Add(manufacturerDevice);
+    adb.Parameters.Add('shell');
+    adb.Parameters.Add('getprop');
+    adb.Parameters.Add('ro.product.manufacturer');
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    manufacturer := TStringList.Create;
+    manufacturer.LoadFromStream(adb.Output);
+    Result := manufacturer[0];
+  finally
+    adb.Free;
+    manufacturer.Free;
+  end;
+end;
+
+function TApkBuilder.GetModel(numberDevice: String): String;
+var
+  adb: TProcessUTF8;
+  model: TStringList;
+begin
+  adb := TProcessUTF8.Create(nil);
+  try
+    adb.Options := [poUsePipes, poStderrToOutPut, poWaitOnExit];
+    adb.Executable := GetAdbPath;
+    adb.Parameters.Add('-s');
+    adb.Parameters.Add(numberDevice);
+    adb.Parameters.Add('shell');
+    adb.Parameters.Add('getprop');
+    adb.Parameters.Add('ro.product.model');
+    adb.ShowWindow := swoHIDE;
+    adb.Execute;
+
+    model := TStringList.Create;
+    model.LoadFromStream(adb.Output);
+    Result := model[0];
+  finally
+    adb.Free;
+    model.Free;
+  end;
+end;
+
+function TApkBuilder.RunCommandAdb(deviceNumber: String): Boolean;
+var
+  s, smallProjectName, auxPath, apkPath: String;
+  p: integer;
+  instructionChip: String;
+begin
+  auxPath:= Copy(FProjPath, 1, Length(FProjPath)-1);
+  p:= LastDelimiter(PathDelim,auxPath);
+  smallProjectName:= Copy(auxPath, p+1 , MaxInt);
+
+  instructionChip:= ExtractFileDir(LazarusIDE.ActiveProject.LazCompilerOptions.TargetFilename);
+  instructionChip:= ExtractFileName(instructionChip);  //armeabi-v7a
+
+  apkPath := FProjPath + 'build'+ PathDelim + 'outputs' + PathDelim + 'apk'
+  + PathDelim + 'debug' + PathDelim + smallProjectName + '-' + instructionChip + '-debug.apk';
+
+  RunCommand(GetAdbPath, ['-s', deviceNumber, 'uninstall', GetPackageName],
+  s, [poUsePipes, poNoConsole]);
+
+  if RunCommand(GetAdbPath, ['-s', deviceNumber, 'install', apkPath],
+  s, [poUsePipes, poNoConsole]) then
+  begin
+    RunCommand(GetAdbPath, ['-s', deviceNumber, 'shell', 'monkey', '-p',
+    GetPackageName, '-c', 'android.intent.category.LAUNCHER', '1'], s,
+    [poUsePipes, poNoConsole]);
+  end;
+
+end;
+
+function TApkBuilder.CheckAvailableDevices: Boolean;
+var
+  devices: TStringList;
+  deviceNumber: String;
+  i, index: Integer;
+  choiceDevice: TTaskDialog;
+begin
+  devices := TStringList.Create;
+  try
+    RunAndGetOutput(GetAdbPath, 'devices', devices);
+
+    if devices.Count > 1 then
+    begin
+      choiceDevice := TTaskDialog.Create(nil);
+      FSaveDevice := TStringList.Create;
+
+      choiceDevice.Caption := 'LAMW';
+      choiceDevice.Title := 'Which smartphone do you want to install on?';
+      try
+        for i:=0 to devices.Count -1 do
+        begin
+          FSaveDevice.AddPair(i.ToString, devices[i]);
+          choiceDevice.RadioButtons.Add.Caption := format('%s - %s', [GetManufacturer(devices[i]) ,GetModel(devices[i])]);
+        end;
+
+        FSaveDevice.AddPair((i+1).ToString, 'emulator');
+        choiceDevice.RadioButtons.Add.Caption := 'Emulator';
+
+        FSaveDevice.AddPair((i+1).ToString, 'all');
+        choiceDevice.RadioButtons.Add.Caption := 'All Devices';
+
+        choiceDevice.ModalResult := mrOk;
+        while choiceDevice.ModalResult <> mrCancel do
+        begin
+          if choiceDevice.Execute then
+          begin
+            if choiceDevice.ModalResult = mrOK then
+            begin
+              index := choiceDevice.RadioButton.Index;
+              deviceNumber := FSaveDevice.ValueFromIndex[index];
+
+              if deviceNumber = 'all' then
+              begin
+                for i:=0 to devices.Count-1 do
+                begin
+                  if FSaveDevice.ValueFromIndex[i] = 'emulator' then
+                  begin
+                    Continue;
+                  end;
+                  RunCommandAdb(FSaveDevice.ValueFromIndex[i]);
+                end;
+              end;
+
+              if deviceNumber = 'emulator' then
+              begin
+                with TfrmStartEmulator.Create(FSdkPath, @RunAndGetOutput) do
+                try
+                  if ShowModal = mrCancel then
+                  begin
+                  end;
+                finally
+                  Free;
+                end
+              end else
+              begin
+                RunCommandAdb(deviceNumber);
+              end;
+            end;
+
+            if choiceDevice.ModalResult = mrCancel then
+            begin
+              Result := True;
+              Exit;
+            end;
+          end;
+        end;
+      finally
+        FSaveDevice.Free;
+        choiceDevice.Free;
+      end;
+    end;
+    Result := False;
+  finally
+    devices.Free;
+  end;
+end;
+
+
+procedure TApkBuilder.RunByGradle;
+var
+  Tool: TIDEExternalToolOptions;
+begin
+  if CheckAvailableDevices then
+  begin
+    FApkRun := True;
+    Exit;
+  end;
+
+  FApkRun := False;
+  Tool := TIDEExternalToolOptions.Create;
+  try
+    Tool.Title := 'Starting APK (Gradle)... ';
+    Tool.EnvironmentOverrides.Add('GRADLE_HOME=' + FGradlePath);
+    Tool.EnvironmentOverrides.Add('PATH=' + GetEnvironmentVariable('PATH')
+      + PathSep + FSdkPath + 'platform-tools'
+      + PathSep + FGradlePath + 'bin');
+    Tool.WorkingDirectory := FProjPath;
+    Tool.Executable := FGradlePath + 'bin' + PathDelim + 'gradle'{$ifdef windows}+'.bat'{$endif};
+    if not FileExists(Tool.Executable) then
+      raise Exception.CreateFmt('Gradle (%s) not found! Check path settings', [Tool.Executable]);
+    Tool.CmdLineParams := 'run';
+    // tk Required for Lazarus >=1.7 to capture output correctly
+{$if lcl_fullversion >= 1070000}
+    Tool.ShowConsole := True;
+{$endif}
+    // end tk
+    {$IF LCL_FULLVERSION >= 2010000}
+    Tool.Parsers.Add(SubToolGradle);
+    {$ELSE}
+    Tool.Scanners.Add(SubToolGradle);
+    {$ENDIF}
+
+    If Not RunExternalTool(Tool) then raise Exception.Create('Cannot run APK!');
+    FApkRun := True;
+  finally
+    Tool.Free;
+    //total clean up!
+    CleanUp;
+  end;
+end;
+
 
 procedure TApkBuilder.CleanUp;
 var
@@ -897,8 +1056,10 @@ end;
 procedure TApkBuilder.RunAPK;
 begin
   if FProj.CustomData['BuildSystem'] = 'Gradle' then
+  begin
     RunByGradle
-  else begin
+  end else
+  begin
     if not InstallByAnt then
       raise Exception.Create('Cannot install APK');
     RunByAdb;
@@ -979,44 +1140,6 @@ begin
     Result := True;
   finally
     Tool.Free;
-  end;
-end;
-
-procedure TApkBuilder.RunByGradle;
-var
-  Tool: TIDEExternalToolOptions;
-begin
-  FApkRun := False;
-  if not CheckAvailableDevices then Exit;
-  Tool := TIDEExternalToolOptions.Create;
-  try
-    Tool.Title := 'Starting APK (Gradle)... ';
-    Tool.EnvironmentOverrides.Add('GRADLE_HOME=' + FGradlePath);
-    Tool.EnvironmentOverrides.Add('PATH=' + GetEnvironmentVariable('PATH')
-      + PathSep + FSdkPath + 'platform-tools'
-      + PathSep + FGradlePath + 'bin');
-    Tool.WorkingDirectory := FProjPath;
-    Tool.Executable := FGradlePath + 'bin' + PathDelim + 'gradle'{$ifdef windows}+'.bat'{$endif};
-    if not FileExists(Tool.Executable) then
-      raise Exception.CreateFmt('Gradle (%s) not found! Check path settings', [Tool.Executable]);
-    Tool.CmdLineParams := 'run';
-    // tk Required for Lazarus >=1.7 to capture output correctly
-{$if lcl_fullversion >= 1070000}
-    Tool.ShowConsole := True;
-{$endif}
-    // end tk
-    {$IF LCL_FULLVERSION >= 2010000}
-    Tool.Parsers.Add(SubToolGradle);
-    {$ELSE}
-    Tool.Scanners.Add(SubToolGradle);
-    {$ENDIF}
-
-    If Not RunExternalTool(Tool) then raise Exception.Create('Cannot run APK!');
-    FApkRun := True;
-  finally
-    Tool.Free;
-    //total clean up!
-    CleanUp;
   end;
 end;
 
@@ -1398,8 +1521,8 @@ begin
   end;
 end;
 
-function  TApkBuilder.PullAppsProc(PullNames:Array of String;
-                                   DestPath :         String):Boolean;
+function TApkBuilder.PullAppsProc(PullNames: array of String; DestPath: String
+  ): Boolean;
 var   I:Integer;
 begin
        Result := True;
@@ -1584,6 +1707,8 @@ begin
     end;
      abApkBuilder         := Nil;
 end;
+
+
 
 
 procedure RegisterExtToolParser;
