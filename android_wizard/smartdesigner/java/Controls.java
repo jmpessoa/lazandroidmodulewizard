@@ -1,4 +1,4 @@
-package org.lamw.appcompatarduinoaflakserialdemo1;
+package com.example.appnotificationmanagerdemo2;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.3 - 17 December - 2021
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -456,7 +456,7 @@ public class Controls {
     }
     
     try {
-        Class<?> res = R.mipmap.class;
+        Class<?> res = android.R.mipmap.class;
         Field field = res.getField(_resName);  //"mipmapName"
 
         if (field != null) {

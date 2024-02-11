@@ -165,7 +165,7 @@ public class jNotificationManager /*extends ...*/ {
 		}
 	    if (cls != null)
 	    	intent.setClass(controls.activity, cls);	 	    	   	    
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, mId, intent, PendingIntent.FLAG_CANCEL_CURRENT);  	  
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, mId, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         mNotificationBuilder.setDeleteIntent(pendingIntent);    	
    } 
     
