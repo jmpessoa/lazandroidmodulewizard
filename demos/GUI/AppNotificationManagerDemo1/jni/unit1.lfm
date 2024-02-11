@@ -1,53 +1,59 @@
 object AndroidModule1: TAndroidModule1
-  Left = 285
-  Top = 118
-  Width = 300
-  Height = 600
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
+  Left = 285
+  Top = 118
+  Width = 300
+  Height = 600
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
+  OnJNIPrompt = AndroidModule1JNIPrompt
   OnActivityCreate = AndroidModule1ActivityCreate
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 51
-    Top = 5
-    Width = 198
-    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
+    Left = 21
+    Top = 5
+    Width = 258
+    Height = 26
     Visible = True
-    Id = 5760731
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App NotificationManager  Demo1'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
-    Left = 2
-    Top = 34
-    Width = 294
-    Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
+    Left = 2
+    Top = 40
+    Width = 296
+    Height = 57
     Visible = True
     Anchor = jTextView1
-    Id = 8479009
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -57,20 +63,21 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jButton2: jButton
-    Left = 4
-    Top = 82
-    Width = 292
-    Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
+    Left = 2
+    Top = 105
+    Width = 296
+    Height = 57
     Visible = True
     Anchor = jButton1
-    Id = 0
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = [rpCenterHorizontal]
     LayoutParamWidth = lpMatchParent
@@ -80,6 +87,7 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton2Click
   end
   object jNotificationManager1: jNotificationManager
@@ -92,12 +100,12 @@ object AndroidModule1: TAndroidModule1
     AutoCancel = False
     Ongoing = False
     PendingFlag = pfUpdateCurrent
-    left = 87
-    top = 154
+    Left = 87
+    Top = 184
   end
   object jIntentManager1: jIntentManager
     IntentAction = iaNone
-    left = 132
-    top = 257
+    Left = 132
+    Top = 257
   end
 end

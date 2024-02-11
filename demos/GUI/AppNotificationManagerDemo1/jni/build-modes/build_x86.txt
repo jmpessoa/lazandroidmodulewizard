@@ -1,3 +1,3 @@
-<Libraries Value="C:\adt32\ndk10\platforms\android-13\arch-x86\usr\lib;C:\adt32\ndk10\toolchains\x86-4.6\prebuilt\windows\lib\gcc\i686-android-linux\4.6"/>
+<Libraries Value="C:\android\android-ndk-r21e\platforms\android-22\arch-x86\usr\lib;C:\android\android-ndk-r21e\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\x86-linux-android\4.9.x"/>
 <TargetCPU Value="i386"/>
-<CustomOptions Value="-Xd -XPi686-linux-android- -FDC:\adt32\ndk10\toolchains\x86-4.6\prebuilt\windows\bin -o..\libs\x86\libcontrols.so"/>
+<CustomOptions Value="-Xd -XPi686-linux-android- -FDC:\android\android-ndk-r21e\toolchains\x86-4.9\prebuilt\windows-x86_64\bin"/>

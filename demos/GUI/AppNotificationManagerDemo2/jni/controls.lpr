@@ -16,7 +16,7 @@ procedure pAppOnCreate(PEnv: PJNIEnv; this: JObject; context: JObject;
   layout: JObject; intent: JObject); cdecl;
 begin
   Java_Event_pAppOnCreate(PEnv, this, context, layout, intent);
-    AndroidModule1.Init(gApp);
+    AndroidModule1.Reinit;
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
@@ -97,6 +97,14 @@ end;
 function pAppOnRotate(PEnv: PJNIEnv; this: JObject; rotate: JInt): JInt; cdecl;
 begin
   Result:=Java_Event_pAppOnRotate(PEnv, this, rotate);
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pAppOnUpdateLayout
+  Signature: ()V }
+procedure pAppOnUpdateLayout(PEnv: PJNIEnv; this: JObject); cdecl;
+begin
+  Java_Event_pAppOnUpdateLayout(PEnv, this);
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
@@ -194,11 +202,10 @@ end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
   Method:    pOnClickGeneric
-  Signature: (JI)V }
-procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
-  value: JInt); cdecl;
+  Signature: (J)V }
+procedure pOnClickGeneric(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
-  Java_Event_pOnClickGeneric(PEnv, this, TObject(pasobj), value);
+  Java_Event_pOnClickGeneric(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
@@ -212,12 +219,44 @@ begin
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnDown
+  Signature: (J)V }
+procedure pOnDown(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnDown(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnUp
+  Signature: (J)V }
+procedure pOnUp(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnUp(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
   Method:    pOnClick
   Signature: (JI)V }
 procedure pOnClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong; value: JInt);
   cdecl;
 begin
   Java_Event_pOnClick(PEnv, this, TObject(pasobj), value);
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnLongClick
+  Signature: (J)V }
+procedure pOnLongClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnLongClick(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnDoubleClick
+  Signature: (J)V }
+procedure pOnDoubleClick(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnDoubleClick(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
@@ -244,6 +283,46 @@ end;
 procedure pOnEnter(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
 begin
   Java_Event_pOnEnter(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnBackPressed
+  Signature: (J)V }
+procedure pOnBackPressed(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnBackPressed(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnDone
+  Signature: (J)V }
+procedure pOnDone(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnDone(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnSearch
+  Signature: (J)V }
+procedure pOnSearch(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnSearch(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnNext
+  Signature: (J)V }
+procedure pOnNext(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnNext(PEnv, this, TObject(pasobj));
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnGo
+  Signature: (J)V }
+procedure pOnGo(PEnv: PJNIEnv; this: JObject; pasobj: JLong); cdecl;
+begin
+  Java_Event_pOnGo(PEnv, this, TObject(pasobj));
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
@@ -301,6 +380,15 @@ begin
 end;
 
 { Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnFocus
+  Signature: (JLjava/lang/String;)V }
+procedure pOnFocus(PEnv: PJNIEnv; this: JObject; pasobj: JLong; text: JString);
+  cdecl;
+begin
+  Java_Event_pOnFocus(PEnv, this, TObject(pasobj), text);
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
   Method:    pOnBeforeDispatchDraw
   Signature: (JLandroid/graphics/Canvas;I)V }
 procedure pOnBeforeDispatchDraw(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
@@ -327,7 +415,26 @@ begin
   Java_Event_pOnLayouting(PEnv, this, TObject(pasobj), changed);
 end;
 
-const NativeMethods: array[0..35] of JNINativeMethod = (
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pAppOnRequestPermissionResult
+  Signature: (ILjava/lang/String;I)V }
+procedure pAppOnRequestPermissionResult(PEnv: PJNIEnv; this: JObject;
+  requestCode: JInt; permission: JString; grantResult: JInt); cdecl;
+begin
+  Java_Event_pAppOnRequestPermissionResult(PEnv, this, requestCode, permission,
+    grantResult);
+end;
+
+{ Class:     com_example_appnotificationmanagerdemo2_Controls
+  Method:    pOnRunOnUiThread
+  Signature: (JI)V }
+procedure pOnRunOnUiThread(PEnv: PJNIEnv; this: JObject; pasobj: JLong;
+  tag: JInt); cdecl;
+begin
+  Java_Event_pOnRunOnUiThread(PEnv, this, TObject(pasobj), tag);
+end;
+
+const NativeMethods: array[0..48] of JNINativeMethod = (
    (name: 'pAppOnCreate';
     signature: '(Landroid/content/Context;Landroid/widget/RelativeLayout;'
       +'Landroid/content/Intent;)V';
@@ -362,6 +469,9 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
    (name: 'pAppOnRotate';
     signature: '(I)I';
     fnPtr: @pAppOnRotate; ),
+   (name: 'pAppOnUpdateLayout';
+    signature: '()V';
+    fnPtr: @pAppOnUpdateLayout; ),
    (name: 'pAppOnConfigurationChanged';
     signature: '()V';
     fnPtr: @pAppOnConfigurationChanged; ),
@@ -393,14 +503,26 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
     signature: '(JIIFFFF)V';
     fnPtr: @pOnTouch; ),
    (name: 'pOnClickGeneric';
-    signature: '(JI)V';
+    signature: '(J)V';
     fnPtr: @pOnClickGeneric; ),
    (name: 'pAppOnSpecialKeyDown';
     signature: '(CILjava/lang/String;)Z';
     fnPtr: @pAppOnSpecialKeyDown; ),
+   (name: 'pOnDown';
+    signature: '(J)V';
+    fnPtr: @pOnDown; ),
+   (name: 'pOnUp';
+    signature: '(J)V';
+    fnPtr: @pOnUp; ),
    (name: 'pOnClick';
     signature: '(JI)V';
     fnPtr: @pOnClick; ),
+   (name: 'pOnLongClick';
+    signature: '(J)V';
+    fnPtr: @pOnLongClick; ),
+   (name: 'pOnDoubleClick';
+    signature: '(J)V';
+    fnPtr: @pOnDoubleClick; ),
    (name: 'pOnChange';
     signature: '(JLjava/lang/String;I)V';
     fnPtr: @pOnChange; ),
@@ -410,6 +532,21 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
    (name: 'pOnEnter';
     signature: '(J)V';
     fnPtr: @pOnEnter; ),
+   (name: 'pOnBackPressed';
+    signature: '(J)V';
+    fnPtr: @pOnBackPressed; ),
+   (name: 'pOnDone';
+    signature: '(J)V';
+    fnPtr: @pOnDone; ),
+   (name: 'pOnSearch';
+    signature: '(J)V';
+    fnPtr: @pOnSearch; ),
+   (name: 'pOnNext';
+    signature: '(J)V';
+    fnPtr: @pOnNext; ),
+   (name: 'pOnGo';
+    signature: '(J)V';
+    fnPtr: @pOnGo; ),
    (name: 'pOnClose';
     signature: '(J)V';
     fnPtr: @pOnClose; ),
@@ -428,6 +565,9 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
    (name: 'pOnLostFocus';
     signature: '(JLjava/lang/String;)V';
     fnPtr: @pOnLostFocus; ),
+   (name: 'pOnFocus';
+    signature: '(JLjava/lang/String;)V';
+    fnPtr: @pOnFocus; ),
    (name: 'pOnBeforeDispatchDraw';
     signature: '(JLandroid/graphics/Canvas;I)V';
     fnPtr: @pOnBeforeDispatchDraw; ),
@@ -436,7 +576,13 @@ const NativeMethods: array[0..35] of JNINativeMethod = (
     fnPtr: @pOnAfterDispatchDraw; ),
    (name: 'pOnLayouting';
     signature: '(JZ)V';
-    fnPtr: @pOnLayouting; )
+    fnPtr: @pOnLayouting; ),
+   (name: 'pAppOnRequestPermissionResult';
+    signature: '(ILjava/lang/String;I)V';
+    fnPtr: @pAppOnRequestPermissionResult; ),
+   (name: 'pOnRunOnUiThread';
+    signature: '(JI)V';
+    fnPtr: @pOnRunOnUiThread; )
 );
 
 function RegisterNativeMethodsArray(PEnv: PJNIEnv; className: PChar;
@@ -447,10 +593,7 @@ begin
   Result:= JNI_FALSE;
   curClass:= (PEnv^).FindClass(PEnv, className);
   if curClass <> nil then
-  begin
-    if (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods) > 0
-      then Result:= JNI_TRUE;
-  end;
+    result := (PEnv^).RegisterNatives(PEnv, curClass, methods, countMethods);
 end;
 
 function RegisterNativeMethods(PEnv: PJNIEnv; className: PChar): integer;
@@ -463,15 +606,23 @@ function JNI_OnLoad(VM: PJavaVM; {%H-}reserved: pointer): JInt; cdecl;
 var
   PEnv: PPointer;
   curEnv: PJNIEnv;
+  rc: integer;
 begin
   PEnv:= nil;
   Result:= JNI_VERSION_1_6;
-  (VM^).GetEnv(VM, @PEnv, Result);
+
+  if (VM^).GetEnv(VM, @PEnv, Result) <> JNI_OK then
+  begin
+   result := JNI_ERR;
+   exit;
+  end;
+
   if PEnv <> nil then
   begin
      curEnv:= PJNIEnv(PEnv);
-     RegisterNativeMethods(curEnv, 'com/example/appnotificationmanagerdemo2/'
-       +'Controls');
+     rc := RegisterNativeMethods(curEnv, 'com/example/appnotificationmanagerdem'
+       +'o2/Controls');
+     if (rc <> JNI_OK) then result := rc;
   end;
   gVM:= VM; {AndroidWidget.pas}
 end;
@@ -482,7 +633,9 @@ var
   curEnv: PJNIEnv;
 begin
   PEnv:= nil;
-  (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6);
+
+  if (VM^).GetEnv(VM, @PEnv, JNI_VERSION_1_6) <> JNI_OK then exit;
+
   if PEnv <> nil then
   begin
     curEnv:= PJNIEnv(PEnv);
@@ -519,6 +672,8 @@ exports
     +'Controls_pAppOnBackPressed',
   pAppOnRotate name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
     +'pAppOnRotate',
+  pAppOnUpdateLayout name 'Java_com_example_appnotificationmanagerdemo2_'
+    +'Controls_pAppOnUpdateLayout',
   pAppOnConfigurationChanged name 'Java_com_example_appnotificationmanagerdemo'
     +'2_Controls_pAppOnConfigurationChanged',
   pAppOnActivityResult name 'Java_com_example_appnotificationmanagerdemo2_'
@@ -542,14 +697,27 @@ exports
     +'pOnClickGeneric',
   pAppOnSpecialKeyDown name 'Java_com_example_appnotificationmanagerdemo2_'
     +'Controls_pAppOnSpecialKeyDown',
+  pOnDown name 'Java_com_example_appnotificationmanagerdemo2_Controls_pOnDown',
+  pOnUp name 'Java_com_example_appnotificationmanagerdemo2_Controls_pOnUp',
   pOnClick name
     'Java_com_example_appnotificationmanagerdemo2_Controls_pOnClick',
+  pOnLongClick name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
+    +'pOnLongClick',
+  pOnDoubleClick name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
+    +'pOnDoubleClick',
   pOnChange name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
     +'pOnChange',
   pOnChanged name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
     +'pOnChanged',
   pOnEnter name
     'Java_com_example_appnotificationmanagerdemo2_Controls_pOnEnter',
+  pOnBackPressed name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
+    +'pOnBackPressed',
+  pOnDone name 'Java_com_example_appnotificationmanagerdemo2_Controls_pOnDone',
+  pOnSearch name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
+    +'pOnSearch',
+  pOnNext name 'Java_com_example_appnotificationmanagerdemo2_Controls_pOnNext',
+  pOnGo name 'Java_com_example_appnotificationmanagerdemo2_Controls_pOnGo',
   pOnClose name
     'Java_com_example_appnotificationmanagerdemo2_Controls_pOnClose',
   pAppOnViewClick name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
@@ -562,12 +730,18 @@ exports
     +'2_Controls_pOnPinchZoomGestureDetected',
   pOnLostFocus name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
     +'pOnLostFocus',
+  pOnFocus name
+    'Java_com_example_appnotificationmanagerdemo2_Controls_pOnFocus',
   pOnBeforeDispatchDraw name 'Java_com_example_appnotificationmanagerdemo2_'
     +'Controls_pOnBeforeDispatchDraw',
   pOnAfterDispatchDraw name 'Java_com_example_appnotificationmanagerdemo2_'
     +'Controls_pOnAfterDispatchDraw',
   pOnLayouting name 'Java_com_example_appnotificationmanagerdemo2_Controls_'
-    +'pOnLayouting';
+    +'pOnLayouting',
+  pAppOnRequestPermissionResult name 'Java_com_example_appnotificationmanagerde'
+    +'mo2_Controls_pAppOnRequestPermissionResult',
+  pOnRunOnUiThread name 'Java_com_example_appnotificationmanagerdemo2_Controls'
+    +'_pOnRunOnUiThread';
 
 {%endregion}
   

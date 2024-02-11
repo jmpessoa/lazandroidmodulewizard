@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="11"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -18,15 +18,19 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <VersionInfo>
-      <StringTable ProductVersion=""/>
-    </VersionInfo>
-    <CustomData Count="5">
-      <Item0 Name="LAMW" Value="GUI"/>
-      <Item1 Name="LamwVersion" Value="0.7"/>
-      <Item2 Name="NdkPath" Value="C:\adt32\ndk10e\"/>
-      <Item3 Name="Package" Value="com.example.appnotificationmanagerdemo2"/>
-      <Item4 Name="SdkPath" Value="C:\adt32\sdk\"/>
+    <CustomData Count="12">
+      <Item0 Name="BuildSystem" Value="Gradle"/>
+      <Item1 Name="CanCreateResMipmapFolder" Value="NO"/>
+      <Item2 Name="KeepMyBuildGradleWhenReopen" Value="NO"/>
+      <Item3 Name="LAMW" Value="GUI"/>
+      <Item4 Name="LamwVersion" Value="0.8.6.4"/>
+      <Item5 Name="MinSdk" Value="14"/>
+      <Item6 Name="NdkApi" Value="android-22"/>
+      <Item7 Name="NdkPath" Value="C:\android\android-ndk-r21e\"/>
+      <Item8 Name="Package" Value="com.example.appnotificationmanagerdemo2"/>
+      <Item9 Name="SdkPath" Value="C:\android\sdkJ17\"/>
+      <Item10 Name="TargetSdk" Value="34"/>
+      <Item11 Name="Theme" Value="DeviceDefault"/>
     </CustomData>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -35,9 +39,10 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
     </RunParams>
     <RequiredPackages Count="1">
       <Item1>
@@ -55,7 +60,7 @@
         <ComponentName Value="AndroidModule1"/>
         <HasResources Value="True"/>
         <CustomData Count="1">
-          <Item0 Name="jControls" Value="jButton;jCheckBox;jForm;jIntentManager;jNotificationManager;jTextView"/>
+          <Item0 Name="jControls" Value="jButton;jCheckBox;jIntentManager;jNotificationManager;jTextView"/>
         </CustomData>
       </Unit1>
     </Units>
@@ -67,7 +72,7 @@
       <Filename Value="..\libs\armeabi\libcontrols"/>
     </Target>
     <SearchPaths>
-      <Libraries Value="C:\adt32\ndk10e\platforms\android-15\arch-arm\usr\lib\;C:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.9\"/>
+      <Libraries Value="C:\android\android-ndk-r21e\platforms\android-22\arch-arm\usr\lib\;C:\android\android-ndk-r21e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x\"/>
       <UnitOutputDirectory Value="..\obj\controls"/>
     </SearchPaths>
     <Parsing>
@@ -96,7 +101,7 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\adt32\ndk10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin"/>
+      <CustomOptions Value="-Xd -CfSoft -CpARMV6 -XParm-linux-androideabi- -FDC:\android\android-ndk-r21e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
     </Other>
   </CompilerOptions>
   <Debugging>

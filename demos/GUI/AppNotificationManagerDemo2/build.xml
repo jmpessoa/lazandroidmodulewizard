@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AppNotificationManagerDemo2" default="help">
-<property name="sdk.dir" location="C:\adt32\sdk\"/>
-<property name="target"  value="android-17"/>
+<property name="sdk.dir" location="C:\android\sdkJ17\"/>
+<property name="target" value="android-34"/>
 <property file="ant.properties"/>
 <fail message="sdk.dir is missing." unless="sdk.dir"/>
 
@@ -11,10 +11,6 @@
 <import file="${sdk.dir}/tools/ant/build.xml"/>
 
 <!-- API version properties, modify according to your API level -->
-<property name="api10" value="true"/>
-<property name="api11" value="true"/>
-<property name="api12" value="true"/>
-<property name="api13" value="true"/>
 <property name="api14" value="true"/>
 <property name="api15" value="true"/>
 <property name="api16" value="true"/>
@@ -27,40 +23,18 @@
 <property name="api23" value="true"/>
 <property name="api24" value="true"/>
 <property name="api25" value="true"/>
+<property name="api26" value="true"/>
+<property name="api27" value="true"/>
+<property name="api28" value="true"/>
+<property name="api29" value="true"/>
+<property name="api30" value="true"/>
+<property name="api31" value="true"/>
+<property name="api32" value="true"/>
+<property name="api33" value="true"/>
+<property name="api34" value="true"/>
+<property name="api35" value="false"/>
 
 <!-- API conditions, do not modify -->
-<condition property="ifdef_api10up" value="/*">
-  <equals arg1="${api10}" arg2="false"/>
-</condition>
-<condition property="endif_api10up" value="*/">
-  <equals arg1="${api10}" arg2="false"/>
-</condition>
-<property name="ifdef_api10up" value=""/>
-<property name="endif_api10up" value=""/>
-<condition property="ifdef_api11up" value="/*">
-  <equals arg1="${api11}" arg2="false"/>
-</condition>
-<condition property="endif_api11up" value="*/">
-  <equals arg1="${api11}" arg2="false"/>
-</condition>
-<property name="ifdef_api11up" value=""/>
-<property name="endif_api11up" value=""/>
-<condition property="ifdef_api12up" value="/*">
-  <equals arg1="${api12}" arg2="false"/>
-</condition>
-<condition property="endif_api12up" value="*/">
-  <equals arg1="${api12}" arg2="false"/>
-</condition>
-<property name="ifdef_api12up" value=""/>
-<property name="endif_api12up" value=""/>
-<condition property="ifdef_api13up" value="/*">
-  <equals arg1="${api13}" arg2="false"/>
-</condition>
-<condition property="endif_api13up" value="*/">
-  <equals arg1="${api13}" arg2="false"/>
-</condition>
-<property name="ifdef_api13up" value=""/>
-<property name="endif_api13up" value=""/>
 <condition property="ifdef_api14up" value="/*">
   <equals arg1="${api14}" arg2="false"/>
 </condition>
@@ -157,6 +131,86 @@
 </condition>
 <property name="ifdef_api25up" value=""/>
 <property name="endif_api25up" value=""/>
+<condition property="ifdef_api26up" value="/*">
+  <equals arg1="${api26}" arg2="false"/>
+</condition>
+<condition property="endif_api26up" value="*/">
+  <equals arg1="${api26}" arg2="false"/>
+</condition>
+<property name="ifdef_api26up" value=""/>
+<property name="endif_api26up" value=""/>
+<condition property="ifdef_api27up" value="/*">
+  <equals arg1="${api27}" arg2="false"/>
+</condition>
+<condition property="endif_api27up" value="*/">
+  <equals arg1="${api27}" arg2="false"/>
+</condition>
+<property name="ifdef_api27up" value=""/>
+<property name="endif_api27up" value=""/>
+<condition property="ifdef_api28up" value="/*">
+  <equals arg1="${api28}" arg2="false"/>
+</condition>
+<condition property="endif_api28up" value="*/">
+  <equals arg1="${api28}" arg2="false"/>
+</condition>
+<property name="ifdef_api28up" value=""/>
+<property name="endif_api28up" value=""/>
+<condition property="ifdef_api29up" value="/*">
+  <equals arg1="${api29}" arg2="false"/>
+</condition>
+<condition property="endif_api29up" value="*/">
+  <equals arg1="${api29}" arg2="false"/>
+</condition>
+<property name="ifdef_api29up" value=""/>
+<property name="endif_api29up" value=""/>
+<condition property="ifdef_api30up" value="/*">
+  <equals arg1="${api30}" arg2="false"/>
+</condition>
+<condition property="endif_api30up" value="*/">
+  <equals arg1="${api30}" arg2="false"/>
+</condition>
+<property name="ifdef_api30up" value=""/>
+<property name="endif_api30up" value=""/>
+<condition property="ifdef_api31up" value="/*">
+  <equals arg1="${api31}" arg2="false"/>
+</condition>
+<condition property="endif_api31up" value="*/">
+  <equals arg1="${api31}" arg2="false"/>
+</condition>
+<property name="ifdef_api31up" value=""/>
+<property name="endif_api31up" value=""/>
+<condition property="ifdef_api32up" value="/*">
+  <equals arg1="${api32}" arg2="false"/>
+</condition>
+<condition property="endif_api32up" value="*/">
+  <equals arg1="${api32}" arg2="false"/>
+</condition>
+<property name="ifdef_api32up" value=""/>
+<property name="endif_api32up" value=""/>
+<condition property="ifdef_api33up" value="/*">
+  <equals arg1="${api33}" arg2="false"/>
+</condition>
+<condition property="endif_api33up" value="*/">
+  <equals arg1="${api33}" arg2="false"/>
+</condition>
+<property name="ifdef_api33up" value=""/>
+<property name="endif_api33up" value=""/>
+<condition property="ifdef_api34up" value="/*">
+  <equals arg1="${api34}" arg2="false"/>
+</condition>
+<condition property="endif_api34up" value="*/">
+  <equals arg1="${api34}" arg2="false"/>
+</condition>
+<property name="ifdef_api34up" value=""/>
+<property name="endif_api34up" value=""/>
+<condition property="ifdef_api35up" value="/*">
+  <equals arg1="${api35}" arg2="false"/>
+</condition>
+<condition property="endif_api35up" value="*/">
+  <equals arg1="${api35}" arg2="false"/>
+</condition>
+<property name="ifdef_api35up" value=""/>
+<property name="endif_api35up" value=""/>
 
 <!-- Copy & filter java sources for defined Android target, do not modify -->
 <copy todir="${src.dir}/${target}">
@@ -164,14 +218,6 @@
     <include name="*.java"/>
   </fileset>
   <filterset begintoken="//[" endtoken="]">
-    <filter token="ifdef_api10up" value="${ifdef_api10up}"/>
-    <filter token="endif_api10up" value="${endif_api10up}"/>
-    <filter token="ifdef_api11up" value="${ifdef_api11up}"/>
-    <filter token="endif_api11up" value="${endif_api11up}"/>
-    <filter token="ifdef_api12up" value="${ifdef_api12up}"/>
-    <filter token="endif_api12up" value="${endif_api12up}"/>
-    <filter token="ifdef_api13up" value="${ifdef_api13up}"/>
-    <filter token="endif_api13up" value="${endif_api13up}"/>
     <filter token="ifdef_api14up" value="${ifdef_api14up}"/>
     <filter token="endif_api14up" value="${endif_api14up}"/>
     <filter token="ifdef_api15up" value="${ifdef_api15up}"/>
@@ -196,6 +242,26 @@
     <filter token="endif_api24up" value="${endif_api24up}"/>
     <filter token="ifdef_api25up" value="${ifdef_api25up}"/>
     <filter token="endif_api25up" value="${endif_api25up}"/>
+    <filter token="ifdef_api26up" value="${ifdef_api26up}"/>
+    <filter token="endif_api26up" value="${endif_api26up}"/>
+    <filter token="ifdef_api27up" value="${ifdef_api27up}"/>
+    <filter token="endif_api27up" value="${endif_api27up}"/>
+    <filter token="ifdef_api28up" value="${ifdef_api28up}"/>
+    <filter token="endif_api28up" value="${endif_api28up}"/>
+    <filter token="ifdef_api29up" value="${ifdef_api29up}"/>
+    <filter token="endif_api29up" value="${endif_api29up}"/>
+    <filter token="ifdef_api30up" value="${ifdef_api30up}"/>
+    <filter token="endif_api30up" value="${endif_api30up}"/>
+    <filter token="ifdef_api31up" value="${ifdef_api31up}"/>
+    <filter token="endif_api31up" value="${endif_api31up}"/>
+    <filter token="ifdef_api32up" value="${ifdef_api32up}"/>
+    <filter token="endif_api32up" value="${endif_api32up}"/>
+    <filter token="ifdef_api33up" value="${ifdef_api33up}"/>
+    <filter token="endif_api33up" value="${endif_api33up}"/>
+    <filter token="ifdef_api34up" value="${ifdef_api34up}"/>
+    <filter token="endif_api34up" value="${endif_api34up}"/>
+    <filter token="ifdef_api35up" value="${ifdef_api35up}"/>
+    <filter token="endif_api35up" value="${endif_api35up}"/>
   </filterset>
 </copy>
 </project>

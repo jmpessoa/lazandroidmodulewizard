@@ -1,3 +1,0 @@
-<Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-mips\usr\lib;C:\android\ndkr18b\toolchains\mipsel-linux-android-4.9\prebuilt\windows-x86_64\lib\gcc\mipsel-linux-android\4.9.x"/>
-<TargetCPU Value="mipsel"/>
-<CustomOptions Value="-Xd -XPmipsel-linux-android- -FDC:\android\ndkr18b\toolchains\mipsel-linux-android-4.9\prebuilt\windows-x86_64\bin"/>

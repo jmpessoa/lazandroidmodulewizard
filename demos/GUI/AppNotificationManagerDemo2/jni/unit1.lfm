@@ -1,53 +1,58 @@
 object AndroidModule1: TAndroidModule1
-  Left = 315
-  Top = 154
-  Width = 320
-  Height = 400
   MarginLeft = 0
   MarginTop = 0
   MarginRight = 0
   MarginBottom = 0
+  Enabled = True
+  Left = 315
+  Top = 154
+  Width = 320
+  Height = 400
   Text = 'AndroidModule1'
   ActivityMode = actMain
   BackgroundColor = colbrDefault
   ActionBarTitle = abtDefault
+  AnimationDurationIn = 1500
+  AnimationDurationOut = 1500
+  AnimationMode = animNone
   OnJNIPrompt = AndroidModule1JNIPrompt
+  OnRequestPermissionResult = AndroidModule1RequestPermissionResult
   object jTextView1: jTextView
-    Left = 63
-    Top = 5
-    Width = 194
-    Height = 20
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
+    Left = 33
+    Top = 5
+    Width = 253
+    Height = 26
     Visible = True
-    Id = 1
     PosRelativeToAnchor = []
     PosRelativeToParent = [rpTop, rpCenterHorizontal]
     LayoutParamWidth = lpWrapContent
     LayoutParamHeight = lpWrapContent
     Text = 'App NotificationManager Demo2'
     Alignment = taLeft
-    Enabled = True
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     TextTypeFace = tfNormal
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
   end
   object jButton1: jButton
-    Left = 2
-    Top = 76
-    Width = 314
-    Height = 40
     MarginLeft = 2
     MarginTop = 4
     MarginRight = 2
     MarginBottom = 4
+    Enabled = True
+    Left = 2
+    Top = 82
+    Width = 316
+    Height = 57
     Visible = True
     Anchor = jCheckBox1
-    Id = 2
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
@@ -57,20 +62,21 @@ object AndroidModule1: TAndroidModule1
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
+    GravityInParent = lgNone
     OnClick = jButton1Click
   end
   object jCheckBox1: jCheckBox
-    Left = 5
-    Top = 35
-    Width = 64
-    Height = 32
     MarginLeft = 5
     MarginTop = 5
     MarginRight = 5
     MarginBottom = 5
+    Enabled = True
+    Left = 5
+    Top = 41
+    Width = 72
+    Height = 32
     Visible = True
     Anchor = jTextView1
-    Id = 3
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpWrapContent
@@ -92,12 +98,12 @@ object AndroidModule1: TAndroidModule1
     AutoCancel = True
     Ongoing = False
     PendingFlag = pfUpdateCurrent
-    left = 72
-    top = 176
+    Left = 72
+    Top = 176
   end
   object jIntentManager1: jIntentManager
     IntentAction = iaNone
-    left = 224
-    top = 176
+    Left = 224
+    Top = 176
   end
 end

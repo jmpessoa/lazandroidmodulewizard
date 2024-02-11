@@ -16,11 +16,12 @@ import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class jButton extends Button {
+public class jButton extends Button { //androidx.appcompat.widget.AppCompatButton
 
 	private Controls controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
@@ -36,6 +37,8 @@ public class jButton extends Button {
 	int mSavedBackgroundColor;
 	
 	int mRadius = 20;
+	
+	boolean mEnable = true;
 
 	//Constructor
 	public  jButton(android.content.Context context, Controls ctrls,long pasobj ) {
@@ -71,12 +74,15 @@ public class jButton extends Button {
 				    }
 			     }, 150);
 			  	 
-			   }  			
-			   controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			   }  		
+			   
+			   if (mEnable) {
+			      controls.pOnClick(LAMWCommon.getPasObj(),Const.Click_Default);
+			   }
 												 				 
 			}
 		};		
-		setOnClickListener(onClickListener);
+		setOnClickListener(onClickListener);		
 	}
 	 
 	//Free object except Self, Pascal Code Free the class.
@@ -88,6 +94,12 @@ public class jButton extends Button {
 
 	public long GetPasObj() {
 		return LAMWCommon.getPasObj();
+	}
+	
+	public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
 	}
 
 	public  void SetViewParent(ViewGroup _viewgroup ) {
@@ -184,11 +196,10 @@ public class jButton extends Button {
 		switch (_unit) {
 			case 0: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 			case 1: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PX; break; 
-			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;
-			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_IN; break; 
-			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
-			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
-			case 6: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
+			case 2: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_DIP; break;			
+			case 3: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_MM; break; 
+			case 4: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_PT; break; 
+			case 5: mTextSizeTypedValue = TypedValue.COMPLEX_UNIT_SP; break; 
 		}
 		String t = this.getText().toString();
 		this.setTextSize(mTextSizeTypedValue, mTextSize);
@@ -203,28 +214,17 @@ public class jButton extends Button {
 		this.performLongClick();
 	}
 
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-
-	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( controls.GetDrawableResourceId(_imgResIdentifier) );			
 	}	
 	
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public  void SetBackgroundByImage(Bitmap _image) {
+	  if(_image == null) return;
+	  
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+	  
+	  if( d == null ) return;
+	  
       //[ifdef_api16up]
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
@@ -237,12 +237,21 @@ public class jButton extends Button {
 		controls.pOnBeforeDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);  //event handle by pascal side		
 	    super.dispatchDraw(canvas);	    
 	    //DO YOUR DRAWING ON TOP OF THIS VIEWS CHILDREN
-	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side    
+	    controls.pOnAfterDispatchDraw(LAMWCommon.getPasObj(), canvas, 1);	 //event handle by pascal side
+	    
+	    if (!mEnable) this.setEnabled(false);
 	}
 	
 	//http://www.android--tutorials.com/2016/03/android-set-button-drawableleft.html
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by ADiV
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -256,8 +265,15 @@ public class jButton extends Button {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by ADiV
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -281,7 +297,8 @@ public class jButton extends Button {
 			   if (background instanceof ColorDrawable) {
 			     color = ((ColorDrawable)this.getBackground()).getColor();
 			     mBackgroundColor = color;
-		         shape.setColorFilter(color, Mode.SRC_ATOP);			        			        			         
+		         shape.setColorFilter(color, Mode.SRC_ATOP);
+		         shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 		          //[ifdef_api16up]
 		  	      if(Build.VERSION.SDK_INT >= 16) { 
 		             this.setBackground((Drawable)shape);
@@ -329,6 +346,7 @@ public class jButton extends Button {
 		if  (this != null) {
 		   //mBackgroundColor = _color;
 	  	   this.setBackgroundColor(_color);
+	  	   //this.setAlpha(0.5f);
 		}   
 	}
 	
@@ -338,7 +356,8 @@ public class jButton extends Button {
     this.getBackground().setColorFilter(_color, android.graphics.PorterDuff.Mode.MULTIPLY);  
     //Set the color of the text displayed inside the button  
     //this.setTextColor(0xFF0000FF);  
-    //Render this Button again  
+    //Render this Button again 
+    //this.setAlpha(0.5f);
     this.invalidate();  
 	}
 	
@@ -381,4 +400,39 @@ public class jButton extends Button {
         Typeface customfont = Typeface.createFromAsset( controls.activity.getAssets(), _fontName);    
         this.setTypeface(customfont);
     }
+	
+	public void SetEnabled(boolean _value) {
+		mEnable = _value;
+		this.setEnabled(_value);		
+	}
+
+  /* Pascal:
+     TFrameGravity = (fgNone,
+                   fgTopLeft, fgTopCenter, fgTopRight,
+                   fgBottomLeft, fgBottomCenter, fgBottomRight,
+                   fgCenter,
+                   fgCenterVerticalLeft, fgCenterVerticalRight
+                   );     
+   */
+   public void SetFrameGravity(int _value) {	   
+      LAMWCommon.setLGravity(_value);
+   }
+   
+   public void SetAllCaps(boolean allCaps)
+   {
+	   this.setAllCaps(allCaps);
+   }
+
+   public void SetFocus() {
+   	  this.requestFocus();
+   }
+   
+   public void ApplyDrawableXML(String _xmlIdentifier) {
+	   this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+   }
+
+	public void Append(String _txt) {
+		this.append(_txt);
+	}
+
 }

@@ -1,1 +1,1 @@
-/adt32/sdk/platform-tools/adb logcat
+/android/sdkJ17/platform-tools/adb logcat &

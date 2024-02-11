@@ -2,7 +2,6 @@ package com.example.appnotificationmanagerdemo1;
 
 import java.lang.reflect.Field;
 import java.util.Random;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

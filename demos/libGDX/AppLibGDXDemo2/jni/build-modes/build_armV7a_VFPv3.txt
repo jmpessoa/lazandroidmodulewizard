@@ -1,3 +1,0 @@
-<Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm\usr\lib;C:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\lib\gcc\arm-linux-androideabi\4.9.x"/>
-<TargetCPU Value="arm"/>
-<CustomOptions Value="-Xd -CfVFPv3 -CpARMV7A -XParm-linux-androideabi- -FDC:\android\ndkr18b\toolchains\arm-linux-androideabi-4.9\prebuilt\windows-x86_64\bin"/>
