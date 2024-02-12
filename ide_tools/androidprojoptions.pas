@@ -1345,8 +1345,8 @@ var
 begin
   list:= TStringList.Create;
   list.LoadFromFile(FProjectPath + 'jni' + PathDelim + 'build-modes' +PathDelim+ filename);
-  temp:= list.Strings[index];
-  p1:= Pos('"', temp) +1; //0 = Libraries ; 2 =CustomOptions
+  temp:= list.Strings[index];  //index 0 --> Libraries ; inedex 2 --> CustomOptions
+  p1:= Pos('"', temp) +1;
   p2:= LastDelimiter('"',temp);
   Result:= Copy(temp, p1, p2 - p1);
   list.Free;

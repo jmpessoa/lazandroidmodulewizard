@@ -693,8 +693,11 @@ var
   gradleVersionBigNumber: integer;
 begin
 
-  if FPathToGradle <> '' then
-    FGradleVersion:= GetGradleVersion(FPathToGradle);
+  if FGradleVersion = '' then
+  begin
+    if FPathToGradle <> '' then
+        FGradleVersion:= GetGradleVersion(FPathToGradle);
+  end;
 
   gradleVersionBigNumber:= GetGradleVersionAsBigNumber(FGradleVersion);
 
@@ -928,9 +931,12 @@ begin
   strList.Add('	}');
   strList.Add('}');
   strList.Add(' ');
-  strList.Add('wrapper {');
-  strList.Add('    gradleVersion = '''+FGradleVersion+''' ');  //7.6.3
-  strList.Add('}');
+  if gradleVersionBigNumber < 820 then
+  begin
+    strList.Add('wrapper {');
+    strList.Add('    gradleVersion = '''+FGradleVersion+''' ');  //7.6.3
+    strList.Add('}');
+  end;
   strList.SaveToFile(FPathToAndroidProject+'build.gradle');
   strList.Free;
   includeList.Free;
@@ -970,9 +976,28 @@ begin
   end;
   strList.Clear;
 
+  if FPathToGradle <> '' then
+       FGradleVersion:= GetGradleVersion(FPathToGradle);
+
+  //Android Studio compatiblity
+  if not DirectoryExists(FPathToAndroidProject+'gradle') then
+  begin
+    CreateDir(FPathToAndroidProject+'gradle');
+    ForceDirectories(FPathToAndroidProject+'gradle'+DirectorySeparator+'wrapper');
+  end;
+  StrList.Clear;
+  strList.Add('distributionBase=GRADLE_USER_HOME');
+  strList.Add('distributionPath=wrapper/dists');
+  strList.Add('distributionUrl=https\://services.gradle.org/distributions/gradle-'+FGradleVersion+'-bin.zip');  //8.2.1
+  strList.Add('networkTimeout=10000');
+  strList.Add('zipStoreBase=GRADLE_USER_HOME');
+  strList.Add('zipStorePath=wrapper/dists');
+  strList.SaveToFile(FPathToAndroidProject+'gradle'+DirectorySeparator+'wrapper'+DirectorySeparator+'gradle-wrapper.properties');
+
   targetpath:=ConcatPaths([FPathToAndroidProject,'res','values']);
   ForceDirectories(targetpath);
 
+  strList.Clear;
   sourcepath:=ConcatPaths([LamwGlobalSettings.PathToJavaTemplates,'values'])+DirectorySeparator +'colors.xml';
   if FileExists(sourcepath) then
   begin

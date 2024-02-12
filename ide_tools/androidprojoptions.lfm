@@ -45,7 +45,7 @@ object LamwProjectOptions: TLamwProjectOptions
           item
             ReadOnly = True
             Title.Caption = 'Permissions'
-            Width = 505
+            Width = 530
           end        
           item
             ButtonStyle = cbsCheckboxColumn
@@ -65,7 +65,7 @@ object LamwProjectOptions: TLamwProjectOptions
         OnMouseDown = PermissonGridMouseDown
         OnMouseMove = PermissonGridMouseMove
         ColWidths = (
-          505
+          530
           64
         )
       end

@@ -1237,9 +1237,12 @@ begin
   strList.Add('	}');
   strList.Add('}');
   strList.Add(' ');
-  strList.Add('wrapper {');
-  strList.Add('    gradleVersion = '''+gradleVersion+''' ');  //8.2.1
-  strList.Add('}');
+  if gradleVersionBigNumber < 820 then
+  begin
+    strList.Add('wrapper {');
+    strList.Add('    gradleVersion = '''+gradleVersion+''' ');  //8.2.1
+    strList.Add('}');
+  end;
   strList.SaveToFile(FAndroidProjectName+PathDelim+'build.gradle');
   strList.Free;
 
@@ -1369,7 +1372,6 @@ var
   sdkBuildTools, androidPluginVersion: string;
   outTheme: string;
   isAppCompatTheme, isGradleBuildSystem: boolean;
-  addInfo: string;
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
@@ -1685,7 +1687,6 @@ begin
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml');
 
-
             CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
             if DirectoryExists(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor) then
@@ -1695,6 +1696,17 @@ begin
               CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors.xml',
                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
 
+            //Android Studio compatiblity
+            CreateDir(FAndroidProjectName+DirectorySeparator+'gradle');
+            ForceDirectories(FAndroidProjectName+DirectorySeparator+'gradle'+DirectorySeparator+'wrapper');
+            StrList.Clear;
+            strList.Add('distributionBase=GRADLE_USER_HOME');
+            strList.Add('distributionPath=wrapper/dists');
+            strList.Add('distributionUrl=https\://services.gradle.org/distributions/gradle-'+FGradleVersion+'-bin.zip');  //8.2.1
+            strList.Add('networkTimeout=10000');
+            strList.Add('zipStoreBase=GRADLE_USER_HOME');
+            strList.Add('zipStorePath=wrapper/dists');
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'gradle'+DirectorySeparator+'wrapper'+DirectorySeparator+'gradle-wrapper.properties');
 
             if Pos('AppCompat', FAndroidTheme) > 0 then
             begin
@@ -2099,7 +2111,6 @@ begin
             {$endif}
             strList.Add('org.gradle.java.home='+tempStr);
           end;
-
           strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle.properties');  //if need configure proxy here, too
 
           //keytool input [dammy] data!
@@ -3396,8 +3407,8 @@ begin
   auxList.Clear;
   auxList.Add('How to get more ".so" chipset builds:');
   auxList.Add(' ');
-  auxList.Add('   :: Warning 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!');
-  auxList.Add('   :: Warning 2: Laz4Android [out-of-box] support only 32 Bits chipset: "armV6", "armV7a+Soft", "x86"!');
+  auxList.Add('   :: Note 1: Your Lazarus/Freepascal needs to be prepared [cross-compile] for the various chipset builds!');
+  auxList.Add('   :: Note 2: Laz4Android support 32 Bits chipset: "armV6", "armV7a+Soft", "x86" and 64 Bits chipset "arm64-v8a", "x86_64" !');
   auxList.Add(' ');
   auxList.Add('1. From LazarusIDE menu:');
   auxList.Add(' ');
@@ -3407,7 +3418,7 @@ begin
   auxList.Add(' ');
   auxList.Add('   > Run -> Clean up and Build...');
   auxList.Add(' ');
-  auxList.Add('3. From LazarusIDE menu:');
+  auxList.Add('3. [Optional] From LazarusIDE menu:');
   auxList.Add(' ');
   auxList.Add('   > [LAMW] Build Android Apk and Run');
   auxList.Add(' ');
