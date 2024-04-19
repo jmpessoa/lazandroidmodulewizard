@@ -5,9 +5,27 @@ unit AndroidWizard_intf;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Controls, Forms, Dialogs, Graphics, laz2_XMLRead, Laz2_DOM,
-  LCLProc, LCLType, LCLIntf, LazIDEIntf, ProjectIntf, FormEditingIntf,
-  uFormAndroidProject, uformworkspace, FPimage, AndroidWidget;
+  Classes,
+  SysUtils,
+  FileUtil,
+  Controls,
+  Forms,
+  Dialogs,
+  Graphics,
+  laz2_XMLRead,
+  Laz2_DOM,
+  LCLProc,
+  LCLType,
+  LCLIntf,
+  LazIDEIntf,
+  ProjectIntf,
+  FormEditingIntf,
+  uFormAndroidProject,
+  uformworkspace,
+  FPimage,
+  createdirectories,
+  createfiles,
+  AndroidWidget;
 
 type
 
@@ -90,7 +108,6 @@ type
      function SettingsFilename: string;
      function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
-     function GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
      procedure DoReadme();
      procedure DoHowToGetsignedReleaseApk;
      procedure DoBuildGradle(strPack: string; androidPluginVersion: string;
@@ -118,6 +135,7 @@ type
 
    public
      constructor Create; override;
+     function GetWorkSpaceFromForm(projectType: integer; out outTag: integer): boolean;
      function GetLocalizedName: string; override;
      function GetLocalizedDescription: string; override;
      function DoInitDescriptor: TModalResult; override;
@@ -253,6 +271,7 @@ begin
   try
     FModuleType := 2; //-1: gdx 0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console  3: generic library
     FPathToClassName := '';
+
     if GetWorkSpaceFromForm(2, outTag) then
     begin
 
@@ -266,15 +285,7 @@ begin
         AndroidFileDescriptor.ModuleType:= 3; // generic/custom library
       end;
 
-      CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86_64');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
+      CreateDirectoriesLibs(FAndroidProjectName);
 
       if FModuleType = 2 then //default
       begin
@@ -515,8 +526,9 @@ begin
 
           Strings[0] := 'package ' + strPackName + ';'; //replace dummy App.java
           SaveToFile(FFullJavaSrcPath + DirectorySeparator + 'App.java');
+          //CreateDirectoriesLamwDesigner(FAndroidProjectName);
 
-          CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
+
           if FileExists(FPathToJavaTemplates+DirectorySeparator + 'Controls.native') then
           begin
             CopyFile(FPathToJavaTemplates+DirectorySeparator + 'Controls.native',
@@ -557,26 +569,11 @@ begin
         Free;
       end;
 
-      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
-      CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86_64');
-      CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
-
-      if  FModuleType < 2 then
-        CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
-
       auxList:= TStringList.Create;
 
       if FProjectModel = 'NEW' then   //new project (Ant)
       begin
         //eclipe compatibility [Neon!]
-        CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
         auxList.Add('eclipse.preferences.version=1');
         auxList.Add('org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.7');
         auxList.Add('org.eclipse.jdt.core.compiler.compliance=1.7');
@@ -585,12 +582,12 @@ begin
         auxList.Clear;
         auxList.Add('<?xml version="1.0" encoding="UTF-8"?>');
         auxList.Add('<classpath>');
-	auxList.Add('<classpathentry kind="src" path="src"/>');
-	auxList.Add('<classpathentry kind="src" path="gen"/>');
-	auxList.Add('<classpathentry kind="con" path="org.eclipse.andmore.ANDROID_FRAMEWORK"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.LIBRARIES"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.DEPENDENCIES"/>');
-	auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
+	      auxList.Add('<classpathentry kind="src" path="src"/>');
+	      auxList.Add('<classpathentry kind="src" path="gen"/>');
+	      auxList.Add('<classpathentry kind="con" path="org.eclipse.andmore.ANDROID_FRAMEWORK"/>');
+	      auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.LIBRARIES"/>');
+	      auxList.Add('<classpathentry exported="true" kind="con" path="org.eclipse.andmore.DEPENDENCIES"/>');
+	      auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
         auxList.Add('</classpath>');
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.classpath');
 
@@ -703,7 +700,7 @@ begin
       begin
          strAfterReplace  := StringReplace(strAfterReplace, '<!--', '', [rfReplaceAll, rfIgnoreCase]);
          strAfterReplace  := StringReplace(strAfterReplace, '-->', '', [rfReplaceAll, rfIgnoreCase]);
-         strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', '', [rfReplaceAll, rfIgnoreCase])
+         strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', '', [rfReplaceAll, rfIgnoreCase]);
       end
       else //gradle
       begin
@@ -746,8 +743,6 @@ begin
       Result := mrAbort;
     end;
   end;
-
-
 end;
 
 {TAndroidProjectDescriptor}
@@ -1375,6 +1370,7 @@ var
 begin
   Result:= False;
   FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
+  CreateDirectoriesFull(FAndroidProjectName);
 
   AndroidFileDescriptor.ModuleType:= projectType;
   strList:= nil;
@@ -1620,74 +1616,43 @@ begin
                CreateDir(FFullJavaSrcPath);
             end;
 
-            CreateDir(FAndroidProjectName+DirectorySeparator+'res');
-
-            ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable');
-            ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'xml');
-
-            ForceDirectories(FAndroidProjectName+DirectorySeparator+'res'+DirectorySeparator+'drawable-hdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-hdpi'+DirectorySeparator+'ic_launcher.png');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-ldpi'+DirectorySeparator+'ic_launcher.png');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-mdpi'+DirectorySeparator+'ic_launcher.png');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xhdpi'+DirectorySeparator+'ic_launcher.png');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-xxhdpi'+DirectorySeparator+'ic_launcher.png');
 
             //Android Studio compatibility
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable'+DirectorySeparator+'ic_launcher_background.xml',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable'+DirectorySeparator+'ic_launcher_background.xml');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-v24');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'drawable-v24'+DirectorySeparator+'ic_launcher_foreground.xml');
-
-
-            //mipmap support
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxxhdpi');
+            ////mipmap support
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher.webp');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxhdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher.webp');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xxhdpi'+DirectorySeparator+'ic_launcher_round.webp');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xhdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher.webp');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-xhdpi'+DirectorySeparator+'ic_launcher_round.webp');
-
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-hdpi');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher.webp');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-hdpi'+DirectorySeparator+'ic_launcher_round.webp');
-
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher.xml');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml',
                      FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'mipmap-anydpi-v26'+DirectorySeparator+'ic_launcher_round.xml');
-
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values');
 
             if DirectoryExists(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor) then
                CopyFile(FPathToJavaTemplates+DirectorySeparator+'values'+DirectorySeparator+'colors'+DirectorySeparator+FAndroidThemeColor+DirectorySeparator+'colors.xml',
@@ -1697,7 +1662,6 @@ begin
                   FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
 
             //Android Studio compatiblity
-            CreateDir(FAndroidProjectName+DirectorySeparator+'gradle');
             ForceDirectories(FAndroidProjectName+DirectorySeparator+'gradle'+DirectorySeparator+'wrapper');
             StrList.Clear;
             strList.Add('distributionBase=GRADLE_USER_HOME');
@@ -1732,11 +1696,9 @@ begin
                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values'+DirectorySeparator+'colors.xml');
             }
 
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v11');
 
             intTargetApi:= StrToInt(FTargetApi);
             if intTargetApi < 14 then   intTargetApi:= 14;
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v14');
             //replace "dummyTheme" ..res\values-v14
             strList.Clear;
             strList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'values-v14'+DirectorySeparator+'styles.xml');
@@ -1751,13 +1713,11 @@ begin
 
             intMinApi:= StrToInt(FMinApi);
 
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
 
             //replace "dummyTheme" ..res\values-v21
             strList.Clear;
             if Pos('AppCompat', FAndroidTheme) <= 0  then  //not AppCompat
             begin
-              CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21');
               //replace "dummyTheme" ..res\values-v21
               if intMinApi >= 21 then
               begin
@@ -1779,14 +1739,8 @@ begin
               strList.SaveToFile(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'values-v21'+DirectorySeparator+'styles.xml');
             end;
 
-            CreateDir(FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout');
             CopyFile(FPathToJavaTemplates+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml',
                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml');
-
-            CreateDir(FAndroidProjectName+ DirectorySeparator + 'assets');
-            CreateDir(FAndroidProjectName+ DirectorySeparator + 'bin');
-            CreateDir(FAndroidProjectName+ DirectorySeparator + 'gen');
-
           end;
 
           if FModuleType <= 0  then  //Android Bridges Controls... [GUI]
@@ -1900,24 +1854,27 @@ begin
           end; //just Ant NoGUI project
         end; // Ant
 
+        //CreateUtils(FAndroidProjectName);
+
+
         if FModuleType < 2 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
         begin
           strList.Clear;
           //begin_cmd_tools
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
           strList.Add('call ant clean -Dtouchtest.enabled=true debug');
           strList.Add('if errorlevel 1 pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-build-debug.bat'); //build Apk using "Ant"
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-build-debug', '.bat');
 
           strList.Clear;
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
           strList.Add('call ant clean release');
           strList.Add('if errorlevel 1 pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-build-release.bat'); //build Apk using "Ant"
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-build-release', '.bat');
 
           strList.Clear;
           strList.Add('cd '+FPathToAndroidSDK+'tools');
@@ -1925,8 +1882,8 @@ begin
             strList.Add('emulator -avd avd_default +  -gpu on &')  //gpu: api >= 15,,,
           else
             strList.Add('tools emulator -avd avd_api_'+FMinApi + ' &');
-          strList.Add('cd '+FAndroidProjectName);
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'launch-avd-default.bat');
+          strList.Add('cd '+FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
+          Create_sh_bat(strList, FAndroidProjectName, 'launch-avd-default', '.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
@@ -1934,7 +1891,7 @@ begin
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb install -r '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-debug.apk');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-adb-install-debug.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-adb-install-debug', '.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
@@ -1942,58 +1899,55 @@ begin
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb install -r '+FAndroidProjectName+DirectorySeparator+'build'+DirectorySeparator+'outputs'+DirectorySeparator+'apk'+DirectorySeparator+'debug'+DirectorySeparator+FSmallProjName+'-'+instructionChip+'-debug.apk');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'gradle-adb-install-debug.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-adb-install-debug', '.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'adb-uninstall.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'adb-uninstall', '.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat &');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'logcat.bat');
-
-          //utils
-          CreateDir(FAndroidProjectName+ DirectorySeparator + 'utils');
+          Create_sh_bat(strList, FAndroidProjectName, 'logcat.bat', '.bat');
 
           {"android list targets" to see the available targets...}
           strList.Clear;
           strList.Add('cd '+FPathToAndroidSDK+'tools');
           strList.Add('android list targets');
-          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'list-target.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'list-target', '.bat');
 
           //need to pause on double-click use...
           strList.Clear;
           strList.Add('cmd /K list-target.bat');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-list-target.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'paused-list-target', '.bat');
 
           strList.Clear;
           strList.Add('cd '+FPathToAndroidSDK+'tools');
           strList.Add('android create avd -n avd_default -t 1 -c 32M');
-          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'create-avd-default.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'create-avd-default', '.bat');
 
           //need to pause on double-click use...
           strList.Clear;
           strList.Add('cmd /k create-avd-default.bat');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'paused-create-avd-default.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'paused-create-avd-default', '.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+
                      DirectorySeparator+'adb logcat AndroidRuntime:E *:S');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat-error.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'logcat-error', '.bat');
 
           strList.Clear;
           strList.Add(FPathToAndroidSDK+'platform-tools'+DirectorySeparator+
                      'adb logcat ActivityManager:I '+FSmallProjName+'-'+FAntBuildMode+'.apk:D *:S');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'utils'+DirectorySeparator+'logcat-app-perform.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'logcat-app-perform', '.bat');
 
           //end_utils
 
@@ -2142,22 +2096,21 @@ begin
           strList.Add('echo Signature file created previously, remember that if you delete this file and it was uploaded to Google Play, you will not be able to upload another app without this signature.');
           strList.Add('echo.');
           strList.Add('pause');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'release-keystore.bat');
-
+          Create_sh_bat(strList, FAndroidProjectName, 'release-keystore', '.bat');
 
           strList.Clear;
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('path %JAVA_HOME%'+PathDelim+'bin;%path%');
-          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
           strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'bin'+DirectorySeparator+FSmallProjName+'-release.apk');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'ant-jarsigner-verify.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-jarsigner-verify', '.bat');
 
           strList.Clear;
           strList.Add('set JAVA_HOME='+FPathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
           strList.Add('path %JAVA_HOME%'+PathDelim+'bin;%path%');
-          strList.Add('cd '+FAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+DirectorySeparator+'windows'+DirectorySeparator);
           strList.Add('jarsigner -verify -verbose -certs '+FAndroidProjectName+DirectorySeparator+'build'+DirectorySeparator+'outputs'+DirectorySeparator+'apk'+DirectorySeparator+'release'+DirectorySeparator+FSmallProjName+'-release.apk');
-          strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'gradle-jarsigner-verify.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-jarsigner-verify', '.bat');
 
           DoHowToGetSignedReleaseApk;
 
@@ -2202,9 +2155,9 @@ begin
           begin
              strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
              strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-             strList.Add('cd '+linuxAndroidProjectName);
+             strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
              strList.Add('ant -Dtouchtest.enabled=true debug');
-             SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-debug.sh');
+             Create_sh_bat(strList, FAndroidProjectName, 'ant-build-debug', '.sh');
           end;
 
           //MacOs
@@ -2214,9 +2167,9 @@ begin
             strList.Add('export PATH='+linuxPathToAntBin+':$PATH');        //export PATH=/usr/bin/ant:PATH
             strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
             strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-            strList.Add('cd '+linuxAndroidProjectName);
+            strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
             strList.Add('ant -Dtouchtest.enabled=true debug');
-            SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-debug-macos.sh');
+            Create_sh_bat(strList, FAndroidProjectName, 'ant-build-debug-macos', '.sh');
           end;
 
           strList.Clear;
@@ -2224,9 +2177,9 @@ begin
           begin
              strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
              strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-             strList.Add('cd '+linuxAndroidProjectName);
+             strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
              strList.Add('ant clean release');
-             SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-release.sh');
+             Create_sh_bat(strList, FAndroidProjectName, 'ant-build-release', '.sh');
           end;
 
           //MacOs
@@ -2236,9 +2189,9 @@ begin
             strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
             strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
             strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-            strList.Add('cd '+linuxAndroidProjectName);
+            strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
             strList.Add('ant clean release');
-            SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-build-release-macos.sh');
+            Create_sh_bat(strList, FAndroidProjectName, 'ant-build-release-macos', '.sh');
           end;
 
           linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
@@ -2254,7 +2207,7 @@ begin
 
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr +
                                   linuxDirSeparator+ 'bin' + linuxDirSeparator+FSmallProjName+'-debug.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-adb-install-debug.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-adb-install-debug', '.sh');
 
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
@@ -2265,18 +2218,18 @@ begin
           {$endif}
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr +
                                   linuxDirSeparator+ 'build'+linuxDirSeparator+'outputs'+linuxDirSeparator+'apk'+linuxDirSeparator+'debug' + linuxDirSeparator+FSmallProjName+'-'+instructionChip+'-debug.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-adb-install-debug.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-adb-install-debug', '.sh');
 
 
           //linux uninstall  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'adb-uninstall.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'adb-uninstall', '.sh');
 
           //linux logcat  - thanks to Stephano!
           strList.Clear;
           strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'logcat.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'logcat', '.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
@@ -2285,44 +2238,43 @@ begin
           ////https://forum.lazarus.freepascal.org/index.php/topic,57735.0.html
           strList.Add('LC_ALL=C keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                        linuxAndroidProjectName+'/keytool_input.txt');
-
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'release-keystore', '.sh');
 
           //MacOs
           strList.Clear;
           strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');
           strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
           strList.Add('keytool -genkey -v -keystore '+Lowercase(FSmallProjName)+'-release.keystore -alias '+apk_aliaskey+' -keyalg RSA -keysize 2048 -validity 10000 < '+
                        linuxAndroidProjectName+'/keytool_input.txt');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'release-keystore-macos.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'release-keystore-macos', '.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-jarsigner-verify.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-jarsigner-verify', '.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'build'+linuxDirSeparator+'outputs'+linuxDirSeparator+'apk'+linuxDirSeparator+'release'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-jarsigner-verify.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-jarsigner-verify', '.sh');
 
           //MacOs
           strList.Clear;
           strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'bin'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'ant-jarsigner-verify-macos.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'ant-jarsigner-verify-macos', '.sh');
 
           strList.Clear;
           strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
           strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-          strList.Add('cd '+linuxAndroidProjectName);
+          strList.Add('cd ' + FAndroidProjectName + DirectorySeparator +'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
           strList.Add('jarsigner -verify -verbose -certs '+linuxAndroidProjectName+linuxDirSeparator+'build'+linuxDirSeparator+'outputs'+linuxDirSeparator+'apk'+linuxDirSeparator+'release'+linuxDirSeparator+FSmallProjName+'-release.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-jarsigner-verify-macos.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-jarsigner-verify-macos', '.sh');
 
           strList.Clear;
           strList.Add('sdk.dir=' + FPathToAndroidSDK);
@@ -2361,7 +2313,7 @@ begin
 
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('gradle wrapper');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-making-wrapper.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-making-wrapper', '.bat');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2374,7 +2326,7 @@ begin
           strList.Add('. ~/.bashrc');
           //strList.Add('./gradle wrapper');
           strList.Add('gradle wrapper');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-making-wrapper.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-making-wrapper', '.sh');
 
           //Drafts Method II
 
@@ -2387,7 +2339,7 @@ begin
             strList.Add('set GRADLE_HOME='+ FPathToGradle);
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('gradlew build');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-build.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradlew-build', '.bat');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2399,7 +2351,7 @@ begin
           strList.Add('. ~/.bashrc');
           //strList.Add('./gradlew build');
           strList.Add('gradlew build');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-build.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradlew-build', '.sh');
 
           //run
           strList.Clear;
@@ -2410,7 +2362,7 @@ begin
             strList.Add('set GRADLE_HOME='+ FPathToGradle);
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('gradlew run');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradlew-run.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradlew-run.bat', '.bat');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2422,7 +2374,7 @@ begin
           strList.Add('. ~/.bashrc');
           //strList.Add('./gradlew run');
           strList.Add('gradlew run');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradlew-run.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradlew-run', '.sh');
 
           //Drafts Method I
 
@@ -2434,7 +2386,7 @@ begin
             strList.Add('set GRADLE_HOME='+ FPathToGradle);
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('gradle clean build --info');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-build', '.bat');
 
           strList.Clear;
           strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
@@ -2444,7 +2396,7 @@ begin
             strList.Add('set GRADLE_HOME='+ FPathToGradle);
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('gradle clean bundle --info');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-build-bundle.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-build-bundle', '.bat');
 
           //thanks to TR3E!
           strList.Clear;
@@ -2459,7 +2411,7 @@ begin
 
           strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
           strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+apkName+'-release-unsigned-aligned.apk');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-apksigner.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-apksigner', '.bat');
 
           strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
           strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools;'+FPathToAndroidSDK+'build-tools\'+sdkBuildTools);
@@ -2467,7 +2419,7 @@ begin
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('zipalign -v -p 4 '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
           strList.Add('apksigner sign --ks '+FAndroidProjectName+'\'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-release.apk '+FAndroidProjectName+'\build\outputs\apk\release\'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-universal-apksigner', '.bat');
 
           strList.Clear;
           strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
@@ -2477,7 +2429,7 @@ begin
             strList.Add('set GRADLE_HOME='+ FPathToGradle);
           strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
           strList.Add('gradle run');
-          strList.SaveToFile(FAndroidProjectName+PathDelim+'gradle-local-run.bat');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-run', '.bat');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2488,7 +2440,7 @@ begin
           strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
           strList.Add('. ~/.bashrc');
           strList.Add('gradle clean build --info');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-build', '.sh');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2499,7 +2451,7 @@ begin
           strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
           strList.Add('. ~/.bashrc');
           strList.Add('gradle clean bundle --info');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-build-bundle.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-build-bundle', '.sh');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2508,7 +2460,7 @@ begin
           strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
           strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
           strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+apkName+'-release-unsigned-aligned.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-apksigner.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-apksigner', '.sh');
 
           strList.Clear;  //multi-arch :: armeabi-v7a + arm64-v8a + ...
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2517,7 +2469,7 @@ begin
           strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
           strList.Add('zipalign -v -p 4 '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
           strList.Add('apksigner sign --ks '+linuxAndroidProjectName+'/'+Lowercase(FSmallProjName)+'-release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-release.apk '+linuxAndroidProjectName+'/build/outputs/apk/release/'+FSmallProjName+'-universal-release-unsigned-aligned.apk');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-universal-apksigner.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-universal-apksigner', '.sh');
 
           strList.Clear;
           strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -2531,7 +2483,8 @@ begin
           strList.Add('. ~/.bashrc');
           //strList.Add('.\gradle run');
           strList.Add('gradle run');
-          SaveShellScript(strList, FAndroidProjectName+PathDelim+'gradle-local-run.sh');
+          Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-run', '.sh');
+
         end; //FModuleType < 2       //0: GUI; 1: NoGUI; 2: NoGUI EXE Console
         Result := True;
       except
@@ -2555,23 +2508,11 @@ begin
    begin
       if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
       begin
-        CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni');
-        CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'armeabi-v7a');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'mips');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'arm64-v8a');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'x86_64');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'obj');
-        CreateDir(FAndroidProjectName+DirectorySeparator+'lamwdesigner');
 
         if FModuleType < 2 then
-           CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
+           //CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
 
         //eclispe compatibility!
-        CreateDir(FAndroidProjectName+DirectorySeparator+'.settings');
 
         auxList:= TStringList.Create;
         auxList.Add('eclipse.preferences.version=1');
@@ -2583,12 +2524,12 @@ begin
         auxList.Clear;
         auxList.Add('<?xml version="1.0" encoding="UTF-8"?>');
         auxList.Add('<classpath>');
-	auxList.Add('<classpathentry kind="src" path="src"/>');
-	auxList.Add('<classpathentry kind="src" path="gen"/>');
-	auxList.Add('<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>');
-	auxList.Add('<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>');
-	auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
+	      auxList.Add('<classpathentry kind="src" path="src"/>');
+	      auxList.Add('<classpathentry kind="src" path="gen"/>');
+	      auxList.Add('<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>');
+	      auxList.Add('<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>');
+	      auxList.Add('<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>');
+	      auxList.Add('<classpathentry kind="output" path="bin/classes"/>');
         auxList.Add('</classpath>');
         auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'.classpath');
 

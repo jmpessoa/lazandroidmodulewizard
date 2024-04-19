@@ -5,8 +5,18 @@ unit SmartDesigner;
 interface
 
 uses
-  Classes, SysUtils, Controls, ProjectIntf, Forms, AndroidWidget,
-  process, SourceChanger, propedits, LCLClasses;
+  Classes,
+  SysUtils,
+  Controls,
+  ProjectIntf,
+  Forms,
+  AndroidWidget,
+  process,
+  SourceChanger,
+  propedits,
+  LCLClasses,
+  createfiles,
+  createdirectories;
 
 //tk min and max API versions for build.xml
 const
@@ -25,12 +35,9 @@ type
     // all Paths have trailing PathDelim
     FPathToJavaSource: string;  //Included Path Delimiter!
     FPathToAndroidProject: string;  //Included Path Delimiter!
-
     FPathToAndroidSDK: string;  //Included Path Delimiter!
     FPathToAndroidNDK: string;  //Included Path Delimiter!
-
     FPathToJavaJDK: string;
-
     FSmallProjName: string;
     FGradleVersion: string;
     FPrebuildOSYS: string;
@@ -46,60 +53,47 @@ type
     FAndroidTheme: string;
     FIsKotlinSupported: boolean;
     FKeepMyBuildGradleWhenReopen: string;
-
     FJavaBigVersion: string;
     FJavaMainVersion: string;
-
     procedure CleanupAllJControlsSource;
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
     procedure AddSupportToFCLControls(chipArch: string);
-    function GetEventSignature(const nativeMethod: string): string;
-    function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
-    function GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
-    function TryAddJControl(ControlsJava: TStringList; jclassname: string; out nativeAdded: boolean): boolean;
     procedure UpdateProjectLpr(oldModuleName: string; newModuleName: string);
     procedure InitSmartDesignerHelpers;
     procedure UpdateStartModuleVarName;
     procedure UpdateAllJControls(AProject: TLazProject);
-
-    function IsDemoProject: boolean;
+    procedure TryUpdateMipmap();
+    procedure UpdateBuildModes();
+    procedure KeepBuildUpdated(targetApi: integer);
     procedure TryChangeDemoProjecPaths;
     procedure TryFindDemoPathsFromReadme(out pathToDemoNDK, pathToDemoSDK: string);
+    procedure TryChangeDemoProjecAntBuildScripts();
 
     function GetMaxNdkPlatform(ndkVer: integer): integer;
-
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetMaxSdkPlatform(): integer;
-
     function GetVesionCodeFromBuilGradle(): string;
     function GetVesionNameFromBuilGradle(): string;
-
-    procedure KeepBuildUpdated(targetApi: integer);
-
     function TryProduceGradleVersion(pathToGradle: string): string;
     function GetGradleVersion(pathToGradle: string): string;
-
+    function IsDemoProject: boolean;
+    function GetEventSignature(const nativeMethod: string): string;
+    function GetPackageNameFromAndroidManifest(pathToAndroidManifest: string): string;
+    function GetCorrectTemplateFileName(const Path, FileName: String): String; //by kordal
+    function TryAddJControl(ControlsJava: TStringList; jclassname: string; out nativeAdded: boolean): boolean;
     function GetLprStartModuleVarName: string;
     function TryChangePrebuildOSY(path: string): string;
     function TryChangeTo49x(path: string): string;
     function TryChangeTo49(path: string): string;
     function TryChangeNdkPlatformsApi(path: string; newNdkApi: integer): string;
     function IsSdkToolsAntEnable(path: string): boolean;
-    procedure TryChangeDemoProjecAntBuildScripts();
-
     function GetPathToSmartDesigner(): string;
-    procedure UpdateBuildModes();
-
     function TryGetNDKRelease(pathNDK: string): string;
     function GetNDKVersion(ndkRelease: string): integer;
-
-    procedure TryUpdateMipmap();
     function GetVerAsString(aVers: integer): string;   //?? android
-
   protected
     function OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
     function OnProjectSavingAll(Sender: TObject): TModalResult;
-
     function AddClicked(ADesigner: TIDesigner;
                  MouseDownComponent: TComponent; Button: TMouseButton;
                  Shift: TShiftState; X, Y: Integer;
@@ -109,24 +103,18 @@ type
   public
     destructor Destroy; override;
     procedure Init;
-    procedure Init4Project(AProject: TLazProject);
-    function IsLaz4Android(): boolean;
-
     // calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
-
+    procedure Init4Project(AProject: TLazProject);
      //calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
     procedure DoBuildGradle(minSdkApi: string; targetApi: string);
-
+    procedure TryProduceJavaVersion(pathToJDK: string);
+    function IsLaz4Android(): boolean;
     function GetAndroidPluginVersion(gradleVersion: string; mainJavaVersion: string): string;  //new!
     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
     function GetAndroidPluginVersionAsBigNumber(androidPluginVersionAsString: string): integer;
-
-
-    procedure TryProduceJavaVersion(pathToJDK: string);
-
   end;
 
   function ReplaceChar(const query: string; oldchar, newchar: char): string;
@@ -141,9 +129,26 @@ implementation
 
 uses
   {$ifdef unix}BaseUnix,{$endif}
-  {Controls,} Dialogs, {SrcEditorIntf,} LazIDEIntf, IDEMsgIntf, IDEExternToolIntf, CodeToolManager, CodeTree,
-  CodeCache, {SourceChanger,} LinkScanner, Laz2_DOM, laz2_XMLRead, FileUtil,
-  LazFileUtils, LamwSettings, uJavaParser, strutils, PackageIntf;
+  {Controls,}
+  Dialogs,
+  {SrcEditorIntf,}
+  LazIDEIntf,
+  IDEMsgIntf,
+  IDEExternToolIntf,
+  CodeToolManager,
+  CodeTree,
+  CodeCache,
+  {SourceChanger,}
+  LinkScanner,
+  Laz2_DOM,
+  laz2_XMLRead,
+  FileUtil,
+  LazFileUtils,
+  LamwSettings,
+  uJavaParser,
+  strutils,
+  AndroidWizard_intf,
+  PackageIntf;
 
 procedure SaveShellScript(script: TStringList; const AFileName: string);
 begin
@@ -328,7 +333,6 @@ procedure TLamwSmartDesigner.TryUpdateMipmap();
 var
   pathToJavaTemplates: string;
 begin
-
   if DirectoryExists(FPathToAndroidProject +'res'+DirectorySeparator+'mipmap-mdpi')  then Exit;
   if LazarusIDE.ActiveProject.CustomData['CanCreateResMipmapFolder'] = 'NO' then Exit;
 
@@ -966,9 +970,9 @@ var
   insertRef, supportProvider: string;
   p1 : integer;
 begin
-
   strTargetApi:= IntTostr(targetApi);
   strList:= TStringList.Create;
+  CreateDirectoriesFull(FPathToAndroidProject);
 
   if not FileExists(FPathToAndroidProject + 'gradle.properties') then
   begin
@@ -982,9 +986,9 @@ begin
   //Android Studio compatiblity
   if not DirectoryExists(FPathToAndroidProject+'gradle') then
   begin
-    CreateDir(FPathToAndroidProject+'gradle');
     ForceDirectories(FPathToAndroidProject+'gradle'+DirectorySeparator+'wrapper');
   end;
+
   StrList.Clear;
   strList.Add('distributionBase=GRADLE_USER_HOME');
   strList.Add('distributionPath=wrapper/dists');
@@ -1381,8 +1385,9 @@ begin
    end;
 
 
-  //gradle build scripts;
+  //CreateUtils;
 
+  //gradle build scripts;
    strList.Clear;
    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
    if FPathToGradle = '' then
@@ -1391,7 +1396,7 @@ begin
     strList.Add('set GRADLE_HOME='+ FPathToGradle);
    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
    strList.Add('gradle clean build --info');
-   strList.SaveToFile(FPathToAndroidProject+'gradle-local-build.bat');
+   Create_sh_bat(strList, FPathToAndroidProject, 'gradle-local-build', '.bat', True);
 
    strList.Clear;
    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
@@ -1401,8 +1406,7 @@ begin
     strList.Add('set GRADLE_HOME='+ FPathToGradle);
    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
    strList.Add('gradle clean bundle --info');
-   strList.SaveToFile(FPathToAndroidProject+'gradle-local-build-bundle.bat');
-
+   Create_sh_bat(strList, FPathToAndroidProject, 'gradle-local-build-bundle', '.bat', True);
 
    strList.Clear;
    strList.Add('set Path=%PATH%;'+FPathToAndroidSDK+'platform-tools');
@@ -1412,7 +1416,7 @@ begin
     strList.Add('set GRADLE_HOME='+ FPathToGradle);
    strList.Add('set PATH=%PATH%;%GRADLE_HOME%\bin');
    strList.Add('gradle run');
-   strList.SaveToFile(FPathToAndroidProject+'gradle-local-run.bat');
+   Create_sh_bat(strList, FPathToAndroidProject, 'gradle-local-run', '.bat', True);
 
    linuxDirSeparator:= DirectorySeparator;
    linuxPathToAndroidSdk:= FPathToAndroidSDK;
@@ -1441,7 +1445,7 @@ begin
    strList.Add('. ~/.bashrc');
    //strList.Add('.\gradle clean build --info');
    strList.Add('gradle clean build --info');
-   SaveShellScript(strList, FPathToAndroidProject+'gradle-local-build.sh');
+   Create_sh_bat(strList, FPathToAndroidProject, 'gradle-local-build', '.sh');
 
    strList.Clear;
    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -1452,7 +1456,7 @@ begin
    strList.Add('export PATH=$PATH:$GRADLE_HOME/bin');
    strList.Add('. ~/.bashrc');
    strList.Add('gradle clean bundle --info');
-   SaveShellScript(strList, FPathToAndroidProject + 'gradle-local-build-bundle.sh');
+   Create_sh_bat(strList, FPathToAndroidProject, 'gradle-local-build-bundle', '.sh');
 
    strList.Clear;
    strList.Add('export PATH='+linuxPathToAndroidSDK+'platform-tools'+':$PATH');
@@ -1466,7 +1470,7 @@ begin
    strList.Add('. ~/.bashrc');
   //strList.Add('.\gradle run');
    strList.Add('gradle run');
-   SaveShellScript(strList, FPathToAndroidProject+'gradle-local-run.sh');
+   Create_sh_bat(strList, FPathToAndroidProject, 'gradle-local-run', '.sh');
 
    strList.Free;
 end;
@@ -1725,6 +1729,7 @@ begin
 
       sdkTargetApi := AProject.CustomData['TargetSdk'];
 
+
       if length(sdkTargetApi) <= 0 then
       begin
        sdkTargetApi:= IntToStr( GetMaxSdkPlatform() );
@@ -1733,10 +1738,15 @@ begin
       end;
 
       if IsAllCharNumber(PChar(sdkTargetApi))  then
-          intTargetApi:= StrToInt(sdkTargetApi)
-      else intTargetApi:= cMaxApi;
+      begin
+        intTargetApi:= StrToInt(sdkTargetApi);
+      end else
+      begin
+        intTargetApi:= cMaxApi;
+      end;
 
-      if intTargetApi < 33 then
+
+      if intTargetApi < 33 then // 34
       begin
         ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
                      'Please, update your android sdk/platforms folder!' + sLineBreak +
@@ -1747,6 +1757,7 @@ begin
       end;
 
       KeepBuildUpdated(intTargetApi);
+
 
       if Self.IsLaz4Android() then
       begin
@@ -1769,6 +1780,7 @@ begin
       end;
       UpdateBuildModes();
     end; //not is brandNews
+
   end;
 end;
 
@@ -2489,7 +2501,9 @@ begin
    if FileExists(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info') then
    begin
      auxList.LoadFromFile(LamwGlobalSettings.PathToJavaTemplates+jclassname+'.info');
+
      ForceDirectories(FPathToAndroidProject+'res'+DirectorySeparator+'xml');
+
      auxList.SaveToFile(FPathToAndroidProject+'res'+DirectorySeparator+'xml'+DirectorySeparator+LowerCase(jclassname)+'_info.xml');
    end;
 
@@ -3671,10 +3685,8 @@ var
   tempStr, linuxPathToAdbBin, packageName: string;
 
 begin
-
   pathToAntBin:= Copy(LamwGlobalSettings.PathToAntBin, 1, Length(LamwGlobalSettings.PathToAntBin)-1); //paths have trailing path
   if pathToAntBin = '' then Exit;
-
   antBuildMode:= 'debug';
   packageName:= LazarusIDE.ActiveProject.CustomData.Values['Package'];
 
@@ -3682,22 +3694,25 @@ begin
 
   androidProjectName:= FPathToAndroidProject; //paths have trailing path
 
+  CreateDirectoriesFull(androidProjectName); // marcos ate entao nao deletar
+
   strList:= TStringList.Create;
 
   strList.Add('set Path=%PATH%;'+pathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
   strList.Add('set JAVA_HOME='+pathToJavaJDK);  //set JAVA_HOME=C:\Program Files (x86)\Java\jdk1.7.0_21
-  strList.Add('cd '+androidProjectName);
+  strList.Add('cd '+androidProjectName + 'utils' + DirectorySeparator + 'windows' + DirectorySeparator);
   strList.Add('call ant clean -Dtouchtest.enabled=true debug');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName+'ant-build-debug.bat');
+  Create_sh_bat(strList, FPathToAndroidProject, 'ant-build-debug', '.bat', True);
+
 
   strList.Clear;
   strList.Add('set Path=%PATH%;'+pathToAntBin);
   strList.Add('set JAVA_HOME='+pathToJavaJDK);
-  strList.Add('cd '+androidProjectName);
+  strList.Add('cd '+androidProjectName + DirectorySeparator + 'utils' + DirectorySeparator + 'windows' + DirectorySeparator);
   strList.Add('call ant clean release');
   strList.Add('if errorlevel 1 pause');
-  strList.SaveToFile(androidProjectName+'ant-build-release.bat');
+  Create_sh_bat(strList, FPathToAndroidProject, 'ant-build-release', '.bat', True);
 
   strList.Clear;
   strList.Add('cd '+androidProjectName+'bin');
@@ -3705,7 +3720,7 @@ begin
              DirectorySeparator+'adb install -r '+FSmallProjName+'-'+antBuildMode+'.apk');
   strList.Add('cd ..');
   strList.Add('pause');
-  strList.SaveToFile(androidProjectName+'adb-install.bat');
+  Create_sh_bat(strList, FPathToAndroidProject, 'adb-install', '.bat', True);
 
   linuxDirSeparator:= DirectorySeparator;
   linuxPathToJavaJDK:= pathToJavaJDK;
@@ -3741,10 +3756,9 @@ begin
     strList.Add('export PATH='+linuxPathToAntBin+':$PATH');
 
   strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);
-  strList.Add('cd '+linuxAndroidProjectName);
+  strList.Add('cd ' + FPathToAndroidProject + 'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
   strList.Add('ant -Dtouchtest.enabled=true debug');
-  SaveShellScript(strList, androidProjectName+'ant-build-debug.sh');
-
+  Create_sh_bat(strList, FPathToAndroidProject, 'ant-build-debug', '.sh');
 
   //MacOs
   strList.Clear;
@@ -3753,9 +3767,9 @@ begin
      strList.Add('export PATH='+linuxPathToAntBin+':$PATH');        //export PATH=/usr/bin/ant:PATH
      strList.Add('export JAVA_HOME=${/usr/libexec/java_home}');     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
      strList.Add('export PATH=${JAVA_HOME}/bin:$PATH');
-     strList.Add('cd '+linuxAndroidProjectName);
+     strList.Add('cd ' + FPathToAndroidProject + 'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
      strList.Add('ant -Dtouchtest.enabled=true debug');
-     SaveShellScript(strList, androidProjectName+'ant-build-debug-macos.sh');
+     Create_sh_bat(strList, FPathToAndroidProject, 'ant-build-debug-macos', '.sh');
   end;
 
   strList.Clear;
@@ -3763,9 +3777,9 @@ begin
      strList.Add('export PATH='+linuxPathToAntBin+':$PATH'); //export PATH=/usr/bin/ant:PATH
 
   strList.Add('export JAVA_HOME='+linuxPathToJavaJDK);     //export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-  strList.Add('cd '+linuxAndroidProjectName);
+  strList.Add('cd ' + FPathToAndroidProject + 'utils'+ DirectorySeparator +'unix'+ DirectorySeparator);
   strList.Add('ant clean release');
-  SaveShellScript(strList, androidProjectName+'ant-build-release.sh');
+  Create_sh_bat(strList, FPathToAndroidProject, 'ant-build-release', '.sh');
 
   linuxPathToAdbBin:= linuxPathToAndroidSdk+'platform-tools';
 
@@ -3783,16 +3797,15 @@ begin
   {$endif}
 
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb install -r ' + tempStr + 'bin' + linuxDirSeparator+FSmallProjName+'-'+antBuildMode+'.apk');
-  //strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
-  SaveShellScript(strList, androidProjectName+'adb-install.sh');
+  Create_sh_bat(strList, FPathToAndroidProject, 'adb-install', '.sh');
 
   strList.Clear;
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb uninstall '+packageName);
-  SaveShellScript(strList, androidProjectName+'adb-uninstall.sh');
+  Create_sh_bat(strList, FPathToAndroidProject, 'adb-uninstall', '.sh');
 
   strList.Clear;
   strList.Add(linuxPathToAdbBin+linuxDirSeparator+'adb logcat &');
-  SaveShellScript(strList, androidProjectName+'logcat.sh');
+  Create_sh_bat(strList, FPathToAndroidProject, 'logcat', '.sh');
 
   strList.Free;
 end;
