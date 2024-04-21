@@ -5,6 +5,7 @@ unit createfiles;
 interface
 
 uses
+  {$ifdef unix}BaseUnix,{$endif}
   Classes,
   SysUtils;
 
