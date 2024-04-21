@@ -9,7 +9,7 @@ uses
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
   uFormBuildFPCCross, {uFormGetFPCSource,} uimportjavastuff, uimportjavastuffchecked,
   uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff,
-  unitformimportpicture, uformapksigner, unitFormExportProjectAsTemplate;
+  unitformimportpicture, uformapksigner, unitFormExportProjectAsTemplate,  lamwexplorer;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);     //By Thierrydijoux!
@@ -50,6 +50,23 @@ begin
   FormGetFPCSource.ShowModal;
 end;
 }
+
+procedure RunLamwExplorer(Sender: TObject);
+var
+  Project: TLazProject;
+begin
+ Project := LazarusIDE.ActiveProject;
+  if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+  begin
+      if LExplorer = nil then
+      begin
+        LExplorer := TLExplorer.Create(Application);
+      end;
+      LExplorer.Show;
+  end
+  else
+    ShowMessage('The active project is not LAMW project!');
+end;
 
 procedure StartPathTool(Sender: TObject);
 begin
@@ -2718,9 +2735,12 @@ Var
   ideSubMnuAMW: TIDEMenuSection;
   ideSubMnuLog: TIDEMenuSection;
   ideSubMnuAppCompat: TIDEMenuSection;
+
   ideMnuLAMWBuild: TIDEMenuCommand;
+  ideMnuLAMWExplorer: TIDEMenuCommand;
 
   CmdMyTool: TIDECommand;
+  CmdMyExplorer: TIDECommand;
 
   Key: TIDEShortCut;
   Cat: TIDECommandCategory;
@@ -2738,6 +2758,7 @@ begin
   end;
   // Register main LAMW menu
   ideMnuAMW:= RegisterIDEMenuSection(mnuTools,'LAMW');
+
   // Register submenu
   ideSubMnuAMW:= RegisterIDESubMenu(ideMnuAMW, 'LAMW', '[LAMW] Android Module Wizard');
   if pathToLamwIcon <> '' then ideSubMnuAMW.Bitmap.LoadFromFile(pathToLamwIcon);
@@ -2808,11 +2829,17 @@ begin
    Key := IDEShortCut(VK_F1,[ssCtrl],VK_UNKNOWN,[]);
    Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
    CmdMyTool := RegisterIDECommand(Cat,'BuildApkAndRun', '[LAMW] Build Android Apk and Run', Key, nil, @BuildApkAndRun);
-
-   //RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
    ideMnuLAMWBuild:= RegisterIDEMenuCommand(itmRunBuilding, 'LAMW Build Apk And Run', '[LAMW] Build Android Apk and Run', nil, nil, CmdMyTool);
+   //RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
 
-  if pathToLamwIcon <> '' then ideMnuLAMWBuild.Bitmap.LoadFromFile(pathToLamwIcon);
+   if pathToLamwIcon <> '' then ideMnuLAMWBuild.Bitmap.LoadFromFile(pathToLamwIcon);
+
+  //LAMW Explore  by marcos-ebm
+   Key := IDEShortCut(VK_E,[ssAlt],VK_UNKNOWN,[]);
+   Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
+   CmdMyExplorer := RegisterIDECommand(Cat,'LAMWExplorer', '', Key, nil, @RunLamwExplorer);
+   ideMnuLAMWExplorer:= RegisterIDEMenuCommand(itmFileDirectories, 'LAMW Explorer', '[LAMW] Explorer', nil, nil, CmdMyExplorer);
+   if pathToLamwIcon <> '' then ideMnuLAMWExplorer.Bitmap.LoadFromFile(pathToLamwIcon);
 
    ApkBuild.RegisterExtToolParser;
 end;
