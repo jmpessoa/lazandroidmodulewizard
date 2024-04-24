@@ -9,7 +9,7 @@ uses
   uformsettingspaths{, lazandroidtoolsexpert}, ufrmEditor, ufrmCompCreate,
   uFormBuildFPCCross, {uFormGetFPCSource,} uimportjavastuff, uimportjavastuffchecked,
   uimportcstuff, process, Laz2_DOM, laz2_XMLRead, uformimportlamwstuff,
-  unitformimportpicture, uformapksigner, unitFormExportProjectAsTemplate,  lamwexplorer;
+  unitformimportpicture, uformapksigner, unitFormExportProjectAsTemplate,  lamwexplorer, LamwToolKit;
 
 procedure StartPathTool(Sender: TObject);
 procedure StartLateTool(Sender: TObject);     //By Thierrydijoux!
@@ -66,6 +66,20 @@ begin
   end
   else
     ShowMessage('The active project is not LAMW project!');
+end;
+
+procedure RunLamwToolKit(Sender: TObject);
+var
+  Project: TLazProject;
+begin
+   Project := LazarusIDE.ActiveProject;
+   if Assigned(Project) and (Project.CustomData.Values['LAMW'] <> '') then
+   begin
+     ToolKit := TToolKit.Create(Application);
+     ToolKit.ShowModal;
+   end
+   else
+     ShowMessage('The active project is not LAMW project!');
 end;
 
 procedure StartPathTool(Sender: TObject);
@@ -2830,7 +2844,8 @@ begin
    Cat:=IDECommandList.FindCategoryByName(CommandCategoryToolMenuName);
    CmdMyTool := RegisterIDECommand(Cat,'BuildApkAndRun', '[LAMW] Build Android Apk and Run', Key, nil, @BuildApkAndRun);
    ideMnuLAMWBuild:= RegisterIDEMenuCommand(itmRunBuilding, 'LAMW Build Apk And Run', '[LAMW] Build Android Apk and Run', nil, nil, CmdMyTool);
-   //RegisterIDEMenuCommand(itmRunBuilding, 'BuildApkAndRun', '[LAMW] Build Android Apk and Run', nil, @BuildApkAndRun);
+
+   RegisterIDEMenuCommand(itmRunBuilding, 'LamwToolKitRun', '[LAMW] Run Android Apk...', nil, @RunLamwToolKit);
 
    if pathToLamwIcon <> '' then ideMnuLAMWBuild.Bitmap.LoadFromFile(pathToLamwIcon);
 
