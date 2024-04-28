@@ -169,7 +169,7 @@ type
   public
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
-    ModuleType: integer;   //-1:gdx 0: GUI; 1: No GUI ; 2: console executable App; 3: generic library
+    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console executable App; 3: generic .so library
 
     AndroidTheme: string;
 
@@ -263,13 +263,13 @@ begin
             'The project is maintained by Lazarus.'
 end;
 
-function TAndroidNoGUIExeProjectDescriptor.DoInitDescriptor: TModalResult;    //NoGUI Exe
+function TAndroidNoGUIExeProjectDescriptor.DoInitDescriptor: TModalResult;    //2: executable console app
 var
   list: TStringList;
   outTag: integer;
 begin
   try
-    FModuleType := 2; //-1: gdx 0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console  3: generic library
+    FModuleType := 2; //0: GUI --- 1:NoGUI --- 2: Console  3: generic raw .so library
     FPathToClassName := '';
 
     if GetWorkSpaceFromForm(2, outTag) then
@@ -281,13 +281,13 @@ begin
 
       if outTag = 3 then
       begin
-        FModuleType:= 3;
+        FModuleType:= 3;  //raw .so library
         AndroidFileDescriptor.ModuleType:= 3; // generic/custom library
       end;
 
       CreateDirectoriesLibs(FAndroidProjectName);
 
-      if FModuleType = 2 then //default
+      if FModuleType = 2 then //console
       begin
         list:= TStringList.Create;
 
@@ -455,7 +455,7 @@ var
   p1: integer;
 begin
   try
-    FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: NoGUI EXE Console
+    FModuleType := 0; //0: GUI --- 1:NoGUI --- 2: executable Console app -- 3: raw .so library
     FJavaClassName := 'Controls';
     FPathToClassName := '';
 
@@ -830,7 +830,7 @@ var
   frm: TFormAndroidProject;
 begin
   Result := False;
-  FModuleType:= projectType; //-1:gdx 0:GUI <--> 1:NoGUI <--> 2:NoGUI console Exe
+  FModuleType:= projectType; //0:GUI    1:NoGUI  2:console executable app   3: raw .so library
   frm:= TFormAndroidProject.Create(nil);  //Create Form
 
   frm.PathToJavaTemplates:= FPathToJavaTemplates;
@@ -1369,8 +1369,7 @@ var
   isAppCompatTheme, isGradleBuildSystem: boolean;
 begin
   Result:= False;
-  FModuleType:= projectType; //-1:gdx 0:GUI  1:NoGUI 2: NoGUI EXE Console 3: generic library
-  CreateDirectoriesFull(FAndroidProjectName);
+  FModuleType:= projectType; //0:GUI    1:NoGUI    2:Console executable app  3:raw .so library
 
   AndroidFileDescriptor.ModuleType:= projectType;
   strList:= nil;
@@ -1404,10 +1403,12 @@ begin
 
       frm.LabelTheme.Caption:= 'App LAMW [NoGUI] Project';
       frm.ComboBoxTheme.Visible:= False;
+      frm.ComboBoxThemeColor.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
+      frm.CheckBoxAutoConfigGradle.Visible:= False;
     end;
 
-    if FModuleType = 2 then //No GUI console executable or generic library [.so]
+    if FModuleType = 2 then //Console executable or generic library [.so]
     begin
       frm.GroupBox1.Visible:= False;
       frm.GroupBox5.Visible:= False;
@@ -1417,7 +1418,7 @@ begin
 
       frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwConsoleApp', frm.ComboSelectProjectName.Items);
 
-      frm.LabelTheme.Caption:= 'App LAMW [NoGUI] Android Console/Executable Project';
+      frm.LabelTheme.Caption:= 'Console App or raw .so Project';
       frm.EditPackagePrefaceName.Visible:= False;
 
       frm.EditPackagePrefaceName.Text:= '';
@@ -1425,6 +1426,9 @@ begin
 
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
+      frm.ComboBoxThemeColor.Visible:= False;
+
+      frm.CheckBoxAutoConfigGradle.Visible:= False;
 
       frm.CheckBoxPIE.Visible:= True;
       frm.CheckBoxGeneric.Visible:= True;  //support to raw [not jni] .so library
@@ -1597,7 +1601,7 @@ begin
       try
         if FProjectModel = 'NEW' then   //please read as "new project"...
         begin
-          if FModuleType < 2 then   //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
+          if FModuleType < 2 then   //0:GUI project   1:NoGui project
           begin
             ForceDirectories(FAndroidProjectName + DirectorySeparator + 'src');
 
@@ -1743,7 +1747,7 @@ begin
                          FAndroidProjectName+DirectorySeparator+ 'res'+DirectorySeparator+'layout'+DirectorySeparator+'activity_app.xml');
           end;
 
-          if FModuleType <= 0  then  //Android Bridges Controls... [GUI]
+          if FModuleType = 0  then  //Android Bridges Controls... [GUI]
           begin
             if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
             begin
@@ -1756,7 +1760,7 @@ begin
             end;
           end;
 
-          if FModuleType = 1 then     //[No GUI]
+          if FModuleType = 1 then     //[NoGUI]
           begin
              if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
              begin
@@ -1854,11 +1858,11 @@ begin
           end; //just Ant NoGUI project
         end; // Ant
 
-        //CreateUtils(FAndroidProjectName);
-
-
-        if FModuleType < 2 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+        if FModuleType < 2 then    {0:GUI; 1:NoGUI}
         begin
+
+          CreateDirectoriesUtils(FAndroidProjectName+DirectorySeparator);
+
           strList.Clear;
           //begin_cmd_tools
           strList.Add('set Path=%PATH%;'+FPathToAntBin); //<--- thanks to andersonscinfo !  [set path=%path%;C:\and32\ant\bin]
@@ -2015,10 +2019,9 @@ begin
 
           strList.Add('</project>');
           strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build.xml');
-
           //end_build.xml
 
-          DoReadme;
+          //DoReadme;   //TODO -> update it!
 
           apk_aliaskey:= LowerCase(FSmallProjName)+'.keyalias';
 
@@ -2485,7 +2488,7 @@ begin
           strList.Add('gradle run');
           Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-run', '.sh');
 
-        end; //FModuleType < 2       //0: GUI; 1: NoGUI; 2: NoGUI EXE Console
+        end; //FModuleType < 2       //0:GUI; 1:NoGUI; 2:Console
         Result := True;
       except
         on e: Exception do
@@ -2508,11 +2511,6 @@ begin
    begin
       if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
       begin
-
-        if FModuleType < 2 then
-           //CreateDir(FAndroidProjectName+DirectorySeparator+'obj'+DirectorySeparator+'controls');
-
-        //eclispe compatibility!
 
         auxList:= TStringList.Create;
         auxList.Add('eclipse.preferences.version=1');
@@ -2685,7 +2683,7 @@ begin
 
   inherited InitProject(AProject);
 
-  if  FModuleType < 2 then
+  if  FModuleType < 2 then  //0:GUI    1:NoGUI
     projName:= LowerCase(FJavaClassName) + '.lpr'
   else
     projName:= LowerCase(FSmallProjName) + '.lpr';
@@ -2698,7 +2696,7 @@ begin
   else
      projDir:= FPathToJNIFolder+DirectorySeparator;
 
-  if FModuleType = 0 then    {0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+  if FModuleType = 0 then    //0:GUI
   begin
     AProject.CustomData.Values['LAMW'] := 'GUI';
     AProject.CustomData.Values['BuildSystem'] := FBuildSystem;
@@ -2720,14 +2718,14 @@ begin
     else
       AProject.CustomData.Values['Support'] := 'FALSE';
   end
-  else if  FModuleType = 1 then
+  else if  FModuleType = 1 then //NoGUI
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
   else if FModuleType = 2 then
     AProject.CustomData.Values['LAMW'] := 'NoGUIConsoleApp'    // FModuleType =2
-  else
+  else  //3
     AProject.CustomData.Values['LAMW'] := 'NoGUIGenericLibrary';    // FModuleType = 3
 
-  if FModuleType < 2 then    {-1:gdx 0: GUI; 1: NoGUI; 2: NoGUI EXE Console}
+  if FModuleType < 2 then    {0:GUI; 1:NoGUI}
     AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
@@ -2743,14 +2741,17 @@ begin
   AProject.AddFile(MainFile, False);
   AProject.MainFileID := 0;
 
-  if FModuleType <= 0 then  //GUI
-    AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI or gdx  controls
+  if FModuleType = 0 then  //GUI
+    AProject.AddPackageDependency('tfpandroidbridge_pack'); //GUI ->  Android Bridges components
 
   sourceList:= TStringList.Create;              //FSmallProjName
-  //sourceList.Add('{hint: save all files to location: ' + projDir + ' }');
-  sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }');
 
-  if FModuleType = 2 then  //console executavel
+  if FModuleType < 2 then //0:GUI   1:NoGUI
+     sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator+'jni }')
+  else //2:console  3: raw .so library
+     sourceList.Add('{hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+'}');
+
+  if FModuleType = 2 then  //console executavel app
     sourceList.Add('program '+ LowerCase(FSmallProjName) +'; '+ ' //[by LAMW: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
   else if  FModuleType = 3 then
     sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ ' //[by LAMW: Lazarus Android Module Wizard: '+DateTimeToStr(Now)+']')
@@ -2763,7 +2764,7 @@ begin
 
   sourceList.Add('uses');
 
-  if FModuleType <= 1 then  //-1:gdx    0:GUI or   1:noGUI controls
+  if FModuleType < 2 then  //0:GUI or   1:noGUI
   begin
     //https://forum.lazarus.freepascal.org/index.php/topic,45715.msg386317
     sourceList.Add('  {$IFDEF UNIX}{$IFDEF UseCThreads}');
@@ -2771,7 +2772,7 @@ begin
     sourceList.Add('  {$ENDIF}{$ENDIF}');
   end;
 
-  if FModuleType <= 0 then  //-1:gdx    0:GUI or   1:noGUI controls
+  if FModuleType = 0 then  //0: GUI
   begin
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
     sourceList.Add('  Laz_And_Controls_Events;');
@@ -2819,7 +2820,7 @@ begin
 
     sourceList.Add('');
   end
-  else if FModuleType = 2 then// 2 - NoGUI console executable
+  else if FModuleType = 2 then//console executable app
   begin
     sourceList.Add('  Classes, SysUtils, CustApp;');
     sourceList.Add(' ');
@@ -2856,12 +2857,12 @@ begin
     sourceList.Add('  AndroidConsoleApp: TAndroidConsoleApp;');
     sourceList.Add('');
   end
-  else //generic .so library // FModuleType = 3
+  else //3: raw .so library // FModuleType = 3
   begin
     sourceList.Add('  Unit1;');  //ok
   end;
 
-  if FModuleType <= 1 then //0:GUI    1:NoGUI    -1:gdx
+  if FModuleType < 2 then //0:GUI    1:NoGUI
   begin
     sourceList.Add('{%region /fold ''LAMW generated code''}');
     sourceList.Add('');
@@ -2871,7 +2872,7 @@ begin
 
   sourceList.Add(' ');
 
-  if FModuleType < 3 then sourceList.Add('begin');
+  if FModuleType < 3 then sourceList.Add('begin');  //0:GUI    1:NoGUI   2:console App
 
   if FModuleType = 0 then  //GUI Android Bridges controls...
   begin
@@ -2905,9 +2906,9 @@ begin
      sourceList.Add('  AndroidConsoleApp.CreateForm(TAndroidConsoleDataForm1,AndroidConsoleDataForm1);');
   end
   else
-  begin  //generic library     // FModuleType = 3
+  begin  //3: generic .so library     // FModuleType = 3
     sourceList.Add(' ');
-    sourceList.Add('function Sum(a: longint; b: longint): longint; cdecl;');
+    sourceList.Add('function Sum(a: longint; b: longint): longint; cdecl;');  //just demo...
     sourceList.Add('begin');
     sourceList.Add('  Result:= SumAB(a, b);');
     sourceList.Add('end;');
@@ -3723,7 +3724,7 @@ begin
    sourceList.Add('interface');
    sourceList.Add('');
 
-   if ModuleType = 3 then    sourceList.Add('{');
+   if ModuleType = 3 then    sourceList.Add('(*');
 
    sourceList.Add('uses');
 
@@ -3735,7 +3736,7 @@ begin
 
    sourceList.Add('  ' + GetInterfaceUsesSection);
 
-   if ModuleType = 3 then    sourceList.Add('}');
+   if ModuleType = 3 then    sourceList.Add('*)');
 
    if ModuleType = 1 then //no GUI
    begin

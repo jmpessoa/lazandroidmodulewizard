@@ -638,6 +638,8 @@ var
   path, tempStr: string;
   aList: TStringList;
 begin
+   //0: GUI project   1: NoGui project   2: NoGUI Exe/console or .so
+
   if FGradleVersion <> '' then
   begin
     aList:= TStringList.Create;
@@ -721,7 +723,7 @@ begin
      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
      FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
 
-     if FModuleType > 0 then //NoGUI
+     if FModuleType > 0 then //NoGUI     //0: GUI project   1: NoGui project   2: NoGUI Exe/console or .so
           FJavaClassName:=  FSmallProjName;
   end
   else
@@ -818,24 +820,17 @@ begin
     end
     else
     begin
-      CreateDir(FAndroidProjectName);
-      CreateDirectoriesFull(FAndroidProjectName, FJavaClassName);
-      if FModuleType <> 2 then  //0: GUI project   1: NoGui project   2: NoGUI Exe
+      CreateDir(FAndroidProjectName);  //project folder....
+      if FModuleType <> 2 then //0: GUI project   1: NoGui project   2: NoGUI Exe/console or .so
       begin
-        //CreateDir(FAndroidProjectName+ DirectorySeparator + 'jni');
-        //CreateDir(FAndroidProjectName+DirectorySeparator+ 'jni'+DirectorySeparator+'build-modes');
+        CreateDirectoriesFull(FAndroidProjectName, FJavaClassName); //other dirs.....
       end
-      else  //console executable app
+      else  //console executable app ->  2: app console executable or raw ".so"
       begin
-        //CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
-      end;
-
-      if FModuleType <> 2 then
-      begin
-        //CreateDir(FAndroidProjectName+ DirectorySeparator + 'obj'+DirectorySeparator+LowerCase(FJavaClassName));
+         CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
+         CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
       end;
     end;
-
   end;
   //CloseAction := caFree;
 end;

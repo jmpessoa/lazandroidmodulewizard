@@ -10,6 +10,8 @@ uses
   SysUtils;
 
 procedure CreateDirectoriesFull(path: String; FJavaClassName: String = '');
+procedure Cleanup_sh_bat(path: String);
+procedure Copy_sh_batToUtils(path: String; T: String);
 
 procedure Delete_sh_bat(path: String; T: String);
 procedure CreateDirectoriesUtils(path: String);
@@ -27,6 +29,11 @@ procedure CreateDirectorieGen(path: String);
 
 implementation
 
+procedure Cleanup_sh_bat(path: String);
+begin
+  Delete_sh_bat(path, '*.sh');
+  Delete_sh_bat(path, '*.bat');
+end;
 
 procedure CreateDirectoriesFull(path: String; FJavaClassName: String = '');
 begin
@@ -69,11 +76,39 @@ begin
   end;
 end;
 
+procedure Copy_sh_batToUtils(path: String; T: String);
+var
+  SR: TSearchRec;
+  I: integer;
+  target: string;
+begin
+  if T = '*.bat' then
+     target := 'windows'
+  else
+     target := 'unix';
+
+  I := FindFirst(path  + T, faNormal, SR);
+  while I = 0 do
+  begin
+    if (SR.Attr and faDirectory) <> faDirectory then
+    begin
+      CopyFile(PChar(path + SR.Name),
+               PChar(path + 'utils'+ DirectorySeparator + target +DirectorySeparator+  SR.Name));
+    end;
+    I := FindNext(SR);
+  end;
+end;
+
 procedure CreateDirectoriesUtils(path: String);
 begin
-  CreateDir(path + DirectorySeparator + 'utils');
-  CreateDir(path + DirectorySeparator + 'utils' + DirectorySeparator + 'windows');
-  CreateDir(path + DirectorySeparator + 'utils' + DirectorySeparator + 'unix');
+  if not DirectoryExists(path + 'utils') then
+      CreateDir(path + DirectorySeparator + 'utils');
+
+  if not DirectoryExists(path + 'utils' + DirectorySeparator + 'windows') then
+      CreateDir(path + 'utils' + DirectorySeparator + 'windows');
+
+  if not DirectoryExists(path + 'utils' + DirectorySeparator + 'unix') then
+     CreateDir(path + 'utils' + DirectorySeparator + 'unix');
 end;
 
 procedure CreateDirectoriesBuildModes(path: String);
