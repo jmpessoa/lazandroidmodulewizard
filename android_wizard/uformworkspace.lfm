@@ -97,7 +97,6 @@ object FormWorkspace: TFormWorkspace
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
-  LCLVersion = '2.0.12.0'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
@@ -1451,7 +1450,7 @@ object FormWorkspace: TFormWorkspace
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = CheckBoxGeneric
       AnchorSideTop.Side = asrCenter
-      Left = 165
+      Left = 167
       Height = 24
       Top = 65
       Width = 194
@@ -1469,10 +1468,10 @@ object FormWorkspace: TFormWorkspace
       Left = 4
       Height = 24
       Top = 65
-      Width = 157
+      Width = 159
       BorderSpacing.Left = 4
       BorderSpacing.Top = 5
-      Caption = 'Build raw .so Library'
+      Caption = 'JNI header signature'
       OnClick = CheckBoxGenericClick
       ParentFont = False
       TabOrder = 4
@@ -1755,7 +1754,7 @@ object FormWorkspace: TFormWorkspace
     ParentColor = False
     ParentFont = False
     TabOrder = 4
-    object GroupBox1: TGroupBox
+    object GroupBoxPrefaceName: TGroupBox
       Left = 2
       Height = 65
       Top = 0
@@ -1771,8 +1770,8 @@ object FormWorkspace: TFormWorkspace
       ParentFont = False
       TabOrder = 0
       object EditPackagePrefaceName: TEdit
-        AnchorSideLeft.Control = GroupBox1
-        AnchorSideTop.Control = GroupBox1
+        AnchorSideLeft.Control = GroupBoxPrefaceName
+        AnchorSideTop.Control = GroupBoxPrefaceName
         Left = 6
         Height = 28
         Top = 4
@@ -1852,7 +1851,7 @@ object FormWorkspace: TFormWorkspace
         ParentShowHint = False
       end
     end
-    object GroupBox5: TGroupBox
+    object GroupBoxApkBuilder: TGroupBox
       Left = 320
       Height = 65
       Top = 0

@@ -5,9 +5,10 @@ unit uformworkspace;
 interface
 
 uses
-  inifiles, Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  inifiles, Classes, SysUtils, FileUtil, StrUtils, Forms, Controls, Graphics, Dialogs,
   LazIDEIntf, StdCtrls, Buttons, ExtCtrls, ComCtrls, ComboEx,
-  FormPathMissing, PackageIntf, Process, uformandroidmanifest, createdirectories;
+  FormPathMissing, PackageIntf, Process, uformandroidmanifest,
+  createdirectories, uformjnirawlibsignature;
 
 type
 
@@ -31,11 +32,11 @@ type
     EditPackagePrefaceName: TEdit;
     EditPathToWorkspace: TEdit;
     edProjectName: TEdit;
-    GroupBox1: TGroupBox;
+    GroupBoxPrefaceName: TGroupBox;
     GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
-    GroupBox5: TGroupBox;
+    GroupBoxApkBuilder: TGroupBox;
     Image1: TImage;
     LabelTheme: TLabel;
     LabelPathToWorkspace: TLabel;
@@ -102,7 +103,7 @@ type
     FPathToGradle: string;
 
     FProjectModel: string;   //NEW or SAVED
-    FModuleType: integer;  //-1:gdx 0: GUI project   1: NoGui project   2: NoGUI Exe
+    FModuleType: integer;  //0: GUI project   1: NoGui project   2: NoGUI Exe console 3: raw lib
     FSmallProjName: string;
     FPackagePrefaceName: string;
 
@@ -125,7 +126,7 @@ type
     FAndroidTheme: string;
     FAndroidThemeColor: string;
     FPieChecked: boolean;
-    FRawLibraryChecked: boolean;  //raw .so
+    FRawJNILibraryChecked: boolean;  //raw .so
     FGradleVersion: string;
 
     FMaxSdkPlatform: integer;
@@ -143,6 +144,9 @@ type
     FJavaMainVersion: string;
     FJavaBigVersion: string;
     FManifestData: TStrings;
+    FRawJniInterfaceData: TStrings;
+    FRawJniJClassWrapper:  TStrings;
+
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
     function GetGradleVersion(pathGradle:string): string;
@@ -214,12 +218,12 @@ type
     property PrebuildOSYS: string read FPrebuildOSYS write FPrebuildOSYS;
     property FullJavaSrcPath: string read FFullJavaSrcPath write FFullJavaSrcPath;
     property JavaClassName: string read   FJavaClassName write FJavaClassName;
-    property ModuleType: integer read FModuleType write FModuleType;  //-1: gdx 0: GUI project   1: NoGui project
+    property ModuleType: integer read FModuleType write FModuleType;  //0: GUI project   1: NoGui project  2: console app 3: raw lib
     property SmallProjName: string read FSmallProjName write FSmallProjName;
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property AndroidThemeColor: string read FAndroidThemeColor write FAndroidThemeColor;
     property PieChecked: boolean read FPieChecked write FPieChecked;
-    property RawLibraryChecked: boolean read FRawLibraryChecked write FRawLibraryChecked; //raw .so
+    property RawJNILibraryChecked: boolean read FRawJNILibraryChecked write FRawJNILibraryChecked; //raw .so
     property BuildSystem: string read GetBuildSystem;
     property MaxSdkPlatform: integer read FMaxSdkPlatform write FMaxSdkPlatform;
     property GradleVersion: string read FGradleVersion write FGradleVersion;
@@ -229,6 +233,8 @@ type
     property JavaMainVersion: string read FJavaMainVersion write FJavaMainVersion;
     property JavaBigVersion: string read FJavaBigVersion write FJavaBigVersion;
     property ManifestData: TStrings read FManifestData write FManifestData;
+    property RawJniInterfaceData: TStrings read FRawJniInterfaceData write FRawJniInterfaceData;
+    property RawJniJClassWrapper: TStrings read FRawJniJClassWrapper write FRawJniJClassWrapper;
   end;
 
   function TrimChar(query: string; delimiter: char): string;
@@ -723,7 +729,7 @@ begin
      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
      FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
 
-     if FModuleType > 0 then //NoGUI     //0: GUI project   1: NoGui project   2: NoGUI Exe/console or .so
+     if FModuleType > 0 then //NoGUI     //0: GUI project   1: NoGui project   2: console app 4: raw .so lib
           FJavaClassName:=  FSmallProjName;
   end
   else
@@ -821,11 +827,11 @@ begin
     else
     begin
       CreateDir(FAndroidProjectName);  //project folder....
-      if FModuleType <> 2 then //0: GUI project   1: NoGui project   2: NoGUI Exe/console or .so
+      if FModuleType < 2 then //0: GUI project   1: NoGui project   2: console app 3: raw .so lib
       begin
-        CreateDirectoriesFull(FAndroidProjectName, FJavaClassName); //other dirs.....
+        CreateDirectoriesFull(FAndroidProjectName, FJavaClassName); //all dirs.....
       end
-      else  //console executable app ->  2: app console executable or raw ".so"
+      else  //console executable app ->  2, 3 -> app  or raw ".so"
       begin
          CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
          CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
@@ -909,6 +915,8 @@ end;
 procedure TFormWorkspace.FormDestroy(Sender: TObject);
 begin
   if FManifestData <> nil then FManifestData.Free;
+  if FRawJniInterfaceData <> nil then FRawJniInterfaceData.Free;
+  if FRawJniJClassWrapper <> nil then FRawJniJClassWrapper.Free;
 end;
 
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
@@ -994,6 +1002,7 @@ begin
     end;
   end;
   Result:= method+'=Java_Event_'+method+signature+');';
+
   if Pos('pAppOnCreate=', Result) > 0 then
   begin
     if FModuleType = 0 then  //GUI
@@ -1518,7 +1527,7 @@ begin
   //using the "CheckBoxGeneric" for two totally different things... sorry!
 
   IsKotlinSupported:= False;
-  FRawLibraryChecked:= False;
+  FRawJNILibraryChecked:= False;
 
   if TCheckBox(Sender).Checked then
   begin
@@ -1531,12 +1540,12 @@ begin
        IsKotlinSupported:= False; //True;
        TCheckBox(Sender).Checked:= False;
 
-       FRawLibraryChecked:= False;
+       FRawJNILibraryChecked:= False;
     end
     else
     begin
       IsKotlinSupported:= False;
-      FRawLibraryChecked:= True;
+      FRawJNILibraryChecked:= True;
     end;
   end;
 
@@ -1680,23 +1689,62 @@ procedure TFormWorkspace.SpeedButtonManifestClick(Sender: TObject);
 var
    frm: TFormAndroidManifest;
    i, count: integer;
+   frmjni: TFormJniRawLibSignature;
 begin
-  frm:= TFormAndroidManifest.Create(nil);
-  if frm.ShowModal = mrOK then
-  begin
-     if FManifestData = nil then
-         FManifestData:= TStringList.Create
-     else
-         FManifestData.Clear;
+    if FModuleType < 3 then
+    begin
+      frm:= TFormAndroidManifest.Create(nil);
+      if frm.ShowModal = mrOK then
+      begin
+         if FManifestData = nil then
+             FManifestData:= TStringList.Create
+         else
+             FManifestData.Clear;
 
-     count:= frm.ListBoxManifestPermission.Count;
-     for i:= 0 to count-1 do
-     begin
-       if frm.ListBoxManifestPermission.Items.Strings[i] <> '' then
-          FManifestData.Add(Trim(frm.ListBoxManifestPermission.Items.Strings[i]));
-     end;
-  end;
-  frm.Free;
+         count:= frm.ListBoxManifestPermission.Count;
+         for i:= 0 to count-1 do
+         begin
+           if frm.ListBoxManifestPermission.Items.Strings[i] <> '' then
+              FManifestData.Add(Trim(frm.ListBoxManifestPermission.Items.Strings[i]));
+         end;
+      end;
+      frm.Free;
+    end
+    else
+    begin //jniLibrary  //CheckBoxGeneric
+      frmjni:= TFormJniRawLibSignature.Create(nil);
+      frmjni.FullPackageName:= EditPackagePrefaceName.Text;
+      frmjni.JClassWrapperName:= ComboSelectProjectName.Text;
+      if frmjni.ShowModal = mrOK then
+      begin
+
+         if FRawJniJClassWrapper =  nil then
+             FRawJniJClassWrapper:= TStringList.Create
+         else
+             FRawJniJClassWrapper.Clear;
+
+         if FRawJniInterfaceData = nil then
+             FRawJniInterfaceData:= TStringList.Create
+         else
+             FRawJniInterfaceData.Clear;
+
+        count:= frmjni.JniLibraryContentMemo.Lines.Count;
+        for i:= 0 to count-1 do
+        begin
+          FRawJniInterfaceData.Add(frmjni.JniLibraryContentMemo.Lines[i]);
+        end;
+        //ShowMessage(FRawJniInterfaceData.Text); ok!
+
+        count:= frmjni.RawJniJClassWrapper.Count;
+        for i:= 0 to count-1 do
+        begin
+          FRawJniJClassWrapper.Add(frmjni.RawJniJClassWrapper.Strings[i]);
+        end;
+        //ShowMessage(FRawJniJClassWrapper.Text); //ok!
+
+      end;
+      frmjni.Free;
+    end;
 end;
 
 procedure TFormWorkspace.SpeedButtonSettingsClick(Sender: TObject);
