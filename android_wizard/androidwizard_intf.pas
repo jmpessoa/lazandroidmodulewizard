@@ -3230,9 +3230,7 @@ begin
     auxList.SaveToFile(projDir+'libs'+DirectorySeparator+FSmallProjName+'.java');
 
   end;
-  sourceList.Add(' ');
-  sourceList.Add('begin');
-  sourceList.Add('   //');
+
   sourceList.Add('end.');
 
   AProject.MainFile.SetSourceText(sourceList.Text, True);
