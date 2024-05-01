@@ -62,6 +62,9 @@ type
 
      FPieChecked: boolean;
      FRawJNILibraryChecked: boolean; //raw JNI header signature .so
+     FRawJniInterfaceData: TStringList;
+     FRawJniJClassWrapper: TStringList;
+
      FIsKotlinSupported: boolean;
 
      FPathToJavaJDK: string;
@@ -927,8 +930,6 @@ begin
     AndroidFileDescriptor.ModuleType:= FModuleType;
     AndroidFileDescriptor.SyntaxMode:= FSyntaxMode;
 
-    //ShowMessage('try new jni FAndroidTheme = ' + FAndroidTheme);
-
     AndroidFileDescriptor.AndroidTheme:= FAndroidTheme;
 
     FPascalJNIInterfaceCode:= frm.PascalJNIInterfaceCode;
@@ -1656,6 +1657,34 @@ begin
         begin
           outTag:= 4;
           FModuleType:= 4;  //build  raw JNI header signature .so library
+          if frm.RawJniInterfaceData <> nil then
+          begin
+             count:= frm.RawJniInterfaceData.Count;
+             if FRawJniInterfaceData = nil then
+                 FRawJniInterfaceData:= TStringList.Create
+             else
+                 FRawJniInterfaceData.Clear;
+
+             for i:= 0 to count-1 do
+             begin
+                 FRawJniInterfaceData.Add(frm.RawJniInterfaceData.Strings[i]);
+             end;
+             if frm.RawJniJClassWrapper <> nil then
+             begin
+               count:= frm.RawJniJClassWrapper.Count;
+
+               if FRawJniJClassWrapper = nil then
+                   FRawJniJClassWrapper:= TStringList.Create
+               else
+                   FRawJniJClassWrapper.Clear;
+
+               for i:= 0 to count-1 do
+               begin
+                   FRawJniJClassWrapper.Add(frm.RawJniJClassWrapper.Strings[i]);
+               end;
+             end;
+          end;
+
         end;
       end;
 
@@ -1920,7 +1949,6 @@ begin
              end;
 
              strList.Clear;
-
 
              if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
              begin
@@ -2776,6 +2804,7 @@ var
   pathToNdkToolchainsBinMips: string;
   pathToNdkToolchainsBinAarch64: string;
   osys, auxPackName: string;      {windows or linux-x86 or linux-x86_64}
+  i, count: integer;
 begin
 
   inherited InitProject(AProject);
@@ -3041,7 +3070,6 @@ begin
   end
   else if (FModuleType = 3) or (FModuleType = 4) then
   begin  //3: generic .so library
-
     //java JNI signature support
     auxPackName:= FPackagePrefaceName;
     auxPackName:= StringReplace(auxPackName, '.', '_', [rfReplaceAll]);
@@ -3057,30 +3085,49 @@ begin
       sourceList.Add('exports');
       sourceList.Add('  Sum;');
       sourceList.Add(' ');
-
-       auxList.Add('function Sum(PEnv: PJNIEnv; this: JObject; a: JInt; b: JInt): JInt; cdecl;  //just demo...');
-       auxList.Add('begin');
-       auxList.Add('  Result:= SumAB(a, b);');
-       auxList.Add('end;');
-       auxList.Add(' ');
-       auxList.Add('exports');
-       auxList.Add('  Sum name ''Java_'+auxPackName+'_'+FSmallProjName+ '_Sum'';');   //warning: check/fix package name!');
-       auxList.Add(' ');
-       auxList.Add('end.');
+      if FRawJniInterfaceData <> nil then
+      begin
+        count:= FRawJniInterfaceData.Count;
+        for i:= 0 to count-1 do
+        begin
+           auxList.Add(FRawJniInterfaceData.Strings[i]);
+        end;
+      end
+      else
+      begin
+        auxList.Add('function Sum(PEnv: PJNIEnv; this: JObject; a: JInt; b: JInt): JInt; cdecl;  //just demo...');
+        auxList.Add('begin');
+        auxList.Add('  Result:= SumAB(a, b);');
+        auxList.Add('end;');
+        auxList.Add(' ');
+        auxList.Add('exports');
+        auxList.Add('  Sum name ''Java_'+auxPackName+'_'+FSmallProjName+ '_Sum'';');   //warning: check/fix package name!');
+        auxList.Add(' ');
+      end;
        auxList.SaveToFile(projDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
-
     end
-    else
+    else //FRawJNILibraryChecked !
     begin
       //java JNI signature support
-       sourceList.Add('function Sum(PEnv: PJNIEnv; this: JObject; a: JInt; b: JInt): JInt; cdecl;  //just demo...');
-       sourceList.Add('begin');
-       sourceList.Add('  Result:= SumAB(a, b);');
-       sourceList.Add('end;');
-       sourceList.Add(' ');
-       sourceList.Add('exports');
-       sourceList.Add('  Sum name ''Java_'+auxPackName+'_'+FSmallProjName+ '_Sum'';');   //warning: check/fix package name!');
-       sourceList.Add(' ');
+       if FRawJniInterfaceData <> nil then
+       begin
+         count:= FRawJniInterfaceData.Count;
+         for i:= 0 to count-1 do
+         begin
+            sourceList.Add(FRawJniInterfaceData.Strings[i]);
+         end;
+       end
+       else
+       begin
+         sourceList.Add('function Sum(PEnv: PJNIEnv; this: JObject; a: JInt; b: JInt): JInt; cdecl;  //just demo...');
+         sourceList.Add('begin');
+         sourceList.Add('  Result:= SumAB(a, b);');
+         sourceList.Add('end;');
+         sourceList.Add(' ');
+         sourceList.Add('exports');
+         sourceList.Add('  Sum name ''Java_'+auxPackName+'_'+FSmallProjName+ '_Sum'';');   //warning: check/fix package name!');
+         sourceList.Add(' ');
+       end;
 
        auxList.Add(' ');
        auxList.Add('function Sum(a: longint; b: longint): longint; cdecl; //just demo');
@@ -3091,6 +3138,8 @@ begin
        auxList.Add('exports');
        auxList.Add('  Sum;');
        auxList.Add(' ');
+       auxList.Add('begin');
+       auxList.Add('  //');
        auxList.Add('end.');
        auxList.SaveToFile(projDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
     end;
@@ -3130,8 +3179,9 @@ begin
     auxList.Add('   > Open "'+FSmallProjName+'.java" generated by LAMW and fix/check the project package name');
     auxList.Add('   > Sync your "Android Studio" project');
     auxList.Add('    ');
-    auxList.Add('   > Coding...');
+    auxList.Add('    ');
     auxList.Add('//.....');
+    auxList.Add('//Use example coding...');
     auxList.Add('public class MainActivity extends AppCompatActivity {');
     auxList.Add(' ');
     auxList.Add('   '+FSmallProjName+' myNativelib = new '+FSmallProjName+'();  //declare it !');
@@ -3149,28 +3199,40 @@ begin
     auxList.Add('}');
     auxList.SaveToFile(projDir+DirectorySeparator+'readme.txt');
 
+    auxList.Clear;
     //pure java JNI support
-    auxList.Clear;
-    auxList.Clear;
-    auxList.Add('package '+FPackagePrefaceName+';  //warning: check/fix package name!');
-    auxList.Add(' ');
-    auxList.Add('import android.util.Log;');
-    auxList.Add(' ');
-    auxList.Add('public class '+FSmallProjName+' {');
-    auxList.Add(' ');
-    auxList.Add('    static {');
-    auxList.Add('        try {');
-    auxList.Add('            System.loadLibrary("'+LowerCase(FSmallProjName)+'");}');
-    auxList.Add('        catch (UnsatisfiedLinkError e) {');
-    auxList.Add('            Log.e("Error loading JNI lib "'+LowerCase(FSmallProjName)+'", "exception", e);');
-    auxList.Add('        }');
-    auxList.Add('    }');
-    auxList.Add('    public native int Sum(int x, int y);');
-    auxList.Add('}');
+    if FRawJniJClassWrapper <> nil then
+    begin
+      count:= FRawJniJClassWrapper.Count;
+      for i:= 0 to count-1 do
+      begin
+         auxList.Add(FRawJniJClassWrapper.Strings[i]);
+      end;
+    end
+    else
+    begin
+      auxList.Add('package '+FPackagePrefaceName+';  //warning: check/fix package name!');
+      auxList.Add(' ');
+      auxList.Add('import android.util.Log;');
+      auxList.Add(' ');
+      auxList.Add('public class '+FSmallProjName+' {');
+      auxList.Add(' ');
+      auxList.Add('    static {');
+      auxList.Add('        try {');
+      auxList.Add('            System.loadLibrary("'+LowerCase(FSmallProjName)+'");}');
+      auxList.Add('        catch (UnsatisfiedLinkError e) {');
+      auxList.Add('            Log.e("Error loading JNI lib "'+LowerCase(FSmallProjName)+'", "exception", e);');
+      auxList.Add('        }');
+      auxList.Add('    }');
+      auxList.Add('    public native int Sum(int x, int y);');
+      auxList.Add('}');
+    end;
     auxList.SaveToFile(projDir+'libs'+DirectorySeparator+FSmallProjName+'.java');
 
   end;
-
+  sourceList.Add(' ');
+  sourceList.Add('begin');
+  sourceList.Add('   //');
   sourceList.Add('end.');
 
   AProject.MainFile.SetSourceText(sourceList.Text, True);

@@ -269,13 +269,14 @@ end;
 procedure ProduceJNILibrarySignatures(jniSignatureList: TStringList; jniExportSignatureList: TStringList;  out jniLibrarySignatureList: TStringList);
 var
  i, count: integer;
+ ch: char;
 begin
   if  jniSignatureList = nil then Exit;
   if  jniExportSignatureList = nil then Exit;
   if  jniLibrarySignatureList = nil then Exit;
 
   jniLibrarySignatureList.Add('type');
-  jniLibrarySignatureList.Add('  jstringArray = jobjectArray');
+  jniLibrarySignatureList.Add('  jstringArray = jobjectArray;');
   jniLibrarySignatureList.Add(' ');
 
   count:= jniSignatureList.Count;
@@ -291,9 +292,14 @@ begin
   jniLibrarySignatureList.Add(' ');
   jniLibrarySignatureList.Add('exports');
 
+  count:= jniExportSignatureList.Count;
+  ch:= ',';
+  if count = 1 then ch:= ';';
+
   for i:= 0 to count-1 do
   begin
-     jniLibrarySignatureList.Add('   '+jniExportSignatureList.Strings[i]);
+     jniLibrarySignatureList.Add('   '+jniExportSignatureList.Strings[i] + ch);
+     if i = count-2 then ch:= ';';
   end;
 
 end;

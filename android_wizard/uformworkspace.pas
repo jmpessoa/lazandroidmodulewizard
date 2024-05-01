@@ -1712,9 +1712,11 @@ begin
     end
     else
     begin //jniLibrary  //CheckBoxGeneric
+
       frmjni:= TFormJniRawLibSignature.Create(nil);
       frmjni.FullPackageName:= EditPackagePrefaceName.Text;
       frmjni.JClassWrapperName:= ComboSelectProjectName.Text;
+
       if frmjni.ShowModal = mrOK then
       begin
 
