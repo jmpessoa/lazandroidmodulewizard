@@ -1,13 +1,13 @@
 object FormAndroidProject: TFormAndroidProject
-  Left = 318
+  Left = -8
   Height = 478
-  Top = 120
-  Width = 1176
+  Top = 121
+  Width = 1078
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSizeToolWin
   Caption = 'Lamw: Lazarus Android Module Wizard '
-  ClientHeight = 478
-  ClientWidth = 1176
+  ClientHeight = 453
+  ClientWidth = 1078
   DesignTimePPI = 120
   FormStyle = fsStayOnTop
   Icon.Data = {
@@ -96,11 +96,12 @@ object FormAndroidProject: TFormAndroidProject
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
+  LCLVersion = '2.0.12.0'
   object StatusBar1: TStatusBar
     Left = 0
     Height = 29
-    Top = 449
-    Width = 1176
+    Top = 424
+    Width = 1078
     Panels = <    
       item
         Width = 62
@@ -112,7 +113,7 @@ object FormAndroidProject: TFormAndroidProject
     Left = 0
     Height = 62
     Top = 0
-    Width = 1176
+    Width = 1078
     Align = alTop
     BevelOuter = bvNone
     ParentFont = False
@@ -120,21 +121,21 @@ object FormAndroidProject: TFormAndroidProject
   end
   object Panel3: TPanel
     Left = 0
-    Height = 387
+    Height = 362
     Top = 62
-    Width = 1026
+    Width = 928
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel3'
-    ClientHeight = 387
-    ClientWidth = 1026
+    ClientHeight = 362
+    ClientWidth = 928
     ParentFont = False
     TabOrder = 2
     object PageControl1: TPageControl
       Left = 0
-      Height = 387
+      Height = 362
       Top = 0
-      Width = 1026
+      Width = 928
       ActivePage = TabSheet2
       Align = alClient
       ParentFont = False
@@ -143,13 +144,13 @@ object FormAndroidProject: TFormAndroidProject
       OnChange = PageControl1Change
       object TabSheet3: TTabSheet
         Caption = 'App.java'
-        ClientHeight = 354
+        ClientHeight = 329
         ClientWidth = 1018
         ParentFont = False
         inline SynMemo3: TSynMemo
           Cursor = crIBeam
           Left = 0
-          Height = 354
+          Height = 329
           Top = 0
           Width = 1018
           Align = alClient
@@ -638,13 +639,13 @@ object FormAndroidProject: TFormAndroidProject
       end
       object TabSheet1: TTabSheet
         Caption = 'Java JNI Source'
-        ClientHeight = 354
+        ClientHeight = 329
         ClientWidth = 1018
         ParentFont = False
         inline SynMemo1: TSynMemo
           Cursor = crIBeam
           Left = 0
-          Height = 354
+          Height = 329
           Top = 0
           Width = 1018
           Align = alClient
@@ -1133,16 +1134,16 @@ object FormAndroidProject: TFormAndroidProject
       end
       object TabSheet2: TTabSheet
         Caption = 'Pascal JNI Interface'
-        ClientHeight = 354
-        ClientWidth = 1018
+        ClientHeight = 329
+        ClientWidth = 920
         ParentFont = False
         inline SynMemo2: TSynMemo
           Tag = 1
           Cursor = crIBeam
           Left = 0
-          Height = 354
+          Height = 329
           Top = 0
-          Width = 1018
+          Width = 920
           Align = alClient
           Font.Height = -16
           Font.Name = 'Courier New'
@@ -1630,20 +1631,20 @@ object FormAndroidProject: TFormAndroidProject
     end
   end
   object Panel4: TPanel
-    Left = 1026
-    Height = 387
+    Left = 928
+    Height = 362
     Top = 62
     Width = 150
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 387
+    ClientHeight = 362
     ClientWidth = 150
     ParentFont = False
     TabOrder = 3
     object BitBtn1: TBitBtn
       Left = 30
       Height = 38
-      Top = 265
+      Top = 240
       Width = 94
       Anchors = [akRight, akBottom]
       Cancel = True
@@ -1656,7 +1657,7 @@ object FormAndroidProject: TFormAndroidProject
     object BitBtn2: TBitBtn
       Left = 30
       Height = 38
-      Top = 315
+      Top = 290
       Width = 94
       Anchors = [akRight, akBottom]
       Caption = 'OK'
@@ -1668,7 +1669,7 @@ object FormAndroidProject: TFormAndroidProject
     end
     object Image1: TImage
       Left = 8
-      Height = 387
+      Height = 362
       Top = 0
       Width = 142
       Align = alRight

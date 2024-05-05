@@ -8,7 +8,7 @@ uses
   inifiles, Classes, SysUtils, FileUtil, StrUtils, Forms, Controls, Graphics, Dialogs,
   LazIDEIntf, StdCtrls, Buttons, ExtCtrls, ComCtrls, ComboEx,
   FormPathMissing, PackageIntf, Process, uformandroidmanifest,
-  createdirectories, uformjnirawlibsignature;
+  createdirectories{, uformjnirawlibsignature};
 
 type
 
@@ -41,6 +41,7 @@ type
     LabelTheme: TLabel;
     LabelPathToWorkspace: TLabel;
     LabelSelectProjectName: TLabel;
+    OpenDialog1: TOpenDialog;
     Panel1: TPanel;
     Panel2: TPanel;
     PanelPlatform: TPanel;
@@ -144,8 +145,8 @@ type
     FJavaMainVersion: string;
     FJavaBigVersion: string;
     FManifestData: TStrings;
-    FRawJniInterfaceData: TStrings;
-    FRawJniJClassWrapper:  TStrings;
+    FRawJniJClassWrapperPath: string;
+    FAndroidStudioJniLibsFolderPath: string;
 
     function GetBuildSystem: string;
     function HasBuildTools(platform: integer; out outBuildTool: string): boolean;
@@ -233,8 +234,8 @@ type
     property JavaMainVersion: string read FJavaMainVersion write FJavaMainVersion;
     property JavaBigVersion: string read FJavaBigVersion write FJavaBigVersion;
     property ManifestData: TStrings read FManifestData write FManifestData;
-    property RawJniInterfaceData: TStrings read FRawJniInterfaceData write FRawJniInterfaceData;
-    property RawJniJClassWrapper: TStrings read FRawJniJClassWrapper write FRawJniJClassWrapper;
+    property RawJniJClassWrapperPath: string read FRawJniJClassWrapperPath write FRawJniJClassWrapperPath;
+    property AndroidStudioJniLibsFolderPath: string read FAndroidStudioJniLibsFolderPath write FAndroidStudioJniLibsFolderPath;
   end;
 
   function TrimChar(query: string; delimiter: char): string;
@@ -636,16 +637,15 @@ begin
 
 end;
 
-
 procedure TFormWorkspace.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 var
   strList: TStringList;
   count, i, j, apiTarg: integer;
   path, tempStr: string;
-  aList: TStringList;
+  aList, auxList: TStringList;
+  auxChip: string;
 begin
    //0: GUI project   1: NoGui project   2: NoGUI Exe/console or .so
-
   if FGradleVersion <> '' then
   begin
     aList:= TStringList.Create;
@@ -656,6 +656,8 @@ begin
   end;
 
   if ModalResult = mrCancel  then Exit;
+
+  strList:= TStringList.Create;
 
   FMainActivity:= 'App'; //TODO: need flexibility here...
 
@@ -754,7 +756,6 @@ begin
   begin
 
      CreateDirectoriesDotSettings(FAndroidProjectName);
-     strList:= TStringList.Create;
      if not DirectoryExists(FAndroidProjectName+DirectorySeparator+'.settings') then
      begin
        strList.Add('eclipse.preferences.version=1');
@@ -796,7 +797,6 @@ begin
      end;
 
      FPackagePrefaceName:= TrimChar(path, '.');
-     strList.Free;
 
      FFullJavaSrcPath:=GetFullJavaSrcPath(FAndroidProjectName); //if [old] project exists
 
@@ -835,9 +835,93 @@ begin
       begin
          CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
          CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
+
+         if FRawJniJClassWrapperPath <> '' then
+         begin
+             strList.Clear;
+             strList.Add(FRawJniJClassWrapperPath);
+             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'javaclass.path');
+
+             if not DirectoryExists(FAndroidStudioJniLibsFolderPath+PathDelim+'jniLibs') then
+             begin
+               try    //jniLibs\armeabi-v7a
+                 CreateDir(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs');
+               except
+                 ShowMessage('Warning:Failt to create A.S. "jniLibs" folder');
+               end;
+
+               auxChip:= 'armeabi-v7a';
+               case Self.RGInstruction.ItemIndex of
+                  0: auxChip:= 'armeabi';
+                  1: auxChip:= 'armeabi-v7a';
+                  2: auxChip:= 'armeabi-v7a';
+                  3: auxChip:= 'x86';
+                  //4: aux:= 'mips'
+                  5: auxChip:= 'arm64-v8a';
+                  6: auxChip:= 'x86_64';
+               end;
+               try
+                 CreateDir(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs'+ DirectorySeparator + auxChip);
+               except
+                 ShowMessage('Warning:Failt to create A.S. "jniLibs" folder .../niLibs/'+auxChip);
+               end;
+             end;
+             strList.Clear;
+             strList.Add('unit java_call_bridge_'+FSmallProjName+';');
+             strList.Add(' ');
+             strList.Add('{$mode delphi} ');
+             strList.Add(' ');
+             strList.Add('interface');
+             strList.Add(' ');
+             strList.Add('uses');
+             strList.Add('  jni, jnihelper;');
+             strList.Add(' ');
+             strList.Add('implementation');
+             strList.Add(' ');
+             strList.Add('uses');
+             strList.Add('  Unit1;');
+             strList.Add('  ');
+             strList.Add('   ');
+             strList.Add('end.');
+             strList.SaveToFile(FAndroidProjectName + DirectorySeparator  + 'java_call_bridge_' + FSmallProjName + '.pas');
+
+             CopyFile(FPathToJavaTemplates+DirectorySeparator+'rawjnihelper'+DirectorySeparator+'jnihelper.pas',
+                      FAndroidProjectName + DirectorySeparator+'jnihelper.pas');
+
+         end
+         else
+         begin
+            auxList:= TStringList.Create;
+            auxList.Add('package '+FPackagePrefaceName+';  //warning: check/fix package name!');
+            auxList.Add(' ');
+            auxList.Add('import android.util.Log;');
+            auxList.Add(' ');
+            auxList.Add('public class '+FSmallProjName+' { //fw');
+            auxList.Add(' ');
+            auxList.Add('    static {');
+            auxList.Add('        try {');
+            auxList.Add('            System.loadLibrary("'+LowerCase(FSmallProjName)+'");}');
+            auxList.Add('        catch (UnsatisfiedLinkError e) {');
+            auxList.Add('            Log.e("Error loading JNI lib <'+LowerCase(FSmallProjName)+'>", "exception", e);');
+            auxList.Add('        }');
+            auxList.Add('    }');
+            auxList.Add('    public native int sum(int x, int y);');
+            auxList.Add('    public native String allCaps(msg: String);');
+            auxList.Add('}');
+            auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName+'.java');
+
+            strList.Clear;
+            //dummy
+            FRawJniJClassWrapperPath:=FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName+'.java';
+            strList.Add(FRawJniJClassWrapperPath);
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'javaclass.path');
+            auxList.Free;
+         end;
       end;
     end;
   end;
+  strList.Free;
+
   //CloseAction := caFree;
 end;
 
@@ -915,8 +999,6 @@ end;
 procedure TFormWorkspace.FormDestroy(Sender: TObject);
 begin
   if FManifestData <> nil then FManifestData.Free;
-  if FRawJniInterfaceData <> nil then FRawJniInterfaceData.Free;
-  if FRawJniJClassWrapper <> nil then FRawJniJClassWrapper.Free;
 end;
 
 procedure TFormWorkspace.ListBoxMinSDKChange(Sender: TObject);
@@ -1342,6 +1424,7 @@ var
   listDirectories: TStringList;
   i, count, p: integer;
 begin
+  FRawJniJClassWrapperPath:= '';
 
   EditPathToWorkspace.Left:= 8; // try fix hidpi bug
   ComboSelectProjectName.Left:= 8;  // try fix hidpi bug
@@ -1424,6 +1507,10 @@ begin
 
   if FPathToGradle <> '' then
      FGradleVersion:= GetGradleVersion(FPathToGradle);
+
+  if Pos('JNI', CheckBoxGeneric.Caption) > 0 then
+       SpeedButtonManifest.Glyph.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+
+                                              'icons'+DirectorySeparator+'open.bmp');
 
   CheckingSettingsCompatibility;   //LAMW 0.8.6.3
 
@@ -1685,11 +1772,47 @@ begin
            sLineBreak+' c2. Android SDK "plataforms" 34 + "build-tools" 34.0.0');
 end;
 
+function GetJavaClassName(selList: TStringList): string;
+var
+  clsLine: string;
+  foundClass: boolean;
+  i, index: integer;
+begin
+    if selList.Text = '' then Exit;
+    foundClass:= False;
+    i:= 0;
+    while (not foundClass) and (i < selList.Count) do
+    begin
+       clsLine:= selList.Strings[i];
+       if Pos('class ', clsLine) > 0 then foundClass:= True;
+       Inc(i);
+    end;
+    if foundClass then
+    begin
+      clsLine:= Trim(clsLine); //cleanup...
+      if Pos('public ', clsLine) > 0 then   //public class jMyComponent
+      begin
+         SplitStr(clsLine, ' ');  //remove "public" word...
+         clsLine:= Trim(clsLine); //cleanup...
+      end;
+      SplitStr(clsLine, ' ');  //remove "class" word...
+      clsLine:= Trim(clsLine); //cleanup...
+
+      if Pos(' ', clsLine) > 0  then index:= Pos(' ', clsLine)
+      else if Pos('{', clsLine) > 0 then index:= Pos('{', clsLine)
+      else if Pos(#10, clsLine) > 0 then index:= Pos(#10, clsLine);
+
+      Result:= Trim(Copy(clsLine,1,index-1));  //get class name
+   end;
+end;
+
 procedure TFormWorkspace.SpeedButtonManifestClick(Sender: TObject);
 var
    frm: TFormAndroidManifest;
-   i, count: integer;
-   frmjni: TFormJniRawLibSignature;
+   i, count, p: integer;
+   list: TStringList;
+   auxPackName: string;
+   //auxJavaClassName: string;
 begin
     if FModuleType < 3 then
     begin
@@ -1711,41 +1834,54 @@ begin
       frm.Free;
     end
     else
-    begin //jniLibrary  //CheckBoxGeneric
-
-      frmjni:= TFormJniRawLibSignature.Create(nil);
-      frmjni.FullPackageName:= EditPackagePrefaceName.Text;
-      frmjni.JClassWrapperName:= ComboSelectProjectName.Text;
-
-      if frmjni.ShowModal = mrOK then
+    begin //jniLibrary  //CheckBox "JNI" = True
+      if OpenDialog1.Execute then
       begin
+         FRawJniJClassWrapperPath:= OpenDialog1.FileName;
+         list:= TStringList.Create;
+         list.LoadFromFile(FRawJniJClassWrapperPath);
+         ShowMessage(list.Text);
 
-         if FRawJniJClassWrapper =  nil then
-             FRawJniJClassWrapper:= TStringList.Create
-         else
-             FRawJniJClassWrapper.Clear;
+         i:= 0;
+         auxPackName:= '';
+         while (auxPackName = '') do
+         begin
+            p:= Pos('package ', list.Strings[i]);
+            if p > 0 then
+            begin
+                auxPackName:= Trim(Copy(list.Strings[i], p+Length('package '), 1000));
+                p:= Pos(';',auxPackName);
+                auxPackName:= Trim(Copy(auxPackName, 1,  p-1));
+            end;
+            i:= i+1;
+         end;
 
-         if FRawJniInterfaceData = nil then
-             FRawJniInterfaceData:= TStringList.Create
-         else
-             FRawJniInterfaceData.Clear;
+         (*
+         i:= 0;
+         auxJavaClassName:= '';
+         while (auxJavaClassName = '') do
+         begin
+            p:= Pos('class ', list.Strings[i]);
+            if p > 0 then
+            begin
+                auxJavaClassName:= Trim(Copy(list.Strings[i], p+Length('class '), 1000));
+                p:= Pos('{',auxJavaClassName);  // TODO  need improve....
+                auxJavaClassName:= Trim(Copy(auxJavaClassName, 1,  p-1));
+            end;
+            i:= i+1;
+         end;
+         *)
 
-        count:= frmjni.JniLibraryContentMemo.Lines.Count;
-        for i:= 0 to count-1 do
-        begin
-          FRawJniInterfaceData.Add(frmjni.JniLibraryContentMemo.Lines[i]);
-        end;
-        //ShowMessage(FRawJniInterfaceData.Text); ok!
+         p:= Pos('main', FRawJniJClassWrapperPath);
+         if  p > 0 then
+            FAndroidStudioJniLibsFolderPath:= Copy(FRawJniJClassWrapperPath, 1, p+3);
 
-        count:= frmjni.RawJniJClassWrapper.Count;
-        for i:= 0 to count-1 do
-        begin
-          FRawJniJClassWrapper.Add(frmjni.RawJniJClassWrapper.Strings[i]);
-        end;
-        //ShowMessage(FRawJniJClassWrapper.Text); //ok!
+         FJavaClassName:= GetJavaClassName(list);
+         ComboSelectProjectName.Text:=FJavaClassName;
+         EditPackagePrefaceName.Text:= auxPackName;
 
+         list.Free;
       end;
-      frmjni.Free;
     end;
 end;
 

@@ -19,16 +19,20 @@ type
     Label2: TLabel;
     NativeMethodMemo: TMemo;
     JniLibraryContentMemo: TMemo;
+    OpenDialog1: TOpenDialog;
     SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     StatusBar1: TStatusBar;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
   private
 
   public
+    //JClassName: string;
     FullPackageName: string;
-    JClassWrapperName: string;
+    RawJniJClassName: string;
     RawJniJClassWrapper: TStringList;
 
   end;
@@ -105,7 +109,7 @@ begin
     if Pos('String', jType) > 0 then
     begin
       pType:= 'jstring';
-      if Pos('String[', jType) > 0 then pType:= 'jstringArray'; //need def type: jstringArray = jobjectArray
+      if Pos('String[', jType) > 0 then pType:= 'jstringArray'; //need def type: jstringArray = jobjec
     end
     else if Pos('int', jType) > 0  then  //The search is case-sensitive!
     begin
@@ -252,18 +256,16 @@ begin
     jwrapperClassList.Add('            System.loadLibrary("'+Lowercase(jwrapperClass)+'");');
     jwrapperClassList.Add('        }');
     jwrapperClassList.Add('        catch (UnsatisfiedLinkError e) {');
-    jwrapperClassList.Add('            Log.e("Error loading JNI lib "'+Lowercase(jwrapperClass)+'", "exception", e);');
+    jwrapperClassList.Add('            Log.e("Error loading JNI lib <'+Lowercase(jwrapperClass)+'>", "exception", e);');
     jwrapperClassList.Add('        }');
     jwrapperClassList.Add('    }');
-
     count:= nativeMethodList.Count;
-
     for i:= 0 to count-1 do
     begin
        jwrapperClassList.Add('    '+nativeMethodList.Strings[i]);
     end;
-
     jwrapperClassList.Add('}');
+
 end;
 
 procedure ProduceJNILibrarySignatures(jniSignatureList: TStringList; jniExportSignatureList: TStringList;  out jniLibrarySignatureList: TStringList);
@@ -276,7 +278,7 @@ begin
   if  jniLibrarySignatureList = nil then Exit;
 
   jniLibrarySignatureList.Add('type');
-  jniLibrarySignatureList.Add('  jstringArray = jobjectArray;');
+  jniLibrarySignatureList.Add('  jstringArray = jobject;');
   jniLibrarySignatureList.Add(' ');
 
   count:= jniSignatureList.Count;
@@ -319,16 +321,17 @@ begin
   jniExportSignatureList:= TStringList.Create;
 
   if RawJniJClassWrapper = nil then
-    RawJniJClassWrapper:= TStringList.Create
-  else
-    RawJniJClassWrapper.Clear;
+    RawJniJClassWrapper:= TStringList.Create;
 
-  ProduceJWrapperClass(NativeMethodMemo.Lines, fullPackageName, JClassWrapperName, {out} RawJniJClassWrapper);
+  if RawJniJClassWrapper.Count = 0 then
+  begin
+     ProduceJWrapperClass(NativeMethodMemo.Lines, fullPackageName, RawJniJClassName, {out} RawJniJClassWrapper);
+  end;
 
   jniSignatureList.Clear;
   jniExportSignatureList.Clear;
 
-  ProduceJNISignatures(NativeMethodMemo.Lines, fullPackageName, JClassWrapperName, {out} jniSignatureList, {out} jniExportSignatureList);
+  ProduceJNISignatures(NativeMethodMemo.Lines, fullPackageName, RawJniJClassName, {out} jniSignatureList, {out} jniExportSignatureList);
 
   auxList.Clear;
   ProduceJNILibrarySignatures(jniSignatureList, jniExportSignatureList, {out} auxList);
@@ -342,6 +345,71 @@ begin
   auxList.Free;
   jniSignatureList.Free;
   jniExportSignatureList.Free;
+end;
+
+function GetJClassName(content: string): string;
+var
+  p, i: integer;
+  c: char;
+  jclassName: string;
+begin
+  p:= Pos(' class ', content);
+  p:= p + Length(' class ');
+
+  i:= p;
+  c:= content[i];
+  while c <> '{' do
+  begin
+       i:= i + 1;
+       c:= content[i];
+  end;
+  jclassName:= Trim(Copy(content, p, i-p));
+  if Pos(' ', jclassName) <= 0 then
+  begin
+    Result:= jclassName;
+  end
+  else   //App extends AppCompatActivity
+  begin
+     p:= Pos(' ', jclassName);
+     Result:= Trim(Copy(jclassName, 1, p));
+  end;
+end;
+
+procedure TFormJniRawLibSignature.SpeedButton2Click(Sender: TObject);
+var
+  filename: string;
+  i, count: integer;
+  jclassname: string;
+begin
+  if OpenDialog1.Execute then
+  begin
+      if RawJniJClassWrapper = nil then
+         RawJniJClassWrapper:= TStringList.Create
+      else
+         RawJniJClassWrapper.Clear;
+
+      filename:= OpenDialog1.FileName;
+      if Pos('.java', filename) > 0 then
+      begin
+         RawJniJClassWrapper.LoadFromFile(filename);
+         jclassname:= GetJClassName(RawJniJClassWrapper.Text);
+      end;
+      count:= RawJniJClassWrapper.Count;
+      for i:=0 to count-1 do
+      begin
+         if Pos(' native ', RawJniJClassWrapper.Strings[i]) > 0 then
+              NativeMethodMemo.Lines.Add(RawJniJClassWrapper.Strings[i]);
+      end;
+      RawJniJClassName:= '';
+      if NativeMethodMemo.Lines.Count > 0 then
+      begin
+        RawJniJClassName:= jclassname;
+      end
+      else
+      begin
+         RawJniJClassWrapper.Clear;
+      end;
+  end;
 end;
 
 procedure TFormJniRawLibSignature.FormCreate(Sender: TObject);

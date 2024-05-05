@@ -2918,24 +2918,29 @@ begin
   begin
     tempList.Add(GetEventSignature(nativeMethodList.Strings[i]));
   end;
+  //produce like:
+  //pAppOnSpecialKeyDown=Java_Event_pAppOnSpecialKeyDown(PEnv,this,keyChar,keyCode,keyCodeString);
 
+
+  //just dummy...
   javaClassList.Clear;
   javaClassList.Add('package ' + FPackageName + ';');
   javaClassList.Add('');
-  javaClassList.AddStrings(importList);
+  javaClassList.AddStrings(importList);  //all "imports" colecteds....
   javaClassList.Add('public class Controls {');
   javaClassList.Add('');
-  javaClassList.AddStrings(nativeMethodList);
+  javaClassList.AddStrings(nativeMethodList);  //all "native" colecteds....
   javaClassList.Add('}');
 
   if nativeMethodList.Count > 0 then
   begin
     with TJavaParser.Create(javaClassList) do
     try
-      str := GetPascalJNIInterfaceCode(tempList);
+      str := GetPascalJNIInterfaceCode(tempList); //pre-processed "temList"
     finally
       Free
     end;
+    //ShowMessage(str); //The Magic!
 
     with CodeToolBoss do
     begin
@@ -2975,7 +2980,7 @@ begin
       if not PosFound then // fallback
       begin
         str := '{%region /fold ''LAMW generated code''}' + sLineBreak + sLineBreak
-          + str + sLineBreak + '{%endregion}' + sLineBreak;
+          + str + sLineBreak + '{%endregion}' + sLineBreak;    //end magic!
         n := CurCodeTool.Tree.Root;
         FromPos := n.FirstChild.EndPos; // should be the end of uses-clause
         ToPos := n.LastChild.StartPos;  // should be the start of begin..end section
@@ -3211,15 +3216,17 @@ begin
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
 
   hasControls:= False;
-  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then hasControls:= True;
-  if not hasControls then Exit;  //not "GUI" jForm basead project
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then
+     hasControls:= True;
+
+  if not hasControls then
+     Exit;  //not "GUI" jForm basead project
 
   FSupport:=(LazarusIDE.ActiveProject.CustomData.Values['Support']='TRUE');
 
   AndroidTheme:= LazarusIDE.ActiveProject.CustomData.Values['Theme'];
 
   PathToJavaTemplates := LamwGlobalSettings.PathToJavaTemplates; //included path delimiter
-  // C:\laz4android18FPC304\components\androidmodulewizard\android_wizard\smartdesigner\java\
 
   //LAMW 0.8
   lprModuleName:= GetLprStartModuleVarName();

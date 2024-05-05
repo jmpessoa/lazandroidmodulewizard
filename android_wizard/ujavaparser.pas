@@ -35,9 +35,10 @@ type
     procedure ParseInterfaceClass;
     procedure ParsePackage;
     function ReadJavaType(out signature: string): string;
-    procedure ReadTill(Token: string); inline;
+    procedure ReadTill(Token: string); //inline;
     procedure ReadTillCurlBracketClose;
   public
+    FlagLAMWGUI: boolean;
     constructor Create(Stream: TStream);
     constructor Create(FileName: string);
     constructor Create(Strings: TStrings);
@@ -202,6 +203,7 @@ begin
   cls := StringReplace(FRootClass, '.', '_', [rfReplaceAll]);
   if FNativeMethods.Count = 0 then
     raise Exception.Create('[MakePascalJNI] No native methods in public class!');
+
   for i := 0 to FNativeMethods.Count - 1 do
     with TNativeMetodDesc(FNativeMethods[i]) do
     begin
@@ -215,16 +217,29 @@ begin
       str := str + ' cdecl;';
       FPascalJNI.Add(str);
       FPascalJNI.Add('begin');
+
       if Assigned(Bodies) then
         str := Bodies.Values[nativeName]
       else
         str := '';
+
       if str = '' then
+      begin
         str := '// TODO ?'
+      end
       else
+      begin
         if ResultType <> '' then
-          str := 'Result:=' + str;
-      FPascalJNI.Add('  ' + str);
+        begin
+           str := 'Result:=' + str
+        end;
+      end;
+
+      //if FlagLAMWGUI then
+        FPascalJNI.Add('  ' + str);
+      //else
+        //FPascalJNI.Add('  //' + str);
+
       FPascalJNI.Add('end;');
       FPascalJNI.Add('');
 
@@ -282,7 +297,10 @@ begin
   FPascalJNI.Add('     rc := RegisterNativeMethods(curEnv, ''' + str + ''');');
   FPascalJNI.Add('     if (rc <> JNI_OK) then result := rc;');
   FPascalJNI.Add('  end;');
-  FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
+
+  if FlagLAMWGUI then
+      FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
+
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
   FPascalJNI.Add('procedure JNI_OnUnload(VM: PJavaVM; {%H-}reserved: pointer); cdecl;');
@@ -297,12 +315,19 @@ begin
   FPascalJNI.Add('  if PEnv <> nil then');
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('    curEnv:= PJNIEnv(PEnv);');
-  FPascalJNI.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
-  FPascalJNI.Add('    gjClass:= nil; {AndroidWidget.pas}');
-  FPascalJNI.Add('    gVM:= nil; {AndroidWidget.pas}');
+  if FlagLAMWGUI then
+  begin
+    FPascalJNI.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
+    FPascalJNI.Add('    gjClass:= nil; {AndroidWidget.pas}');
+    FPascalJNI.Add('    gVM:= nil; {AndroidWidget.pas}');
+  end;
   FPascalJNI.Add('  end;');
-  FPascalJNI.Add('  gApp.Terminate;');
-  FPascalJNI.Add('  FreeAndNil(gApp);');
+  if FlagLAMWGUI then
+  begin
+    FPascalJNI.Add('  gApp.Terminate;');
+    FPascalJNI.Add('  FreeAndNil(gApp);');
+  end;
+
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
   FPascalJNI.Add('exports');
@@ -520,6 +545,7 @@ end;
 
 constructor TJavaParser.Create(Stream: TStream);
 begin
+  FlagLAMWGUI:= True;
   FStream := Stream;
   FStreamSize := FStream.Size;
   FImports := TStringList.Create;
@@ -530,6 +556,7 @@ end;
 
 constructor TJavaParser.Create(FileName: string);
 begin
+  FlagLAMWGUI:= True;
   FMemStream := TMemoryStream.Create;
   FMemStream.LoadFromFile(FileName); //Controls.java
   FMemStream.Position := 0;
@@ -538,6 +565,7 @@ end;
 
 constructor TJavaParser.Create(Strings: TStrings);
 begin
+  FlagLAMWGUI:= True;
   FMemStream := TMemoryStream.Create;
   Strings.SaveToStream(FMemStream);
   FMemStream.Position := 0;

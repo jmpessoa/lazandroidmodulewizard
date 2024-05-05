@@ -1,7 +1,7 @@
 object FrmCompCreate: TFrmCompCreate
-  Left = 231
+  Left = 525
   Height = 648
-  Top = 300
+  Top = 258
   Width = 1019
   Caption = '[LAMW]  Create New jComponent'
   ClientHeight = 648
@@ -95,12 +95,12 @@ object FrmCompCreate: TFrmCompCreate
   LCLVersion = '2.0.12.0'
   object Panel1: TPanel
     Left = 0
-    Height = 50
+    Height = 88
     Top = 0
     Width = 1019
     Align = alTop
     BevelOuter = bvNone
-    ClientHeight = 50
+    ClientHeight = 88
     ClientWidth = 1019
     ParentFont = False
     TabOrder = 0
@@ -291,6 +291,98 @@ object FrmCompCreate: TFrmCompCreate
       }
       OnClick = SpeedButton1Click
     end
+    object GroupBoxMainUnit: TGroupBox
+      Left = 248
+      Height = 63
+      Top = 9
+      Width = 167
+      Caption = 'Main Project Unit'
+      ClientHeight = 38
+      ClientWidth = 163
+      TabOrder = 1
+      Visible = False
+      object EditMainUnit: TEdit
+        Left = 11
+        Height = 28
+        Top = 1
+        Width = 141
+        TabOrder = 0
+        Text = 'Unit1'
+      end
+    end
+    object GroupBox1: TGroupBox
+      Left = 96
+      Height = 63
+      Top = 8
+      Width = 136
+      Caption = 'Pascal Interface'
+      ClientHeight = 38
+      ClientWidth = 132
+      TabOrder = 2
+      object CheckBoxRawJni: TCheckBox
+        Left = 16
+        Height = 24
+        Top = 2
+        Width = 76
+        Caption = 'Raw JNI'
+        OnChange = CheckBoxRawJniChange
+        TabOrder = 0
+      end
+    end
+    object GroupBoxJavaClass: TGroupBox
+      Left = 432
+      Height = 63
+      Top = 8
+      Width = 88
+      Caption = 'Java Class'
+      ClientHeight = 38
+      ClientWidth = 84
+      TabOrder = 3
+      Visible = False
+      object SpeedButton2: TSpeedButton
+        Left = 16
+        Height = 28
+        Top = 1
+        Width = 29
+        Glyph.Data = {
+          36040000424D3604000000000000360000002800000010000000100000000100
+          2000000000000004000064000000640000000000000000000000000000000000
+          0000000000000000000000000000000000000000000000000000000000000000
+          00000000000000000000000000000000000000000000000000004C92DEE95698
+          DEFF5B9BDEFF5B9BDEFF5B9BDEFF5A9BDEFF5A9BDEFF5A9BDEFF5A9BDEFF5A9A
+          DEFF599ADDFF5999DDFF4E93DEF54C92DE0E00000000000000005195DEFF96BE
+          E1FFADCEE4FFABCEE5FFA9CDE5FFA7CCE6FFA7CCE6FFA6CBE5FFA5CAE4FFA3C8
+          E1FFA0C5DDFF9DC1D9FF78AAD9FF4C92DE6A0000000000000000599ADFFF7BB1
+          E5FFB6D8EFFFB4D8F0FFB2D7F1FFB0D7F1FFAFD6F1FFAFD6F1FFADD5EFFFABD2
+          ECFFA7CCE6FFA2C7DFFF95BCDAFF598DC4FF7C807EFF7C807EFF5E9FE2FF62A1
+          E3FFBDE1F8FFBCE1F9FFBAE0FBFFB9E0FBFFB8E0FBFFB7DFFAFFB6DEF8FFB3DA
+          F5FFAFD4EFFFA8CDE6FFA2C6DDFF5E9CDDFFE5E7E9FF7B807EFF5FA0E3FF6CA9
+          E7FFB5DDFAFFC2E7FFFFC1E6FFFFC0E6FFFFC0E6FFFFBFE5FFFFBDE4FEFFBAE0
+          FBFFB5DAF4FFAED3EBFFA8CAE1FF73A8DCFFBED2E7FF7C807EFF60A0E3FF93C4
+          F1FF8FC2F0FFC6E8FFFFC6E8FFFFC5E8FFFFC4E8FFFFC4E7FFFFC1E6FFFFBEE3
+          FCFFBADEF6FFB3D6EEFFACCDE3FF90B9DBFF8EB7E3FF7C807FFF60A0E4FFBEE2
+          FCFF61A0E3FF60A0E4FF60A0E4FF60A0E4FF60A0E4FF60A0E4FF60A0E3FF5FA0
+          E3FF5F9FE2FF5E9DE1FF5C9CDFFF5698DEFF74A9E2FF7C817FFF60A0E4FFC8E9
+          FFFFCAE9FFFFC9EAFFFFC7E9FFFFC6E9FFFF8A8E8DFFF7F7F7FFF7F7F7FFF7F7
+          F7FFF5F5F5FFF3F3F3FFF1F1F1FFEFEFEFFFEDEDEDFF7D8180FF5397E0F8BCE1
+          FCFFC7E9FFFFC6E8FFFFC4E7FFFFB9E0FCFF8B908EFFF9F9F9FFF9F9F9FFF8F8
+          F8FFF7F7F7FFF4F4F4FFF2F2F2FFF0F0F0FFEDEDEDFF7E8280FF4C92DE6A5397
+          E0F860A0E4FF60A0E3FF60A0E3FF5397E0F88C908FFFFAFAFAFFFAFAFAFFFAFA
+          FAFFF8F8F8FFF6F6F6FFF3F3F3FFF0F0F0FFEEEEEEFF7F8381FF000000000000
+          0000000000000000000000000000000000008D918FFFFBFBFBFFFBFBFBFFFAFA
+          FAFFF9F9F9FFF6F6F6FFF4F4F4FFF1F1F1FFEEEEEEFF808482FF000000000000
+          0000000000000000000000000000000000008D9190FFFBFBFBFFFBFBFBFFFAFA
+          FAFFF9F9F9FFF6F6F6FFF3F3F3FFF1F1F1FFEEEEEEFF818584FF000000000000
+          0000000000000000000000000000000000008D9290FFFBFBFBFFFBFBFBFFFAFA
+          FAFFF9F9F9FFF6F6F6FFF4F4F4FFF0F0F0FFEDEDEDFF828685FF000000000000
+          0000000000000000000000000000000000008D9290FFFAFAFAFFFAFAFAFFF9F9
+          F9FFF8F8F8FFF6F6F6FFF3F3F3FFF0F0F0FFEDEDEDFF838786FF000000000000
+          0000000000000000000000000000000000008D9190FF8D918FFF8D918FFF8C90
+          8FFF8B8F8DFF898E8CFF888C8AFF878B89FF858988FF848887FF
+        }
+        OnClick = SpeedButton2Click
+      end
+    end
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -302,8 +394,8 @@ object FrmCompCreate: TFrmCompCreate
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 531
-    Top = 50
+    Height = 493
+    Top = 88
     Width = 1019
     ActivePage = TabSheet1
     Align = alClient
@@ -312,13 +404,13 @@ object FrmCompCreate: TFrmCompCreate
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Java'
-      ClientHeight = 498
+      ClientHeight = 460
       ClientWidth = 1011
       ParentFont = False
       inline SynMemo1: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 498
+        Height = 460
         Hint = 'Right Click....'
         Top = 0
         Width = 1011
@@ -809,13 +901,13 @@ object FrmCompCreate: TFrmCompCreate
     end
     object TabSheet2: TTabSheet
       Caption = 'Pascal'
-      ClientHeight = 498
+      ClientHeight = 460
       ClientWidth = 1011
       ParentFont = False
       inline SynMemo2: TSynMemo
         Cursor = crIBeam
         Left = 0
-        Height = 498
+        Height = 460
         Hint = 'Right Click....'
         Top = 0
         Width = 1011
@@ -1666,7 +1758,7 @@ object FrmCompCreate: TFrmCompCreate
   object OpenDialog1: TOpenDialog
     DefaultExt = '.jar'
     Filter = 'JAR|*.jar'
-    Left = 400
-    Top = 8
+    Left = 832
+    Top = 16
   end
 end
