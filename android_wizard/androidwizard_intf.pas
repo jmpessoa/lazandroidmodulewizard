@@ -525,6 +525,9 @@ end;
 function TAndroidNoGUIRawLibDescriptor.DoInitDescriptor: TModalResult;    //3: raw lib
 var
   nativeMethodEventList: TStringList;
+  //nativeMethodList: TStringList
+  //outImportsList: TStringList;
+  //javaClassList: TStringList;
   outTag, i, count: integer;
   aux: string;
 begin
@@ -597,50 +600,75 @@ begin
         FMainUnitInterfaceList.Free;
         FMainUnitImplementationList.Free;
 
+        //nativeMethodList:= TStringList.Create;
         nativeMethodEventList:= TStringList.Create;
+
         count:= FRawJniJClassWrapper.Count;
         for i:= 0 to count -1 do
         begin
             if Pos('native ',FRawJniJClassWrapper.Strings[i]) > 0 then
             begin
               aux:= Trim(FRawJniJClassWrapper.Strings[i]);
+              //nativeMethodList.Add(aux);
               nativeMethodEventList.Add(GetEventSignature(aux));
             end;
         end;
+        nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.events');
 
-        (*  TODO :prepare "imports" stuff... -> Controls.java?
-        javaClassList := FindAllFiles(FPathToJavaSource, '*.java', False);
-        for k := 0 to javaClassList.Count - 1 do
+        //prepare "imports" [Dictionary] stuff...
+        (*
+        javaClassList:= TStringList.Create;
+        outImportsList:= TStringList.Create;
+        outImportsList.Sorted:= True;
+        outImportsList.Duplicates:= dupIgnore;
+
+        if  no FileExists(FPathToJavaTemplates+DirectorySeparator+'Controls.imports') then
         begin
-          tempList.LoadFromFile(javaClassList.Strings[k]);
-          for i := 0 to tempList.Count - 1 do
-          begin
-            if Pos('import ', tempList.Strings[i]) > 0 then
-              importList.Add(Trim(tempList.Strings[i]));
-          end;
+          ProduceImportsDictionary(FPathToJavaTemplates+DirectorySeparator+'Controls.java', outImportsList);
+          outImportsList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.imports');
+        end
+        else
+        begin
+           outImportsList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.imports');
         end;
-        javaClassList.Free;
+
+        count:= FRawJniJClassWrapper.Count;
+        for i:= 0 to count-1 do
+        begin
+           if Pos('import ', FRawJniJClassWrapper.Strings[i]) > 0 then
+           begin
+              outImportsList.Add( Trim(FRawJniJClassWrapper.Strings[i]) );
+           end;
+        end;
+        outImportsList.Add(' ');
+
         //just dummy...
         javaClassList.Clear;
         javaClassList.Add('package ' + FPackagePrefaceName + ';');
         javaClassList.Add('');
-        javaClassList.AddStrings(importList);  //all "imports" colecteds....
-        javaClassList.Add('public class '+LowerCase(FSmallProjName)+' {');
+        javaClassList.AddStrings(outImportsList);  //all "imports" colecteds....
+         javaClassList.Add(' ');
+        javaClassList.Add('public class '+FSmallProjName+' {');
         javaClassList.Add('');
         javaClassList.AddStrings(nativeMethodList);  //all "native" colecteds....
+         javaClassList.Add(' ');
         javaClassList.Add('}');
         *)
 
-        nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.events');
-        with TJavaParser.Create(FRawJniJClassWrapper) do
+        with TJavaParser.Create(FRawJniJClassWrapper) do  //javaClassList
         try
           IsLAMWGUI:= False; //not LAMW GUI project...
           FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(nativeMethodEventList);
         finally
           Free;
         end;
+
+        //nativeMethodList.Free;
+        //javaClassList.Free;
+        //outImportsList.Free;
         FRawJniJClassWrapper.Free;
         nativeMethodEventList.Free;
+
       end; //4
       Result := mrOK
     end else

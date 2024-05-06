@@ -24,6 +24,7 @@ procedure ProduceRawJniInterface(pascalMainUnit: string; jclasspath: string;
                                  out unitInterfaceList: TStringList;
                                  out unitImplementationList: TStringList);
 function GetCallSignature(const nativeMethod: string): string;
+procedure ProduceImportsDictionary(pathToJclass: string; out outimportsList: TStringList);
 
 implementation
 
@@ -46,6 +47,32 @@ begin
        theString:= '';
     end;
   end;
+end;
+
+//FPathToJavaTemplates+DirectorySeparator+'Controls.java'
+procedure ProduceImportsDictionary(pathToJclass: string; out outimportsList: TStringList);
+var
+    auxList: TStringList;
+    auxStr: string;
+    i: integer;
+begin
+  auxList:= TStringList.Create;
+
+  auxList.LoadFromFile(pathToJclass);
+  for i:= 0 to auxList.Count-1 do
+  begin
+      auxStr:= auxList.Strings[i];
+      if auxStr <> '' then
+      begin
+        if Pos('import ', auxStr) > 0 then
+        begin
+           outimportsList.Add( Trim(auxStr) );
+        end;
+      end;
+      //outimportsList.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.imports');
+  end;
+  auxList.Free;
+
 end;
 
 function GetCallSignature(const nativeMethod: string): string;

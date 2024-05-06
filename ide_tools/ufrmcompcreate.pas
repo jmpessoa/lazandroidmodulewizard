@@ -139,6 +139,8 @@ type
     procedure GetNativeMethodList(selList: TStringList; nativeEventMethodList: TStringList; namingBypassList: TStringList);
     procedure GetNativeMethodInterfaceList(jclassname: string; nativeMethod: TStringList; namingBypass: TStringList; MemoLines: TStrings);
 
+    procedure ProduceImportsDictionary();
+
   public
     { public declarations }
   end;
@@ -2242,10 +2244,43 @@ begin
 
 end;
 
+procedure TFrmCompCreate.ProduceImportsDictionary();
+var
+    imports: TStringList;
+    auxList: TStringList;
+    auxStr: string;
+    i: integer;
+begin
+  auxList:= TStringList.Create;
+  Imports:= TStringList.Create;
+
+  Imports.Sorted:= True;
+  Imports.Duplicates:= dupIgnore;
+
+  auxList.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+'Controls.java');
+  for i:= 0 to auxList.Count-1 do
+  begin
+      auxStr:= auxList.Strings[i];
+      if auxStr <> '' then
+      begin
+        if Pos('import ', auxStr) > 0 then
+        begin
+           Imports.Add( Trim(auxStr) );
+        end;
+      end;
+      Imports.SaveToFile(FPathToJavaTemplates+DirectorySeparator+'Controls.imports');
+  end;
+
+  Imports.Free;
+  auxList.Free;
+
+end;
+
 procedure TFrmCompCreate.CheckBoxRawJniChange(Sender: TObject);
 begin
   if CheckBoxRawJni.Checked then
   begin
+    ProduceImportsDictionary();
     GroupBoxMainUnit.Visible:= True;
     GroupBoxJavaClass.Visible:= True;
   end
