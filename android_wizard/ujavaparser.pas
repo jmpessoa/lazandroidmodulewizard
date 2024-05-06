@@ -38,7 +38,7 @@ type
     procedure ReadTill(Token: string); //inline;
     procedure ReadTillCurlBracketClose;
   public
-    FlagLAMWGUI: boolean;
+    IsLAMWGUI: boolean;
     constructor Create(Stream: TStream);
     constructor Create(FileName: string);
     constructor Create(Strings: TStrings);
@@ -298,7 +298,7 @@ begin
   FPascalJNI.Add('     if (rc <> JNI_OK) then result := rc;');
   FPascalJNI.Add('  end;');
 
-  if FlagLAMWGUI then
+  if IsLAMWGUI then
       FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
 
   FPascalJNI.Add('end;');
@@ -315,14 +315,14 @@ begin
   FPascalJNI.Add('  if PEnv <> nil then');
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('    curEnv:= PJNIEnv(PEnv);');
-  if FlagLAMWGUI then
+  if IsLAMWGUI then
   begin
     FPascalJNI.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
     FPascalJNI.Add('    gjClass:= nil; {AndroidWidget.pas}');
     FPascalJNI.Add('    gVM:= nil; {AndroidWidget.pas}');
   end;
   FPascalJNI.Add('  end;');
-  if FlagLAMWGUI then
+  if IsLAMWGUI then
   begin
     FPascalJNI.Add('  gApp.Terminate;');
     FPascalJNI.Add('  FreeAndNil(gApp);');
@@ -545,7 +545,7 @@ end;
 
 constructor TJavaParser.Create(Stream: TStream);
 begin
-  FlagLAMWGUI:= True;
+  IsLAMWGUI:= True;
   FStream := Stream;
   FStreamSize := FStream.Size;
   FImports := TStringList.Create;
@@ -556,7 +556,7 @@ end;
 
 constructor TJavaParser.Create(FileName: string);
 begin
-  FlagLAMWGUI:= True;
+  IsLAMWGUI:= True;
   FMemStream := TMemoryStream.Create;
   FMemStream.LoadFromFile(FileName); //Controls.java
   FMemStream.Position := 0;
@@ -565,7 +565,7 @@ end;
 
 constructor TJavaParser.Create(Strings: TStrings);
 begin
-  FlagLAMWGUI:= True;
+  IsLAMWGUI:= True;
   FMemStream := TMemoryStream.Create;
   Strings.SaveToStream(FMemStream);
   FMemStream.Position := 0;

@@ -26,6 +26,7 @@ uses
   StrUtils,
   createdirectories,
   createfiles,
+  rawjnihelper,
   AndroidWidget;
 
 type
@@ -48,7 +49,7 @@ type
      FPascalJNIInterfaceCode: string;
      FJavaClassName: string;
      FPathToClassName: string;
-     FPathToJNIFolder: string;
+    // FPathToJNIFolder: string;
      //FPathToNdkPlatforms: string; {C:\adt32\ndk\platforms\android-14\arch-arm\usr\lib}
      //FPathToNdkToolchains: string;
      {C:\adt32\ndk7\toolchains\arm-linux-androideabi-4.4.3\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.4.3}
@@ -267,597 +268,6 @@ begin
   LamwSmartDesigner.Init;
 end;
 
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++
-function GetNativeOutPascalReturnInit(ptype: string): string;
-begin
-  Result:= '0';
-  if ptype = 'TDynArrayOfInteger' then Result:= 'nil'
-  else if ptype = 'TDynArrayOfString'  then Result:= 'nil'
-  else if ptype = 'TDynArrayOfSingle'  then Result:= 'nil'
-  else if ptype = 'TDynArrayOfDouble'  then Result:= 'nil'
-  else if ptype = 'TDynArrayOfJByte'   then Result:= 'nil'
-  else if ptype = 'boolean' then Result:= 'False'
-  else if ptype = 'string'  then Result:= '''''';
-end;
-
-function GetNativeParamName(param: string): string;
-var
-  pname, ptype: string;
-begin
-  ptype:= param;
-  pname:= SplitStr(ptype, ':');
-  Result:= pname;
-end;
-
-function TryNativeConvertSignature(param: string): string;
-var
-  pname, ptype: string;
-begin
-  Result:= param;
-  ptype:= param;
-  pname:= SplitStr(ptype, ':');
-  if Pos('jfloatArray', ptype) > 0 then Result:= pname + ':' + 'array of single'
-  else if Pos('jdoubleArray', ptype) > 0 then Result:= pname + ':' + 'array of double'
-  else if Pos('jintArray', ptype) > 0 then Result:= pname + ':' + 'array of integer'
-  else if Pos('jbyteArray', ptype) > 0 then Result:= pname + ':' + 'array of shortint'
-  else if Pos('jString', ptype) > 0 then Result:= pname + ':' + 'string'
-  else if Pos('jstringArray', ptype) > 0 then Result:= pname + ':' + 'array of string'
-  else if Pos('jBoolean', ptype) > 0 then Result:= pname + ':' + 'boolean';
-end;
-
-function TryNativeConvertParam(param: string): string;
-var
-  pname, ptype: string;
-begin
-  ptype:= param;
-  pname:= SplitStr(ptype, ':');
-  Result:= pname;
-  if Pos('jString', ptype) > 0 then Result:= 'GetString(env,'+pname+')'
-  else if Pos('jBoolean', ptype) > 0 then Result:= 'boolean('+pname+')'
-  else if Pos('jbyteArray', ptype) > 0 then Result:= 'GetDynArrayOfJByte(env,'+pname+')'  //array of shortint
-  else if Pos('jintArray', ptype) > 0 then Result:= 'GetDynArrayOfInteger(env,'+pname+')'
-  else if Pos('jfloatArray', ptype) > 0 then Result:= 'GetDynArrayOfSingle(env,'+pname+')'
-  else if Pos('jdoubleArray', ptype) > 0 then Result:= 'GetDynArrayOfDouble(env,'+pname+')'
-  else if Pos('jstringArray', ptype) > 0 then Result:= 'GetDynArrayOfString(env,'+pname+')';
-end;
-
-//----------------------------Native Call Pascal Interface------------------
-function GetNativePascalTypeSignature(jSignature: string): string;
-var
-  jType, pType: string;
-  jName: string;
-begin
-    pType:= 'JObject';
-
-    jName:= Trim(jSignature);
-    jType:= SplitStr(jName, ' ');
-
-    if Pos('String', jType) > 0 then
-    begin
-      pType:= 'jString';
-      if Pos('String[', jType) > 0 then pType:= 'jstringArray';
-    end
-    else if Pos('int', jType) > 0  then  //The search is case-sensitive!
-    begin
-       pType := 'integer';
-       if Pos('[', jType) > 0 then pType := 'jintArray';
-    end
-    else if Pos('double',jType) > 0 then
-    begin
-       pType := 'double';
-       if Pos('[', jType) > 0 then pType := 'jdoubleArray';
-    end
-    else if Pos('float', jType) > 0 then
-    begin
-       pType := 'single';
-       if Pos('[', jType) > 0 then pType := 'jfloatArray';
-    end
-    else if Pos('char', jType) > 0 then
-    begin
-       pType := 'jchar';
-       if Pos('[', jType) > 0 then pType := 'jcharArray';
-    end
-    else if Pos('short', jType) > 0 then
-    begin
-       pType := 'smallint';
-       if Pos('[', jType) > 0 then pType := 'jshortArray';
-    end
-    else if Pos('boolean', jType) > 0 then
-    begin
-       pType := 'jBoolean';
-       if Pos('[', jType) > 0 then pType := 'jbooleanArray';
-    end
-    else if Pos('byte', jType) > 0 then
-    begin
-       pType := 'jbyte';
-       if Pos('[', jType) > 0 then pType := 'jbyteArray';
-    end
-    else if Pos('long', jType) > 0 then
-    begin
-       pType := 'int64';
-       if Pos('[', jType) > 0 then pType := 'jlongArray';
-    end;
-
-    if  jName <> '' then
-      Result:= jName + ':' + pType
-    else
-      Result:= pType;
-
-end;
-
-function GetNativePascalFuncResultHack(jType: string): string;
-begin
-  Result:= 'jObject';
-  if Pos('String', jType) > 0 then
-  begin
-     Result:= 'string';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfString';
-  end else if Pos('int', jType) > 0  then
-  begin
-     Result := 'integer';  //longint
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfInteger';
-  end
-  else if Pos('double',jType) > 0 then
-  begin
-     Result := 'double';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfDouble';
-  end
-  else if Pos('float', jType) > 0 then
-  begin
-     Result := 'single';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfSingle';
-  end
-  else if Pos('char', jType) > 0 then
-  begin
-     Result := 'char';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJChar';
-  end
-  else if Pos('short', jType) > 0 then
-  begin
-     Result := 'smallint';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfSmallint';  //smallint
-  end
-  else if Pos('boolean', jType) > 0 then
-  begin
-     Result := 'boolean';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJBoolean';
-  end
-  else if Pos('byte', jType) > 0 then
-  begin
-     Result := 'byte';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfJByte';  //array of shortint
-  end
-  else if Pos('long', jType) > 0 then
-  begin
-     Result := 'int64';
-     if Pos('[', jType) > 0 then Result := 'TDynArrayOfInt64';
-  end;
-
-  if Result = 'jObject' then
-      if Pos('[', jType) > 0 then Result := 'TDynArrayOfJObject';
-
-end;
-
-function GetNativePascalSignature(const methodNative: string; out eventname: string; out outType: string): string;
-var
-  method: string;
-  signature: string;
-  params: string;
-  i, d, p, p1, p2: integer;
-  listParam: TStringList;
-  fTypereturn: string;
-begin
-  listParam:= TStringList.Create;
-
-  fTypereturn:= '';
-  method:= methodNative;
-
-  p:= Pos('native', method);
-  method:= Copy(method, p+Length('native'), MaxInt);
-  p1:= Pos('(', method);
-  p2:= PosEx(')', method, p1 + 1);
-  d:=(p2-p1);
-
-  params:= Copy(method, p1+1, d-1); //long pasobj, long elapsedTimeMillis
-                                    //long pasobj, int state, String phoneNumber
-  method:= Copy(method, 1, p1-1);
-  method:= Trim(method);            //void pOnChronometerTick
-
-  fTypereturn:= Trim(SplitStr(method, ' '));
-
-  method:= Trim(method);            //pOnChronometerTick
-
-  signature:= '(env:PJNIEnv;this:JObject';
-  if Length(params) > 3  then
-  begin
-    listParam.Delimiter:= ',';
-    listParam.StrictDelimiter:= True;
-    listParam.DelimitedText:= params;
-    for i:= 0 to listParam.Count-1 do
-    begin
-      if Pos('pasobj', listParam.Strings[i]) > 0 then
-         signature:= signature + ';'+ 'Sender:TObject'
-      else
-         signature:= signature + ';' + GetNativePascalTypeSignature(Trim(listParam.Strings[i]));
-    end;
-  end;
-
-  //raw jni
-  if fTypereturn = 'void' then
-    Result:= 'procedure Java_Call_'+method+signature+');'
-  else
-  begin
-    outType:= GetNativePascalFuncResultHack(fTypereturn) ;
-    Result:= 'function Java_Call_'+method+signature+'):'+GetNativePascalTypeSignature(fTypereturn)+';';
-  end;
-
-  eventname:= method;  //raw jni
-
-  listParam.Free;
-end;
-
-procedure GetNativeMethodInterfaceList(pascalMainUnit: string; jclassname: string; nativeMethod: TStringList;
-                                       namingBypass: TStringList;
-                                       out bridgeContentList: TStringList;
-                                       out unitInterfaceList: TStringList;
-                                       out unitImplementationList: TStringList);
-var
-  signature, outEventname, params, pasSignature, pasParams: string;
-  listBody, listParam: TStringList;
-  p1, p2, i, count, dx,  j, k: integer;
-  aux, outPascalReturnType, smallEventName: string;
-
-  LazAndControlsEventsHeader: TStringList;
-  LazAndControlsEventsBody: TStringList;
-
-  PasHeaderType: TStringList;
-  PasHeaderProperty: TStringList;
-  PasHeaderProcedure: TStringList;
-  PasHeaderPublished: TStringList;
-  PasBody: TStringList;
-  has_pasobj_param: boolean;
-begin
-
-  listParam:= TStringList.Create;
-  listParam.Delimiter:= ';';
-  listParam.StrictDelimiter:= True;
-  listBody:= TStringList.Create;
-
-  LazAndControlsEventsHeader:= TStringList.Create;
-  LazAndControlsEventsBody:= TStringList.Create;
-
-  PasHeaderType:= TStringList.Create;
-  PasHeaderProperty:= TStringList.Create;
-  PasHeaderProcedure:= TStringList.Create;
-  PasHeaderPublished:= TStringList.Create;
-  PasBody:= TStringList.Create;
-
-
-  for k:= 0 to nativeMethod.Count-1 do
-  begin
-    outPascalReturnType:= ''; //jString, jBoolean, integer, single
-    outEventname:='';
-
-    listParam.Clear;
-    listBody.Clear;
-
-    signature:= GetNativePascalSignature(nativeMethod.Strings[k], outEventname, outPascalReturnType);
-
-    if Pos('Sender', signature) > 0 then
-         has_pasobj_param:= True;
-
-    LazAndControlsEventsHeader.Add(signature);
-
-    p1:= Pos('(', signature);
-    p2:= Pos(')', signature);
-    listParam.DelimitedText:= Copy(signature, p1+1,p2-(p1+1)); // env:PJNIEnv;this:JObject;Obj:TObject;state:integer;phoneNumber:jString
-
-    smallEventName:= StringReplace(outEventname,namingBypass.Strings[k],'',[rfIgnoreCase, rfReplaceAll]);
-
-    has_pasobj_param:= False;
-    pasSignature:='';
-
-    params:= '';
-    pasParams:= '';
-    dx:=2;
-    {ex. dx:
-    env:PJNIEnv
-    this:JObject
-
-    x:integer
-    y:integer
-    }
-
-    if has_pasobj_param  then
-    begin
-       pasSignature:='Sender:TObject';
-       params:= 'Sender';
-       pasParams:= 'Sender';
-       dx:= 3;
-    end;
-
-    LazAndControlsEventsBody.Add(signature);
-
-    {ex. dx = 3:
-    env:PJNIEnv
-    this:JObject
-    Sender:TObject
-
-    x:integer
-    y:integer
-    }
-
-    count:= listParam.Count;
-    if count > dx then
-    begin
-      for i:= dx to count-1 do
-      begin
-         //Sender:TObject; x:integer; y:integer    or
-         //x:integer; y:string
-         aux:= listParam.Strings[i];
-         if pasSignature <> '' then
-             pasSignature:= pasSignature + ';'+ TryNativeConvertSignature(aux)
-         else
-             pasSignature:= TryNativeConvertSignature(aux);
-
-         if pasParams <> '' then
-            pasParams:=pasParams + ',' +GetNativeParamName(aux)
-         else
-            pasParams:= GetNativeParamName(aux);
-
-         if params <> '' then
-           params:= params + ','+ TryNativeConvertParam(aux)
-         else
-           params:= TryNativeConvertParam(aux);
-
-      end;
-    end;
-
-    if outPascalReturnType <> '' then
-    begin
-      LazAndControlsEventsBody.Add('var');
-      LazAndControlsEventsBody.Add('  outReturn: '+outPascalReturnType+';');
-    end;
-
-    LazAndControlsEventsBody.Add('begin');
-
-    //raw jni
-    //LazAndControlsEventsBody.Add('  //'+Self.EditMainUnit.Text+'.EnvJni.Jni.jEnv:= env;');
-    //LazAndControlsEventsBody.Add('  //'+Self.EditMainUnit.Text+'.EnvJni.Jni.jThis:= this;');
-
-    //Raw jni
-    if outPascalReturnType = '' then
-      LazAndControlsEventsBody.Add('   '+pascalMainUnit+'.'+outEventname+'('+params+');')
-    else
-      LazAndControlsEventsBody.Add('    outReturn:= '+pascalMainUnit+'.'+outEventname+'('+params+');');
-
-
-    if outPascalReturnType <> '' then
-    begin
-
-      if outPascalReturnType = 'string' then
-        LazAndControlsEventsBody.Add('  Result:=GetJString(env,outReturn);')
-      else if outPascalReturnType = 'boolean' then
-         LazAndControlsEventsBody.Add('  Result:=JBool(outReturn);')
-
-      else if outPascalReturnType = 'TDynArrayOfJByte' then
-        LazAndControlsEventsBody.Add('  Result:=GetJObjectOfDynArrayOfJByte(env,outReturn);')
-
-      else if outPascalReturnType = 'TDynArrayOfInteger' then
-        LazAndControlsEventsBody.Add('  Result:=GetJObjectOfDynArrayOfInteger(env,outReturn);')
-
-      else if outPascalReturnType = 'TDynArrayOfSingle' then
-        LazAndControlsEventsBody.Add('  Result:=GetJObjectOfDynArrayOfSingle(env,outReturn);')
-
-      else if outPascalReturnType = 'TDynArrayOfDouble' then
-        LazAndControlsEventsBody.Add('  Result:=GetJObjectOfDynArrayOfDouble(env,outReturn);')
-
-      else if outPascalReturnType = 'TDynArrayOfString' then
-        LazAndControlsEventsBody.Add('  Result:=GetJObjectOfDynArrayOfString(env,outReturn);')
-
-      else
-        LazAndControlsEventsBody.Add('  Result:=outReturn;');
-    end;
-
-    LazAndControlsEventsBody.Add('end;');
-
-    //raw jni
-      if outPascalReturnType = '' then
-         PasHeaderType.Add('procedure '+outEventname+'('+pasSignature+');')
-      else                                                                        //TryNativeReConvertOutSignature
-         PasHeaderType.Add('function '+outEventname+'('+pasSignature+'): '+ outPascalReturnType+';');
-
-  end;//for
-
-  bridgeContentList.Clear;
-
-  bridgeContentList.Add(' ');
-
-  //raw init
-  //bridgeContentList.Add('//------------------- java_call_bridge_'+jclassname+'.pas  ----------------------');
-
-  bridgeContentList.Add('unit java_call_bridge_'+jclassname+';');
-  bridgeContentList.Add(' ');
-  bridgeContentList.Add('{$mode delphi} ');
-  bridgeContentList.Add(' ');
-  bridgeContentList.Add('interface');
-  bridgeContentList.Add(' ');
-  bridgeContentList.Add('uses');
-  bridgeContentList.Add('  jni, jnihelper;');
-  bridgeContentList.Add(' ');
-  for j:= 0 to  (LazAndControlsEventsHeader.Count-1) do
-  begin
-     bridgeContentList.Add(LazAndControlsEventsHeader.Strings[j]);
-  end;
-
-  bridgeContentList.Add(' ');
-  bridgeContentList.Add('implementation');
-  bridgeContentList.Add(' ');
-  bridgeContentList.Add('uses');
-  bridgeContentList.Add('  '+pascalMainUnit+';');
-  bridgeContentList.Add(' ');
-  for j:= 0 to  (LazAndControlsEventsBody.Count-1) do
-  begin
-     bridgeContentList.Add(LazAndControlsEventsBody.Strings[j]);
-  end;
-  bridgeContentList.Add(' ');
-  bridgeContentList.Add('end. ');
-  bridgeContentList.Add(' ');
-
-  //*************************
-
-  unitInterfaceList.Clear;
-  //unitContentList.Add('//--------------------'+pascalMainUnit+'.pas ------------------------');
-  //unitInterfaceList.Add('//' + pascalMainUnit+'.pas ');
-  //unitInterfaceList.Add(' ');
-  //unitInterfaceList.Add('//interface');
-  //unitInterfaceList.Add(' ');
-  //unitInterfaceList.Add('//type');
-  //unitInterfaceList.Add('//TEnvJni=record');
-  //unitInterfaceList.Add('//  jEnv: PJNIEnv;');  //a pointer reference to the JNI environment,
-  //unitInterfaceList.Add('//  jThis: jObject;');  //a reference to the object making this call (or class if static-> lamwrawlib1.java).
-  //unitInterfaceList.Add('//end;');
-  //unitInterfaceList.Add(' ');
-  //unitInterfaceList.Add('//var');
-  //unitInterfaceList.Add('   //EnvJni: TEnvJni');
-
-  unitInterfaceList.Add(' ');
-  for j:= 0 to (PasHeaderType.Count-1) do
-  begin
-     unitInterfaceList.Add(PasHeaderType.Strings[j]);
-  end;
-  //unitInterfaceList.Add(' ');
-
-  //raw jni
-  //unitImplementationList.Add(' ');
-  //unitImplementationList.Add('//implementation');
-  //unitImplementationList.Add(' ');
-  unitImplementationList.Add(' ');
-  for j:= 0 to (PasHeaderType.Count-1) do
-  begin
-     unitImplementationList.Add(PasHeaderType.Strings[j]);
-     unitImplementationList.Add('begin');
-     unitImplementationList.Add('   //');
-     unitImplementationList.Add('end;');
-     unitImplementationList.Add(' ');
-  end;
-  //unitImplementationList.Add(' ');
-  //unitImplementationList.Add('//end.');
-
-  LazAndControlsEventsHeader.Free;
-  LazAndControlsEventsBody.Free;
-
-  PasHeaderType.Free;
-  PasHeaderProperty.Free;
-  PasHeaderProcedure.Free;
-  PasHeaderPublished.Free;
-  PasBody.Free;
-
-  listParam.Free;
-  listBody.Free;
-
-end;
-
-function GetJavaClassName(selList: TStringList): string;
-var
-  clsLine: string;
-  foundClass: boolean;
-  i, index: integer;
-begin
-    if selList.Text = '' then Exit;
-    foundClass:= False;
-    i:= 0;
-    while (not foundClass) and (i < selList.Count) do
-    begin
-       clsLine:= selList.Strings[i];
-       if Pos('class ', clsLine) > 0 then foundClass:= True;
-       Inc(i);
-    end;
-    if foundClass then
-    begin
-      clsLine:= Trim(clsLine); //cleanup...
-      if Pos('public ', clsLine) > 0 then   //public class jMyComponent
-      begin
-         SplitStr(clsLine, ' ');  //remove "public" word...
-         clsLine:= Trim(clsLine); //cleanup...
-      end;
-      SplitStr(clsLine, ' ');  //remove "class" word...
-      clsLine:= Trim(clsLine); //cleanup...
-
-      if Pos(' ', clsLine) > 0  then index:= Pos(' ', clsLine)
-      else if Pos('{', clsLine) > 0 then index:= Pos('{', clsLine)
-      else if Pos(#10, clsLine) > 0 then index:= Pos(#10, clsLine);
-
-      Result:= Trim(Copy(clsLine,1,index-1));  //get class name
-   end;
-end;
-
-//public native void pOnSpinnerItemSeleceted(long pasobj, int position, String caption); //Spinner
-procedure GetNativeMethodList(selList: TStringList; nativeEventMethodList: TStringList; namingBypassList: TStringList);
-var
-  i: integer;
-  aux, nativeMethod: string;
-begin
-    if selList.Text = '' then Exit;
-    i:= 0;
-    while i < selList.Count do
-    begin
-       if Pos(' native ', selList.Strings[i]) > 0 then
-       begin
-          aux:= selList.Strings[i];
-          nativeMethod:= SplitStr(aux, '//');
-          nativeEventMethodList.Add(nativeMethod);
-          aux:= Trim(aux);
-          if aux <> '' then
-            namingBypassList.Add(aux)
-          else
-            namingBypassList.Add('//');
-       end;
-       Inc(i);
-    end
-end;
-
-
-procedure ProduceRawJniInterface(pascalMainUnit: string; jclasspath: string;
-                                 out bridgeContentList: TStringList;
-                                 out unitInterfaceList: TStringList;
-                                 out unitImplementationList: TStringList);
-var
-  jclsName: string;
-  auxList: TStringList;
-  nativeEventMethodList, namingBypassList: TStringList;
-begin
-
-     auxList:= TStringList.Create;
-     auxList.LoadFromFile(jclasspath);
-
-     jclsName:= Trim(GetJavaClassName(auxList));
-     nativeEventMethodList:= TStringList.Create;
-     namingBypassList:= TStringList.Create;
-
-     //nativeEventMethod:= GetNativeMethod(auxList, namingBypass);
-     GetNativeMethodList(auxList, nativeEventMethodList, namingBypassList);
-
-     //GetNativeMethodInterface(clsName,nativeEventMethod,namingBypass, SynMemo2.Lines);
-
-     if nativeEventMethodList.Count > 0 then
-             GetNativeMethodInterfaceList(pascalMainUnit, jclsName,
-                                       nativeEventMethodList,
-                                       namingBypassList,
-                                       bridgeContentList,
-                                       unitInterfaceList,
-                                       unitImplementationList);
-
-     nativeEventMethodList.Free;
-     namingBypassList.Free;
-     auxList.Free;
-end;
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
 {TAndroidNoGUIExeProjectDescriptor}
 
 constructor TAndroidNoGUIExeProjectDescriptor.Create;
@@ -891,8 +301,8 @@ begin
     if GetWorkSpaceFromForm(2, outTag) then
     begin
 
-      FPathToJNIFolder := FAndroidProjectName;
-      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      //FPathToJNIFolder := FAndroidProjectName;   //project folder?
+      AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
       AndroidFileDescriptor.ModuleType:= 2; //Console
 
       CreateDirectoriesLibs(FAndroidProjectName);
@@ -1042,17 +452,17 @@ end;
 constructor TAndroidNoGUIRawLibDescriptor.Create;
 begin
   inherited Create;
-  Name := 'Create a new LAMW [NoGUI] Android Raw/JNI library';
+  Name := 'Create a new LAMW [NoGUI] Android raw JNI library';
 end;
 
 function TAndroidNoGUIRawLibDescriptor.GetLocalizedName: string;
 begin
-  Result:= 'LAMW Android raw .so lib';
+  Result:= 'LAMW Android raw jni .so lib';
 end;
 
 function TAndroidNoGUIRawLibDescriptor.GetLocalizedDescription: string;
 begin
-  Result:=  'LAMW [NoGUI] Android raw .so library'+ LineEnding +
+  Result:=  'LAMW [NoGUI] Android raw jni .so library'+ LineEnding +
             '[Native .so Library]'+ LineEnding +
             'The project is maintained by Lazarus.'
 end;
@@ -1114,7 +524,7 @@ end;
 
 function TAndroidNoGUIRawLibDescriptor.DoInitDescriptor: TModalResult;    //3: raw lib
 var
-  auxList, nativeMethodEventList: TStringList;
+  nativeMethodEventList: TStringList;
   outTag, i, count: integer;
   aux: string;
 begin
@@ -1125,8 +535,8 @@ begin
     if GetWorkSpaceFromForm(3, outTag) then
     begin
 
-      FPathToJNIFolder := FAndroidProjectName;
-      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      //FPathToJNIFolder := FAndroidProjectName;
+      AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
       AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
       AndroidFileDescriptor.ModuleType:= 3; //raw lib
 
@@ -1135,8 +545,6 @@ begin
         FModuleType:= 4;  //JNI headers signature  raw .so library
         AndroidFileDescriptor.ModuleType:= 4;
       end;
-
-      CreateDirectoriesLibs(FAndroidProjectName);
 
       if FModuleType = 3 then
       begin
@@ -1149,10 +557,10 @@ begin
         if FileExists(FRawJniJClassWrapperPath) then
         begin
            FRawJniJClassWrapper.LoadFromFile(FRawJniJClassWrapperPath);
-           FRawJniJClassWrapper.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java');
+           FRawJniJClassWrapper.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java');
         end
         else
-        begin
+        begin  //dummy
           FRawJniJClassWrapper.Add('package '+FPackagePrefaceName+';  //warning: check/fix package name!');
           FRawJniJClassWrapper.Add(' ');
           FRawJniJClassWrapper.Add('import android.util.Log;');
@@ -1168,7 +576,7 @@ begin
           FRawJniJClassWrapper.Add('    }');
           FRawJniJClassWrapper.Add('    public native int Sum(int x, int y);');
           FRawJniJClassWrapper.Add('}');
-          FRawJniJClassWrapperPath:= FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java';
+          FRawJniJClassWrapperPath:= FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java';
           FRawJniJClassWrapper.SaveToFile(FRawJniJClassWrapperPath);
         end;
 
@@ -1179,15 +587,15 @@ begin
         ProduceRawJniInterface('Unit1', FRawJniJClassWrapperPath, FJCallBridgeContentList,
                                 FMainUnitInterfaceList, FMainUnitImplementationList);
 
-        FJCallBridgeContentList.SaveToFile(FAndroidProjectName + DirectorySeparator+'java_call_bridge_'+FJavaClassName+'.pas');
+        FJCallBridgeContentList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+ DirectorySeparator+'java_call_bridge_'+FJavaClassName+'.pas');
         FJCallBridgeContentList.Free;
 
         //ShowMessage(FMainUnitContentList.Text);
          AndroidFileDescriptor.MainUnitInterface:= FMainUnitInterfaceList.Text;
          AndroidFileDescriptor.MainUnitImplementation:= FMainUnitImplementationList.Text;
 
-         FMainUnitInterfaceList.Free;
-         FMainUnitImplementationList.Free;
+        FMainUnitInterfaceList.Free;
+        FMainUnitImplementationList.Free;
 
         nativeMethodEventList:= TStringList.Create;
         count:= FRawJniJClassWrapper.Count;
@@ -1199,11 +607,34 @@ begin
               nativeMethodEventList.Add(GetEventSignature(aux));
             end;
         end;
-        //FAndroidProjectName + DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.java'
-        nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.events');
+
+        (*  TODO :prepare "imports" stuff... -> Controls.java?
+        javaClassList := FindAllFiles(FPathToJavaSource, '*.java', False);
+        for k := 0 to javaClassList.Count - 1 do
+        begin
+          tempList.LoadFromFile(javaClassList.Strings[k]);
+          for i := 0 to tempList.Count - 1 do
+          begin
+            if Pos('import ', tempList.Strings[i]) > 0 then
+              importList.Add(Trim(tempList.Strings[i]));
+          end;
+        end;
+        javaClassList.Free;
+        //just dummy...
+        javaClassList.Clear;
+        javaClassList.Add('package ' + FPackagePrefaceName + ';');
+        javaClassList.Add('');
+        javaClassList.AddStrings(importList);  //all "imports" colecteds....
+        javaClassList.Add('public class '+LowerCase(FSmallProjName)+' {');
+        javaClassList.Add('');
+        javaClassList.AddStrings(nativeMethodList);  //all "native" colecteds....
+        javaClassList.Add('}');
+        *)
+
+        nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.events');
         with TJavaParser.Create(FRawJniJClassWrapper) do
         try
-          FlagLAMWGUI:= False; //not LAMW GUI project...
+          IsLAMWGUI:= False; //not LAMW GUI project...
           FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(nativeMethodEventList);
         finally
           Free;
@@ -1356,13 +787,14 @@ begin
           Free;
       end;
 
-      FPathToJNIFolder := FAndroidProjectName;
-      AndroidFileDescriptor.PathToJNIFolder:= FPathToJNIFolder;
+      //FPathToJNIFolder := FAndroidProjectName; //project folder
+      AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
       AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
       AndroidFileDescriptor.ModuleType:= 0;
 
       with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
       try         //produce helper file [old] "ControlsEvents.txt"
+        IsLAMWGUI:= True;
         FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'Controls.events');
       finally
         Free;
@@ -1652,7 +1084,7 @@ begin
 
     FSyntaxMode:= frm.SyntaxMode;
 
-    FPathToJNIFolder:= FAndroidProjectName;
+    //FPathToJNIFolder:= FAndroidProjectName;
 
     AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName;
     AndroidFileDescriptor.ModuleType:= FModuleType;
@@ -2240,8 +1672,8 @@ begin
 
       frm.GroupBoxPrefaceName.Caption:= 'Full Package Name:' ;
       frm.EditPackagePrefaceName.Text:= 'org.lamw.myapp';
-      frm.SpeedButtonManifest.Visible:= True;  //bad reuse...
-      frm.SpeedButtonManifest.Hint:= 'Load Java Class...';  //bad reuse...
+      frm.SpeedButtonHelper.Visible:= True;  //bad reuse...
+      frm.SpeedButtonHelper.Hint:= 'Load the java class "native" methods content...';  //bad reuse...
 
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
@@ -3418,7 +2850,7 @@ end;
 function TAndroidProjectDescriptor.InitProject(AProject: TLazProject): TModalResult;
 var
   MainFile: TLazProjectFile;
-  projName, projDir, auxStr, auxInstr: string;
+  projName, projJniDir, auxStr, auxInstr: string;
   sourceList: TStringList;
   auxList: TStringList;
 
@@ -3456,7 +2888,6 @@ var
   pathToNdkToolchainsBinMips: string;
   pathToNdkToolchainsBinAarch64: string;
   osys, auxPackName: string;      {windows or linux-x86 or linux-x86_64}
-  i, count: integer;
 begin
 
   inherited InitProject(AProject);
@@ -3469,10 +2900,10 @@ begin
   if   FPathToClassName = '' then
       FPathToClassName:= StringReplace(FPackagePrefaceName, '.', '/', [rfReplaceAll])+'/'+LowerCase(FSmallProjName)+'/'+ FJavaClassName; //ex. 'com/example/appasynctaskdemo1/Controls'
 
-  if  FModuleType < 2 then
-     projDir:= FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator
-  else
-     projDir:= FPathToJNIFolder+DirectorySeparator;
+  //if  FModuleType < 2 then
+     projJniDir:= FAndroidProjectName {FPathToJNIFolder}+DirectorySeparator+'jni'+DirectorySeparator;
+  //else
+     //projDir:= FPathToJNIFolder+DirectorySeparator;
 
   if FModuleType = 0 then    //0:GUI
   begin
@@ -3500,8 +2931,10 @@ begin
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
   else if FModuleType = 2 then
     AProject.CustomData.Values['LAMW'] := 'ConsoleApp'    // FModuleType =2
-  else  //3 or 4
-    AProject.CustomData.Values['LAMW'] := 'RawLibrary';    // FModuleType = 3 or 4
+  else  if FModuleType = 3 then
+    AProject.CustomData.Values['LAMW'] := 'RawLibrary'    // FModuleType =
+  else if FModuleType = 4 then
+     AProject.CustomData.Values['LAMW'] := 'RawJniLibrary';    // FModuleType = 4
 
   if FModuleType < 2 then    {0:GUI; 1:NoGUI}
     AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
@@ -3511,9 +2944,9 @@ begin
 
   AProject.CustomData.Values['NdkApi']:= 'android-'+FNdkApi; //legacy
 
-  AProject.ProjectInfoFile := projDir + ChangeFileExt(projName, '.lpi');
+  AProject.ProjectInfoFile := projJniDir + ChangeFileExt(projName, '.lpi');
 
-  MainFile := AProject.CreateProjectFile(projDir + projName);
+  MainFile := AProject.CreateProjectFile(projJniDir + projName);
 
   MainFile.IsPartOfProject := True;
   AProject.AddFile(MainFile, False);
@@ -3669,10 +3102,9 @@ begin
     if not FRawJNILibraryChecked then
     begin
        sourceList.Add('  Unit1;');  //ok
+       (*
        auxList.Add(' jni, Unit1;'); //
        auxList.Add(' ');
-
-
        sourceList.Add(' ');
        sourceList.Add('function Sum(a: longint; b: longint): longint; cdecl; //just demo');
        sourceList.Add('begin');
@@ -3682,7 +3114,7 @@ begin
        sourceList.Add('exports');
        sourceList.Add('  Sum;');
        sourceList.Add(' ');
-       (*
+
        if FRawJniInterfaceData <> nil then
        begin
          count:= FRawJniInterfaceData.Count;
@@ -3692,7 +3124,7 @@ begin
          end;
        end
        else  //example code....
-       begin *)
+       begin
          auxList.Add('function Sum(PEnv: PJNIEnv; this: JObject; a: JInt; b: JInt): JInt; cdecl;  //just demo...');
          auxList.Add('begin');
          auxList.Add('  Result:= SumAB(a, b);');
@@ -3702,13 +3134,15 @@ begin
          auxList.Add('  Sum name ''Java_'+auxPackName+'_'+FSmallProjName+ '_Sum'';');   //warning: check/fix package name!');
          auxList.Add(' ');
        //end;
-       auxList.SaveToFile(projDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
+       auxList.SaveToFile(projJniDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
+       *)
     end
     else //jni checked!
     begin
       sourceList.Add(' jni, java_call_bridge_'+FSmallProjName+';'); //ex.
      (* JNI signature source code handled by  "FPascalJNIInterfaceCode"  property [region] *)
 
+     (*
       auxList.Add(' Unit1;');
       auxList.Add(' ');
       auxList.Add(' ');
@@ -3723,9 +3157,12 @@ begin
       auxList.Add('begin');
       auxList.Add('  //');
       auxList.Add('end.');
-      auxList.SaveToFile(projDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
+      auxList.SaveToFile(projJniDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
+      *)
+
     end;
 
+    (*
     auxList.Clear;
     auxList.Add('unit '+LowerCase(FSmallProjName)+'_h;');
     auxList.Add(' ');
@@ -3736,30 +3173,30 @@ begin
     auxList.Add('implementation');
     auxList.Add(' ');
     auxList.Add('end.');
-    auxList.SaveToFile(projDir+'libs'+DirectorySeparator+LowerCase(FSmallProjName)+'_h.pas');
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+LowerCase(FSmallProjName)+'_h.pas');
+    *)
 
     auxList.Clear;
     auxList.Add('How to Use:');
     auxList.Add('');
-    auxList.Add('I. Using "lib'+LowerCase(FSmallProjName)+'.so'+'" in Pascal/LAMW project');
-    auxList.Add('   > Check the Pascal "*.lpr" content (no "jni" reference...). If need replace the "*.lpr" by "*.lpr2" content...');
-    auxList.Add('   > "Build" the *.so library !');
-    auxList.Add('   > Create a new "Lazarus/LAMW [GUI]" project');
-    auxList.Add('   > Copy the "*.so" library from ...libs\... to your new project ...libs\...,  according your chip architecture,  ex.: "armeabi-v7a"');
-    auxList.Add('   > Copy the "'+LowerCase(FSmallProjName)+'_h.pas" file from library.../libs folder to your new LAMW project "jni" folder');
-    auxList.Add(' ');
-    auxList.Add('II. Using "lib'+LowerCase(FSmallProjName)+'.so'+'" in Java "Android Studio" project');
-    auxList.Add('   > Create a "Android Studio" Java project, and remember your full package name!');
-    auxList.Add('   > Check the Pascal "*.lpr" content ("jni" reference found!). If need replace the "*.lpr" by "*.lpr2" content...');
-    auxList.Add('   > Check the Pascal "*.lpr" code for package name signature used in exports functions...');
-    auxList.Add('   >   ex.: for project package name "org.lamw.myapp" you will get "Java_org_lamw_myapp_'+FSmallProjName+'_*" jni signature!');
-    auxList.Add('   > "Build" the *.so library');
-    auxList.Add('   > Go to your "Android Studio" projec "main" folder and create the "jniLibs" sub-folder');
-    auxList.Add('   > Go to "jniLibs" folder and create the sub-folder(s) "armeabi-v7a" and/or other(s)');
-    auxList.Add('   > Copy the "*.so" file from ...libs/armeabi-v7a to you "Android Studio" project "armeabi-v7a" folder [just example...]');
-    auxList.Add('   > Copy the file "'+FSmallProjName+'.java" generated by LAMW from .../libs to the same folder where is "MainActivity.java"');
-    auxList.Add('   > Open "'+FSmallProjName+'.java" generated by LAMW and fix/check the project package name');
-    auxList.Add('   > Sync your "Android Studio" project');
+    //auxList.Add('I. Using "lib'+LowerCase(FSmallProjName)+'.so'+'" in Pascal/LAMW project');
+    //auxList.Add('   > Check the Pascal "*.lpr" content (no "jni" reference...). If need replace the "*.lpr" by "*.lpr2" content...');
+    //auxList.Add('   > "Build" the *.so library !');
+    //auxList.Add('   > Create a new "Lazarus/LAMW [GUI]" project');
+    //auxList.Add('   > Copy the "*.so" library from ...libs\... to your new project ...libs\...,  according your chip architecture,  ex.: "armeabi-v7a"');
+    //auxList.Add('   > Copy the "'+LowerCase(FSmallProjName)+'_h.pas" file from library.../libs folder to your new LAMW project "jni" folder');
+    //auxList.Add(' ');
+    auxList.Add('Using the "lib'+LowerCase(FSmallProjName)+'.so'+'" in Java "Android Studio" project');
+    auxList.Add('> If need create a "Android Studio" Java project, and remember your full package name!');
+    auxList.Add('> Check the Pascal "*.lpr" code for package name signature used in exports functions...');
+    auxList.Add('>   ex.: for project package name "org.lamw.myapp" you will get "Java_org_lamw_myapp_AcbrJBridges1_*" jni signature!');
+    auxList.Add('> Go to Menu "Run" -> ""Build" the *.so library');
+    auxList.Add('> If need go to your "Android Studio" projec "main" folder and create the "jniLibs" sub-folder');
+    auxList.Add('> Copy the "*.so" file from jni  "libs/armeabi-v7a" [or like...] to your "Android Studio" project "jniLibs/armeabi-v7a" folder [just example...]');
+    auxList.Add('> If need copy the file "'+FSmallProjName+'.java" generated by LAMW from .../libs to the same folder where is "MainActivity.java"');
+    auxList.Add('> Open "AcbrJBridges1.java" generated by LAMW and fix/check the project package name...');
+    auxList.Add('> Sync your "Android Studio" project...');
+
     auxList.Add('    ');
     auxList.Add('    ');
     auxList.Add('//.....');
@@ -3779,7 +3216,7 @@ begin
     auxList.Add('   }');
     auxList.Add('   //.....');
     auxList.Add('}');
-    auxList.SaveToFile(projDir+DirectorySeparator+'readme.txt');
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
     auxList.Clear;
 
   end; //3 or 4
@@ -4176,9 +3613,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FModuleType < 2 then
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt')
+    auxList.SaveToFile(FAndroidProjectName  +DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt')
   else
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
+    auxList.SaveToFile(FAndroidProjectName  +DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_x86_64+'"/>');
@@ -4186,9 +3623,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_x86_64+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FModuleType < 2 then
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt')
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt')
   else
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt');
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_mips+'"/>');
@@ -4196,9 +3633,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_mips+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FModuleType < 2 then
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt')
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt')
   else
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt');
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
@@ -4206,9 +3643,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV6"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FModuleType < 2 then
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt')
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt')
   else
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
@@ -4216,9 +3653,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FModuleType < 2 then
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt')
+     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt')
   else
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
+     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
 
 
   auxList.Clear;
@@ -4227,9 +3664,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a_VFPv3+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
   if FModuleType < 2 then
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt')
+     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt')
   else
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt');
+     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_aarch64+'"/>');
@@ -4237,9 +3674,9 @@ begin
   auxList.Add('<CustomOptions Value="'+customOptions_armv8+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMv8"/>');  //commented until lazarus fix bug for missing ARMv8  //again thanks to Stephano!
   if FModuleType < 2 then
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt')
+     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt')
   else
-     auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt');
+     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt');
 
   auxList.Clear;
   auxList.Add('How to get more ".so" chipset builds:');
@@ -4261,9 +3698,9 @@ begin
   auxList.Add(' ');
 
   if FModuleType < 2 then
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')
   else
-    auxList.SaveToFile(FPathToJNIFolder+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
+    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
   if FModuleType < 2 then
   begin
@@ -4343,7 +3780,7 @@ begin
       for i:= 0 to count-1 do
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
-         CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'assets'+PathDelim+fileName);
+         CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'assets'+PathDelim+fileName);
       end;
     finally
       templateFiles.Free;
@@ -4358,7 +3795,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-           CopyFile(templateFiles.Strings[i], FPathToJNIFolder + PathDelim + 'res' + PathDelim + 'drawable' + PathDelim + fileName);
+           CopyFile(templateFiles.Strings[i], FAndroidProjectName + PathDelim + 'res' + PathDelim + 'drawable' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4373,7 +3810,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-hdpi' + PathDelim + fileName);
+            CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'drawable-hdpi' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4388,7 +3825,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-mdpi' + PathDelim + fileName);
+            CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'drawable-mdpi' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4403,7 +3840,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-xhdpi' + PathDelim + fileName);
+            CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'drawable-xhdpi' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4418,7 +3855,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-xxhdpi' + PathDelim + fileName);
+            CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'drawable-xxhdpi' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4433,7 +3870,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-ldpi' + PathDelim + fileName);
+            CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'drawable-ldpi' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4449,7 +3886,7 @@ begin
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
          if Pos('ic_launcher',fileName) <= 0 then
-            CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'drawable-v24' + PathDelim + fileName);
+            CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'drawable-v24' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4463,7 +3900,7 @@ begin
       for i:= 0 to count-1 do
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
-         CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'raw' + PathDelim + fileName);
+         CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'raw' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4477,7 +3914,7 @@ begin
       for i:= 0 to count-1 do
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
-         CopyFile(templateFiles.Strings[i], FPathToJNIFolder+PathDelim+'res'+ PathDelim+'xml' + PathDelim + fileName);
+         CopyFile(templateFiles.Strings[i], FAndroidProjectName+PathDelim+'res'+ PathDelim+'xml' + PathDelim + fileName);
       end;
     finally
       templateFiles.Free;
@@ -4491,10 +3928,10 @@ begin
       for i:= 0 to count-1 do
       begin
          fileName:= ExtractFileName(templateFiles.Strings[i]);
-         CopyFile(templateFiles.Strings[i], FPathToJNIFolder + PathDelim+'jni' + PathDelim + fileName);
+         CopyFile(templateFiles.Strings[i], FAndroidProjectName + PathDelim+'jni' + PathDelim + fileName);
          if Pos('.pas', fileName) > 0 then
          begin
-           unitFile := LazarusIDE.ActiveProject.CreateProjectFile(FPathToJNIFolder+PathDelim+'jni' + PathDelim + fileName);
+           unitFile := LazarusIDE.ActiveProject.CreateProjectFile(FAndroidProjectName+PathDelim+'jni' + PathDelim + fileName);
            unitFile.IsPartOfProject:= True;
            LazarusIDE.ActiveProject.AddFile(unitFile, True);
            LazarusIDE.ActiveProject.Modified:= True;
@@ -4671,8 +4108,6 @@ begin
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
-var
-   list: TStringList;
 begin
   Result:= '';
   if ModuleType = 0 then // GUI "Android Bridges" controls...

@@ -52,7 +52,7 @@ type
     SpdBtnPathToWorkspace: TSpeedButton;
     SpdBtnRefreshProjectName: TSpeedButton;
     SpeedButton1: TSpeedButton;
-    SpeedButtonManifest: TSpeedButton;
+    SpeedButtonHelper: TSpeedButton;
     SpeedButtonSettings: TSpeedButton;
     SpeedButtonHintTheme: TSpeedButton;
     StatusBarInfo: TStatusBar;
@@ -82,7 +82,7 @@ type
     procedure SpdBtnPathToWorkspaceClick(Sender: TObject);
     procedure SpdBtnRefreshProjectNameClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
-    procedure SpeedButtonManifestClick(Sender: TObject);
+    procedure SpeedButtonHelperClick(Sender: TObject);
     procedure SpeedButtonSettingsClick(Sender: TObject);
     procedure SpeedButtonSDKPlusClick(Sender: TObject);
     procedure SpeedButtonHintThemeClick(Sender: TObject);
@@ -833,21 +833,23 @@ begin
       end
       else  //console executable app ->  2, 3 -> app  or raw ".so"
       begin
+         CreateDir(FAndroidProjectName+DirectorySeparator+'jni');
+         CreateDir(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs');
+
          CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
-         CreateDir(FAndroidProjectName+DirectorySeparator+'libs');
 
          if FRawJniJClassWrapperPath <> '' then
          begin
              strList.Clear;
              strList.Add(FRawJniJClassWrapperPath);
-             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'javaclass.path');
+             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+'javaclass.path');
 
              if not DirectoryExists(FAndroidStudioJniLibsFolderPath+PathDelim+'jniLibs') then
              begin
                try    //jniLibs\armeabi-v7a
                  CreateDir(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs');
                except
-                 ShowMessage('Warning:Failt to create A.S. "jniLibs" folder');
+                 ShowMessage('warning: fail to create A.S. "...main/jniLibs" folder');
                end;
 
                auxChip:= 'armeabi-v7a';
@@ -863,7 +865,7 @@ begin
                try
                  CreateDir(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs'+ DirectorySeparator + auxChip);
                except
-                 ShowMessage('Warning:Failt to create A.S. "jniLibs" folder .../niLibs/'+auxChip);
+                 ShowMessage('warning: fail to create A.S. "jniLibs" folder "...main/jniLibs/'+auxChip);
                end;
              end;
              strList.Clear;
@@ -883,11 +885,10 @@ begin
              strList.Add('  ');
              strList.Add('   ');
              strList.Add('end.');
-             strList.SaveToFile(FAndroidProjectName + DirectorySeparator  + 'java_call_bridge_' + FSmallProjName + '.pas');
+             strList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+ 'java_call_bridge_' + FSmallProjName + '.pas');
 
              CopyFile(FPathToJavaTemplates+DirectorySeparator+'rawjnihelper'+DirectorySeparator+'jnihelper.pas',
-                      FAndroidProjectName + DirectorySeparator+'jnihelper.pas');
-
+                      FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'jnihelper.pas');
          end
          else
          begin
@@ -908,13 +909,13 @@ begin
             auxList.Add('    public native int sum(int x, int y);');
             auxList.Add('    public native String allCaps(msg: String);');
             auxList.Add('}');
-            auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName+'.java');
+            auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName+'.java');
 
             strList.Clear;
-            //dummy
-            FRawJniJClassWrapperPath:=FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName+'.java';
+            //dummy path
+            FRawJniJClassWrapperPath:=FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName+'.java';
             strList.Add(FRawJniJClassWrapperPath);
-            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+'javaclass.path');
+            strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+'javaclass.path');
             auxList.Free;
          end;
       end;
@@ -1509,7 +1510,7 @@ begin
      FGradleVersion:= GetGradleVersion(FPathToGradle);
 
   if Pos('JNI', CheckBoxGeneric.Caption) > 0 then
-       SpeedButtonManifest.Glyph.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+
+       SpeedButtonHelper.Glyph.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+
                                               'icons'+DirectorySeparator+'open.bmp');
 
   CheckingSettingsCompatibility;   //LAMW 0.8.6.3
@@ -1614,7 +1615,6 @@ begin
   //using the "CheckBoxGeneric" for two totally different things... sorry!
 
   IsKotlinSupported:= False;
-  FRawJNILibraryChecked:= False;
 
   if TCheckBox(Sender).Checked then
   begin
@@ -1626,14 +1626,21 @@ begin
 
        IsKotlinSupported:= False; //True;
        TCheckBox(Sender).Checked:= False;
-
-       FRawJNILibraryChecked:= False;
     end
     else
     begin
       IsKotlinSupported:= False;
-      FRawJNILibraryChecked:= True;
     end;
+  end;
+
+  if FModuleType >= 3 then
+  begin
+     if not CheckBoxGeneric.Checked then
+     begin
+       FRawJNILibraryChecked:= True;
+       ShowMessage('warning: pure .so pascal header not support yet! ');
+       CheckBoxGeneric.Checked:= True;
+     end;
   end;
 
 end;
@@ -1806,7 +1813,7 @@ begin
    end;
 end;
 
-procedure TFormWorkspace.SpeedButtonManifestClick(Sender: TObject);
+procedure TFormWorkspace.SpeedButtonHelperClick(Sender: TObject);
 var
    frm: TFormAndroidManifest;
    i, count, p: integer;

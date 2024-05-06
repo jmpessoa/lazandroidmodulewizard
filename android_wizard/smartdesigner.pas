@@ -16,7 +16,8 @@ uses
   propedits,
   LCLClasses,
   createfiles,
-  createdirectories;
+  createdirectories,
+  rawjnihelper;
 
 //tk min and max API versions for build.xml
 const
@@ -29,7 +30,7 @@ type
 
   TLamwSmartDesigner = class
   private
-    FProjFile: TLazProjectFile;
+    FLazProjectMainFile: TLazProjectFile;
     FPackageName: string;
     FStartModuleVarName: string;
     // all Paths have trailing PathDelim
@@ -59,6 +60,7 @@ type
     procedure GetAllJControlsFromForms(jControlsList: TStrings);
     procedure AddSupportToFCLControls(chipArch: string);
     procedure UpdateProjectLpr(oldModuleName: string; newModuleName: string);
+    procedure UpdateProjectLpr4RawJniLibrary();
     procedure InitSmartDesignerHelpers;
     procedure UpdateStartModuleVarName;
     procedure UpdateAllJControls(AProject: TLazProject);
@@ -105,6 +107,8 @@ type
     // calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateJControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure Init4Project(AProject: TLazProject);
+    procedure Init4RawJniProject(AProject: TLazProject);
+
      //calleds from Designer/TAndroidWidgetMediator ::: TAndroidWidgetMediator.UpdateJControlsList;
     procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
@@ -286,13 +290,39 @@ begin
   end;
 end;
 
-function TLamwSmartDesigner.OnProjectOpened(Sender: TObject;
- AProject: TLazProject): TModalResult;
+procedure TLamwSmartDesigner.Init4RawJniProject(AProject: TLazProject);
+begin
+   if not AProject.CustomData.Contains('LAMW') then Exit;
+   if AProject.CustomData['LAMW'] <> 'RawJniLibrary' then Exit;
+end;
+
+function TLamwSmartDesigner.OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
+var
+  tempStr: string;
+  p: integer;
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
+
+    //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
+    FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
+    //C:\android\workspace\AppLAMWProject20\jni\   <---
+
+    FPathToAndroidProject := Copy(FPathToAndroidProject, 1, RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
+    //C:\android\workspace\AppLAMWProject20\    <---
+
+    tempStr:= Copy(FPathToAndroidProject, 1, Length(FPathToAndroidProject)-1);
+    p:= LastDelimiter(PathDelim, tempStr) + 1;
+    FSmallProjName:= Copy(tempStr,  p, Length(tempStr));
+
+     FLazProjectMainFile := AProject.MainFile; //save ...
+
+     //ShowMessage(AProject.MainFile.Filename); //C:\android\workspace\AppLAMWProject24\jni\controls.lpr
+
      if AProject.CustomData.Values['LAMW'] = 'GUI' then
-         Init4Project(AProject);
+        Init4Project(AProject)
+     else if AProject.CustomData.Values['LAMW'] = 'RawJniLibrary' then
+        Init4RawJniProject(AProject);
   end;
   Result := mrOK;
 end;
@@ -1600,6 +1630,13 @@ begin
 
   if AProject.CustomData['LAMW'] = 'GUI' then
   begin
+    FPackageName := AProject.CustomData['Package'];
+    if FPackageName = '' then
+    begin
+      FPackageName := GetPackageNameFromAndroidManifest(FPathToAndroidProject);
+      AProject.CustomData['Package'] := FPackageName;
+    end;
+    FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
     FPathToAndroidSDK := LamwGlobalSettings.PathToAndroidSDK; //Included Path Delimiter!
     FPathToAndroidNDK := LamwGlobalSettings.PathToAndroidNDK; //Included Path Delimiter!
     FPathToJavaJDK:=     LamwGlobalSettings.PathToJavaJDK;    //Included Path Delimiter!
@@ -1634,8 +1671,6 @@ begin
     else if Pos('-xpx86_64', aux) > 0 then FChipArchitecture:= 'x86_64'
     else if Pos('-xpmipsel', aux) > 0 then FChipArchitecture:= 'mips';
 
-    FProjFile := AProject.MainFile; //save ...
-
     FNdkApi:= AProject.CustomData['NdkApi']; //android-22
     auxFNdkApi:= FNdkApi;
     tempStr:= SplitStr(auxFNdkApi, '-');   //now  FNdkApi = 22 !
@@ -1652,21 +1687,6 @@ begin
       UpdateAllJControls(AProject);
     end;
 
-    //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
-    FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
-    FPathToAndroidProject := Copy(FPathToAndroidProject, 1, RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
-
-    tempStr:= Copy(FPathToAndroidProject, 1, Length(FPathToAndroidProject)-1);
-    p:= LastDelimiter(PathDelim, tempStr) + 1;
-    FSmallProjName:= Copy(tempStr,  p, Length(tempStr));
-    FPackageName := AProject.CustomData['Package'];
-
-    if FPackageName = '' then
-    begin
-      FPackageName := GetPackageNameFromAndroidManifest(FPathToAndroidProject);
-      AProject.CustomData['Package'] := FPackageName;
-    end;
-    FPathToJavaSource:= FPathToAndroidProject + 'src' + PathDelim + AppendPathDelim(ReplaceChar(FPackageName, '.', PathDelim));
 
     if  (FAndroidTheme = '') or (Pos('AppCompat', FAndroidTheme) <= 0) then
       LamwGlobalSettings.QueryPaths:= False;  //dont query Path to Gradle
@@ -1881,7 +1901,7 @@ var
   IdentList: TStringList;
   OldName: string;
 begin
-  if not FProjFile.IsPartOfProject then Exit;
+  if not FLazProjectMainFile.IsPartOfProject then Exit;
 
   OldName := LazarusIDE.ActiveProject.CustomData['StartModule'];
 
@@ -2862,6 +2882,149 @@ begin
 end;
 
 
+procedure TLamwSmartDesigner.UpdateProjectLpr4RawJniLibrary();
+var
+   rawJniJClassWrapper: TStringList;
+   nativeMethodEventList: TStringList;
+   auxList: TStringList;
+   jclasspath, aux: string;
+   i, count: integer;
+   k, FromPos, ToPos: Integer;
+   n: TCodeTreeNode;
+   cb: TCodeBuffer;
+   PosFound: Boolean;
+   str: string;
+   Beauty: TBeautifyCodeOptions;
+begin
+
+  if not FLazProjectMainFile.IsPartOfProject then
+  begin
+     ShowMessage('not FProjFile.IsPartOfProject');
+     Exit;
+  end;
+
+  jclasspath:= '';
+  auxList:= TStringList.Create;
+  auxList.LoadFromFile(FPathToAndroidProject+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ 'javaclass.path');
+  jclasspath:= auxList.Strings[0];
+  auxList.Free;
+
+   //FPathToAndroidProject: string;  //Included Path Delimiter!
+  if jclasspath = '' then
+      jclasspath:= FPathToAndroidProject+'jni'+DirectorySeparator +'libs'+DirectorySeparator+ FSmallProjName + '.java';
+
+  rawJniJClassWrapper:= TStringList.Create;
+  rawJniJClassWrapper.LoadFromFile(jclasspath);
+
+  nativeMethodEventList:= TStringList.Create;
+
+  count:= rawJniJClassWrapper.Count;
+
+  for i:= 0 to count -1 do
+  begin
+    if Pos('native ',rawJniJClassWrapper.Strings[i]) > 0 then
+    begin
+      aux:= Trim(rawJniJClassWrapper.Strings[i]);
+      nativeMethodEventList.Add(GetCallSignature(aux));
+    end;
+  end;
+
+    //FPathToAndroidProject: string;  //Included Path Delimiter!
+  nativeMethodEventList.SaveToFile(FPathToAndroidProject+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.events');
+
+  (*  TODO :prepare "imports" stuff... -> Controls.java?
+  javaClassList := FindAllFiles(FPathToJavaSource, '*.java', False);
+  for k := 0 to javaClassList.Count - 1 do
+  begin
+    tempList.LoadFromFile(javaClassList.Strings[k]);
+    for i := 0 to tempList.Count - 1 do
+    begin
+      if Pos('import ', tempList.Strings[i]) > 0 then
+        importList.Add(Trim(tempList.Strings[i]));
+    end;
+  end;
+  javaClassList.Free;
+  //just dummy...
+  javaClassList.Clear;
+  javaClassList.Add('package ' + FPackagePrefaceName + ';');
+  javaClassList.Add('');
+  javaClassList.AddStrings(importList);  //all "imports" colecteds....
+  javaClassList.Add('public class '+LowerCase(FSmallProjName)+' {');
+  javaClassList.Add('');
+  javaClassList.AddStrings(nativeMethodList);  //all "native" colecteds....
+  javaClassList.Add('}');
+  *)
+
+  if nativeMethodEventList.Count > 0 then
+  begin
+    with TJavaParser.Create(rawJniJClassWrapper) do
+    try
+      IsLAMWGUI:= False; //not LAMW GUI project
+      str:= GetPascalJNIInterfaceCode(nativeMethodEventList); //pre-processed "temList"
+    finally
+      Free;
+    end;
+
+    //ShowMessage(str); //The Magic!
+    rawJniJClassWrapper.Free;
+    nativeMethodEventList.Free;
+
+    with CodeToolBoss do
+    begin
+      cb := FindFile(FLazProjectMainFile.GetFullFilename);
+      PosFound := False;
+      InitCurCodeTool(cb);
+      CurCodeTool.BuildTree(lsrEnd);
+      // search first "{%region /fold ... }"
+      i := PosEx('{%', CurCodeTool.Src);
+      while i > 0 do
+      begin
+        if CurCodeTool.CompareSrcIdentifiers(i + 2, 'region') then
+        begin
+          FromPos := PosEx('}', CurCodeTool.Src, i) + 1;
+          k := PosEx('/fold', CurCodeTool.Src, i);
+          if (k = 0) or (k > FromPos) then
+          begin
+            i := PosEx('{%', CurCodeTool.Src, i);
+            Continue;
+          end;
+          i := RPos('{%', CurCodeTool.Src);
+          while (i > 0) and (i > FromPos) do
+          begin
+            if CurCodeTool.CompareSrcIdentifiers(i + 2, 'endregion') then
+            begin
+              ToPos := i - 1;
+              PosFound := True;
+              Break;
+            end;
+            i := RPosEx('{%', CurCodeTool.Src, i - 1);
+          end;
+          Break;
+        end;
+        i := PosEx('{%', CurCodeTool.Src, i + 1);
+      end;
+
+      if not PosFound then // fallback
+      begin
+        str := '{%region /fold ''LAMW generated code''}' + sLineBreak + sLineBreak
+          + str + sLineBreak + '{%endregion}' + sLineBreak;    //end magic!
+        n := CurCodeTool.Tree.Root;
+        FromPos := n.FirstChild.EndPos; // should be the end of uses-clause
+        ToPos := n.LastChild.StartPos;  // should be the start of begin..end section
+      end;
+
+      Beauty := SourceChangeCache.BeautifyCodeOptions;
+      SourceChangeCache.MainScanner := CurCodeTool.Scanner;
+
+      SourceChangeCache.Replace(gtEmptyLine, gtNewLine,
+        FromPos, ToPos,
+        Beauty.BeautifyStatement(str, Beauty.Indent, [bcfDoNotIndentFirstLine]));
+
+      SourceChangeCache.Apply;
+    end;
+  end;
+end;
+
 procedure TLamwSmartDesigner.UpdateProjectLpr(oldModuleName: string; newModuleName: string);
 var
   tempList, importList, javaClassList, nativeMethodList: TStringList;
@@ -2873,7 +3036,9 @@ var
   Beauty: TBeautifyCodeOptions;
   IdentList : TStringList;
 begin
-  if not FProjFile.IsPartOfProject then Exit;
+
+  if not FLazProjectMainFile.IsPartOfProject then Exit;
+
   if FPackageName = '' then Exit;
 
   nativeMethodList:= TStringList.Create;
@@ -2936,6 +3101,7 @@ begin
   begin
     with TJavaParser.Create(javaClassList) do
     try
+      IsLAMWGUI:= True; // LAMW GUI Project
       str := GetPascalJNIInterfaceCode(tempList); //pre-processed "temList"
     finally
       Free
@@ -2944,7 +3110,7 @@ begin
 
     with CodeToolBoss do
     begin
-      cb := FindFile(FProjFile.GetFullFilename);
+      cb := FindFile(FLazProjectMainFile.GetFullFilename);
       PosFound := False;
       InitCurCodeTool(cb);
       CurCodeTool.BuildTree(lsrEnd);
@@ -3006,7 +3172,7 @@ begin
               IdentList.Add(newModuleName);
               IdentList.Add('T' + oldModuleName);
               IdentList.Add('T' + newModuleName);
-              cb := FindFile(FProjFile.GetFullFilename);
+              cb := FindFile(FLazProjectMainFile.GetFullFilename);
               InitCurCodeTool(cb);
               SourceChangeCache.MainScanner := CurCodeTool.Scanner;
               CurCodeTool.ReplaceWords(IdentList, True, SourceChangeCache);
@@ -3031,7 +3197,7 @@ var
   dlgMessage: string;
 begin
   // FProjFile = nil if it is a just created project
-  if (FProjFile = nil) or not FProjFile.IsPartOfProject then Exit;
+  if (FLazProjectMainFile = nil) or not FLazProjectMainFile.IsPartOfProject then Exit;
 
   if not DirectoryExists(FPathToAndroidProject+'lamwdesigner') then
   begin
@@ -3067,7 +3233,7 @@ var
 begin
   with CodeToolBoss do
   begin
-    InitCurCodeTool(FindFile(FProjFile.GetFullFilename));
+    InitCurCodeTool(FindFile(FLazProjectMainFile.GetFullFilename));
     with CurCodeTool do
     begin
       BuildTree(lsrEnd);
@@ -3099,7 +3265,7 @@ var
 begin
   with CodeToolBoss do
   begin
-    InitCurCodeTool(FindFile(FProjFile.GetFullFilename));
+    InitCurCodeTool(FindFile(FLazProjectMainFile.GetFullFilename));
     with CurCodeTool do
     begin
       BuildTree(lsrEnd);
@@ -3216,7 +3382,11 @@ begin
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
 
   hasControls:= False;
-  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then
+  if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'RawJniLibrary' then
+  begin
+     UpdateProjectLpr4RawJniLibrary();
+  end
+  else if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'GUI' then
      hasControls:= True;
 
   if not hasControls then

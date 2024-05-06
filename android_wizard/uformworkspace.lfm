@@ -1,7 +1,7 @@
 object FormWorkspace: TFormWorkspace
-  Left = 461
+  Left = 828
   Height = 690
-  Top = 121
+  Top = 294
   Width = 496
   Caption = '[LAMW 0.8.6.4]  New Project'
   ClientHeight = 690
@@ -1457,8 +1457,10 @@ object FormWorkspace: TFormWorkspace
       Width = 194
       BorderSpacing.Left = 4
       Caption = 'Enable PIE [Target >= 21]'
+      Checked = True
       OnClick = CheckBoxPIEClick
       ParentFont = False
+      State = cbChecked
       TabOrder = 3
       Visible = False
     end
@@ -1473,8 +1475,10 @@ object FormWorkspace: TFormWorkspace
       BorderSpacing.Left = 4
       BorderSpacing.Top = 5
       Caption = 'JNI header signature'
+      Checked = True
       OnClick = CheckBoxGenericClick
       ParentFont = False
+      State = cbChecked
       TabOrder = 4
       Visible = False
     end
@@ -1785,7 +1789,7 @@ object FormWorkspace: TFormWorkspace
         TabOrder = 0
         Text = 'org.lamw'
       end
-      object SpeedButtonManifest: TSpeedButton
+      object SpeedButtonHelper: TSpeedButton
         Left = 280
         Height = 28
         Hint = 'Android Manifest Permissions...'
@@ -1845,7 +1849,7 @@ object FormWorkspace: TFormWorkspace
           EF1005B1EB8E05ADE5E806B9F4F206C1FFA207BFFF4400FFFF01000000000000
           0000000000000000000000000000000000000000000000000000
         }
-        OnClick = SpeedButtonManifestClick
+        OnClick = SpeedButtonHelperClick
         ShowCaption = False
         ShowHint = True
         ParentFont = False
