@@ -2959,7 +2959,7 @@ begin
   begin
     with TJavaParser.Create(rawJniJClassWrapper) do
     try
-      IsLAMWGUI:= False; //not LAMW GUI project
+      FlagModuleType:= 4; //not LAMW GUI project
       str:= GetPascalJNIInterfaceCode(nativeMethodEventList); //pre-processed "temList"
     finally
       Free;
@@ -3035,6 +3035,7 @@ var
   str: string;
   Beauty: TBeautifyCodeOptions;
   IdentList : TStringList;
+  fullpackName: string;
 begin
 
   if not FLazProjectMainFile.IsPartOfProject then Exit;
@@ -3088,6 +3089,7 @@ begin
 
 
   //just dummy...
+
   javaClassList.Clear;
   javaClassList.Add('package ' + FPackageName + ';');
   javaClassList.Add('');
@@ -3097,11 +3099,18 @@ begin
   javaClassList.AddStrings(nativeMethodList);  //all "native" colecteds....
   javaClassList.Add('}');
 
+
+  fullpackName:= FPackageName;
+  fullpackName:= StringReplace(fullpackName, '.', '/', [rfReplaceAll]);
+  fullpackName:= fullpackName + '/' +'Controls';     //not FSmallProjName;
+
   if nativeMethodList.Count > 0 then
   begin
     with TJavaParser.Create(javaClassList) do
     try
-      IsLAMWGUI:= True; // LAMW GUI Project
+      // LAMW GUI Project
+      FlagModuleType:= 0;
+      jClassName:= fullpackName;
       str := GetPascalJNIInterfaceCode(tempList); //pre-processed "temList"
     finally
       Free
@@ -3382,6 +3391,7 @@ begin
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
 
   hasControls:= False;
+
   if LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'RawJniLibrary' then
   begin
      UpdateProjectLpr4RawJniLibrary();

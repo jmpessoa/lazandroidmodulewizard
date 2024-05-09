@@ -33,9 +33,9 @@ type
     EditPathToWorkspace: TEdit;
     edProjectName: TEdit;
     GroupBoxPrefaceName: TGroupBox;
-    GroupBox2: TGroupBox;
-    GroupBox3: TGroupBox;
-    GroupBox4: TGroupBox;
+    GroupBoxNdkApi: TGroupBox;
+    GroupBoxMinApi: TGroupBox;
+    GroupBoxTargetApi: TGroupBox;
     GroupBoxApkBuilder: TGroupBox;
     Image1: TImage;
     LabelTheme: TLabel;
@@ -127,7 +127,7 @@ type
     FAndroidTheme: string;
     FAndroidThemeColor: string;
     FPieChecked: boolean;
-    FRawJNILibraryChecked: boolean;  //raw .so
+    //FRawJNILibraryChecked: boolean;  //raw .so
     FGradleVersion: string;
 
     FMaxSdkPlatform: integer;
@@ -224,7 +224,7 @@ type
     property AndroidTheme: string read FAndroidTheme write FAndroidTheme;
     property AndroidThemeColor: string read FAndroidThemeColor write FAndroidThemeColor;
     property PieChecked: boolean read FPieChecked write FPieChecked;
-    property RawJNILibraryChecked: boolean read FRawJNILibraryChecked write FRawJNILibraryChecked; //raw .so
+    //property RawJNILibraryChecked: boolean read FRawJNILibraryChecked write FRawJNILibraryChecked; //raw .so
     property BuildSystem: string read GetBuildSystem;
     property MaxSdkPlatform: integer read FMaxSdkPlatform write FMaxSdkPlatform;
     property GradleVersion: string read FGradleVersion write FGradleVersion;
@@ -731,7 +731,7 @@ begin
      if EditPackagePrefaceName.Text = '' then EditPackagePrefaceName.Text:= 'org.lamw';
      FPackagePrefaceName:= LowerCase(Trim(EditPackagePrefaceName.Text));
 
-     if FModuleType > 0 then //NoGUI     //0: GUI project   1: NoGui project   2: console app 4: raw .so lib
+     if FModuleType > 0 then // NoGUI     //0: GUI project   1: NoGui project   2: console app 4: raw .so lib
           FJavaClassName:=  FSmallProjName;
   end
   else
@@ -827,7 +827,7 @@ begin
     else
     begin
       CreateDir(FAndroidProjectName);  //project folder....
-      if FModuleType < 2 then //0: GUI project   1: NoGui project   2: console app 3: raw .so lib
+      if FModuleType = 0 then // [ < 2 ]: GUI project   1: NoGui project   2: console app 3: raw .so lib
       begin
         CreateDirectoriesFull(FAndroidProjectName, FJavaClassName); //all dirs.....
       end
@@ -835,8 +835,7 @@ begin
       begin
          CreateDir(FAndroidProjectName+DirectorySeparator+'jni');
          CreateDir(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs');
-
-         CreateDir(FAndroidProjectName+DirectorySeparator+'build-modes');
+         CreateDir(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes');
 
          if FRawJniJClassWrapperPath <> '' then
          begin
@@ -1509,7 +1508,7 @@ begin
   if FPathToGradle <> '' then
      FGradleVersion:= GetGradleVersion(FPathToGradle);
 
-  if Pos('JNI', CheckBoxGeneric.Caption) > 0 then
+  if (FModuleType = 1) or (FModuleType = 3)  then
        SpeedButtonHelper.Glyph.LoadFromFile(FPathToJavaTemplates+DirectorySeparator+
                                               'icons'+DirectorySeparator+'open.bmp');
 
@@ -1633,13 +1632,13 @@ begin
     end;
   end;
 
-  if FModuleType >= 3 then
+  if FModuleType = 3 then  //FModuleType >= 3
   begin
-     if not CheckBoxGeneric.Checked then
+     if (FModuleType =  3) and (not CheckBoxGeneric.Checked) then
      begin
-       FRawJNILibraryChecked:= True;
        ShowMessage('warning: pure .so pascal header not support yet! ');
        CheckBoxGeneric.Checked:= True;
+       //FModuleType:= 4;
      end;
   end;
 
@@ -1722,7 +1721,6 @@ begin
    FKeepMyBuildGradleWhenReopen:= CheckBoxAutoConfigGradle.Checked;
 end;
 
-
 procedure TFormWorkspace.ComboSelectProjectNameKeyPress(Sender: TObject;
   var Key: char);
 begin
@@ -1768,7 +1766,9 @@ end;
 
 procedure TFormWorkspace.SpeedButton1Click(Sender: TObject);
 begin
-   ShowMessage('Information:'+
+
+   if FModuleType = 0 then
+      ShowMessage('Information:'+
            sLineBreak+
            sLineBreak+'[LAMW 0.8.6.4] recomentations:'+
            sLineBreak+' a1. Java JDK 11 + Gradle version >= 6.7.1' +
@@ -1777,6 +1777,11 @@ begin
            sLineBreak+' b2. Android SDK "plataforms" 34 + "build-tools" 34.0.0'+ sLineBreak +
            sLineBreak+' c1. Java JDK 21 + Gradle version >= 8.5.0' +
            sLineBreak+' c2. Android SDK "plataforms" 34 + "build-tools" 34.0.0');
+
+   If (ModuleType = 1) or (ModuleType = 3) then
+      ShowMessage('Load a [java] class content native methods....');
+
+
 end;
 
 function GetJavaClassName(selList: TStringList): string;
@@ -1821,7 +1826,7 @@ var
    auxPackName: string;
    //auxJavaClassName: string;
 begin
-    if FModuleType < 3 then
+    if (FModuleType = 0) or  (FModuleType = 2) then  //FModuleType < 3
     begin
       frm:= TFormAndroidManifest.Create(nil);
       if frm.ShowModal = mrOK then
@@ -1840,15 +1845,25 @@ begin
       end;
       frm.Free;
     end
-    else
-    begin //jniLibrary  //CheckBox "JNI" = True
+    else if (FModuleType = 1) or  (FModuleType = 3) then
+    begin //jniLibrary  //
       if OpenDialog1.Execute then
       begin
+
          FRawJniJClassWrapperPath:= OpenDialog1.FileName;
+
          list:= TStringList.Create;
          list.LoadFromFile(FRawJniJClassWrapperPath);
-         ShowMessage(list.Text);
 
+         if Pos('native ', list.Text) > 0 then
+         begin
+            ShowMessage(list.Text)
+         end
+         else
+         begin
+            ShowMessage('warning: the [java] class don''t have "native" method....');
+            Exit;
+         end;
          i:= 0;
          auxPackName:= '';
          while (auxPackName = '') do
@@ -1862,22 +1877,6 @@ begin
             end;
             i:= i+1;
          end;
-
-         (*
-         i:= 0;
-         auxJavaClassName:= '';
-         while (auxJavaClassName = '') do
-         begin
-            p:= Pos('class ', list.Strings[i]);
-            if p > 0 then
-            begin
-                auxJavaClassName:= Trim(Copy(list.Strings[i], p+Length('class '), 1000));
-                p:= Pos('{',auxJavaClassName);  // TODO  need improve....
-                auxJavaClassName:= Trim(Copy(auxJavaClassName, 1,  p-1));
-            end;
-            i:= i+1;
-         end;
-         *)
 
          p:= Pos('main', FRawJniJClassWrapperPath);
          if  p > 0 then
@@ -2232,10 +2231,13 @@ begin
       if FInstructionSetIndex >= 0 then
          WriteString('NewProject', 'InstructionSet', IntToStr(Self.FInstructionSetIndex));
 
-      if EditPackagePrefaceName.Text <> '' then
-         WriteString('NewProject', 'PackagePrefaceName', EditPackagePrefaceName.Text)
-      else
-        WriteString('NewProject', 'PackagePrefaceName', 'org.lamw');
+      if FModuleType = 0 then
+      begin
+        if EditPackagePrefaceName.Text <> '' then
+           WriteString('NewProject', 'PackagePrefaceName', EditPackagePrefaceName.Text)
+        else
+          WriteString('NewProject', 'PackagePrefaceName', 'org.lamw');
+      end;
 
       if FPathToJavaTemplates <> '' then
          WriteString('NewProject', 'PathToJavaTemplates', FPathToJavaTemplates)

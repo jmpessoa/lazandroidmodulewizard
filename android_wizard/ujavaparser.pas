@@ -38,7 +38,9 @@ type
     procedure ReadTill(Token: string); //inline;
     procedure ReadTillCurlBracketClose;
   public
-    IsLAMWGUI: boolean;
+    FlagModuleType: integer;
+    jClassName: string;
+
     constructor Create(Stream: TStream);
     constructor Create(FileName: string);
     constructor Create(Strings: TStrings);
@@ -294,12 +296,34 @@ begin
   FPascalJNI.Add('  if PEnv <> nil then');
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('     curEnv:= PJNIEnv(PEnv);');
+
+  if FlagModuleType = 0 then
+  begin
+    FPascalJNI.Add('     gjClass:= (curEnv^).FindClass(curEnv, '''+jClassName+''');');  //org/lamw/appnoguidemo1/Controls
+    FPascalJNI.Add('     gjClass:= (curEnv^).NewGlobalRef(curEnv, gjClass);');
+  end;
+
+  if FlagModuleType = 1 then
+  begin
+    FPascalJNI.Add('     jClassRef:= (curEnv^).FindClass(curEnv, '''+jClassName+''');');  //org/lamw/appnoguidemo1/AppNoGUIDemo1
+    FPascalJNI.Add('     jClassRef:= (curEnv^).NewGlobalRef(curEnv, jClassRef);');
+  end;
+
   FPascalJNI.Add('     rc := RegisterNativeMethods(curEnv, ''' + str + ''');');
   FPascalJNI.Add('     if (rc <> JNI_OK) then result := rc;');
   FPascalJNI.Add('  end;');
 
-  if IsLAMWGUI then
-      FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
+  if FlagModuleType = 0 then
+  begin
+    FPascalJNI.Add('  gjClassName:= '''+jClassName+''';');
+    FPascalJNI.Add('  gVM:= VM; {AndroidWidget.pas}');
+  end;
+
+  if FlagModuleType = 1 then
+  begin
+    FPascalJNI.Add('  jClassName:= '''+jClassName+''';');                                 //org/lamw/appnoguidemo1/AppNoGUIDemo1
+    FPascalJNI.Add('  jVMRef:= VM;'); {PJavaVM}
+  end;
 
   FPascalJNI.Add('end;');
   FPascalJNI.Add('');
@@ -315,20 +339,35 @@ begin
   FPascalJNI.Add('  if PEnv <> nil then');
   FPascalJNI.Add('  begin');
   FPascalJNI.Add('    curEnv:= PJNIEnv(PEnv);');
-  if IsLAMWGUI then
+
+  if FlagModuleType = 0 then
   begin
     FPascalJNI.Add('    (curEnv^).DeleteGlobalRef(curEnv, gjClass);');
     FPascalJNI.Add('    gjClass:= nil; {AndroidWidget.pas}');
     FPascalJNI.Add('    gVM:= nil; {AndroidWidget.pas}');
   end;
+
+  if FlagModuleType = 1 then
+  begin
+    FPascalJNI.Add('    (curEnv^).DeleteGlobalRef(curEnv, jClassRef);');
+    FPascalJNI.Add('    jClassRef:= nil;');
+    FPascalJNI.Add('    jVMRef:= nil;');
+  end;
   FPascalJNI.Add('  end;');
-  if IsLAMWGUI then
+
+  if FlagModuleType = 0 then
   begin
     FPascalJNI.Add('  gApp.Terminate;');
     FPascalJNI.Add('  FreeAndNil(gApp);');
   end;
 
+  if FlagModuleType = 1 then
+  begin
+    FPascalJNI.Add('  NoGUIApp.Terminate;');
+    FPascalJNI.Add('  FreeAndNil(NoGUIApp);');
+  end;
   FPascalJNI.Add('end;');
+
   FPascalJNI.Add('');
   FPascalJNI.Add('exports');
   FPascalJNI.Add('  JNI_OnLoad name ''JNI_OnLoad'',');
@@ -545,7 +584,7 @@ end;
 
 constructor TJavaParser.Create(Stream: TStream);
 begin
-  IsLAMWGUI:= True;
+  FlagModuleType:= -1;
   FStream := Stream;
   FStreamSize := FStream.Size;
   FImports := TStringList.Create;
@@ -556,7 +595,7 @@ end;
 
 constructor TJavaParser.Create(FileName: string);
 begin
-  IsLAMWGUI:= True;
+  FlagModuleType:= -1;
   FMemStream := TMemoryStream.Create;
   FMemStream.LoadFromFile(FileName); //Controls.java
   FMemStream.Position := 0;
@@ -565,7 +604,7 @@ end;
 
 constructor TJavaParser.Create(Strings: TStrings);
 begin
-  IsLAMWGUI:= True;
+  FlagModuleType:= -1;
   FMemStream := TMemoryStream.Create;
   Strings.SaveToStream(FMemStream);
   FMemStream.Position := 0;

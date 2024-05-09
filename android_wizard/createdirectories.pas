@@ -113,7 +113,7 @@ end;
 
 procedure CreateDirectoriesBuildModes(path: String);
 begin
-  CreateDir(path+DirectorySeparator+'build-modes');
+  CreateDir(path+DirectorySeparator+'jni'+DirectorySeparator+'build-modes');
 end;
 
 procedure CreateDirectoriesLibs(path: String);

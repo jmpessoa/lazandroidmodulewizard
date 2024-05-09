@@ -489,7 +489,7 @@ begin
     if outPascalReturnType = '' then
       LazAndControlsEventsBody.Add('   '+pascalMainUnit+'.'+outEventname+'('+params+');')
     else
-      LazAndControlsEventsBody.Add('    outReturn:= '+pascalMainUnit+'.'+outEventname+'('+params+');');
+      LazAndControlsEventsBody.Add('  outReturn:= '+pascalMainUnit+'.'+outEventname+'('+params+');');
 
 
     if outPascalReturnType <> '' then

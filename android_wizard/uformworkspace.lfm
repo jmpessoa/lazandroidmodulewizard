@@ -1476,7 +1476,6 @@ object FormWorkspace: TFormWorkspace
       BorderSpacing.Top = 5
       Caption = 'JNI header signature'
       Checked = True
-      OnClick = CheckBoxGenericClick
       ParentFont = False
       State = cbChecked
       TabOrder = 4
@@ -1983,7 +1982,7 @@ object FormWorkspace: TFormWorkspace
     ParentColor = False
     ParentFont = False
     TabOrder = 5
-    object GroupBox2: TGroupBox
+    object GroupBoxNdkApi: TGroupBox
       Left = 0
       Height = 72
       Top = 4
@@ -2006,7 +2005,7 @@ object FormWorkspace: TFormWorkspace
         TabOrder = 0
       end
     end
-    object GroupBox3: TGroupBox
+    object GroupBoxMinApi: TGroupBox
       Left = 162
       Height = 72
       Top = 4
@@ -2052,7 +2051,7 @@ object FormWorkspace: TFormWorkspace
         Text = '23'
       end
     end
-    object GroupBox4: TGroupBox
+    object GroupBoxTargetApi: TGroupBox
       Left = 324
       Height = 72
       Top = 4
@@ -2078,7 +2077,7 @@ object FormWorkspace: TFormWorkspace
     end
   end
   object SelDirDlgPathToWorkspace: TSelectDirectoryDialog
-    Left = 280
+    Left = 288
   end
   object ImageList1: TImageList
     Left = 200
@@ -2442,7 +2441,7 @@ object FormWorkspace: TFormWorkspace
   object OpenDialog1: TOpenDialog
     DefaultExt = '.java'
     Filter = 'java|*.java'
-    Left = 224
-    Top = 120
+    Left = 240
+    Top = 72
   end
 end

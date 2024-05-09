@@ -20,7 +20,7 @@ uses
   LazIDEIntf,
   ProjectIntf,
   FormEditingIntf,
-  uFormAndroidProject,
+  //uFormAndroidProject,
   uformworkspace,
   FPimage,
   StrUtils,
@@ -30,6 +30,8 @@ uses
   AndroidWidget;
 
 type
+
+  TSyntaxMode = (smDelphi, smObjFpc);
 
   TAndroidModule = class(jForm)            //support to Android Bridges [components]
   end;
@@ -115,7 +117,7 @@ type
      FKeepMyBuildGradleWhenReopen: boolean;
 
      function SettingsFilename: string;
-     function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
+     //function TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //0: GUI  project --- 1:NoGUI project
      function GetPathToJNIFolder(fullPath: string): string;
      procedure DoReadme();
      procedure DoHowToGetsignedReleaseApk;
@@ -162,6 +164,19 @@ type
     function DoInitDescriptor: TModalResult; override;
   end;
 
+
+
+  { TAndroidNoGUIProjectDescriptor }
+
+  TAndroidNoGUIProjectDescriptor = class(TAndroidProjectDescriptor)
+  public
+    constructor Create; override;
+    function GetLocalizedName: string; override;
+    function GetLocalizedDescription: string; override;
+    function DoInitDescriptor: TModalResult; override;
+  end;
+
+
   {TAndroidNoGUIExeProjectDescriptor}
 
   TAndroidNoGUIExeProjectDescriptor = class(TAndroidProjectDescriptor)   //console executable App
@@ -172,15 +187,15 @@ type
     function DoInitDescriptor: TModalResult; override;
   end;
 
-  {TAndroidNoGUIRawLibDescriptor}
+  {TAndroidNoGUIRawJNILibDescriptor}
 
-  TAndroidNoGUIRawLibDescriptor = class(TAndroidProjectDescriptor)   //raw lib
+  TAndroidNoGUIRawJNILibDescriptor = class(TAndroidProjectDescriptor)   //raw lib
   public
     constructor Create; override;
     function GetLocalizedName: string; override;
     function GetLocalizedDescription: string; override;
     function DoInitDescriptor: TModalResult; override;
-    function GetEventSignature(const nativeMethod: string): string;
+    //function GetEventSignature(const nativeMethod: string): string;
   end;
 
   TAndroidFileDescPascalUnitWithResource = class(TFileDescPascalUnitWithResource)
@@ -189,7 +204,7 @@ type
   public
     SyntaxMode: TSyntaxMode; {mdDelphi, mdObjFpc}
     PathToJNIFolder: string;
-    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console App; 3: generic raw .so library  4: JNI raw .so
+    ModuleType: integer;   //0: GUI; 1: No GUI ; 2: console App; 3: raw jni .so library  4: pascal raw .so
 
     AndroidTheme: string;
     SmallProjName: string;
@@ -226,14 +241,15 @@ var
 
   AndroidGUIProjectDescriptor: TAndroidGUIProjectDescriptor;
 
+  AndroidNoGUIProjectDescriptor: TAndroidNoGUIProjectDescriptor;
+
   AndroidNoGUIExeProjectDescriptor: TAndroidNoGUIExeProjectDescriptor;
 
-  AndroidNoGUIRawLibDescriptor: TAndroidNoGUIRawLibDescriptor;
-
-
-procedure Register;
+  AndroidNoGUIRawJNILibDescriptor: TAndroidNoGUIRawJNILibDescriptor;
 
 function SplitStr(var theString: string; delimiter: string): string;
+
+procedure Register;
 
 implementation
 
@@ -249,17 +265,19 @@ begin
   RegisterProjectFileDescriptor(AndroidFileDescriptor);
 
   AndroidProjectDescriptor:= TAndroidProjectDescriptor.Create;
-  RegisterProjectDescriptor(AndroidProjectDescriptor);
+  //RegisterProjectDescriptor(AndroidProjectDescriptor);
 
   AndroidGUIProjectDescriptor:= TAndroidGUIProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidGUIProjectDescriptor);
 
+  AndroidNoGUIProjectDescriptor:= TAndroidNoGUIProjectDescriptor.Create;
+  RegisterProjectDescriptor(AndroidNoGUIProjectDescriptor);
 
   AndroidNoGUIExeProjectDescriptor:= TAndroidNoGUIExeProjectDescriptor.Create;
   RegisterProjectDescriptor(AndroidNoGUIExeProjectDescriptor);
 
-  AndroidNoGUIRawLibDescriptor:= TAndroidNoGUIRawLibDescriptor.Create;
-  RegisterProjectDescriptor(AndroidNoGUIRawLibDescriptor);
+  AndroidNoGUIRawJNILibDescriptor:= TAndroidNoGUIRawJNILibDescriptor.Create;
+  RegisterProjectDescriptor(AndroidNoGUIRawJNILibDescriptor);
 
   FormEditingHook.RegisterDesignerBaseClass(TAndroidModule);
   FormEditingHook.RegisterDesignerBaseClass(TNoGUIAndroidModule);
@@ -449,18 +467,18 @@ end;
 
 {TAndroidNoGUIRawLibDescriptor}
 
-constructor TAndroidNoGUIRawLibDescriptor.Create;
+constructor TAndroidNoGUIRawJNILibDescriptor.Create;
 begin
   inherited Create;
   Name := 'Create a new LAMW [NoGUI] Android raw JNI library';
 end;
 
-function TAndroidNoGUIRawLibDescriptor.GetLocalizedName: string;
+function TAndroidNoGUIRawJNILibDescriptor.GetLocalizedName: string;
 begin
   Result:= 'LAMW Android raw jni .so lib';
 end;
 
-function TAndroidNoGUIRawLibDescriptor.GetLocalizedDescription: string;
+function TAndroidNoGUIRawJNILibDescriptor.GetLocalizedDescription: string;
 begin
   Result:=  'LAMW [NoGUI] Android raw jni .so library'+ LineEnding +
             '[Native .so Library]'+ LineEnding +
@@ -470,6 +488,7 @@ end;
 ////Event signature!
 //pAppOnSpecialKeyDown=Java_Event_pAppOnSpecialKeyDown(PEnv,this,keyChar,keyCode,keyCodeString);
 
+(*
 function TAndroidNoGUIRawLibDescriptor.GetEventSignature(const nativeMethod: string): string;
 var
   method: string;
@@ -521,10 +540,10 @@ begin
   end;
   listParam.Free;
 end;
-
-function TAndroidNoGUIRawLibDescriptor.DoInitDescriptor: TModalResult;    //3: raw lib
+*)
+function TAndroidNoGUIRawJNILibDescriptor.DoInitDescriptor: TModalResult;    //3: raw jni lib
 var
-  nativeMethodEventList: TStringList;
+  nativeMethodEventList, auxList: TStringList;
   //nativeMethodList: TStringList
   //outImportsList: TStringList;
   //javaClassList: TStringList;
@@ -532,29 +551,19 @@ var
   aux: string;
 begin
   try
-    FModuleType := 3; //0: GUI --- 1:NoGUI --- 2: Console  3: generic raw .so library 4: JNI .so library
+    FModuleType := 3; //0: GUI --- 1:NoGUI --- 2: Console  3: raw jni  .so library 4: raw pascal.so library
     FPathToClassName := '';
 
-    if GetWorkSpaceFromForm(3, outTag) then
+    if GetWorkSpaceFromForm(3, outTag) then //3
     begin
 
+      //ShowMessage('FModuleType 3? -->' + IntToStr(FModuleType)); //ok
       //FPathToJNIFolder := FAndroidProjectName;
       AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
       AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
-      AndroidFileDescriptor.ModuleType:= 3; //raw lib
-
-      if outTag = 4 then
-      begin
-        FModuleType:= 4;  //JNI headers signature  raw .so library
-        AndroidFileDescriptor.ModuleType:= 4;
-      end;
+      AndroidFileDescriptor.ModuleType:= FModuleType; //raw lib
 
       if FModuleType = 3 then
-      begin
-        FPascalJNIInterfaceCode:= ''; // raw lib TODO !
-      end;
-
-      if FModuleType = 4 then
       begin
         FRawJniJClassWrapper:= TStringList.Create;
         if FileExists(FRawJniJClassWrapperPath) then
@@ -577,7 +586,7 @@ begin
           FRawJniJClassWrapper.Add('            Log.e("Error loading JNI lib <'+LowerCase(FSmallProjName)+'>", "exception", e);');
           FRawJniJClassWrapper.Add('        }');
           FRawJniJClassWrapper.Add('    }');
-          FRawJniJClassWrapper.Add('    public native int Sum(int x, int y);');
+          FRawJniJClassWrapper.Add('    public native int Sum4(int x, int y);');
           FRawJniJClassWrapper.Add('}');
           FRawJniJClassWrapperPath:= FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java';
           FRawJniJClassWrapper.SaveToFile(FRawJniJClassWrapperPath);
@@ -593,7 +602,7 @@ begin
         FJCallBridgeContentList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+ DirectorySeparator+'java_call_bridge_'+FJavaClassName+'.pas');
         FJCallBridgeContentList.Free;
 
-        //ShowMessage(FMainUnitContentList.Text);
+         //ShowMessage(FMainUnitInterfaceList.Text); //ok
          AndroidFileDescriptor.MainUnitInterface:= FMainUnitInterfaceList.Text;
          AndroidFileDescriptor.MainUnitImplementation:= FMainUnitImplementationList.Text;
 
@@ -610,10 +619,10 @@ begin
             begin
               aux:= Trim(FRawJniJClassWrapper.Strings[i]);
               //nativeMethodList.Add(aux);
-              nativeMethodEventList.Add(GetEventSignature(aux));
+              nativeMethodEventList.Add(GetCallSignature(aux)); //GetEventSignature(aux)
             end;
         end;
-        nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.events');
+        nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.calls');
 
         //prepare "imports" [Dictionary] stuff...
         (*
@@ -657,7 +666,7 @@ begin
 
         with TJavaParser.Create(FRawJniJClassWrapper) do  //javaClassList
         try
-          IsLAMWGUI:= False; //not LAMW GUI project...
+          FlagModuleType:= FModuleType; //3  Raw JNI Library project...
           FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(nativeMethodEventList);
         finally
           Free;
@@ -669,14 +678,46 @@ begin
         FRawJniJClassWrapper.Free;
         nativeMethodEventList.Free;
 
-      end; //4
+        auxList:= TStringList.Create;
+        auxList.Add('How to Use [lib'+LowerCase(FSmallProjName)+']: from Raw JNI library project');
+        auxList.Add('');
+        auxList.Add('> Go to your "Android Studio" projec "main" folder and create the "jniLibs" sub-folder');
+        auxList.Add('> Copy the "*.so" file from "jni/libs/armeabi-v7a" [or like...] to your "Android Studio" project "jniLibs/armeabi-v7a" folder [just example...]');
+        auxList.Add('> Sync your "Android Studio" project...');
+        auxList.Add('    ');
+        auxList.Add('    ');
+        auxList.Add('//.....');
+        auxList.Add('//Use example coding...');
+        auxList.Add('public class MainActivity extends AppCompatActivity {');
+        auxList.Add(' ');
+        auxList.Add('   '+FSmallProjName+' myNativelib = new '+FSmallProjName+'();  //declare it !');
+        auxList.Add(' ');
+        auxList.Add('   @Override');
+        auxList.Add('   protected void onCreate(Bundle savedInstanceState) {');
+        auxList.Add('      super.onCreate(savedInstanceState);');
+        auxList.Add('      setContentView(R.layout.activity_main);');
+        auxList.Add(' ');
+        auxList.Add('      int sum = myNativelib.Sum(12, 17);   //use it !');
+        auxList.Add(' ');
+        auxList.Add('      Toast.makeText(getApplicationContext(), "myNativelib.Sum(12,17) = " + sum, Toast.LENGTH_LONG).show();');
+        auxList.Add('   }');
+        auxList.Add('   //.....');
+        auxList.Add('}');
+        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+        auxList.Free;
+      end //3 jni header lib
+      else
+      begin
+         ShowMessage('4?'); //raw pascal header
+      end;
+
       Result := mrOK
     end else
       Result := mrAbort;
   except
     on e: Exception do
     begin
-      MessageDlg('Error NoGUI Raw Decritor', e.Message, mtError, [mbOk], 0);
+      MessageDlg('Error NoGUI Raw JNI Decritor', e.Message, mtError, [mbOk], 0);
       Result := mrAbort;
     end;
   end;
@@ -709,7 +750,7 @@ var
   strAfterReplace, strPackName, aux, strMainActivity: string;
   auxList, providerList: TStringList;
   outTag: integer;
-  supportProvider, tempStr, insertRef: string;
+  supportProvider, tempStr, insertRef, fullpackName: string;
   p1: integer;
 begin
   try
@@ -720,6 +761,10 @@ begin
     if GetWorkSpaceFromForm(0, outTag) then //GUI
     begin
       strPackName:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
+
+      AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
+      AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
+      AndroidFileDescriptor.ModuleType:= 0;
 
       with TStringList.Create do
         try
@@ -815,14 +860,18 @@ begin
           Free;
       end;
 
-      //FPathToJNIFolder := FAndroidProjectName; //project folder
       AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
       AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
       AndroidFileDescriptor.ModuleType:= 0;
 
+      fullpackName:= FPackagePrefaceName + '.'  + FSmallProjName;
+      fullpackName:= StringReplace(fullpackName, '.', '/', [rfReplaceAll]);
+      fullpackName:= fullpackName + '/' +FJavaClassName;     //not FSmallProjName;
+
       with TJavaParser.Create(FFullJavaSrcPath + DirectorySeparator+  'Controls.java') do
       try         //produce helper file [old] "ControlsEvents.txt"
-        IsLAMWGUI:= True;
+        FlagModuleType:= FModuleType; //0;
+        jClassName:= fullpackName;
         FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(FPathToJavaTemplates + DirectorySeparator + 'Controls.events');
       finally
         Free;
@@ -945,15 +994,15 @@ begin
       else
         auxList.LoadFromFile(FPathToJavaTemplates + DirectorySeparator + 'androidmanifest.txt');
 
-      strAfterReplace  := StringReplace(auxList.Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace:= StringReplace(auxList.Text, 'dummyPackage',strPackName, [rfReplaceAll, rfIgnoreCase]);
 
       strMainActivity:= strPackName+'.'+FMainActivity; {gApp}
 
-      strAfterReplace  := StringReplace(strAfterReplace, 'dummyAppName',strMainActivity, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace:= StringReplace(strAfterReplace, 'dummyAppName',strMainActivity, [rfReplaceAll, rfIgnoreCase]);
 
       //    <!-- This is a comment -->
-      strAfterReplace  := StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
-      strAfterReplace  := StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace:= StringReplace(strAfterReplace, 'dummySdkApi', FMinApi, [rfReplaceAll, rfIgnoreCase]);
+      strAfterReplace:= StringReplace(strAfterReplace, 'dummyTargetApi', FTargetApi, [rfReplaceAll, rfIgnoreCase]);
 
       if FBuildSystem  = 'Ant' then
       begin
@@ -1084,6 +1133,7 @@ begin
   else raise Exception.Create('src folder not found...');
 end;
 
+(*
 function TAndroidProjectDescriptor.TryNewJNIAndroidInterfaceCode(projectType: integer): boolean; //NoGUI
 var
   frm: TFormAndroidProject;
@@ -1126,19 +1176,38 @@ begin
   end;
   frm.Free;
 end;
+*)
 
 constructor TAndroidProjectDescriptor.Create;
+begin
+  inherited Create;
+  Name := 'LAMW';
+end;
+
+function TAndroidProjectDescriptor.GetLocalizedName: string;
+begin
+  Result := 'LAMW';
+end;
+
+function TAndroidProjectDescriptor.GetLocalizedDescription: string;
+begin
+  Result := 'LAMW'
+end;
+
+//--------------
+
+constructor TAndroidNoGUIProjectDescriptor.Create;
 begin
   inherited Create;
   Name := 'Create a new LAMW [NoGUI] Android Module (.so)';
 end;
 
-function TAndroidProjectDescriptor.GetLocalizedName: string;
+function TAndroidNoGUIProjectDescriptor.GetLocalizedName: string;
 begin
   Result := 'LAMW [NoGUI] Android Module'; //fix thanks to Stephano!
 end;
 
-function TAndroidProjectDescriptor.GetLocalizedDescription: string;
+function TAndroidNoGUIProjectDescriptor.GetLocalizedDescription: string;
 begin
   Result := 'LAMW [NoGUI] Android loadable module (.so)'+ LineEnding +
             'using datamodule like form.'+ LineEnding +
@@ -1146,7 +1215,147 @@ begin
             'The project and library are maintained by Lazarus.'
 end;
 
-     //just for test!  not realistic!
+function TAndroidNoGUIProjectDescriptor.DoInitDescriptor: TModalResult;
+var
+  nativeMethodEventList, auxList: TStringList;
+  //nativeMethodList: TStringList
+  //outImportsList: TStringList;
+  //javaClassList: TStringList;
+  outTag, i, count: integer;
+  aux, fullpackName: string;
+begin
+  try
+    FModuleType := 1; //0: GUI --- 1:NoGUI --- 2: Console  3: generic raw .so library 4: JNI .so library
+
+    FPathToClassName := '';
+
+    if GetWorkSpaceFromForm(1, outTag) then
+    begin
+
+      //FPathToJNIFolder := FAndroidProjectName;
+      AndroidFileDescriptor.PathToJNIFolder:= FAndroidProjectName; //FPathToJNIFolder;
+      AndroidFileDescriptor.SmallProjName:=  FSmallProjName;
+      AndroidFileDescriptor.ModuleType:= 1; //No GUI
+
+      FRawJniJClassWrapper:= TStringList.Create;
+      if FileExists(FRawJniJClassWrapperPath) then
+      begin
+         FRawJniJClassWrapper.LoadFromFile(FRawJniJClassWrapperPath);
+         FRawJniJClassWrapper.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java');
+      end
+      else
+      begin  //dummy
+        FRawJniJClassWrapper.Add('package '+FPackagePrefaceName+';  //warning: check/fix package name!');
+        FRawJniJClassWrapper.Add(' ');
+        FRawJniJClassWrapper.Add('import android.util.Log;');
+        FRawJniJClassWrapper.Add(' ');
+        FRawJniJClassWrapper.Add('public class '+FSmallProjName+' {');
+        FRawJniJClassWrapper.Add(' ');
+        FRawJniJClassWrapper.Add('    static {');
+        FRawJniJClassWrapper.Add('        try {');
+        FRawJniJClassWrapper.Add('            System.loadLibrary("'+LowerCase(FSmallProjName)+'");}');
+        FRawJniJClassWrapper.Add('        catch (UnsatisfiedLinkError e) {');
+        FRawJniJClassWrapper.Add('            Log.e("Error loading JNI lib <'+LowerCase(FSmallProjName)+'>", "exception", e);');
+        FRawJniJClassWrapper.Add('        }');
+        FRawJniJClassWrapper.Add('    }');
+        FRawJniJClassWrapper.Add('    public native int sum1(int x, int y);');
+        FRawJniJClassWrapper.Add('    public native int mult1(int x, int y);');
+        FRawJniJClassWrapper.Add('}');
+        FRawJniJClassWrapperPath:= FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java';
+        FRawJniJClassWrapper.SaveToFile(FRawJniJClassWrapperPath);
+      end;
+
+      FJCallBridgeContentList:= TStringList.Create;
+      FMainUnitInterfaceList:= TStringList.Create;
+      FMainUnitImplementationList:= TStringList.Create;
+
+      ProduceRawJniInterface('Unit1', FRawJniJClassWrapperPath, FJCallBridgeContentList,
+                              FMainUnitInterfaceList, FMainUnitImplementationList);
+
+      FJCallBridgeContentList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+ DirectorySeparator+'java_call_bridge_'+FJavaClassName+'.pas');
+      FJCallBridgeContentList.Free;
+
+       AndroidFileDescriptor.MainUnitInterface:= FMainUnitInterfaceList.Text;
+       AndroidFileDescriptor.MainUnitImplementation:= FMainUnitImplementationList.Text;
+
+      FMainUnitInterfaceList.Free;
+      FMainUnitImplementationList.Free;
+
+      //nativeMethodList:= TStringList.Create;
+      nativeMethodEventList:= TStringList.Create;
+
+      count:= FRawJniJClassWrapper.Count;
+      for i:= 0 to count -1 do
+      begin
+          if Pos('native ',FRawJniJClassWrapper.Strings[i]) > 0 then
+          begin
+            aux:= Trim(FRawJniJClassWrapper.Strings[i]);
+            //nativeMethodList.Add(aux);
+            nativeMethodEventList.Add(GetCallSignature(aux)); //GetEventSignature(aux)
+          end;
+      end;
+      nativeMethodEventList.SaveToFile(FAndroidProjectName + DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+ FSmallProjName + '.calls');
+
+      fullpackName:= FPackagePrefaceName;
+      fullpackName:= StringReplace(fullpackName, '.', '/', [rfReplaceAll]);
+      fullpackName:= fullpackName + '/' +FSmallProjName;
+
+      with TJavaParser.Create(FRawJniJClassWrapper) do  //javaClassList
+      try
+        FlagModuleType:= FModuleType;  //1
+        jClassName:= fullpackName;                               //org/lamw/appnoguidemo1/AcbrJBridges1
+        FPascalJNIInterfaceCode := GetPascalJNIInterfaceCode(nativeMethodEventList);
+      finally
+        Free;
+      end;
+      //nativeMethodList.Free;
+      //javaClassList.Free;
+      //outImportsList.Free;
+      FRawJniJClassWrapper.Free;
+      nativeMethodEventList.Free;
+
+      auxList:= TStringList.Create;
+      auxList.Add('How to Use [lib'+LowerCase(FSmallProjName)+'] from NoGUI DataModule based library project:');
+      auxList.Add('');
+      auxList.Add('> Go to your "Android Studio" projec "main" folder and create the "jniLibs" sub-folder');
+      auxList.Add('> Copy the "*.so" file from "jni/libs/armeabi-v7a" [or like...] to your "Android Studio" project "jniLibs/armeabi-v7a" folder [just example...]');
+      auxList.Add('> Sync your "Android Studio" project...');
+      auxList.Add('    ');
+      auxList.Add('    ');
+      auxList.Add('//.....');
+      auxList.Add('//Use example coding...');
+      auxList.Add('public class MainActivity extends AppCompatActivity {');
+      auxList.Add(' ');
+      auxList.Add('   '+FSmallProjName+' myNativelib = new '+FSmallProjName+'();  //declare it !');
+      auxList.Add(' ');
+      auxList.Add('   @Override');
+      auxList.Add('   protected void onCreate(Bundle savedInstanceState) {');
+      auxList.Add('      super.onCreate(savedInstanceState);');
+      auxList.Add('      setContentView(R.layout.activity_main);');
+      auxList.Add(' ');
+      auxList.Add('      int sum = myNativelib.Sum(12, 17);   //use it !');
+      auxList.Add(' ');
+      auxList.Add('      Toast.makeText(getApplicationContext(), "myNativelib.Sum(12,17) = " + sum, Toast.LENGTH_LONG).show();');
+      auxList.Add('   }');
+      auxList.Add('   //.....');
+      auxList.Add('}');
+      auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
+      auxList.Free;
+
+      Result := mrOK
+    end else
+      Result := mrAbort;
+  except
+    on e: Exception do
+    begin
+      MessageDlg('Error NoGUI Project Module Descriptor', e.Message, mtError, [mbOk], 0);
+      Result := mrAbort;
+    end;
+  end;
+end;
+//-------------------------------
+
+//just for test!  not realistic!
 function TAndroidProjectDescriptor.GetFolderFromApi(api: integer): string;
 begin
   Result:= 'android-x.y';
@@ -1651,20 +1860,6 @@ begin
       frm.CheckBoxGeneric.Caption:= 'Add support to Kotlin'; //bad reuse ... sorry
     end;
 
-    if FModuleType = 1 then //No GUI
-    begin
-      frm.Color:= clWhite;
-      frm.PanelButtons.Color:= clWhite;
-
-      frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWNoGUIProject', frm.ComboSelectProjectName.Items);
-
-      frm.LabelTheme.Caption:= 'App LAMW [NoGUI] Project';
-      frm.ComboBoxTheme.Visible:= False;
-      frm.ComboBoxThemeColor.Visible:= False;
-      frm.SpeedButtonHintTheme.Visible:= False;
-      frm.CheckBoxAutoConfigGradle.Visible:= False;
-    end;
-
     if FModuleType = 2 then //Console executable
     begin
       frm.GroupBoxPrefaceName.Visible:= False;
@@ -1687,21 +1882,35 @@ begin
       frm.CheckBoxAutoConfigGradle.Visible:= False;
     end;
 
-    if (FModuleType = 3) or (FModuleType = 4) then //raw lib
+    if (FModuleType = 1) or (FModuleType = 3) then //raw jni lib
     begin
+
       frm.GroupBoxApkBuilder.Visible:= False; //not system builder
+      frm.GroupBoxMinApi.Visible:= False;    // handle by java project
+      frm.GroupBoxTargetApi.Visible:= False;  // handle by java project
 
       frm.Color:= clGradientInactiveCaption;
       frm.PanelButtons.Color:= clGradientInactiveCaption;
 
-      frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwRawLib', frm.ComboSelectProjectName.Items);
+      frm.LabelTheme.Caption:= 'Raw JNI [header] library';
 
-      frm.LabelTheme.Caption:= 'Raw .so library project';
+      frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwJNIRawLib', frm.ComboSelectProjectName.Items);
 
-      frm.GroupBoxPrefaceName.Caption:= 'Full Package Name:' ;
-      frm.EditPackagePrefaceName.Text:= 'org.lamw.myapp';
-      frm.SpeedButtonHelper.Visible:= True;  //bad reuse...
-      frm.SpeedButtonHelper.Hint:= 'Load the java class "native" methods content...';  //bad reuse...
+      if FModuleType = 1 then
+       frm.ComboSelectProjectName.Text:= MakeUniqueName('LamwNoGUILib', frm.ComboSelectProjectName.Items);
+
+      if FModuleType = 1 then
+      begin
+        frm.ComboSelectProjectName.Text:= MakeUniqueName('AppLAMWNoGUIProject', frm.ComboSelectProjectName.Items);
+        frm.LabelTheme.Caption:= 'NoGUI DataModule form basead Project';
+      end;
+
+      frm.LabelSelectProjectName.Caption:= 'New Project Name: [from loading java class...]';
+      frm.ComboSelectProjectName.Text:= '';
+      frm.GroupBoxPrefaceName.Caption:= 'Full Package Name: [from loading java class...]' ;
+      frm.EditPackagePrefaceName.Text:= '';
+      frm.SpeedButtonHelper.Visible:= True;
+      frm.SpeedButtonHelper.Hint:= 'Load the java class "native" methods content...';
 
       frm.ComboBoxTheme.Visible:= False;
       frm.SpeedButtonHintTheme.Visible:= False;
@@ -1714,13 +1923,23 @@ begin
 
       frm.CheckBoxGeneric.Visible:= True;
       frm.CheckBoxGeneric.Checked:= True; //support to raw jni header signature .so library
-      frm.RawJNILibraryChecked:= True;
 
     end;
 
     if frm.ShowModal = mrOK then
     begin
       frm.SaveSettings(SettingsFilename); //LAMW.ini
+
+      FModuleType:= frm.ModuleType; //changed ?
+
+      if FModuleType = 4 then //changed!
+      begin
+        ShowMessage('FModuleType changed! --> ' + IntToStr(FModuleType) );
+        LazarusIDE.ActiveProject.CustomData.Values['LAMW'] := 'RawLibrary';  //raw pascal header lib TODO !
+        LazarusIDE.ActiveProject.Modified:= True;
+        FPascalJNIInterfaceCode:= ''; // raw pascal header lib TODO !
+      end;
+
 
       FBuildSystem:= frm.BuildSystem;
       FAndroidTheme:= frm.AndroidTheme;
@@ -1773,12 +1992,18 @@ begin
       FSupport:=frm.Support;
 
       FPieChecked:= frm.PieChecked;
-      FRawJNILibraryChecked:= frm.RawJNILibraryChecked;
 
       FMaxSdkPlatform:= frm.MaxSdkPlatform;
 
       FGradleVersion:= frm.GradleVersion;
       FJavaMainVersion:= frm.JavaMainVersion;
+
+      if frm.RawJniJClassWrapperPath <>  '' then //Original java class path.... "javaclass.path"
+      begin
+         FRawJniJClassWrapperPath:= frm.RawJniJClassWrapperPath;
+         FAndroidStudioJniLibsFolderPath:= frm.AndroidStudioJniLibsFolderPath;
+         FJavaClassName:= frm.JavaClassName;
+      end;
 
       strList.Clear;
       if frm.ManifestData <> nil then
@@ -1838,23 +2063,6 @@ begin
         end;
       end;
 
-      if Pos('JNI ', frm.CheckBoxGeneric.Caption) > 0 then  //bad CheckBox reuse... sorry!
-      begin
-        if FRawJNILibraryChecked then
-        begin
-          outTag:= 4;
-          FModuleType:= 4;  //build  raw JNI header signature .so library
-
-          if frm.RawJniJClassWrapperPath <>  '' then //Original java class  "javaclass.path"
-          begin
-             FRawJniJClassWrapperPath:= frm.RawJniJClassWrapperPath;
-             FAndroidStudioJniLibsFolderPath:= frm.AndroidStudioJniLibsFolderPath;
-             FJavaClassName:= frm.JavaClassName;
-          end;
-
-        end;
-      end;
-
       FMainActivity:= frm.MainActivity;  //App
       FJavaClassName:= frm.JavaClassName;
 
@@ -1892,7 +2100,7 @@ begin
       try
         if FProjectModel = 'NEW' then   //please read as "new project"...
         begin
-          if FModuleType < 2 then   //0:GUI project   1:NoGui project
+          if FModuleType = 0 then   //0:GUI project   1:NoGui project
           begin
             ForceDirectories(FAndroidProjectName + DirectorySeparator + 'src');
 
@@ -2008,7 +2216,6 @@ begin
 
             intMinApi:= StrToInt(FMinApi);
 
-
             //replace "dummyTheme" ..res\values-v21
             strList.Clear;
             if Pos('AppCompat', FAndroidTheme) <= 0  then  //not AppCompat
@@ -2050,105 +2257,9 @@ begin
                strList.SaveToFile(FFullJavaSrcPath+DirectorySeparator+'App.java');
             end;
           end;
+        end;
 
-          if FModuleType = 1 then     //[NoGUI]
-          begin
-             if not FileExists(FFullJavaSrcPath+DirectorySeparator+'App.java') then
-             begin
-               strList.Clear;
-               strList.Add('package '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+';');
-               strList.Add('');
-               strList.Add('import android.os.Bundle;');
-               strList.Add('import android.app.Activity;');
-               strList.Add('import android.widget.Toast;');
-               strList.Add('import android.util.Log;');
-               strList.Add(' ');
-               strList.Add('//HINT: You can change/edit "App.java" and "'+FSmallProjName+'.java" ');
-               strList.Add('//to accomplish/fill  yours requirements...');
-               strList.Add(' ');
-               strList.Add('public class App extends Activity {');
-               strList.Add('  ');
-
-               strList.Add('   '+FSmallProjName+' m'+FSmallProjName+';  //just for demo...');
-               strList.Add('  ');
-               strList.Add('   @Override');
-               strList.Add('   protected void onCreate(Bundle savedInstanceState) {');
-               strList.Add('       super.onCreate(savedInstanceState);');
-               strList.Add('       setContentView(R.layout.activity_app);');
-               strList.Add('');
-
-               strList.Add('       m'+FSmallProjName+' = new '+FSmallProjName+'(); //just for demo...');
-               strList.Add('');
-               strList.Add('       int sum = m'+FSmallProjName+'.getSum(2,3); //just for demo...');
-               strList.Add('       Toast.makeText(getApplicationContext(), "m'+FSmallProjName+'.getSum(2,3) = "+ sum,Toast.LENGTH_LONG).show();');
-               strList.Add(' ');
-               strList.Add('       String mens = m'+FSmallProjName+'.getString(1); //just for demo...');
-               strList.Add('       Toast.makeText(getApplicationContext(), "m'+FSmallProjName+'.getString(1) = "+ mens,Toast.LENGTH_LONG).show();');
-               strList.Add(' ');
-               strList.Add('   }');
-               strList.Add('}');
-               strList.SaveToFile(FFullJavaSrcPath+DirectorySeparator+'App.java');
-             end;
-
-             if not FileExists(FFullJavaSrcPath+DirectorySeparator+FSmallProjName+'.java') then
-             begin
-               strList.Clear;
-               strList.Add('package '+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+';');
-               strList.Add('');
-               strList.Add('//HINT: You can change/edit "App.java" and "'+FSmallProjName+'.java"');
-               strList.Add('//to accomplish/fill  yours requirements...');
-               strList.Add('');
-               strList.Add('public class '+FSmallProjName+' {');
-               strList.Add('');
-  	           strList.Add('  public native String getString(int flag);  //just for demo...');
-  	           strList.Add('  public native int getSum(int x, int y);    //just for demo...');
-               strList.Add('');
-               strList.Add('  static {');
-         	     strList.Add('	  try {');
-       	       strList.Add('	      System.loadLibrary("'+LowerCase(FSmallProjName)+'");');
-  	           strList.Add('	  } catch(UnsatisfiedLinkError ule) {');
-   	           strList.Add('	      ule.printStackTrace();');
-   	           strList.Add('	  }');
-               strList.Add('  }');
-               strList.Add('');
-               strList.Add('}');
-               strList.SaveToFile(FFullJavaSrcPath+DirectorySeparator+FSmallProjName+'.java');
-             end;
-
-             strList.Clear;
-
-             if not FileExists(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml') then
-             begin
-               strList.Add('<?xml version="1.0" encoding="utf-8"?>');
-               strList.Add('<manifest xmlns:android="http://schemas.android.com/apk/res/android"');
-               strList.Add('    package="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'"');
-               strList.Add('    android:versionCode="1"');
-               strList.Add('    android:versionName="1.0" >');
-               strList.Add('    <application');
-               strList.Add('        android:allowBackup="true"');
-               strList.Add('        android:icon="@drawable/ic_launcher"');
-               strList.Add('        android:label="@string/app_name"');
-               strList.Add('        android:theme="@style/AppTheme" >');
-               strList.Add('        <activity');
-               strList.Add('            android:name="'+FPackagePrefaceName+'.'+LowerCase(FSmallProjName)+'.App">');
-               strList.Add('            <intent-filter>');
-               strList.Add('                <action android:name="android.intent.action.MAIN" />');
-               strList.Add('                <category android:name="android.intent.category.LAUNCHER" />');
-               strList.Add('            </intent-filter>');
-               strList.Add('        </activity>');
-               strList.Add('    </application>');
-               strList.Add('</manifest>');
-               strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'AndroidManifest.xml');
-             end;
-
-             strList.Clear;
-             strList.Add(FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-             strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'packagename.txt');
-
-          end; //just Ant NoGUI project
-        end; // Ant
-
-        if FModuleType < 2 then    {0:GUI; 1:NoGUI}
+        if FModuleType = 0 then    {0:GUI; 1:NoGUI} //FModuleType < 2
         begin
 
           CreateDirectoriesUtils(FAndroidProjectName+DirectorySeparator);
@@ -2778,7 +2889,7 @@ begin
           strList.Add('gradle run');
           Create_sh_bat(strList, FAndroidProjectName, 'gradle-local-run', '.sh');
 
-        end; //FModuleType < 2       //0:GUI; 1:NoGUI; 2:Console
+        end; //FModuleType = 0       //0:GUI; 1:NoGUI; 2:Console
         Result := True;
       except
         on e: Exception do
@@ -2792,71 +2903,8 @@ begin
 end;
 
 function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;
-var
-   auxList: TStringList;
-   outTag: integer;
 begin
-   FModuleType := 1;
-
-   if GetWorkSpaceFromForm(1, outTag) then //1: noGUI project
-   begin
-      if TryNewJNIAndroidInterfaceCode(1) then //1: noGUI project
-      begin
-
-        auxList:= TStringList.Create;
-
-        auxList.Clear;
-        auxList.Add('# To enable ProGuard in your project, edit project.properties');
-        auxList.Add('# to define the proguard.config property as described in that file.');
-        auxList.Add('#');
-        auxList.Add('# Add project specific ProGuard rules here.');
-        auxList.Add('# By default, the flags in this file are appended to flags specified');
-        auxList.Add('# in ${sdk.dir}/tools/proguard/proguard-android.txt');
-        auxList.Add('# You can edit the include path and order by changing the ProGuard');
-        auxList.Add('# include property in project.properties.');
-        auxList.Add('#');
-        auxList.Add('# For more details, see');
-        auxList.Add('#   http://developer.android.com/guide/developing/tools/proguard.html');
-        auxList.Add(' ');
-        auxList.Add('# Add any project specific keep options here:');
-        auxList.Add(' ');
-        auxList.Add('# If your project uses WebView with JS, uncomment the following');
-        auxList.Add('# and specify the fully qualified class name to the JavaScript interface');
-        auxList.Add('# class:');
-        auxList.Add('#-keepclassmembers class fqcn.of.javascript.interface.for.webview {');
-        auxList.Add('#   public *;');
-        auxList.Add('#}');
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'proguard-project.txt');
-
-        auxList.Clear;
-        auxList.Add('# This file is automatically generated by Android Tools.');
-        auxList.Add('# Do not modify this file -- YOUR CHANGES WILL BE ERASED!');
-        auxList.Add('#');
-        auxList.Add('# This file must be checked in Version Control Systems.');
-        auxList.Add('#');
-        auxList.Add('# To customize properties used by the Ant build system edit');
-        auxList.Add('# "ant.properties", and override values to adapt the script to your');
-        auxList.Add('# project structure.');
-        auxList.Add('#');
-        auxList.Add('# To enable ProGuard to shrink and obfuscate your code, uncomment this (available properties: sdk.dir, user.home):');
-        auxList.Add('#proguard.config=${sdk.dir}/tools/proguard/proguard-android.txt:proguard-project.txt');
-        auxList.Add(' ');
-        auxList.Add('# Project target.');
-        auxList.Add('target=android-'+Trim(FTargetApi));
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'project.properties');
-
-        auxList.Clear;
-        auxList.Add(FPackagePrefaceName+'.'+LowerCase(FSmallProjName));
-        auxList.SaveToFile(FAndroidProjectName+DirectorySeparator + 'packagename.txt');
-
-        auxList.Free;
-
-        Result := mrOK
-      end
-      else
-        Result := mrAbort;
-   end
-   else Result := mrAbort;
+  //
 end;
 
 
@@ -2915,23 +2963,21 @@ var
   pathToNdkToolchainsBinArm: string;
   pathToNdkToolchainsBinMips: string;
   pathToNdkToolchainsBinAarch64: string;
-  osys, auxPackName: string;      {windows or linux-x86 or linux-x86_64}
+  osys, fullpackame: string;      {windows or linux-x86 or linux-x86_64}
 begin
 
   inherited InitProject(AProject);
 
-  if  FModuleType < 2 then  //0:GUI    1:NoGUI
-    projName:= LowerCase(FJavaClassName) + '.lpr'
+  if  FModuleType = 0 then  //0:GUI    1:NoGUI
+    projName:= LowerCase(FJavaClassName) + '.lpr'  //'Controls'
   else
     projName:= LowerCase(FSmallProjName) + '.lpr';
 
-  if   FPathToClassName = '' then
+  if FPathToClassName = '' then
       FPathToClassName:= StringReplace(FPackagePrefaceName, '.', '/', [rfReplaceAll])+'/'+LowerCase(FSmallProjName)+'/'+ FJavaClassName; //ex. 'com/example/appasynctaskdemo1/Controls'
 
-  //if  FModuleType < 2 then
-     projJniDir:= FAndroidProjectName {FPathToJNIFolder}+DirectorySeparator+'jni'+DirectorySeparator;
-  //else
-     //projDir:= FPathToJNIFolder+DirectorySeparator;
+   projJniDir:= FAndroidProjectName {FPathToJNIFolder}+DirectorySeparator+'jni'+DirectorySeparator;
+   //console, too?
 
   if FModuleType = 0 then    //0:GUI
   begin
@@ -2959,16 +3005,18 @@ begin
     AProject.CustomData.Values['LAMW'] := 'NoGUI'
   else if FModuleType = 2 then
     AProject.CustomData.Values['LAMW'] := 'ConsoleApp'    // FModuleType =2
-  else  if FModuleType = 3 then
-    AProject.CustomData.Values['LAMW'] := 'RawLibrary'    // FModuleType =
-  else if FModuleType = 4 then
-     AProject.CustomData.Values['LAMW'] := 'RawJniLibrary';    // FModuleType = 4
+  else if FModuleType = 3  then
+  begin
+   AProject.CustomData.Values['LAMW'] := 'RawJniLibrary';    // FModuleType =  3
+  end;
 
-  if FModuleType < 2 then    {0:GUI; 1:NoGUI}
+  if FModuleType = 0 then    {0:GUI; 1:NoGUI}   //FModuleType < 2
     AProject.CustomData.Values['Package']:= FPackagePrefaceName + '.' + LowerCase(FSmallProjName);
 
   AProject.CustomData.Values['NdkPath']:= FPathToAndroidNDK;
-  AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
+
+  if FModuleType = 0 then
+     AProject.CustomData.Values['SdkPath']:= FPathToAndroidSDK;
 
   AProject.CustomData.Values['NdkApi']:= 'android-'+FNdkApi; //legacy
 
@@ -2986,48 +3034,35 @@ begin
   sourceList:= TStringList.Create;
   auxList:= TStringList.Create;
 
-  if FModuleType < 2 then //0:GUI   1:NoGUI
-     sourceList.Add('//hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName+DirectorySeparator)
-  else //2:console;  3 or 4: raw .so library
-     sourceList.Add('//hint: Pascal files location: ...'+DirectorySeparator+FSmallProjName);
+  if FModuleType = 0 then  //GUI  jForm
+  begin
+    sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ '       //[by LAMW [GUI]:'+DateTimeToStr(Now)+']');
+  end;
+
+  if FModuleType = 1 then //NoGUI DataModule
+  begin
+    sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW [NoGUI]:'+DateTimeToStr(Now)+']');
+  end;
 
   if FModuleType = 2 then  //console executavel app
   begin
-    sourceList.Add('program '+ LowerCase(FSmallProjName) +';' + '       //[by LAMW:'+DateTimeToStr(Now)+']')
-  end
-  else if (FModuleType = 3) or  (FModuleType = 4) then
-  begin
-    if not FRawJNILibraryChecked then
-    begin
-      sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW:'+DateTimeToStr(Now)+']');
-      sourceList.Add('//used by  -> ' +LowerCase(FSmallProjName) + '_h.pas');
+    sourceList.Add('program '+ LowerCase(FSmallProjName) +';' + '       //[by LAMW [App Console]:'+DateTimeToStr(Now)+']')
+  end;
 
-      auxList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW:'+DateTimeToStr(Now)+']');
-      auxList.Add('//used by Java wrapper -> ' + FSmallProjName + '.java');
-    end
-    else
-    begin
-      sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW:'+DateTimeToStr(Now)+']');
-      sourceList.Add('//used by Java wrapper -> ' + FSmallProjName + '.java');
-
-      auxList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW:'+DateTimeToStr(Now)+']');
-      auxList.Add('//used by  -> ' +LowerCase(FSmallProjName) + '_h.pas');
-    end;
-  end
-  else
+  if FModuleType = 3   then
   begin
-    sourceList.Add('library '+ LowerCase(FJavaClassName) +'; '+ '       //[by LAMW:'+DateTimeToStr(Now)+']');
+    sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW [JNI header]:'+DateTimeToStr(Now)+']');
+  end;
+
+  if FModuleType = 4   then
+  begin
+    sourceList.Add('library '+ LowerCase(FSmallProjName) +'; '+ '       //[by LAMW [Pascal header]:'+DateTimeToStr(Now)+']');
   end;
 
   sourceList.Add(' ');
   sourceList.Add('{$mode delphi}');
   sourceList.Add(' ');
   sourceList.Add('uses');
-
-  auxList.Add(' ');
-  auxList.Add('{$mode delphi}');
-  auxList.Add(' ');
-  auxList.Add('uses');
 
   if FModuleType < 2 then  //0:GUI or   1:noGUI
   begin
@@ -3042,17 +3077,17 @@ begin
     sourceList.Add('  Classes, SysUtils, And_jni, And_jni_Bridge, AndroidWidget, Laz_And_Controls,');
     sourceList.Add('  Laz_And_Controls_Events;');
     sourceList.Add(' ');
-  end
-  else if FModuleType = 1 then //NoGUI ---  No "Android Bridges" Controls
+  end else if FModuleType = 1 then //NoGUI ---  No "Android Bridges" Controls
   begin
-    sourceList.Add('  Classes, SysUtils, CustApp, jni;');
+    sourceList.Add('  Classes, SysUtils, CustApp, jni,');
+    sourceList.Add('  java_call_bridge_'+FSmallProjName+';');
     sourceList.Add(' ');
     sourceList.Add('type');
     sourceList.Add(' ');
     sourceList.Add('  TNoGUIApp = class(TCustomApplication)');
     sourceList.Add('  public');
-    sourceList.Add('     jClassName: string;');
-    sourceList.Add('     jAppName: string;');
+    sourceList.Add('     jClassName: string;  //ex.  org/lamw/appnoguidemo1/AcbrJBridges1');
+    sourceList.Add('     AppName: string;');
     sourceList.Add('     procedure CreateForm(InstanceClass: TComponentClass; out Reference);');
     sourceList.Add('     constructor Create(TheOwner: TComponent); override;');
     sourceList.Add('     destructor Destroy; override;');
@@ -3079,13 +3114,11 @@ begin
     sourceList.Add('end;');
     sourceList.Add(' ');
     sourceList.Add('var');
-    sourceList.Add('  gNoGUIApp: TNoGUIApp;');
-    sourceList.Add('  gNoGUIjAppName: string;');
-    sourceList.Add('  gNoGUIAppjClassName: string;');
-
+    sourceList.Add('  NoGUIApp: TNoGUIApp;');
+    sourceList.Add('  NoGUIAppName: string;');
+    sourceList.Add('  NoGUIAppjClassName: string;  //ex.  org/lamw/appnoguidemo1/AcbrJBridges1');
     sourceList.Add('');
-  end
-  else if FModuleType = 2 then//console executable app
+  end else if FModuleType = 2 then//console executable app
   begin
     sourceList.Add('  Classes, SysUtils, CustApp;');
     sourceList.Add(' ');
@@ -3121,133 +3154,12 @@ begin
     sourceList.Add('var');
     sourceList.Add('  AndroidConsoleApp: TAndroidConsoleApp;');
     sourceList.Add('');
-  end
-  else //3 or 4: raw .so library // FModuleType = 3 or 4
-  begin
-    auxPackName:= FPackagePrefaceName;
-    auxPackName:= StringReplace(auxPackName, '.', '_', [rfReplaceAll]);
+  end else if FModuleType = 3 then
+    sourceList.Add(' jni, java_call_bridge_'+FSmallProjName+';') // raw jni .so library
+  else //4
+    sourceList.Add('  Unit1;');  ////: raw .so library
 
-    if not FRawJNILibraryChecked then
-    begin
-       sourceList.Add('  Unit1;');  //ok
-       (*
-       auxList.Add(' jni, Unit1;'); //
-       auxList.Add(' ');
-       sourceList.Add(' ');
-       sourceList.Add('function Sum(a: longint; b: longint): longint; cdecl; //just demo');
-       sourceList.Add('begin');
-       sourceList.Add('  Result:= SumAB(a, b);');
-       sourceList.Add('end;');
-       sourceList.Add(' ');
-       sourceList.Add('exports');
-       sourceList.Add('  Sum;');
-       sourceList.Add(' ');
-
-       if FRawJniInterfaceData <> nil then
-       begin
-         count:= FRawJniInterfaceData.Count;
-         for i:= 0 to count-1 do
-         begin
-            auxList.Add(FRawJniInterfaceData.Strings[i]); //initial jni pascal interface method..
-         end;
-       end
-       else  //example code....
-       begin
-         auxList.Add('function Sum(PEnv: PJNIEnv; this: JObject; a: JInt; b: JInt): JInt; cdecl;  //just demo...');
-         auxList.Add('begin');
-         auxList.Add('  Result:= SumAB(a, b);');
-         auxList.Add('end;');
-         auxList.Add(' ');
-         auxList.Add('exports');
-         auxList.Add('  Sum name ''Java_'+auxPackName+'_'+FSmallProjName+ '_Sum'';');   //warning: check/fix package name!');
-         auxList.Add(' ');
-       //end;
-       auxList.SaveToFile(projJniDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
-       *)
-    end
-    else //jni checked!
-    begin
-      sourceList.Add(' jni, java_call_bridge_'+FSmallProjName+';'); //ex.
-     (* JNI signature source code handled by  "FPascalJNIInterfaceCode"  property [region] *)
-
-     (*
-      auxList.Add(' Unit1;');
-      auxList.Add(' ');
-      auxList.Add(' ');
-      auxList.Add('function Sum(a: longint; b: longint): longint; cdecl; //just demo');
-      auxList.Add('begin');
-      auxList.Add('  Result:= SumAB(a, b);');
-      auxList.Add('end;');
-      auxList.Add(' ');
-      auxList.Add('exports');
-      auxList.Add('  Sum;');
-      auxList.Add(' ');
-      auxList.Add('begin');
-      auxList.Add('  //');
-      auxList.Add('end.');
-      auxList.SaveToFile(projJniDir+DirectorySeparator+LowerCase(FSmallProjName)+'.lpr2');
-      *)
-
-    end;
-
-    (*
-    auxList.Clear;
-    auxList.Add('unit '+LowerCase(FSmallProjName)+'_h;');
-    auxList.Add(' ');
-    auxList.Add('interface');
-    auxList.Add(' ');
-    auxList.Add('  function Sum(a: longint; b: longint): longint; cdecl; external ''lib'+LowerCase(FSmallProjName)+'.so'' name ''Sum'';');
-    auxList.Add(' ');
-    auxList.Add('implementation');
-    auxList.Add(' ');
-    auxList.Add('end.');
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'libs'+DirectorySeparator+LowerCase(FSmallProjName)+'_h.pas');
-    *)
-
-    auxList.Clear;
-    auxList.Add('How to Use:');
-    auxList.Add('');
-    //auxList.Add('I. Using "lib'+LowerCase(FSmallProjName)+'.so'+'" in Pascal/LAMW project');
-    //auxList.Add('   > Check the Pascal "*.lpr" content (no "jni" reference...). If need replace the "*.lpr" by "*.lpr2" content...');
-    //auxList.Add('   > "Build" the *.so library !');
-    //auxList.Add('   > Create a new "Lazarus/LAMW [GUI]" project');
-    //auxList.Add('   > Copy the "*.so" library from ...libs\... to your new project ...libs\...,  according your chip architecture,  ex.: "armeabi-v7a"');
-    //auxList.Add('   > Copy the "'+LowerCase(FSmallProjName)+'_h.pas" file from library.../libs folder to your new LAMW project "jni" folder');
-    //auxList.Add(' ');
-    auxList.Add('Using the "lib'+LowerCase(FSmallProjName)+'.so'+'" in Java "Android Studio" project');
-    auxList.Add('> If need create a "Android Studio" Java project, and remember your full package name!');
-    auxList.Add('> Check the Pascal "*.lpr" code for package name signature used in exports functions...');
-    auxList.Add('>   ex.: for project package name "org.lamw.myapp" you will get "Java_org_lamw_myapp_AcbrJBridges1_*" jni signature!');
-    auxList.Add('> Go to Menu "Run" -> ""Build" the *.so library');
-    auxList.Add('> If need go to your "Android Studio" projec "main" folder and create the "jniLibs" sub-folder');
-    auxList.Add('> Copy the "*.so" file from jni  "libs/armeabi-v7a" [or like...] to your "Android Studio" project "jniLibs/armeabi-v7a" folder [just example...]');
-    auxList.Add('> If need copy the file "'+FSmallProjName+'.java" generated by LAMW from .../libs to the same folder where is "MainActivity.java"');
-    auxList.Add('> Open "AcbrJBridges1.java" generated by LAMW and fix/check the project package name...');
-    auxList.Add('> Sync your "Android Studio" project...');
-
-    auxList.Add('    ');
-    auxList.Add('    ');
-    auxList.Add('//.....');
-    auxList.Add('//Use example coding...');
-    auxList.Add('public class MainActivity extends AppCompatActivity {');
-    auxList.Add(' ');
-    auxList.Add('   '+FSmallProjName+' myNativelib = new '+FSmallProjName+'();  //declare it !');
-    auxList.Add(' ');
-    auxList.Add('   @Override');
-    auxList.Add('   protected void onCreate(Bundle savedInstanceState) {');
-    auxList.Add('      super.onCreate(savedInstanceState);');
-    auxList.Add('      setContentView(R.layout.activity_main);');
-    auxList.Add(' ');
-    auxList.Add('      int sum = myNativelib.Sum(12, 17);   //use it !');
-    auxList.Add(' ');
-    auxList.Add('      Toast.makeText(getApplicationContext(), "myNativelib.Sum(12,17) = " + sum, Toast.LENGTH_LONG).show();');
-    auxList.Add('   }');
-    auxList.Add('   //.....');
-    auxList.Add('}');
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'readme.txt');
-    auxList.Clear;
-
-  end; //3 or 4
+  //ShowMessage('InitProject'); //after formworkspace!
 
   sourceList.Add('{%region /fold ''LAMW generated code''}');
   sourceList.Add('');
@@ -3256,41 +3168,45 @@ begin
 
   sourceList.Add(' ');
 
-  //0:GUI    1:NoGUI   2:console App
-  //if FModuleType < 3 then
   sourceList.Add('begin');
 
   if FModuleType = 0 then  //GUI Android Bridges controls...
   begin
     sourceList.Add('  gApp:= jApp.Create(nil);');
-    sourceList.Add('  gApp.Title:= ''LAMW JNI Android Bridges Library'';');
+    sourceList.Add('  gApp.Title:= ''LAMW GUI JNI Android Bridges Library'';');
     sourceList.Add('  gjAppName:= '''+GetAppName(FPathToClassName)+''';'); //com.example.appasynctaskdemo1
     sourceList.Add('  gjClassName:= '''+FPathToClassName+''';');           //com/example/appasynctaskdemo1/Controls
     sourceList.Add('  gApp.AppName:=gjAppName;');
     sourceList.Add('  gApp.ClassName:=gjClassName;');
     sourceList.Add('  gApp.Initialize;');
     sourceList.Add('  gApp.CreateForm(TAndroidModule1, AndroidModule1);');
-  end
-  else if FModuleType = 1 then
+  end;
+
+  if FModuleType = 1 then
   begin
-     sourceList.Add('  gNoGUIApp:= TNoGUIApp.Create(nil);');
-     sourceList.Add('  gNoGUIApp.Title:= ''My Android Pure Library'';');
-     sourceList.Add('  gNoGUIjAppName:= '''+GetAppName(FPathToClassName)+''';');
-     sourceList.Add('  gNoGUIAppjClassName:= '''+FPathToClassName+''';');
+     fullpackame:= GetAppName(FPathToClassName);
+     sourceList.Add('  NoGUIApp:= TNoGUIApp.Create(nil);');
+     sourceList.Add('  NoGUIApp.Title:= ''LAMW NoGUI JNI Android Library'';');
 
-     sourceList.Add('  gNoGUIApp.jAppName:=gNoGUIjAppName;');
-     sourceList.Add('  gNoGUIApp.jClassName:=gNoGUIAppjClassName;');
+     sourceList.Add('  NoGUIAppName:= '''+fullpackame+''';');
+     fullpackame:= StringReplace(fullpackame, '.', '/', [rfReplaceAll]);
+     sourceList.Add('  NoGUIAppjClassName:= '''+fullpackame+''';');
 
-     sourceList.Add('  gNoGUIApp.Initialize;');
-     sourceList.Add('  gNoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
-  end
-  else if FModuleType = 2 then // 2  - console executable
+     sourceList.Add('  NoGUIApp.AppName:=NoGUIAppName;');
+     sourceList.Add('  NoGUIApp.jClassName:=NoGUIAppjClassName;');
+
+     sourceList.Add('  NoGUIApp.Initialize;');
+     sourceList.Add('  NoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
+  end;
+
+  if FModuleType = 2 then // 2  - console executable
   begin
      sourceList.Add('  AndroidConsoleApp:= TAndroidConsoleApp.Create(nil);');
      sourceList.Add('  AndroidConsoleApp.Title:= ''Android Executable Console App'';');
      sourceList.Add('  AndroidConsoleApp.Initialize;');
      sourceList.Add('  AndroidConsoleApp.CreateForm(TAndroidConsoleDataForm1,AndroidConsoleDataForm1);');
   end;
+
   sourceList.Add('end.');
 
   AProject.MainFile.SetSourceText(sourceList.Text, True);
@@ -3640,71 +3556,48 @@ begin
   auxList.Add('<TargetCPU Value="i386"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType < 2 then
-    auxList.SaveToFile(FAndroidProjectName  +DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt')
-  else
-    auxList.SaveToFile(FAndroidProjectName  +DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
 
+  auxList.SaveToFile(FAndroidProjectName  +DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86.txt');
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_x86_64+'"/>');
   auxList.Add('<TargetCPU Value="x86_64"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_x86_64+'"/>');
-  //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType < 2 then
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt')
-  else
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt');
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_x86_64.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_mips+'"/>');
   auxList.Add('<TargetCPU Value="mipsel"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_mips+'"/>');
   //auxList.Add('<TargetProcessor Value=""/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType < 2 then
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt')
-  else
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt');
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_mipsel.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV6+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV6"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType < 2 then
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt')
-  else
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV6.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType < 2 then
-     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt')
-  else
-     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
-
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_arm+'"/>');
   auxList.Add('<TargetCPU Value="arm"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armV7a_VFPv3+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMV7A"/>');  //commented until lazarus fix bug for missing ARMV7A  //again thanks to Stephano!
-  if FModuleType < 2 then
-     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt')
-  else
-     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt');
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_armV7a_VFPv3.txt');
 
   auxList.Clear;
   auxList.Add('<Libraries Value="'+libraries_aarch64+'"/>');
   auxList.Add('<TargetCPU Value="aarch64"/>');
   auxList.Add('<CustomOptions Value="'+customOptions_armv8+'"/>');
   //auxList.Add('<TargetProcessor Value="ARMv8"/>');  //commented until lazarus fix bug for missing ARMv8  //again thanks to Stephano!
-  if FModuleType < 2 then
-     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt')
-  else
-     auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt');
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'build_arm64.txt');
 
   auxList.Clear;
   auxList.Add('How to get more ".so" chipset builds:');
@@ -3724,13 +3617,9 @@ begin
   auxList.Add(' ');
   auxList.Add('   > [LAMW] Build Android Apk and Run');
   auxList.Add(' ');
+  auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
 
-  if FModuleType < 2 then
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt')
-  else
-    auxList.SaveToFile(FAndroidProjectName+DirectorySeparator+'build-modes'+DirectorySeparator+'readme.txt');
-
-  if FModuleType < 2 then
+  if FModuleType = 0 then
   begin
     AProject.LazCompilerOptions.OtherUnitFiles := '$(ProjOutDir)';
 
@@ -3741,7 +3630,7 @@ begin
          '..'+DirectorySeparator+'obj'+ DirectorySeparator+LowerCase(FJavaClassName); {-FU}
 
   end
-  else  //2 -- noGUI console executable
+  else  //2 -- noGUI and others libraries...
   begin
     AProject.LazCompilerOptions.TargetFilename:=
             'libs'+DirectorySeparator+auxStr+DirectorySeparator+LowerCase(FSmallProjName);
@@ -4073,10 +3962,7 @@ begin
    uName:= SplitStr(uName,'.');
    sourceList:= TStringList.Create;
 
-   if ModuleType < 2 then
-     sourceList.Add('//hint: Pascal files location: ...'+DirectorySeparator+SmallProjName+DirectorySeparator+'jni')
-   else
-     sourceList.Add('//hint: Pascal files location: ...'+DirectorySeparator+SmallProjName);
+   //sourceList.Add('//hint: Pascal files location: ...'+DirectorySeparator+SmallProjName+DirectorySeparator+'jni')
 
    sourceList.Add('unit '+uName+';');
    sourceList.Add('');
@@ -4099,30 +3985,26 @@ begin
    if ModuleType >= 3 then
      sourceList.Add('*)');
 
-   if ModuleType >= 3 then
-      sourceList.Add('  jnihelper;');
+   if ModuleType = 0 then
+        sourceList.Add('  ' + GetInterfaceUsesSection);
 
-   sourceList.Add('  ' + GetInterfaceUsesSection);
+   if ModuleType = 1 then
+        sourceList.Add('  ' + GetInterfaceUsesSection);
+
+   if ModuleType = 3  then
+      sourceList.Add('  ' + GetInterfaceUsesSection); //sourceList.Add('  jnihelper;');
 
    if ModuleType = 1 then //noGUI
    begin
     sourceList.Add('');
     sourceList.Add('const');
-    sourceList.Add('  gNoGUIjClassPath: string='''';');
-    sourceList.Add('  gNoGUIjClass: JClass=nil;');
-    sourceList.Add('  gNoGUIPDalvikVM: PJavaVM=nil;');
+    sourceList.Add('  jClassName: string='''';' + '   //ex.  org/lamw/appnoguidemo1/AcbrJBridges1');
+    sourceList.Add('  jClassRef: JClass=nil;          //Pointer');
+    sourceList.Add('  jVMRef: PJavaVM=nil;            //Pointer');
    end;
 
-   if ModuleType < 3 then
-   begin
-     sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
-   end
-   else
-   begin //raw lib
-     //sourceList.Add(' ');
-     //sourceList.Add('function SumAB(A: longint; B: longint): longint;');
-     //sourceList.Add(' ');
-   end;
+   sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
+
    sourceList.Add(' ');
    sourceList.Add('implementation');
    sourceList.Add(' ');
@@ -4137,17 +4019,21 @@ end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceUsesSection: string;
 begin
-  Result:= '';
+  Result:= 'Classes, SysUtils;';
+
   if ModuleType = 0 then // GUI "Android Bridges" controls...
-     Result := 'Classes, SysUtils, AndroidWidget;'
-  else if ModuleType = 1  then  //NoGUI module
-     Result := 'Classes, SysUtils, jni;'
-  else if (ModuleType = 4) or (ModuleType = 3) then
+     Result := 'Classes, SysUtils, AndroidWidget;';
+
+  if ModuleType = 1 then
   begin
-     Result:= Self.MainUnitInterface;
-  end
-  else
-     Result:= 'Classes, SysUtils;'
+     Result:= 'Classes, {SysUtils,} jni, jnihelper;'
+  end;
+
+  if ModuleType = 3 then
+  begin
+     Result:= '{Classes, SysUtils, jni,} jnihelper;'
+  end;
+
 end;
 
 function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filename     : string;
@@ -4160,39 +4046,60 @@ begin
   strList:= TStringList.Create;
 
   strList.Add(' ');
-  strList.Add('type');
   if ModuleType = 0 then //GUI controls module
   begin
+    strList.Add('type');
     if ResourceName <> '' then
        strList.Add('  T' + ResourceName + ' = class(jForm)')
     else
        strList.Add('  TAndroidModuleXX = class(jForm)'); //dummy
+
+      strList.Add('  private');
+      strList.Add('    {private declarations}');
+      strList.Add('  public');
+      strList.Add('    {public declarations}');
+      strList.Add('  end;');
   end
   else if ModuleType = 1 then//NoGUI module
   begin
+    strList.Add('type');
     if ResourceName <> '' then
       strList.Add('  T' + ResourceName + ' = class(TDataModule)')
     else
       strList.Add('  TNoGUIAndroidModuleXX  = class(TDataModule)');
+
+      strList.Add('  private');
+      strList.Add('    {private declarations}');
+      strList.Add('  public');
+      strList.Add('    {public declarations}');
+      strList.Add('  end;');
   end
   else if ModuleType = 2 then //  console
   begin
+    strList.Add('type');
     if ResourceName <> '' then
       strList.Add('  T' + ResourceName + ' = class(TDataModule)')
     else
       strList.Add('  TAndroidConsoleDataFormXX  = class(TDataModule)');
+
+      strList.Add('  private');
+      strList.Add('    {private declarations}');
+      strList.Add('  public');
+      strList.Add('    {public declarations}');
+      strList.Add('  end;');
   end;
 
-  strList.Add('  private');
-  strList.Add('    {private declarations}');
-  strList.Add('  public');
-  strList.Add('    {public declarations}');
-  strList.Add('  end;');
+  if ModuleType = 1 then
+     strList.AddStrings( Self.MainUnitInterface);
+
+  if ModuleType = 3 then
+     strList.AddStrings( Self.MainUnitInterface);
+
   strList.Add('');
-  strList.Add('var');
 
   if ModuleType = 0 then //GUI controls module
   begin
+    strList.Add('var');
     if ResourceName <> '' then
        strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
     else
@@ -4200,6 +4107,7 @@ begin
   end
   else if ModuleType = 1 then //NoGUI module
   begin
+    strList.Add('var');
     if ResourceName <> '' then
       strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
     else
@@ -4207,13 +4115,14 @@ begin
   end
   else if ModuleType = 2 then//2  console
   begin
+    strList.Add('var');
     if ResourceName <> '' then
      strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
     else
       strList.Add('  AndroidConsoleDataFormXX: TAndroidConsoleDataForm');
   end;
 
-  if ModuleType < 3 then
+  if ModuleType <= 3 then
     Result := strList.Text
   else
     Result:= '';
@@ -4230,17 +4139,21 @@ var
 begin
  sttList:= TStringList.Create;
  sttList.Text:= '';
- if ModuleType < 3 then //0:GUI  1:NoGui 2:console "form" based modules...
+
+ if ModuleType = 0 then //0:GUI  1:NoGui 2:console "form" based modules...
  begin
   sttList.Add(' ');
   sttList.Add('{$R *.lfm}');
   sttList.Add(' ');
  end;
 
- if (ModuleType = 3) or (ModuleType = 4) then
+ if (ModuleType = 1) or (ModuleType = 3) or (ModuleType = 4) then
  begin
     sttList.Text:= Self.MainUnitImplementation;
  end;
+
+ if (ModuleType = 1) then
+  sttList.Insert(0, '{$R *.lfm}');
 
  Result:= sttList.Text;
  sttList.Free;

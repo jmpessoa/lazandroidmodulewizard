@@ -1,3 +1,0 @@
-<Libraries Value="C:\android\ndkr18b\platforms\android-22\arch-arm64\usr\lib;C:\android\ndkr18b\toolchains\aarch64-linux-android-4.9\prebuilt\windows-x86_64\lib\gcc\aarch64-linux-android\4.9.x"/>
-<TargetCPU Value="aarch64"/>
-<CustomOptions Value="-Xd -XPaarch64-linux-android- -FDC:\android\ndkr18b\toolchains\aarch64-linux-android-4.9\prebuilt\windows-x86_64\bin"/>
