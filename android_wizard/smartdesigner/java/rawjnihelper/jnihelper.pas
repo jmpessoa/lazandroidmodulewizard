@@ -44,9 +44,17 @@ function GetJObjectOfDynArrayOfSingle(env: PJNIEnv; var dataContent: TDynArrayOf
 function GetJObjectOfDynArrayOfDouble(env: PJNIEnv; var dataContent: TDynArrayOfDouble):jdoubleArray; // jObject;
 function GetJObjectOfDynArrayOfInteger(env: PJNIEnv; var dataContent: TDynArrayOfInteger):jintArray; // jObject;
 function GetJObjectOfDynArrayOfString(env: PJNIEnv; var dataContent: TDynArrayOfString): jstringArray;  // jObject;
-
+function GetJBoolean(b: boolean): byte;
 
 implementation
+
+function GetJBoolean(b: boolean): byte;
+begin
+  Case b of
+   True  : Result := 1;
+   False : Result := 0;
+  End;
+end;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
