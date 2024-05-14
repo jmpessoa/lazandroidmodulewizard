@@ -847,8 +847,11 @@ begin
              begin
                try    //jniLibs\armeabi-v7a
                  CreateDir(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs');
+                 strList.Clear;
+                 strList.Add(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs');
+                 strList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+'jnilibs.path');
                except
-                 ShowMessage('warning: fail to create A.S. "...main/jniLibs" folder');
+                 ShowMessage('warning: fail to create "Android Studio"'+sLineBreak+'"...main/jniLibs" folder!');
                end;
 
                auxChip:= 'armeabi-v7a';
@@ -864,7 +867,7 @@ begin
                try
                  CreateDir(FAndroidStudioJniLibsFolderPath+DirectorySeparator+'jniLibs'+ DirectorySeparator + auxChip);
                except
-                 ShowMessage('warning: fail to create A.S. "jniLibs" folder "...main/jniLibs/'+auxChip);
+                 ShowMessage('warning: fail to create "Android Studio"'+sLineBreak+'folder "...main/jniLibs/'+auxChip+'" folder!');
                end;
              end;
              strList.Clear;

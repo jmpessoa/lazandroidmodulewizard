@@ -1,7 +1,7 @@
 object FrmCompCreate: TFrmCompCreate
-  Left = 545
+  Left = 480
   Height = 648
-  Top = 264
+  Top = 269
   Width = 1019
   Caption = '[LAMW]  Create New jComponent'
   ClientHeight = 648
@@ -292,52 +292,33 @@ object FrmCompCreate: TFrmCompCreate
       OnClick = SpeedButton1Click
     end
     object GroupBoxMainUnit: TGroupBox
-      Left = 248
+      Left = 320
       Height = 63
-      Top = 9
-      Width = 167
-      Caption = 'Main Project Unit'
+      Top = 8
+      Width = 216
+      Caption = 'Methods Namespace'
       ClientHeight = 38
-      ClientWidth = 163
+      ClientWidth = 212
       TabOrder = 1
       Visible = False
       object EditMainUnit: TEdit
         Left = 11
         Height = 28
         Top = 1
-        Width = 141
+        Width = 189
         TabOrder = 0
         Text = 'Unit1'
       end
     end
-    object GroupBox1: TGroupBox
-      Left = 96
-      Height = 63
-      Top = 8
-      Width = 136
-      Caption = 'Pascal Interface'
-      ClientHeight = 38
-      ClientWidth = 132
-      TabOrder = 2
-      object CheckBoxRawJni: TCheckBox
-        Left = 16
-        Height = 24
-        Top = 2
-        Width = 76
-        Caption = 'Raw JNI'
-        OnChange = CheckBoxRawJniChange
-        TabOrder = 0
-      end
-    end
     object GroupBoxJavaClass: TGroupBox
-      Left = 432
+      Left = 552
       Height = 63
       Top = 8
       Width = 88
       Caption = 'Java Class'
       ClientHeight = 38
       ClientWidth = 84
-      TabOrder = 3
+      TabOrder = 2
       Visible = False
       object SpeedButton2: TSpeedButton
         Left = 16
@@ -382,6 +363,32 @@ object FrmCompCreate: TFrmCompCreate
         }
         OnClick = SpeedButton2Click
       end
+    end
+    object RadioGroupPasInterface: TRadioGroup
+      Left = 78
+      Height = 54
+      Top = 8
+      Width = 226
+      AutoFill = True
+      Caption = 'Pascal Interface'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 3
+      ClientHeight = 29
+      ClientWidth = 222
+      Columns = 3
+      ItemIndex = 0
+      Items.Strings = (
+        'GUI'
+        'NoGUI'
+        'RawJni'
+      )
+      OnSelectionChanged = RadioGroupPasInterfaceSelectionChanged
+      TabOrder = 3
     end
   end
   object StatusBar1: TStatusBar

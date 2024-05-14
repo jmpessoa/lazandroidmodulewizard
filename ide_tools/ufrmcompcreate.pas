@@ -17,9 +17,7 @@ type
   TFrmCompCreate = class(TForm)
     BitBtn1: TBitBtn;
     BitBtnJAR: TBitBtn;
-    CheckBoxRawJni: TCheckBox;
     EditMainUnit: TEdit;
-    GroupBox1: TGroupBox;
     GroupBoxJavaClass: TGroupBox;
     GroupBoxMainUnit: TGroupBox;
     Memo1: TMemo;
@@ -47,6 +45,7 @@ type
     Panel2: TPanel;
     PopupMenuDraftCode: TPopupMenu;
     PopupMenuRegister: TPopupMenu;
+    RadioGroupPasInterface: TRadioGroup;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
     StatusBar1: TStatusBar;
@@ -58,12 +57,12 @@ type
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     procedure BitBtnJARClick(Sender: TObject);
-    procedure CheckBoxRawJniChange(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure PopupMenu1Close(Sender: TObject);
     procedure PopupMenu2Close(Sender: TObject);
+    procedure RadioGroupPasInterfaceSelectionChanged(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
   private
@@ -1723,6 +1722,22 @@ begin
   end;
 end;
 
+procedure TFrmCompCreate.RadioGroupPasInterfaceSelectionChanged(Sender: TObject);
+begin
+  if RadioGroupPasInterface.ItemIndex <> 0 then
+  begin
+    ProduceImportsDictionary();
+    GroupBoxMainUnit.Visible:= True;
+    GroupBoxJavaClass.Visible:= True;
+  end
+  else
+  begin
+     GroupBoxMainUnit.Visible:= False;
+     GroupBoxJavaClass.Visible:= False;
+  end;
+
+end;
+
 procedure TFrmCompCreate.SpeedButton1Click(Sender: TObject);
 begin
   ShowMessage('About Android Bridges components palettes' + sLineBreak +
@@ -2276,20 +2291,6 @@ begin
 
 end;
 
-procedure TFrmCompCreate.CheckBoxRawJniChange(Sender: TObject);
-begin
-  if CheckBoxRawJni.Checked then
-  begin
-    ProduceImportsDictionary();
-    GroupBoxMainUnit.Visible:= True;
-    GroupBoxJavaClass.Visible:= True;
-  end
-  else
-  begin
-     GroupBoxMainUnit.Visible:= False;
-     GroupBoxJavaClass.Visible:= False;
-  end;
-end;
 
 procedure TFrmCompCreate.FormDestroy(Sender: TObject);
 begin
@@ -3453,7 +3454,7 @@ begin
     end;
   end;
 
-  if not CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex = 0 then //GUI
   begin
     if fTypereturn = 'void' then
       Result:= 'procedure Java_Event_'+method+signature+');'
@@ -3463,7 +3464,7 @@ begin
       Result:= 'function Java_Event_'+method+signature+'):'+GetNativePascalTypeSignature(fTypereturn)+';';
     end;
   end
-  else //raw jni
+  else //raw jni/NoGUI
   begin
     if fTypereturn = 'void' then
       Result:= 'procedure Java_Call_'+method+signature+');'
@@ -3474,7 +3475,7 @@ begin
     end;
   end;
 
-  if not CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex = 0 then  //GUI
      eventname:= Copy(method, 2, MaxInt) //drop 'p'
   else
      eventname:= method;  //raw jni
@@ -3667,18 +3668,18 @@ begin
     end;
 
     LazAndControlsEventsBody.Add('begin');
-    if not CheckBoxRawJni.Checked then
+    if Self.RadioGroupPasInterface.ItemIndex = 0 then  //GUI
     begin
        LazAndControlsEventsBody.Add('  gApp.Jni.jEnv:= env;');
        LazAndControlsEventsBody.Add('  gApp.Jni.jThis:= this;');
     end
-    else
+    else  //raw jni/NoGUI
     begin
       //LazAndControlsEventsBody.Add('  //'+Self.EditMainUnit.Text+'.EnvJni.Jni.jEnv:= env;');
       //LazAndControlsEventsBody.Add('  //'+Self.EditMainUnit.Text+'.EnvJni.Jni.jThis:= this;');
     end;
 
-    if not CheckBoxRawJni.Checked then
+    if Self.RadioGroupPasInterface.ItemIndex = 0 then  //GUI
     begin
       if outPascalReturnType <> '' then
       begin
@@ -3686,7 +3687,7 @@ begin
       end;
     end;
 
-    if not CheckBoxRawJni.Checked then
+    if Self.RadioGroupPasInterface.ItemIndex = 0 then    //GUI
     begin
 
       LazAndControlsEventsBody.Add('  if Sender is '+jclassname+' then');
@@ -3700,7 +3701,7 @@ begin
       LazAndControlsEventsBody.Add('  end;');
 
     end
-    else //Raw jni
+    else //Raw jni / NoGUI
     begin
       //LazAndControlsEventsBody.Add('//if Sender is '+jclassname+' then');
       //LazAndControlsEventsBody.Add('//begin');
@@ -3711,7 +3712,6 @@ begin
 
       //LazAndControlsEventsBody.Add('//end;');
     end;
-
 
     if outPascalReturnType <> '' then
     begin
@@ -3742,14 +3742,14 @@ begin
 
     LazAndControlsEventsBody.Add('end;');
 
-    if not CheckBoxRawJni.Checked then
+    if Self.RadioGroupPasInterface.ItemIndex = 0 then //GUI
     begin
       if outPascalReturnType = '' then
          PasHeaderType.Add('T'+outEventname+'=procedure('+pasSignature+') of object;')
       else                                                                        //TryNativeReConvertOutSignature
          PasHeaderType.Add('T'+outEventname+'=procedure('+pasSignature+';var outReturn:'+outPascalReturnType+') of object;');
     end
-    else //raw jni
+    else //raw jni  / NoGUI
     begin
       if outPascalReturnType = '' then
          PasHeaderType.Add('procedure '+outEventname+'('+pasSignature+');')
@@ -3757,7 +3757,7 @@ begin
          PasHeaderType.Add('function '+outEventname+'('+pasSignature+'): '+ outPascalReturnType+';');
     end;
 
-    if not CheckBoxRawJni.Checked then
+    if Self.RadioGroupPasInterface.ItemIndex = 0 then //GUI
     begin
 
       //jclassname = class
@@ -3794,7 +3794,7 @@ begin
   MemoLines.Clear;
 
   MemoLines.Add(' ');
-  if not CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex = 0 then
   begin
     MemoLines.Add('//------------------ Laz_And_Controls_Events.pas -------------------------------------------');
     MemoLines.Add('//------------------(or Laz_And_Controls.pas ) ---------------------------------------------');
@@ -3804,21 +3804,23 @@ begin
     MemoLines.Add('//------------------- java_call_bridge_'+jclassname+'.pas  ----------------------');
   end;
 
-  if CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
       MemoLines.Add('unit java_call_bridge_'+jclassname+';');
+
   MemoLines.Add(' ');
-  if CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
   begin
        MemoLines.Add('{$mode delphi} ');
        MemoLines.Add(' ');
   end;
-  if CheckBoxRawJni.Checked then
+
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
     MemoLines.Add('interface')
   else
     MemoLines.Add('//interface');
 
   MemoLines.Add(' ');
-  if CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
   begin
     MemoLines.Add('uses');
     MemoLines.Add('  jni, jnihelper;');
@@ -3832,18 +3834,18 @@ begin
   end;
 
   MemoLines.Add(' ');
-  if CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
     MemoLines.Add('implementation')
   else
     MemoLines.Add('//implementation');
 
   MemoLines.Add(' ');
-  if CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
     MemoLines.Add('uses')
   else
     MemoLines.Add('//uses');
 
-  if not CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex = 0 then
      MemoLines.Add('  '+Lowercase(Copy(jclassname,2,MaxInt))+';')
   else
      MemoLines.Add('  '+EditMainUnit.Text+';');
@@ -3859,7 +3861,7 @@ begin
   MemoLines.Add('end. ');
 
   MemoLines.Add(' ');
-  if not CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex = 0 then
      MemoLines.Add('//--------------------'+Lowercase(Copy(jclassname,2,MaxInt))+'.pas -------')
   else
      MemoLines.Add('//--------------------'+EditMainUnit.Text+'.pas ------------------------');
@@ -3870,7 +3872,7 @@ begin
   MemoLines.Add(' ');
   MemoLines.Add('//type');
   //if raw jni
-  if CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex <> 0 then
   begin
   //MemoLines.Add('//TEnvJni=record');
   //MemoLines.Add('//  jEnv: PJNIEnv;');  //a pointer reference to the JNI environment,
@@ -3886,7 +3888,7 @@ begin
      MemoLines.Add(PasHeaderType.Strings[j]);
   end;
 
-  if not CheckBoxRawJni.Checked then
+  if Self.RadioGroupPasInterface.ItemIndex = 0 then
   begin
 
     MemoLines.Add(' ');
