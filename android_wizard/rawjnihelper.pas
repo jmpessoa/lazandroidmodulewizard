@@ -11,18 +11,23 @@ function TryNativeConvertParam(param: string): string;
 function GetNativePascalTypeSignature(jSignature: string): string;
 function GetNativePascalFuncResultHack(jType: string): string;
 function GetNativePascalSignature(const methodNative: string; out eventname: string; out outType: string): string;
-procedure GetNativeMethodInterfaceList(pascalMainUnit: string; jclassname: string; nativeMethod: TStringList;
+procedure GetNativeMethodInterfaceList(methodNameSpace: string; jclassname: string; nativeMethod: TStringList;
                                        namingBypass: TStringList;
                                        out bridgeContentList: TStringList;
-                                       out unitInterfaceList: TStringList;
-                                       out unitImplementationList: TStringList);
+                                       out pasHeaderMethods: TStringList);
 
 function GetJavaClassName(selList: TStringList): string;
 procedure GetNativeMethodList(selList: TStringList; nativeEventMethodList: TStringList; namingBypassList: TStringList);
-procedure ProduceRawJniInterface(pascalMainUnit: string; jclasspath: string;
+
+procedure ProduceJavaCallJniInterface(pascalMainUnit: string; jclasspath: string;
                                  out bridgeContentList: TStringList;
-                                 out unitInterfaceList: TStringList;
-                                 out unitImplementationList: TStringList);
+                                 out pasHeaderMethods: TStringList
+                                 );
+
+procedure ProduceMainUnitInterfaceList(pasHeaderMethods: TStringList;  out mainUnitInterfaceList: TStringList);
+procedure ProduceMainUnitImplementationList(pasHeaderMethods: TStringList; out mainUnitImplementationList: TStringList);
+
+
 function GetCallSignature(const nativeMethod: string): string;
 procedure ProduceImportsDictionary(pathToJclass: string; out outimportsList: TStringList);
 
@@ -356,11 +361,11 @@ begin
   listParam.Free;
 end;
 
-procedure GetNativeMethodInterfaceList(pascalMainUnit: string; jclassname: string; nativeMethod: TStringList;
+
+procedure GetNativeMethodInterfaceList(methodNameSpace: string; jclassname: string; nativeMethod: TStringList;
                                        namingBypass: TStringList;
                                        out bridgeContentList: TStringList;
-                                       out unitInterfaceList: TStringList;
-                                       out unitImplementationList: TStringList);
+                                       out pasHeaderMethods: TStringList);
 var
   signature, outEventname, params, pasSignature, pasParams: string;
   listBody, listParam: TStringList;
@@ -370,7 +375,6 @@ var
   LazAndControlsEventsHeader: TStringList;
   LazAndControlsEventsBody: TStringList;
 
-  PasHeaderType: TStringList;
   PasHeaderProperty: TStringList;
   PasHeaderProcedure: TStringList;
   PasHeaderPublished: TStringList;
@@ -386,12 +390,10 @@ begin
   LazAndControlsEventsHeader:= TStringList.Create;
   LazAndControlsEventsBody:= TStringList.Create;
 
-  PasHeaderType:= TStringList.Create;
   PasHeaderProperty:= TStringList.Create;
   PasHeaderProcedure:= TStringList.Create;
   PasHeaderPublished:= TStringList.Create;
   PasBody:= TStringList.Create;
-
 
   for k:= 0 to nativeMethod.Count-1 do
   begin
@@ -487,9 +489,9 @@ begin
 
     //Raw jni
     if outPascalReturnType = '' then
-      LazAndControlsEventsBody.Add('   '+pascalMainUnit+'.'+outEventname+'('+params+');')
+      LazAndControlsEventsBody.Add('   '+methodNameSpace+'.'+outEventname+'('+params+');')
     else
-      LazAndControlsEventsBody.Add('  outReturn:= '+pascalMainUnit+'.'+outEventname+'('+params+');');
+      LazAndControlsEventsBody.Add('  outReturn:= '+methodNameSpace+'.'+outEventname+'('+params+');');
 
 
     if outPascalReturnType <> '' then
@@ -498,7 +500,7 @@ begin
       if outPascalReturnType = 'string' then
         LazAndControlsEventsBody.Add('  Result:=GetJString(env,outReturn);')
       else if outPascalReturnType = 'boolean' then
-         LazAndControlsEventsBody.Add('  Result:=JBool(outReturn);')
+         LazAndControlsEventsBody.Add('  Result:=GetJBoolean(outReturn);')
 
       else if outPascalReturnType = 'TDynArrayOfJByte' then
         LazAndControlsEventsBody.Add('  Result:=GetJObjectOfDynArrayOfJByte(env,outReturn);')
@@ -523,19 +525,14 @@ begin
 
     //raw jni
       if outPascalReturnType = '' then
-         PasHeaderType.Add('procedure '+outEventname+'('+pasSignature+');')
+         pasHeaderMethods.Add('procedure '+outEventname+'('+pasSignature+');')
       else                                                                        //TryNativeReConvertOutSignature
-         PasHeaderType.Add('function '+outEventname+'('+pasSignature+'): '+ outPascalReturnType+';');
+         pasHeaderMethods.Add('function '+outEventname+'('+pasSignature+'): '+ outPascalReturnType+';');
 
   end;//for
 
-  bridgeContentList.Clear;
-
-  bridgeContentList.Add(' ');
-
   //raw init
   //bridgeContentList.Add('//------------------- java_call_bridge_'+jclassname+'.pas  ----------------------');
-
   bridgeContentList.Add('unit java_call_bridge_'+jclassname+';');
   bridgeContentList.Add(' ');
   bridgeContentList.Add('{$mode delphi} ');
@@ -545,7 +542,7 @@ begin
   bridgeContentList.Add('uses');
   bridgeContentList.Add('  jni, jnihelper;');
   bridgeContentList.Add(' ');
-  for j:= 0 to  (LazAndControlsEventsHeader.Count-1) do
+  for j:= 0 to (LazAndControlsEventsHeader.Count-1) do
   begin
      bridgeContentList.Add(LazAndControlsEventsHeader.Strings[j]);
   end;
@@ -554,7 +551,7 @@ begin
   bridgeContentList.Add('implementation');
   bridgeContentList.Add(' ');
   bridgeContentList.Add('uses');
-  bridgeContentList.Add('  '+pascalMainUnit+';');
+  bridgeContentList.Add('  Unit1;'); //pascalMainUnit
   bridgeContentList.Add(' ');
   for j:= 0 to  (LazAndControlsEventsBody.Count-1) do
   begin
@@ -564,50 +561,10 @@ begin
   bridgeContentList.Add('end. ');
   bridgeContentList.Add(' ');
 
-  //*************************
-
-  unitInterfaceList.Clear;
-  //unitContentList.Add('//--------------------'+pascalMainUnit+'.pas ------------------------');
-  //unitInterfaceList.Add('//' + pascalMainUnit+'.pas ');
-  //unitInterfaceList.Add(' ');
-  //unitInterfaceList.Add('//interface');
-  //unitInterfaceList.Add(' ');
-  //unitInterfaceList.Add('//type');
-  //unitInterfaceList.Add('//TEnvJni=record');
-  //unitInterfaceList.Add('//  jEnv: PJNIEnv;');  //a pointer reference to the JNI environment,
-  //unitInterfaceList.Add('//  jThis: jObject;');  //a reference to the object making this call (or class if static-> lamwrawlib1.java).
-  //unitInterfaceList.Add('//end;');
-  //unitInterfaceList.Add(' ');
-  //unitInterfaceList.Add('//var');
-  //unitInterfaceList.Add('   //EnvJni: TEnvJni');
-
-  unitInterfaceList.Add(' ');
-  for j:= 0 to (PasHeaderType.Count-1) do
-  begin
-     unitInterfaceList.Add(PasHeaderType.Strings[j]);
-  end;
-  //unitInterfaceList.Add(' ');
-
-  //raw jni
-  //unitImplementationList.Add(' ');
-  //unitImplementationList.Add('//implementation');
-  //unitImplementationList.Add(' ');
-  unitImplementationList.Add(' ');
-  for j:= 0 to (PasHeaderType.Count-1) do
-  begin
-     unitImplementationList.Add(PasHeaderType.Strings[j]);
-     unitImplementationList.Add('begin');
-     unitImplementationList.Add('   //');
-     unitImplementationList.Add('end;');
-     unitImplementationList.Add(' ');
-  end;
-  //unitImplementationList.Add(' ');
-  //unitImplementationList.Add('//end.');
-
   LazAndControlsEventsHeader.Free;
   LazAndControlsEventsBody.Free;
 
-  PasHeaderType.Free;
+  //PasHeaderMethods.Free;
   PasHeaderProperty.Free;
   PasHeaderProcedure.Free;
   PasHeaderPublished.Free;
@@ -677,39 +634,80 @@ begin
 end;
 
 
-procedure ProduceRawJniInterface(pascalMainUnit: string; jclasspath: string;
+procedure ProduceMainUnitInterfaceList(pasHeaderMethods: TStringList;  out mainUnitInterfaceList: TStringList);
+var
+  j: integer;
+begin
+   // mainUnitInterfaceList.Clear;
+  //mainUnitInterfaceList.Add('//--------------------'+pascalMainUnit+'.pas ------------------------');
+  //mainUnitInterfaceList.Add('//' + pascalMainUnit+'.pas ');
+  //mainUnitInterfaceList.Add(' ');
+  //mainUnitInterfaceList.Add('//interface');
+  //mainUnitInterfaceList.Add(' ');
+  //mainUnitInterfaceList.Add('//type');
+  //mainUnitInterfaceList.Add('//TEnvJni=record');
+  //mainUnitInterfaceList.Add('//  jEnv: PJNIEnv;');  //a pointer reference to the JNI environment,
+  //mainUnitInterfaceList.Add('//  jThis: jObject;');  //a reference to the object making this call (or class if static-> lamwrawlib1.java).
+  //mainUnitInterfaceList.Add('//end;');
+  //mainUnitInterfaceList.Add(' ');
+  //mainUnitInterfaceList.Add('//var');
+  //mainUnitInterfaceList.Add('   //EnvJni: TEnvJni');
+
+  mainUnitInterfaceList.Add(' ');
+  for j:= 0 to (pasHeaderMethods.Count-1) do
+  begin
+     mainUnitInterfaceList.Add(pasHeaderMethods.Strings[j]);
+  end;
+
+end;
+
+procedure ProduceMainUnitImplementationList(pasHeaderMethods: TStringList; out mainUnitImplementationList: TStringList);
+var
+  j: integer;
+begin
+  mainUnitImplementationList.Add(' ');
+  for j:= 0 to (pasHeaderMethods.Count-1) do
+  begin
+     mainUnitImplementationList.Add(pasHeaderMethods.Strings[j]);
+     mainUnitImplementationList.Add('begin');
+     mainUnitImplementationList.Add('   //');
+     mainUnitImplementationList.Add('end;');
+     mainUnitImplementationList.Add(' ');
+  end;
+
+end;
+
+procedure ProduceJavaCallJniInterface(pascalMainUnit: string; jclasspath: string;
                                  out bridgeContentList: TStringList;
-                                 out unitInterfaceList: TStringList;
-                                 out unitImplementationList: TStringList);
+                                 out pasHeaderMethods: TStringList);
 var
   jclsName: string;
-  auxList: TStringList;
+  jSourceList: TStringList;
   nativeEventMethodList, namingBypassList: TStringList;
 begin
 
-     auxList:= TStringList.Create;
-     auxList.LoadFromFile(jclasspath);
+     jSourceList:= TStringList.Create;
+     jSourceList.LoadFromFile(jclasspath);
 
-     jclsName:= Trim(GetJavaClassName(auxList));
+     jclsName:= Trim(GetJavaClassName(jSourceList));
+
      nativeEventMethodList:= TStringList.Create;
      namingBypassList:= TStringList.Create;
 
-     //nativeEventMethod:= GetNativeMethod(auxList, namingBypass);
-     GetNativeMethodList(auxList, nativeEventMethodList, namingBypassList);
-
-     //GetNativeMethodInterface(clsName,nativeEventMethod,namingBypass, SynMemo2.Lines);
+     GetNativeMethodList(jSourceList, nativeEventMethodList, namingBypassList);
 
      if nativeEventMethodList.Count > 0 then
-             GetNativeMethodInterfaceList(pascalMainUnit, jclsName,
-                                       nativeEventMethodList,
-                                       namingBypassList,
-                                       bridgeContentList,
-                                       unitInterfaceList,
-                                       unitImplementationList);
+     begin
+        GetNativeMethodInterfaceList(pascalMainUnit, jclsName,
+                                     nativeEventMethodList,
+                                     namingBypassList,
+                                     bridgeContentList,
+                                     pasHeaderMethods);
 
+     end;
      nativeEventMethodList.Free;
      namingBypassList.Free;
-     auxList.Free;
+     jSourceList.Free;
 end;
 
 end.

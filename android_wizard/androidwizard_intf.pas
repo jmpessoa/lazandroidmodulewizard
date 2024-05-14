@@ -543,7 +543,7 @@ end;
 *)
 function TAndroidNoGUIRawJNILibDescriptor.DoInitDescriptor: TModalResult;    //3: raw jni lib
 var
-  nativeMethodEventList, auxList: TStringList;
+  nativeMethodEventList, auxList, outPasHeaderMethods: TStringList;
   //nativeMethodList: TStringList
   //outImportsList: TStringList;
   //javaClassList: TStringList;
@@ -586,7 +586,7 @@ begin
           FRawJniJClassWrapper.Add('            Log.e("Error loading JNI lib <'+LowerCase(FSmallProjName)+'>", "exception", e);');
           FRawJniJClassWrapper.Add('        }');
           FRawJniJClassWrapper.Add('    }');
-          FRawJniJClassWrapper.Add('    public native int Sum4(int x, int y);');
+          FRawJniJClassWrapper.Add('    public native int Sum3(int x, int y);');
           FRawJniJClassWrapper.Add('}');
           FRawJniJClassWrapperPath:= FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator+'libs'+DirectorySeparator+FSmallProjName+'.java';
           FRawJniJClassWrapper.SaveToFile(FRawJniJClassWrapperPath);
@@ -595,9 +595,14 @@ begin
         FJCallBridgeContentList:= TStringList.Create;
         FMainUnitInterfaceList:= TStringList.Create;
         FMainUnitImplementationList:= TStringList.Create;
+        outPasHeaderMethods:= TStringList.Create;
 
-        ProduceRawJniInterface('Unit1', FRawJniJClassWrapperPath, FJCallBridgeContentList,
-                                FMainUnitInterfaceList, FMainUnitImplementationList);
+        ProduceJavaCallJniInterface('Unit1', FRawJniJClassWrapperPath, FJCallBridgeContentList,
+                                outPasHeaderMethods); //outPasHeaderMethods
+
+
+        ProduceMainUnitInterfaceList(outPasHeaderMethods, FMainUnitInterfaceList);
+        ProduceMainUnitImplementationList(outPasHeaderMethods, FMainUnitImplementationList);
 
         FJCallBridgeContentList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+ DirectorySeparator+'java_call_bridge_'+FJavaClassName+'.pas');
         FJCallBridgeContentList.Free;
@@ -677,6 +682,7 @@ begin
         //outImportsList.Free;
         FRawJniJClassWrapper.Free;
         nativeMethodEventList.Free;
+        outPasHeaderMethods.Free;
 
         auxList:= TStringList.Create;
         auxList.Add('How to Use [lib'+LowerCase(FSmallProjName)+']: from Raw JNI library project');
@@ -1217,7 +1223,7 @@ end;
 
 function TAndroidNoGUIProjectDescriptor.DoInitDescriptor: TModalResult;
 var
-  nativeMethodEventList, auxList: TStringList;
+  nativeMethodEventList, auxList, outPasHeaderMethods: TStringList;
   //nativeMethodList: TStringList
   //outImportsList: TStringList;
   //javaClassList: TStringList;
@@ -1268,14 +1274,36 @@ begin
       FJCallBridgeContentList:= TStringList.Create;
       FMainUnitInterfaceList:= TStringList.Create;
       FMainUnitImplementationList:= TStringList.Create;
+      outPasHeaderMethods:= TStringList.Create;
 
-      ProduceRawJniInterface('Unit1', FRawJniJClassWrapperPath, FJCallBridgeContentList,
-                              FMainUnitInterfaceList, FMainUnitImplementationList);
+                                  //Unit1
+      ProduceJavaCallJniInterface('NoGUIAndroidModule1', FRawJniJClassWrapperPath, FJCallBridgeContentList,
+                              outPasHeaderMethods);
 
       FJCallBridgeContentList.SaveToFile(FAndroidProjectName+DirectorySeparator+'jni'+ DirectorySeparator+'java_call_bridge_'+FJavaClassName+'.pas');
       FJCallBridgeContentList.Free;
 
+      ProduceMainUnitInterfaceList(outPasHeaderMethods, FMainUnitInterfaceList);
+      ProduceMainUnitImplementationList(outPasHeaderMethods, FMainUnitImplementationList);
+
        AndroidFileDescriptor.MainUnitInterface:= FMainUnitInterfaceList.Text;
+
+       count:= FMainUnitImplementationList.Count;
+       for i:= 0 to count-1 do
+       begin
+          if Pos('function ',FMainUnitImplementationList.Strings[i]) > 0 then
+          begin
+             aux:= FMainUnitImplementationList.Strings[i];
+             aux:=  StringReplace(aux ,'function ', 'function TNoGUIAndroidModule1.',[rfIgnoreCase, rfReplaceAll]);
+             FMainUnitImplementationList.Strings[i]:= aux;
+          end
+          else if Pos('procedure ',FMainUnitImplementationList.Strings[i]) > 0 then
+          begin
+             aux:= FMainUnitImplementationList.Strings[i];
+             aux:=  StringReplace(aux ,'procedure ', 'procedure TNoGUIAndroidModule1.',[rfIgnoreCase, rfReplaceAll]);
+             FMainUnitImplementationList.Strings[i]:= aux;
+          end;
+       end;
        AndroidFileDescriptor.MainUnitImplementation:= FMainUnitImplementationList.Text;
 
       FMainUnitInterfaceList.Free;
@@ -1313,6 +1341,7 @@ begin
       //outImportsList.Free;
       FRawJniJClassWrapper.Free;
       nativeMethodEventList.Free;
+      outPasHeaderMethods.Free;
 
       auxList:= TStringList.Create;
       auxList.Add('How to Use [lib'+LowerCase(FSmallProjName)+'] from NoGUI DataModule based library project:');
@@ -2904,7 +2933,7 @@ end;
 
 function TAndroidProjectDescriptor.DoInitDescriptor: TModalResult;
 begin
-  //
+  //Result:= mrOK;
 end;
 
 
@@ -2963,7 +2992,7 @@ var
   pathToNdkToolchainsBinArm: string;
   pathToNdkToolchainsBinMips: string;
   pathToNdkToolchainsBinAarch64: string;
-  osys, fullpackame: string;      {windows or linux-x86 or linux-x86_64}
+  osys, auxpackame: string;      {windows or linux-x86 or linux-x86_64}
 begin
 
   inherited InitProject(AProject);
@@ -3115,8 +3144,6 @@ begin
     sourceList.Add(' ');
     sourceList.Add('var');
     sourceList.Add('  NoGUIApp: TNoGUIApp;');
-    sourceList.Add('  NoGUIAppName: string;');
-    sourceList.Add('  NoGUIAppjClassName: string;  //ex.  org/lamw/appnoguidemo1/AcbrJBridges1');
     sourceList.Add('');
   end else if FModuleType = 2 then//console executable app
   begin
@@ -3184,17 +3211,11 @@ begin
 
   if FModuleType = 1 then
   begin
-     fullpackame:= GetAppName(FPathToClassName);
+     auxpackame:= FPackagePrefaceName;
+     auxpackame:= StringReplace(auxpackame,'.','/',[rfReplaceAll]);
      sourceList.Add('  NoGUIApp:= TNoGUIApp.Create(nil);');
      sourceList.Add('  NoGUIApp.Title:= ''LAMW NoGUI JNI Android Library'';');
-
-     sourceList.Add('  NoGUIAppName:= '''+fullpackame+''';');
-     fullpackame:= StringReplace(fullpackame, '.', '/', [rfReplaceAll]);
-     sourceList.Add('  NoGUIAppjClassName:= '''+fullpackame+''';');
-
-     sourceList.Add('  NoGUIApp.AppName:=NoGUIAppName;');
-     sourceList.Add('  NoGUIApp.jClassName:=NoGUIAppjClassName;');
-
+     sourceList.Add('  NoGUIApp.jClassName:= '''+auxpackame + '/' + FSmallProjName+''';'); //ex:  org/lamw/appnoguidemo1/AcbrJBridges1
      sourceList.Add('  NoGUIApp.Initialize;');
      sourceList.Add('  NoGUIApp.CreateForm(TNoGUIAndroidModule1, NoGUIAndroidModule1);');
   end;
@@ -3994,15 +4015,6 @@ begin
    if ModuleType = 3  then
       sourceList.Add('  ' + GetInterfaceUsesSection); //sourceList.Add('  jnihelper;');
 
-   if ModuleType = 1 then //noGUI
-   begin
-    sourceList.Add('');
-    sourceList.Add('const');
-    sourceList.Add('  jClassName: string='''';' + '   //ex.  org/lamw/appnoguidemo1/AcbrJBridges1');
-    sourceList.Add('  jClassRef: JClass=nil;          //Pointer');
-    sourceList.Add('  jVMRef: PJavaVM=nil;            //Pointer');
-   end;
-
    sourceList.Add(GetInterfaceSource(Filename, SourceName, ResourceName));
 
    sourceList.Add(' ');
@@ -4040,7 +4052,8 @@ function TAndroidFileDescPascalUnitWithResource.GetInterfaceSource(const Filenam
                                                                    const SourceName   : string;
                                                                    const ResourceName : string): string;
 var
-  strList: TStringList;
+  strList, auxList: TStringList;
+  i, count: integer;
 begin
 
   strList:= TStringList.Create;
@@ -4063,6 +4076,7 @@ begin
   else if ModuleType = 1 then//NoGUI module
   begin
     strList.Add('type');
+
     if ResourceName <> '' then
       strList.Add('  T' + ResourceName + ' = class(TDataModule)')
     else
@@ -4072,6 +4086,18 @@ begin
       strList.Add('    {private declarations}');
       strList.Add('  public');
       strList.Add('    {public declarations}');
+      if ModuleType = 1 then
+      begin
+         //strList.AddStrings( Self.MainUnitInterface);
+         auxList:= TStringList.Create;
+         auxList.Text:= Self.MainUnitInterface;
+         count:= auxList.Count;
+         for i:= 0 to count-1 do
+         begin
+            strList.Add('    ' + auxList.Strings[i]);
+         end;
+         auxList.Free;
+      end;
       strList.Add('  end;');
   end
   else if ModuleType = 2 then //  console
@@ -4089,11 +4115,8 @@ begin
       strList.Add('  end;');
   end;
 
-  if ModuleType = 1 then
-     strList.AddStrings( Self.MainUnitInterface);
-
   if ModuleType = 3 then
-     strList.AddStrings( Self.MainUnitInterface);
+     strList.AddStrings(Self.MainUnitInterface);
 
   strList.Add('');
 
@@ -4108,6 +4131,10 @@ begin
   else if ModuleType = 1 then //NoGUI module
   begin
     strList.Add('var');
+    strList.Add('  jClassName: string;   //ex.  org/lamw/appnoguidemo1/AcbrJBridges1');
+    strList.Add('  jClassRef: JClass;');
+    strList.Add('  jVMRef: PJavaVM;');
+    strList.Add(' ');
     if ResourceName <> '' then
       strList.Add('  ' + ResourceName + ': T' + ResourceName + ';')
     else
