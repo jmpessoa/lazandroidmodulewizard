@@ -475,7 +475,7 @@ end;
 
 function TAndroidNoGUIRawJNILibDescriptor.GetLocalizedName: string;
 begin
-  Result:= 'LAMW Android raw jni .so lib';
+  Result:= 'LAMW [NoGUI] Raw JNI Library';   //
 end;
 
 function TAndroidNoGUIRawJNILibDescriptor.GetLocalizedDescription: string;
@@ -739,7 +739,7 @@ end;
 
 function TAndroidGUIProjectDescriptor.GetLocalizedName: string;
 begin
-  Result:= 'LAMW [GUI] Android Module';
+  Result:= 'LAMW [GUI] Android App';
 end;
 
 function TAndroidGUIProjectDescriptor.GetLocalizedDescription: string;
@@ -1205,19 +1205,19 @@ end;
 constructor TAndroidNoGUIProjectDescriptor.Create;
 begin
   inherited Create;
-  Name := 'Create a new LAMW [NoGUI] Android Module (.so)';
+  Name := 'Create a new [NoGUI] LAMW JNI Android Library (.so)';
 end;
 
 function TAndroidNoGUIProjectDescriptor.GetLocalizedName: string;
 begin
-  Result := 'LAMW [NoGUI] Android Module'; //fix thanks to Stephano!
+  Result := 'LAMW [NoGUI] JNI Library'; //fix thanks to Stephano!
 end;
 
 function TAndroidNoGUIProjectDescriptor.GetLocalizedDescription: string;
 begin
-  Result := 'LAMW [NoGUI] Android loadable module (.so)'+ LineEnding +
-            'using datamodule like form.'+ LineEnding +
-            'No[!] Form Designer/Android and no Components Bridges!'+ LineEnding +
+  Result := 'LAMW [NoGUI] JNI Android loadable module (.so)'+ LineEnding +
+            'using TDataModule like form....'+ LineEnding +
+            'No[!] Form Designer and no[!] Android Components Bridges!'+ LineEnding +
             'The project and library are maintained by Lazarus.'
 end;
 
@@ -3031,7 +3031,7 @@ begin
       AProject.CustomData.Values['Support'] := 'FALSE';
   end
   else if  FModuleType = 1 then //NoGUI
-    AProject.CustomData.Values['LAMW'] := 'NoGUIApp'
+    AProject.CustomData.Values['LAMW'] := 'NoGUIJniLibrary'
   else if FModuleType = 2 then
     AProject.CustomData.Values['LAMW'] := 'ConsoleApp'    // FModuleType =2
   else if FModuleType = 3  then

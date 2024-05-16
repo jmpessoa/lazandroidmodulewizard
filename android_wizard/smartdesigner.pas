@@ -3393,7 +3393,7 @@ begin
   hasControls:= False;
 
   if (LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'RawJniLibrary') or
-     (LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'NoGUIApp') then
+     (LazarusIDE.ActiveProject.CustomData.Values['LAMW'] = 'NoGUIJniLibrary') then
   begin
      UpdateProjectLpr4RawJniLibrary();
   end

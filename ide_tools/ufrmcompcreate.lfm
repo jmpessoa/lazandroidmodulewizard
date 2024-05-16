@@ -292,7 +292,7 @@ object FrmCompCreate: TFrmCompCreate
       OnClick = SpeedButton1Click
     end
     object GroupBoxMainUnit: TGroupBox
-      Left = 320
+      Left = 408
       Height = 63
       Top = 8
       Width = 216
@@ -311,7 +311,7 @@ object FrmCompCreate: TFrmCompCreate
       end
     end
     object GroupBoxJavaClass: TGroupBox
-      Left = 552
+      Left = 640
       Height = 63
       Top = 8
       Width = 88
@@ -366,11 +366,11 @@ object FrmCompCreate: TFrmCompCreate
     end
     object RadioGroupPasInterface: TRadioGroup
       Left = 78
-      Height = 54
+      Height = 62
       Top = 8
-      Width = 226
+      Width = 314
       AutoFill = True
-      Caption = 'Pascal Interface'
+      Caption = 'Pascal Interface Code'
       ChildSizing.LeftRightSpacing = 6
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
@@ -378,14 +378,14 @@ object FrmCompCreate: TFrmCompCreate
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 3
-      ClientHeight = 29
-      ClientWidth = 222
+      ClientHeight = 37
+      ClientWidth = 310
       Columns = 3
       ItemIndex = 0
       Items.Strings = (
         'GUI'
-        'NoGUI'
-        'RawJni'
+        'NoGUI jni'
+        'NoGUI raw jni'
       )
       OnSelectionChanged = RadioGroupPasInterfaceSelectionChanged
       TabOrder = 3

@@ -53,7 +53,7 @@
     <activity
         android:name="dummyAppName"
         android:configChanges="orientation|keyboardHidden|screenSize|screenLayout|fontScale"
-	       android:launchMode="standard" android:enabled="true" android:exported="true">
+	       android:launchMode="singleTask" android:enabled="true" android:exported="true">
         <intent-filter>
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
