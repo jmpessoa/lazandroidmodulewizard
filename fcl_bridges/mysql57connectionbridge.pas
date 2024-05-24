@@ -1,30 +1,39 @@
 unit mysql57connectionbridge;
 
+//fixed by Alcatiz
+//https://forum.lazarus.freepascal.org/index.php/topic,67249.0.html
+
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, mysql57conn, sqldb;
+
+  Classes, {SysUtils,} SQLDB, DB, MySQL57Conn;
 
 type
+
+  { TMySQL57ConnectionBridgeError }
+
+  TMySQL57ConnectionBridgeError = (err_NoError, err_CreateSQLConnection, err_CreateSQLTransaction, err_CreateSQLQuery);
 
   { TMySQL57ConnectionBridge }
 
   TMySQL57ConnectionBridge = class(TComponent)
   private
 
-    FDatabaseName: string;
-    FHostName: string;
-    FPort: integer;
-    FPassword: string;
-    FUserName: string;
-
-    procedure SetDatabaseName(database: string);
-    procedure SetHostName(host: string);
-    procedure SetPort(portnumber: integer);
-    procedure SetPassword(pwd: string);
-    procedure SetUserName(user: string);
+    FDataBaseName: String;
+    FHostName: String;
+    FPort: Integer;
+    FPassword: String;
+    FUserName: String;
+    FError: TMySQL57ConnectionBridgeError;
+    FIsConnected: boolean;
+    procedure SetDataBaseName(AValue: String);
+    procedure SetHostName(AValue: String);
+    procedure SetPassword(AValue: String);
+    procedure SetPort(AValue: Integer);
+    procedure SetUserName(AValue: String);
 
   protected
 
@@ -33,126 +42,131 @@ type
     MySQL57Connection: TMySQL57Connection;
     SQLQuery: TSQLQuery;
     SQLTransaction: TSQLTransaction;
-
     constructor Create(AOwner: TComponent); override;
-    destructor  Destroy; override;
-    function Connect(): boolean;
-    procedure BeginTransaction();
-    procedure EndTransaction();
-    procedure CommitTransaction();
+    destructor Destroy; override;
+    function Connect: boolean;
 
+    property IsConnected: boolean read FIsConnected write FIsConnected;
   published
-    property DatabaseName: string read FDatabaseName write SetDatabaseName;
-    property HostName: string read FHostName write SetHostName;
-    property Port: integer read FPort write FPort;
-    property Password: string read FPassword write SetPassword;
-    property UserName: string read FUserName write SetUserName;
+    property DataBaseName: String read FDataBaseName write SetDataBaseName;
+    property HostName: String read FHostName write SetHostName;
+    property Port: Integer read FPort write SetPort;
+    property Password: String read FPassword write SetPassword;
+    property UserName: String read FUserName write SetUserName;
+    property Error: TMySQL57ConnectionBridgeError read FError;
 
   end;
 
 
 implementation
 
-{ TMySQL57Bridge }
+{ TMySQL57ConnectionBridge }
 
-procedure TMySQL57ConnectionBridge.SetDatabaseName(database: string);
+procedure TMySQL57ConnectionBridge.SetDatabaseName(AValue: string);
 begin
-  FDatabaseName:= database;
+  if FDataBaseName = AValue then Exit;
+  FDataBaseName := AValue;
 end;
 
-procedure TMySQL57ConnectionBridge.SetHostName(host: string);
+procedure TMySQL57ConnectionBridge.SetHostName(AValue: string);
 begin
-  FHostName:= host;
+   if FHostName = AValue then Exit;
+   FHostName := AValue;
 end;
 
-procedure TMySQL57ConnectionBridge.SetPort(portnumber: integer);
+procedure TMySQL57ConnectionBridge.SetPort(AValue: integer);
 begin
-  FPort:= portnumber;
+    if FPort = AValue then Exit;
+    FPort := AValue;
 end;
 
-procedure TMySQL57ConnectionBridge.SetPassword(pwd: string);
+procedure TMySQL57ConnectionBridge.SetPassword(AValue: string);
 begin
-   FPassword:= pwd;
+    if FPassword = AValue then Exit;
+    FPassword := AValue;
 end;
 
-procedure TMySQL57ConnectionBridge.SetUserName(user: string);
+procedure TMySQL57ConnectionBridge.SetUserName(AValue: string);
 begin
-  FUserName:= user;
+  if FUserName = AValue then Exit;
+  FUserName := AValue;
 end;
 
+(* Allocates SQLDB components *)
 constructor TMySQL57ConnectionBridge.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  try
-    MySQL57Connection:=TMySQL57Connection.Create(nil);
-    MySQL57Connection.SkipLibraryVersionCheck:=true;
-  except
-     //ShowMessage('fail to init TMySQL57ConnectionBridge');
-  end;
 
-  try
-    SQLTransaction:=TSQLTransaction.Create(nil)
-  except
-     //ShowMessage('fail to init TMySQL57ConnectionBridge');
-  end;
+   FIsConnected:= False;
+   FError := err_NoError;
 
-  try
-    SQLQuery:=TSQLQuery.Create(nil);
-  except
-    //ShowMessage('fail to init TMySQL57ConnectionBridge');
-  end;
-
+   try
+     MySQL57Connection := TMySQL57Connection.Create(Nil);
+     MySQL57Connection.SkipLibraryVersionCheck := True;
+   except
+     FError := err_CreateSQLConnection;
+     Exit;
+   end;
+   try
+     SQLTransaction := TSQLTransaction.Create(Nil)
+   except
+     FError := err_CreateSQLTransaction;
+     Exit;
+   end;
+   try
+     SQLQuery := TSQLQuery.Create(Nil);
+   except
+     FError := err_CreateSQLQuery;
+   end;
 end;
 
-procedure TMySQL57ConnectionBridge.BeginTransaction();
-begin
-  SQLTransaction:=TSQLTransaction.Create(nil)
-end;
 
-procedure TMySQL57ConnectionBridge.EndTransaction();
-begin
-  SQLTransaction.Free;
-end;
-
-procedure TMySQL57ConnectionBridge.CommitTransaction();
-begin
-   SQLTransaction.Commit;
-end;
-
+(* Deallocates SQLDB components *)
 destructor TMySQL57ConnectionBridge.Destroy;
 begin
-  if SQLTransaction <> nil then SQLTransaction.Free;
-
-  SQLQuery.Free;
-
-  MySQL57Connection.Close;
-  MySQL57Connection.Free;
-
-  inherited Destroy;
+  if Assigned(SQLQuery)
+       then
+         begin
+           SQLQuery.Close;
+           SQLQuery.Free;
+         end;
+    if Assigned(SQLTransaction)
+       then
+         begin
+           SQLTransaction.Active := False;
+           SQLTransaction.Free;
+         end;
+    if Assigned(MySQL57Connection)
+       then
+         begin
+           MySQL57Connection.Connected := False;
+           MySQL57Connection.Free;
+         end;
+    inherited Destroy;
 end;
 
+(* Tries to connect to database *)
 function TMySQL57ConnectionBridge.Connect(): boolean;
 begin
-
-  Result:= False;
-  MySQL57Connection.DatabaseName:= FDatabaseName;
-  MySQL57Connection.HostName:= FHostName;
-  MySQL57Connection.Port:= FPort;
-  MySQL57Connection.Password:= FPassword;
-  MySQL57Connection.UserName:= FUserName;
-
-  SQLQuery.DataBase:= MySQL57Connection;
+  FIsConnected:= False;
+  Result := False;
+  MySQL57Connection.DatabaseName := FDataBaseName;
+  MySQL57Connection.HostName := FHostName;
+  MySQL57Connection.Port := FPort;
+  MySQL57Connection.Password := FPassword;
+  MySQL57Connection.UserName := FUserName;
+  MySQL57Connection.Transaction := SQLTransaction;
+  MySQL57Connection.CharSet := 'UTF8';
+  SQLQuery.DataBase := MySQL57Connection;
   try
-    MySQL57Connection.Open();
-    MySQL57Connection.Connected:= True;
+    MySQL57Connection.Open;
+    MySQL57Connection.Connected := True;
   except
-    MySQL57Connection.Connected:= False;
-     //ShowMessage('connection fail...');
+    MySQL57Connection.Connected := False;
   end;
-  Result:= MySQL57Connection.Connected;
 
-  if Result then  SQLQuery.Transaction:= TSQLTransaction.Create(nil);
-
+  FIsConnected:= MySQL57Connection.Connected;
+  Result := FIsConnected;
 
 end;
 

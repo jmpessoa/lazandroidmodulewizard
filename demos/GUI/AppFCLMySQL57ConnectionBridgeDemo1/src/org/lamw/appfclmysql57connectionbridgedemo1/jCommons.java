@@ -3,6 +3,9 @@ package org.lamw.appfclmysql57connectionbridgedemo1;
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+//import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,8 @@ import android.widget.LinearLayout;
 import android.content.Context;
 import android.os.Build;
 import android.view.Gravity;
+
+import java.io.File;
 //import android.util.Log;
 
 public class jCommons {
@@ -42,7 +47,7 @@ public class jCommons {
  /* //[endif_api14up]
  private int lgravity = Gravity.TOP | Gravity.LEFT;
  //[ifdef_api14up] */
-	private float lweight = 0;
+	private float lweight = 1.0f;
 	private boolean mRemovedFromParent = false;
 	private int algravity;
 	private int algravityAnchorId;
@@ -98,7 +103,14 @@ public class jCommons {
 		if ( (parent != null) && (aOwnerView != null) ) { parent.removeView(aOwnerView); }
 		parent = _viewgroup;
 		if ( (parent != null) && (aOwnerView != null) ) {
-			parent.addView(aOwnerView, newLayoutParams(parent,(ViewGroup.MarginLayoutParams)lparams));
+
+			if (parent instanceof LinearLayout) {
+				parent.addView(aOwnerView, 0, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+			else {
+				parent.addView(aOwnerView, newLayoutParams(parent, (ViewGroup.MarginLayoutParams) lparams));
+			}
+
 			lparams = null;
 			lparams = (ViewGroup.MarginLayoutParams)aOwnerView.getLayoutParams();
 			aOwnerView.setVisibility(android.view.View.VISIBLE);			
@@ -116,6 +128,15 @@ public class jCommons {
 	
 	public ViewGroup getParent() {
 		return parent;
+	}
+	
+	public void BringToFront() {
+		 if (Build.VERSION.SDK_INT < 19 ) {
+	       	if (parent!= null) {
+	       		parent.requestLayout();
+	       		parent.invalidate();	
+	       	}
+	     }		
 	}
 	
 	public void removeFromViewParent() {
@@ -178,6 +199,12 @@ public class jCommons {
 			r = aOwnerView.getMeasuredHeight();
 		}
 		
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {
+			if( aOwnerView.getHeight() > 0 ) r = aOwnerView.getHeight();			
+		}
+		
 		return r;
 	}
 
@@ -192,6 +219,12 @@ public class jCommons {
 		    aOwnerView.measure(widthMeasureSpec, heightMeasureSpec);
 		   			
 			r = aOwnerView.getMeasuredWidth();		
+		}
+		
+		//Fix the "match_parent" error with an "anchor" and 
+		// within the component a "half_parent" is set
+		if (r == android.view.ViewGroup.LayoutParams.MATCH_PARENT) {  
+			if( aOwnerView.getWidth() > 0 ) r = aOwnerView.getWidth(); 
 		}
 		
 		return r;		
@@ -299,11 +332,12 @@ public class jCommons {
 			}			
 		}        
  		if (lparams instanceof FrameLayout.LayoutParams) {
-			((FrameLayout.LayoutParams)lparams).gravity = lgravity;
+          		((FrameLayout.LayoutParams)lparams).gravity = lgravity;
 		}
  		
-		if (lparams instanceof LinearLayout.LayoutParams) {
-			((LinearLayout.LayoutParams)lparams).weight = lweight;
+		if (lparams instanceof LinearLayout.LayoutParams) { //.weight
+                        ((LinearLayout.LayoutParams)lparams).weight = lweight; //lweight = 1 <-- the trick!!
+			((LinearLayout.LayoutParams)lparams).gravity = lgravity; //lweight;
 		}
 		
 		if (aOwnerView != null) { aOwnerView.setLayoutParams(lparams); }
@@ -366,16 +400,16 @@ public class jCommons {
 		}
 	}
 
-	public void setCollapseMode(int _mode) {  //called on JNIPrompt
-		
+	public void setCollapseMode(int _mode) {  
+		//AppCompat theme
 	}
 		
-    public void setFitsSystemWindows(boolean _value) {
-    	
-    }
+        public void setFitsSystemWindows(boolean _value) {
+    	     //AppCompat theme
+        }
 
-    public void setScrollFlag(int _collapsingScrollFlag) {   //called in OnJNIPrompt
-  
+    public void setScrollFlag(int _collapsingScrollFlag) {  
+        //AppCompat theme
     }
 
     public int getColorFromResources(Context c, int colorResId) {    	
@@ -473,10 +507,50 @@ public class jCommons {
 	}
 
 	public static void ActionBarSetIcon(Controls controls, Drawable icon) {
+        ActionBar actionBar = (controls.activity).getActionBar();
+		
+		if (actionBar != null){		
+			if( icon != null ){
+				actionBar.setDisplayShowHomeEnabled(true);	       
+				actionBar.setIcon(icon);
+			} else {
+				actionBar.setDisplayShowHomeEnabled(false);
+				actionBar.setIcon(null);
+			}
+		}
+	}
+	
+	public static void ActionBarShowHome(Controls controls, boolean showHome){
 		ActionBar actionBar = (controls.activity).getActionBar();
-		if (actionBar != null)
-			( controls.activity).getActionBar().setIcon(icon);;
-
+		
+		if (actionBar != null){
+			actionBar.setDisplayHomeAsUpEnabled(showHome);
+			actionBar.setDisplayShowHomeEnabled(showHome);	        						
+		}
+	}
+	
+	public static void ActionBarSetColor(Controls controls, int color){
+		ActionBar actionBar = (controls.activity).getActionBar();
+		
+		if (actionBar != null){									
+				 actionBar.setBackgroundDrawable(new ColorDrawable(color));						
+		}
+	}
+	
+	public static void NavigationSetColor(Controls controls, int color){
+			
+			if (Build.VERSION.SDK_INT >= 21) {								
+					controls.activity.getWindow().setNavigationBarColor(color);								
+		    }
+			
+	}
+	
+	public static void StatusSetColor(Controls controls, int color){
+			
+			if (Build.VERSION.SDK_INT >= 21) {								
+					controls.activity.getWindow().setStatusBarColor(color);								
+		    }
+					
 	}
 
 	public static void ActionBarSetTabNavigationMode(Controls controls) {
@@ -520,4 +594,17 @@ public class jCommons {
 	public static boolean IsAppCompatProject() {
 		return false;
 	}
+
+
+        public static boolean IsAppCompatProject(Controls controls) {
+                //if (controls.activity instanceof AppCompatActivity) return true;
+		  //else return false;
+                return false;
+	}
+
+
+	public static Uri FileProviderGetUriForFile(Controls controls, File file) {
+			return jSupported.FileProviderGetUriForFile(controls, file);
+	}
+
 }

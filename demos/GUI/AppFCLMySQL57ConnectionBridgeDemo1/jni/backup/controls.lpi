@@ -16,7 +16,7 @@
       <ResourceType Value="res"/>
     </General>
     <CustomData Count="13">
-      <Item0 Name="BuildSystem" Value="Ant"/>
+      <Item0 Name="BuildSystem" Value="Gradle"/>
       <Item1 Name="CanCreateResMipmapFolder" Value="NO"/>
       <Item2 Name="KeepMyBuildGradleWhenReopen" Value="NO"/>
       <Item3 Name="LAMW" Value="GUI"/>

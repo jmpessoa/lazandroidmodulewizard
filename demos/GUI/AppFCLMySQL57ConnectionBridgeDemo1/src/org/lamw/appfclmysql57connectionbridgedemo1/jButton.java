@@ -21,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-public class jButton extends Button {
+public class jButton extends Button { //androidx.appcompat.widget.AppCompatButton
 
 	private Controls controls = null;   // Control Class for Event
 	private jCommons LAMWCommon;
@@ -94,6 +94,12 @@ public class jButton extends Button {
 
 	public long GetPasObj() {
 		return LAMWCommon.getPasObj();
+	}
+	
+	public void BringToFront() {
+		this.bringToFront();
+		
+		LAMWCommon.BringToFront();
 	}
 
 	public  void SetViewParent(ViewGroup _viewgroup ) {
@@ -208,28 +214,17 @@ public class jButton extends Button {
 		this.performLongClick();
 	}
 
-	private Drawable GetDrawableResourceById(int _resID) {
-		return (Drawable)( this.controls.activity.getResources().getDrawable(_resID));
-	}
-	
-	private int GetDrawableResourceId(String _resName) {
-		  try {
-		     Class<?> res = R.drawable.class;
-		     Field field = res.getField(_resName);  //"drawableName" ex. "ic_launcher"
-		     int drawableId = field.getInt(null);
-		     return drawableId;
-		  }
-		  catch (Exception e) {
-		     return 0;
-		  }
-	}
-
-	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"
-		this.setBackgroundResource(GetDrawableResourceId(_imgResIdentifier));			
+	public  void SetBackgroundByResIdentifier(String _imgResIdentifier) {	   // ..res/drawable  ex. "ic_launcher"		
+		this.setBackgroundResource( controls.GetDrawableResourceId(_imgResIdentifier) );			
 	}	
 	
-	public  void SetBackgroundByImage(Bitmap _image) {	
+	public  void SetBackgroundByImage(Bitmap _image) {
+	  if(_image == null) return;
+	  
 	  Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+	  
+	  if( d == null ) return;
+	  
       //[ifdef_api16up]
 	  if(Build.VERSION.SDK_INT >= 16) 
           this.setBackground(d);
@@ -250,6 +245,13 @@ public class jButton extends Button {
 	//http://www.android--tutorials.com/2016/03/android-set-button-drawableleft.html
 	public void SetCompoundDrawables(Bitmap _image, int _side) {		
 		Drawable d = new BitmapDrawable(controls.activity.getResources(), _image);
+		
+		// by ADiV
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );
@@ -263,8 +265,15 @@ public class jButton extends Button {
 	}
 		
 	public void SetCompoundDrawables(String _imageResIdentifier, int _side) {
-		int id = GetDrawableResourceId(_imageResIdentifier);
-		Drawable d = GetDrawableResourceById(id);  		
+		
+		Drawable d = controls.GetDrawableResourceById(controls.GetDrawableResourceId(_imageResIdentifier));
+		
+		// by ADiV
+		if( d == null ){
+			this.setCompoundDrawables(null, null, null, null);
+			return;
+		}
+		
 		int h = d.getIntrinsicHeight(); 
 		int w = d.getIntrinsicWidth();   
 		d.setBounds( 0, 0, w, h );		
@@ -288,7 +297,8 @@ public class jButton extends Button {
 			   if (background instanceof ColorDrawable) {
 			     color = ((ColorDrawable)this.getBackground()).getColor();
 			     mBackgroundColor = color;
-		         shape.setColorFilter(color, Mode.SRC_ATOP);			        			        			         
+		         shape.setColorFilter(color, Mode.SRC_ATOP);
+		         shape.setAlpha(((ColorDrawable)this.getBackground()).getAlpha()); // By ADiV
 		          //[ifdef_api16up]
 		  	      if(Build.VERSION.SDK_INT >= 16) { 
 		             this.setBackground((Drawable)shape);
@@ -416,4 +426,13 @@ public class jButton extends Button {
    public void SetFocus() {
    	  this.requestFocus();
    }
+   
+   public void ApplyDrawableXML(String _xmlIdentifier) {
+	   this.setBackgroundResource(controls.GetDrawableResourceId(_xmlIdentifier));		
+   }
+
+	public void Append(String _txt) {
+		this.append(_txt);
+	}
+
 }

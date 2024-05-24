@@ -1,7 +1,13 @@
 public native void pOnClickWidgetItem(long pasobj, int position, boolean checked);
+public native void pOnClickImageItem(long pasobj, int position);
 public native void pOnClickCaptionItem(long pasobj, int position, String caption);
+public native void pOnClickItemTextLeft(long pasobj, int position, String caption);
+public native void pOnClickItemTextCenter(long pasobj, int position, String caption);
+public native void pOnClickItemTextRight(long pasobj, int position, String caption);
 public native void pOnListViewLongClickCaptionItem(long pasobj, int position, String caption);
 public native int pOnListViewDrawItemCaptionColor(long pasobj, int position, String caption);
+public native String pOnListViewDrawItemCustomFont(long pasobj, int position, String caption);
+public native int pOnListViewDrawItemBackgroundColor(long pasobj, int position);
 public native Bitmap pOnListViewDrawItemBitmap(long pasobj, int position, String caption);
 public native void pOnWidgeItemLostFocus(long pasobj, int position, String widgetText);
 public native void pOnListViewScrollStateChanged(long pasobj, int firstVisibleItem, int visibleItemCount, int totalItemCount, boolean lastItemReached);

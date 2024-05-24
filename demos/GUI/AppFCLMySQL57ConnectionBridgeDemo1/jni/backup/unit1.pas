@@ -14,14 +14,14 @@ type
 
   TAndroidModule1 = class(jForm)
     ButtonConnect: jButton;
-    jButtonQuery: jButton;
+    jButton1: jButton;
     jEditText1: jEditText;
     jListView1: jListView;
     jTextView1: jTextView;
     jTextView2: jTextView;
     MySQL57ConnectionBridge1: TMySQL57ConnectionBridge;
     procedure ButtonConnectClick(Sender: TObject);
-    procedure jButtonQueryClick(Sender: TObject);
+    procedure jButton1Click(Sender: TObject);
   private
     {private declarations}
   public
@@ -38,7 +38,7 @@ implementation
 
 { TAndroidModule1 }
 
-procedure TAndroidModule1.jButtonQueryClick(Sender: TObject);
+procedure TAndroidModule1.jButton1Click(Sender: TObject);
 begin
 
   ShowMessage('Query a real dabase info and uncomment the code!');

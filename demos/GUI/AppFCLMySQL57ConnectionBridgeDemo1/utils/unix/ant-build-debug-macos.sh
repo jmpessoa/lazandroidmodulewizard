@@ -1,5 +1,5 @@
-export PATH=/adt32/ant/bin:$PATH
+export PATH=/android/ant/bin:$PATH
 export JAVA_HOME=${/usr/libexec/java_home}
 export PATH=${JAVA_HOME}/bin:$PATH
-cd /android/workspace/AppFCLMySQL57ConnectionBridgeDemo1
+cd C:\android\workspace\AppFCLMySQL57ConnectionBridgeDemo1\utils\unix\
 ant -Dtouchtest.enabled=true debug

@@ -38,7 +38,7 @@ type
     FPathToAndroidProject: string;  //Included Path Delimiter!
     FPathToAndroidSDK: string;  //Included Path Delimiter!
     FPathToAndroidNDK: string;  //Included Path Delimiter!
-    FPathToJavaJDK: string;
+    FPathToJavaJDK: string;  //Included Path Delimiter!
     FSmallProjName: string;
     FGradleVersion: string;
     FPrebuildOSYS: string;
@@ -113,7 +113,7 @@ type
     procedure UpdateFCLControls(ProjFile: TLazProjectFile; AndroidForm: TAndroidForm);
     procedure UpdateProjectStartModule(const NewName: string; moduleType: integer);
     procedure DoBuildGradle(minSdkApi: string; targetApi: string);
-    procedure TryProduceJavaVersion(pathToJDK: string);
+    procedure TryProduceJavaVersion(pathToJDKRelease: string);
     function IsLaz4Android(): boolean;
     function GetAndroidPluginVersion(gradleVersion: string; mainJavaVersion: string): string;  //new!
     function GetGradleVersionAsBigNumber(gradleVersionAsString: string): integer;
@@ -681,37 +681,43 @@ begin
 
 end;
 
-procedure TLamwSmartDesigner.TryProduceJavaVersion(pathToJDK: string);
+procedure TLamwSmartDesigner.TryProduceJavaVersion(pathToJDKRelease: string); //
 var
   list: TStringList;
   i, p, len: integer;
   version, aux, mainVersion: string;
 begin
    list:= TStringList.Create;
+
    //list.LoadFromFile('C:\Program Files\Eclipse Adoptium\jdk-11.0.21.9-hotspot\release');
    //list.LoadFromFile('C:\Program Files\Java\jdk1.8.0_151\release');
-   list.LoadFromFile(pathToJDK + PathDelim + 'release');
-   aux:='';
-   i:= 0;
-   while (aux = '') and (i < list.Count) do
+
+   if FileExists(pathToJDKRelease) then
    begin
-      p:= Pos('JAVA_VERSION=', list.Strings[i]);
-      if p > 0 then
-      begin
-        aux:= list.Strings[i];
-        i:= list.Count; //exit while
-      end;
-      i:= i + 1;
+     list.LoadFromFile(pathToJDKRelease);
+     aux:='';
+     i:= 0;
+     while (aux = '') and (i < list.Count) do
+     begin
+        p:= Pos('JAVA_VERSION=', list.Strings[i]);
+        if p > 0 then
+        begin
+          aux:= list.Strings[i];
+          i:= list.Count; //exit while
+        end;
+        i:= i + 1;
+     end;
+     if p > 0 then
+     begin
+       len:= Length('JAVA_VERSION=');
+       version:= Trim(Copy(aux, p+len, 15));
+       aux:= TrimChar(version, '"');
+       FJavaBigVersion:= aux;  //11.0.21  or 1.8.0_151
+       mainVersion:= SplitStr(aux, '.');  //main number: 11 or 17 or 21 or 1 (ex.: 1.8)
+       FJavaMainVersion:=Trim(mainVersion);
+     end;
    end;
-   if p > 0 then
-   begin
-     len:= Length('JAVA_VERSION=');
-     version:= Trim(Copy(aux, p+len, 15));
-     aux:= TrimChar(version, '"');
-     FJavaBigVersion:= aux;  //11.0.21  or 1.8.0_151
-     mainVersion:= SplitStr(aux, '.');  //main number: 11 or 17 or 21 or 1 (ex.: 1.8)
-     FJavaMainVersion:=Trim(mainVersion);
-   end;
+
    list.Free;
 end;
 
@@ -735,7 +741,7 @@ begin
 
   gradleVersionBigNumber:= GetGradleVersionAsBigNumber(FGradleVersion);
 
-  TryProduceJavaVersion(FPathToJavaJDK);
+  TryProduceJavaVersion(FPathToJavaJDK + 'release'); //FPathToJavaJDK Included Path Delimiter!
   androidPluginVersion:= GetAndroidPluginVersion(FGradleVersion, FJavaMainVersion); //'7.1.3';
 
   isAppCompatTheme:= False;

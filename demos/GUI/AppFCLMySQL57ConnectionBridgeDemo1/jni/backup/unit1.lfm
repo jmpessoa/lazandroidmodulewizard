@@ -80,7 +80,7 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'select * from...'
+    Text = 'select * from TABFOO'
     Alignment = taLeft
     InputTypeEx = itxText
     MaxTextLength = -1
@@ -100,7 +100,7 @@ object AndroidModule1: TAndroidModule1
     CaptureBackPressed = False
     GravityInParent = lgNone
   end
-  object jButtonQuery: jButton
+  object jButton1: jButton
     MarginLeft = 15
     MarginTop = 5
     MarginRight = 15
@@ -116,13 +116,13 @@ object AndroidModule1: TAndroidModule1
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
     LayoutParamHeight = lpWrapContent
-    Text = 'Query...'
+    Text = 'Query Select From...'
     BackgroundColor = colbrDefault
     FontColor = colbrDefault
     FontSize = 0
     FontSizeUnit = unitDefault
     GravityInParent = lgNone
-    OnClick = jButtonQueryClick
+    OnClick = jButton1Click
   end
   object jListView1: jListView
     MarginLeft = 15
@@ -135,7 +135,7 @@ object AndroidModule1: TAndroidModule1
     Width = 329
     Height = 96
     Visible = True
-    Anchor = jButtonQuery
+    Anchor = jButton1
     PosRelativeToAnchor = [raBelow]
     PosRelativeToParent = []
     LayoutParamWidth = lpMatchParent
