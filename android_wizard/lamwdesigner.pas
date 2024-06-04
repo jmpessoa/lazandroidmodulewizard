@@ -788,7 +788,8 @@ uses
   IDEExternToolIntf, laz2_XMLRead, FileUtil, LazFileUtils, FPimage, typinfo,
   uFormSizeSelect, LamwSettings, SmartDesigner, jImageListEditDlg, NinePatchPNG,
   customdialog, togglebutton, switchbutton,
-  Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas, gridview, Spinner, seekbar,
+  {$IFNDEF Darwin} Laz_And_GLESv1_Canvas, Laz_And_GLESv2_Canvas,{$ENDIF}
+  gridview, Spinner, seekbar,
   radiogroup, ratingbar, digitalclock, analogclock, surfaceview,
   autocompletetextview, drawingview, chronometer, viewflipper, videoview,
   comboedittext, toolbar, expandablelistview, framelayout, linearlayout, captionpanel,
@@ -5290,11 +5291,11 @@ initialization
   RegisterAndroidWidgetDraftClass(jAutoTextView, TDraftAutoTextView);
   RegisterAndroidWidgetDraftClass(jComboEditText, TDraftComboEditText);
   RegisterAndroidWidgetDraftClass(jDrawingView, TDraftDrawingView);
-
   // TODO::(default drawing and layout)
+  {$IFNDEF Darwin}
   RegisterAndroidWidgetDraftClass(jCanvasES2, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jCanvasES1, TDraftWidget);
-
+  {$ENDIF}
   RegisterAndroidWidgetDraftClass(jChronometer, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jViewFlipper, TDraftWidget);
   RegisterAndroidWidgetDraftClass(jVideoView, TDraftWidget);

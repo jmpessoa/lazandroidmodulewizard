@@ -15,8 +15,10 @@ uses
   gif,
   zoomableimageview,
   Laz_And_Controls,
+  {$IFNDEF Darwin}
   Laz_And_GLESv1_Canvas,
   Laz_And_GLESv2_Canvas,
+  {$ENDIF}
   comboedittext,
   customdialog,
   digitalClock,
@@ -100,8 +102,10 @@ begin
   {$I jcustomcamera_icon.lrs}
   {$I jBitmap_icon.lrs}
   {$I jgif_icon.lrs}
+  {$IFNDEF Darwin}
   {$I jcanvases1_icon.lrs}
   {$I jcanvases2_icon.lrs}
+  {$ENDIF}
   {$I jviewflipper_icon.lrs}
   {$I jvideoview_icon.lrs}
   {$I jtoolbar_icon.lrs}
@@ -156,8 +160,10 @@ begin
       jCustomCamera,
       jBitmap,
       jGif,
+      {$IFNDEF Darwin}
       jCanvasES1,
       jCanvasES2,
+      {$ENDIF}
       jViewFlipper,
       jVideoView,
       jToolbar,
@@ -169,8 +175,8 @@ begin
       jZBarcodeScannerView
     ]
   );
-  RegisterClasses([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
-  RegisterNoIcon([jApp, jForm, jControl, jVisualControl, jGLViewEvent]);
+  RegisterClasses([jApp, jForm, jControl, jVisualControl{$IFNDEF Darwin}, jGLViewEvent{$ENDIF}]);
+  RegisterNoIcon([jApp, jForm, jControl, jVisualControl{$IFNDEF Darwin}, jGLViewEvent{$ENDIF}]);
 end;
   
 end.
