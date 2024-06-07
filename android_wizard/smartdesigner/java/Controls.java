@@ -1,4 +1,4 @@
-package com.example.appnotificationmanagerdemo2;
+package org.lamw.appcompatkref;
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.3 - 17 December - 2021
 //RAD Android: Project Wizard, Form Designer and Components Development Model!
@@ -200,7 +200,6 @@ public class Controls {
   static {
      /*libsmartload*/
   }
-
   //
   public Activity activity;  // Activity
   public RelativeLayout appLayout; // Base Layout
@@ -503,9 +502,10 @@ public class Controls {
 
   //by jmpessoa
   public int systemGetOrientation() {
-	if (this.activity == null) return 0;
-	
-    return (this.activity.getResources().getConfiguration().orientation);
+	if (this.activity == null)
+      return 0;
+    else
+      return (this.activity.getResources().getConfiguration().orientation);
   }
 
   public void classSetNull(Class<?> object) {

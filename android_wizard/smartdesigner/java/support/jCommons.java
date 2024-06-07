@@ -1,5 +1,6 @@
-package org.lamw.appcompatnavigationdrawerdemo3;
+package org.lamw.appcompatkref;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ColorDrawable;
@@ -347,6 +348,7 @@ public class jCommons {
 		countParentRule = countParentRule + 1;
 	}
 	
+	@SuppressLint("WrongConstant")
 	public void setLayoutAll(int _idAnchor) {
 		lparams.width  = lparamW;
 		lparams.height = lparamH;

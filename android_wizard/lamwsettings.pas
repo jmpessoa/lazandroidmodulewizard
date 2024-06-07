@@ -106,9 +106,9 @@ const
   //ref https://android-developers.googleblog.com/2023/10/androidx-minsdkversion-19.html
 
   AppCompatLibs: TAppCompatLibs = (
-    (MinAPI:28;Name:'androidx.appcompat:appcompat:1.6.1'),  //1.3.1
+    (MinAPI:28;Name:'androidx.appcompat:appcompat:1.7.0'),  //1.3.1
     (MinAPI:28;Name:'androidx.multidex:multidex:2.0.1'),
-    (MinAPI:28;Name:'com.google.android.material:material:1.11.0')  //1.2.1
+    (MinAPI:28;Name:'com.google.android.material:material:1.12.0')  //1.2.1
   );
 
   SupportLibs: TSupportLibs = (

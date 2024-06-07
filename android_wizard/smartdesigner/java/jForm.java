@@ -1,4 +1,4 @@
-package org.lamw.apphellodemo1;
+package org.lamw.appcompatkref;
 
 
 //LAMW: Lazarus Android Module Wizard - version 0.8.6.2 - 15 July - 2021 [jForm.java]
@@ -114,14 +114,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.lang.Object;
-
-//need by GDXGme framework...
-//import javax.microedition.khronos.opengles.GL10;
-//import javax.microedition.khronos.egl.EGL10;
-//import javax.microedition.khronos.egl.EGLContext;
-//import javax.microedition.khronos.egl.EGLDisplay;
-//import javax.microedition.khronos.egl.EGLSurface;
-
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.app.KeyguardManager;
@@ -1303,6 +1295,7 @@ public class jForm {
 //  Android Device
 // -------------------------------------------------------------------------
 // Result: Phone Number - LORDMAN
+    @SuppressLint("HardwareIds")
     public String GetDevPhoneNumber() {
         String f = "";
 
@@ -1311,7 +1304,7 @@ public class jForm {
             try {
                 f = telephony.getLine1Number();
             } catch (SecurityException ex) {
-                Log.e("getDevPhoneNumber", ex.getMessage());
+                Log.e("getDevPhoneNumber", Objects.requireNonNull(ex.getMessage()));
             }
         }
 
@@ -1488,28 +1481,23 @@ public class jForm {
 
     // by ADiV
     private String GetAppVersion(String patternString, String inputString) {
+        String result= "";
         try {
             //Create a pattern
             Pattern pattern = Pattern.compile(patternString);
-            
-            if (null == pattern) return "";            
-
-            //Match the pattern string in provided string
-            Matcher matcher = pattern.matcher(inputString);
-            if (null != matcher && matcher.find()) {
-                String r = matcher.group(1);
-
-                if (r == null) return "";                
-
-                return r;
+            if (pattern != null) {//Match the pattern string in provided string
+                Matcher matcher = pattern.matcher(inputString);
+                if (matcher != null) {
+                    if (matcher.find()) {
+                        String r = matcher.group(1);
+                        if (r != null) result = r;
+                    }
+                }
             }
-
         } catch (PatternSyntaxException ex) {
-
             ex.printStackTrace();
         }
-
-        return "";
+        return result;
     }
 
     // by ADiV
@@ -2382,7 +2370,7 @@ public class jForm {
 
     public void Restart(int _delay) {
         PendingIntent intent = PendingIntent.getActivity(controls.activity.getBaseContext(), 0,
-                                new Intent(controls.activity.getIntent()), PendingIntent.FLAG_CANCEL_CURRENT);
+                                new Intent(controls.activity.getIntent()), PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         
         if (intent == null)   return;
         
@@ -2556,9 +2544,10 @@ public class jForm {
         if(GetScreenRealXdpi() != 0)
         {screen_width = GetRealScreenWidth() / GetScreenRealXdpi();}
 		
-        if(GetScreenRealYdpi() != 0)
-        screen_height = GetRealScreenHeight() / GetScreenRealYdpi();		
-		
+        if(GetScreenRealYdpi() != 0) {
+            screen_height = GetRealScreenHeight() / GetScreenRealYdpi();
+        }
+
         r = Math.sqrt(screen_width*screen_width + screen_height*screen_height);	
 		
         return r;
@@ -2576,13 +2565,14 @@ public class jForm {
     public ByteBuffer GetByteBufferFromImage(Bitmap _bitmap) {
         if (_bitmap == null) {
             return null;
+        } else {
+            int w = _bitmap.getWidth();
+            int h = _bitmap.getHeight();
+            ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w * h * 4);
+            _bitmap.copyPixelsToBuffer(graphicBuffer);
+            graphicBuffer.rewind();  //reset position
+            return graphicBuffer;
         }
-        int w = _bitmap.getWidth();
-        int h = _bitmap.getHeight();
-        ByteBuffer graphicBuffer = ByteBuffer.allocateDirect(w * h * 4);
-        _bitmap.copyPixelsToBuffer(graphicBuffer);
-        graphicBuffer.rewind();  //reset position
-        return graphicBuffer;
     }
 
     private String getRealPathFromURI(Uri contentUri) {

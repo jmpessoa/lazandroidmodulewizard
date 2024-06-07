@@ -1,4 +1,4 @@
-package org.lamw.appcompatescposthermalprinterdemo1;
+package org.lamw.appcompatkref;
 
 //Lamw: Lazarus Android Module Wizard - version 0.8.6 - 30 October - 2020
 //Form Designer and Components development model!
@@ -175,7 +175,10 @@ public class App extends AppCompatActivity {
     protected void onStop() { super.onStop(); controls.jAppOnStop();} 
     	                                        
     @Override
-    public    void onBackPressed() { controls.jAppOnBackPressed();}
+    public    void onBackPressed() {
+        super.onBackPressed();
+        controls.jAppOnBackPressed();
+    }
     
     @Override
     public    void onConfigurationChanged(Configuration newConfig) {

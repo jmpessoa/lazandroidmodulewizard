@@ -1589,7 +1589,7 @@ begin
 
   strList.Add('buildscript {');
   if isKotlinSupported then
-    strList.Add('    ext.kotlin_version = ''1.6.10''');
+    strList.Add('    ext.kotlin_version = ''2.0.0''');
 
   strList.Add('    repositories {');
   strList.Add('        mavenCentral()');
@@ -1613,7 +1613,7 @@ begin
   strList.Add('apply plugin: ''com.android.application''');
 
   if isKotlinSupported then
-   strList.Add('apply plugin: ''kotlin-android''');
+   strList.Add('apply plugin: ''org.jetbrains.kotlin.android''');
 
   strList.Add('android {');
 
@@ -1632,8 +1632,16 @@ begin
   strList.Add('        }');
   strList.Add('    }');
   strList.Add('    compileOptions {');
-  strList.Add('        sourceCompatibility 1.8');
-  strList.Add('        targetCompatibility 1.8');
+  if not isKotlinSupported then
+  begin
+    strList.Add('        sourceCompatibility 1.8');
+    strList.Add('        targetCompatibility 1.8');
+  end
+  else
+  begin
+    strList.Add('        sourceCompatibility = JavaVersion.VERSION_17');
+    strList.Add('        targetCompatibility = JavaVersion.VERSION_17');
+  end;
   strList.Add('    }');
   strList.Add('    compileSdk '+compileSdkVersion+'');
 
@@ -1686,6 +1694,12 @@ begin
     strList.Add('       abortOnError false');
     strList.Add('    }');
   end;
+  if isKotlinSupported then
+  begin
+    strList.Add('    kotlinOptions {');
+    strList.Add('      jvmTarget = ''17''');
+    strList.Add('    }');
+  end;
   strList.Add('}');
 
   strList.Add('dependencies {');
@@ -1702,8 +1716,8 @@ begin
     end;
     if isKotlinSupported then
     begin
-       strList.Add('    '+directive+'("androidx.core:core-ktx:1.3.2")');
-       strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');
+       strList.Add('    '+directive+'("androidx.core:core-ktx:1.13.1")');
+       //strList.Add('    '+directive+'("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")');//??
     end;
   end
   else if isGradleBuildSystem then//only gradle not AppCompat
