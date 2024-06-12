@@ -3585,6 +3585,14 @@ begin
   customOptions_mips  := customOptions_mips  +' -FD' + pathToNdkToolchainsBinMips;
 
   {Others}
+
+  AProject.LazCompilerOptions.ExecuteBefore.Command:='before_build.bat';
+  AProject.LazCompilerOptions.ExecuteAfter.Command:= 'after_build.bat';
+  {$ifdef unix}
+  AProject.LazCompilerOptions.ExecuteBefore.Command:= 'before_build.sh';
+  AProject.LazCompilerOptions.ExecuteAfter.Command:= 'after_build.sh';
+  {$endif}
+
   AProject.LazCompilerOptions.CustomOptions:= customOptions_default;
 
   auxList.Add('<Libraries Value="'+libraries_x86+'"/>');

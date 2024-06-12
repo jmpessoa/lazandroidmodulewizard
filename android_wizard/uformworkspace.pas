@@ -250,7 +250,9 @@ var
 
 implementation
 
-uses LamwSettings;
+uses
+  {$ifdef unix}BaseUnix,{$endif}
+  LamwSettings;
 
 {$R *.lfm}
 
@@ -827,6 +829,35 @@ begin
     else
     begin
       CreateDir(FAndroidProjectName);  //project folder....
+      CreateDir(FAndroidProjectName+DirectorySeparator+'jni');
+
+      tempStr:= FAndroidProjectName+DirectorySeparator+'jni'+DirectorySeparator;
+      strList.Clear;
+      strList.Add('@echo off');
+      strList.Add('echo before build...');
+      strList.SaveToFile(tempStr+'before_build.bat');
+
+      strList.Clear;
+      strList.Add('@echo off');
+      strList.Add('echo after build...');
+      strList.SaveToFile(tempStr+'after_build.bat');
+
+      strList.Clear;
+      strList.Add('#!/bin/bash');
+      strList.Add('echo "before build..."');
+      strList.SaveToFile(tempStr+'before_build.sh');
+      {$ifdef unix}
+        FpChmod(tempStr+'before_build.sh, &751);
+      {$endif}
+
+      strList.Clear;
+      strList.Add('#!/bin/bash');
+      strList.Add('echo "after build..."');
+      strList.SaveToFile(tempStr+'after_build.sh');
+      {$ifdef unix}
+        FpChmod(tempStr+'after_build.sh', &751);
+      {$endif}
+
       if FModuleType = 0 then // [ < 2 ]: GUI project   1: NoGui project   2: console app 3: raw .so lib
       begin
         CreateDirectoriesFull(FAndroidProjectName, FJavaClassName); //all dirs.....

@@ -304,6 +304,14 @@ begin
   if AProject.CustomData.Contains('LAMW') then
   begin
 
+    AProject.LazCompilerOptions.ExecuteBefore.Command:='before_build.bat';
+    AProject.LazCompilerOptions.ExecuteAfter.Command:= 'after_build.bat';
+    {$ifdef unix}
+    AProject.LazCompilerOptions.ExecuteBefore.Command:= 'before_build.sh';
+    AProject.LazCompilerOptions.ExecuteAfter.Command:= 'after_build.sh';
+    {$endif}
+    AProject.Modified:= True;
+
     //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
     FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
     //C:\android\workspace\AppLAMWProject20\jni\   <---
