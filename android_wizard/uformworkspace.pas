@@ -847,7 +847,7 @@ begin
       strList.Add('echo "before build..."');
       strList.SaveToFile(tempStr+'before_build.sh');
       {$ifdef unix}
-        FpChmod(tempStr+'before_build.sh, &751);
+        FpChmod(tempStr+'before_build.sh', &751);
       {$endif}
 
       strList.Clear;
