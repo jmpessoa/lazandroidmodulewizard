@@ -298,11 +298,57 @@ end;
 
 function TLamwSmartDesigner.OnProjectOpened(Sender: TObject; AProject: TLazProject): TModalResult;
 var
-  tempStr: string;
+  tempStr, ext: string;
   p: integer;
+  strList: TStringList;
 begin
   if AProject.CustomData.Contains('LAMW') then
   begin
+
+    //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
+    tempStr := ExtractFilePath(AProject.MainFile.Filename);
+    //C:\android\workspace\AppLAMWProject20\jni\   <---
+
+    FPathToAndroidProject := Copy(tempStr, 1, RPosEX(PathDelim, tempStr, Length(tempStr) - 1));
+    //C:\android\workspace\AppLAMWProject20\    <---
+
+     ext:= 'bat';
+    {$ifdef unix}
+        ext:= 'sh';
+     {$endif}
+
+    if not FileExists(tempStr + 'before_build.'+ ext) then
+    begin
+      strList:= TStringList.Create;
+      strList.Add('@echo off');
+      strList.Add('echo before build...');
+      strList.SaveToFile(tempStr+'before_build.bat');
+      strList.Clear;
+      strList.Add('#!/bin/bash');
+      strList.Add('echo "before build..."');
+      strList.SaveToFile(tempStr+'before_build.sh');
+      {$ifdef unix}
+        FpChmod(tempStr+'before_build.sh', &751);
+      {$endif}
+      strList.Free;
+    end;
+
+    if not FileExists(tempStr + 'after_build.'+ext) then
+    begin
+      strList:= TStringList.Create;
+      strList.Clear;
+      strList.Add('@echo off');
+      strList.Add('echo after build...');
+      strList.SaveToFile(tempStr+'after_build.bat');
+      strList.Clear;
+      strList.Add('#!/bin/bash');
+      strList.Add('echo "after build..."');
+      strList.SaveToFile(tempStr+'after_build.sh');
+      {$ifdef unix}
+        FpChmod(tempStr+'after_build.sh', &751);
+      {$endif}
+      strList.Free;
+    end;
 
     AProject.LazCompilerOptions.ExecuteBefore.Command:='before_build.bat';
     AProject.LazCompilerOptions.ExecuteAfter.Command:= 'after_build.bat';
@@ -311,13 +357,6 @@ begin
     AProject.LazCompilerOptions.ExecuteAfter.Command:= 'after_build.sh';
     {$endif}
     AProject.Modified:= True;
-
-    //warning: Lazarus 2.0.12 dont read anymore  *.lpi  from Lazarus 2.2!
-    FPathToAndroidProject := ExtractFilePath(AProject.MainFile.Filename);
-    //C:\android\workspace\AppLAMWProject20\jni\   <---
-
-    FPathToAndroidProject := Copy(FPathToAndroidProject, 1, RPosEX(PathDelim, FPathToAndroidProject, Length(FPathToAndroidProject) - 1));
-    //C:\android\workspace\AppLAMWProject20\    <---
 
     tempStr:= Copy(FPathToAndroidProject, 1, Length(FPathToAndroidProject)-1);
     p:= LastDelimiter(PathDelim, tempStr) + 1;
