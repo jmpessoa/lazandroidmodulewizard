@@ -1464,10 +1464,16 @@ begin
   ComboSelectProjectName.Left:= 8;  // try fix hidpi bug
 
   ListBoxTargetAPI.Clear;  //SDK
-  ListBoxTargetAPI.Items.Add(IntToStr(FMaxSdkPlatform));
+  if FMaxSdkPlatform > 0 then
+  begin
+      ListBoxTargetAPI.Items.Add(IntToStr(FMaxSdkPlatform));
+      ListBoxTargetAPI.ItemIndex:= 0;
+      StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
+  end;
 
-  ListBoxTargetAPI.ItemIndex:= 0;
-  StatusBarInfo.Panels.Items[2].Text:='[Target] '+ GetCodeNameByApi(ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex]);
+
+  if ListBoxMinSDK.ItemIndex <  0 then
+    ListBoxMinSDK.ItemIndex:= 1;
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
   StatusBarInfo.Panels.Items[1].Text:= '[MinSdk] '+GetTextByListIndex(ListBoxMinSDK.ItemIndex);
@@ -1527,7 +1533,6 @@ begin
      cbBuildSystem.ItemIndex:= 0;
 
   ListBoxMinSDK.ItemIndex:= 1;
-
   if cbBuildSystem.Text = 'Gradle' then
   begin
      ListBoxMinSDK.ItemIndex:= 10;  //api 23
@@ -2155,7 +2160,7 @@ end;
 procedure TFormWorkspace.LoadSettings(const pFilename: string);
 var
   auxInstSet: string;
-  i: integer;
+  i, index: integer;
   lamwIni: TIniFile;
 begin
   //run before "OnFormActive"
@@ -2247,8 +2252,12 @@ begin
   //default '22' is good for old 4.x, 5.x devices compatibility!!!!
   if ListBoxNdkPlatform.Items.Count > 0 then
   begin
-    ListBoxNdkPlatform.ItemIndex:= ListBoxNdkPlatform.Items.IndexOf('22');
-    StatusBarInfo.Panels.Items[0].Text:='[NDK-'+IntToStr(FNDKVersion)+' Api 22]';
+      index:= ListBoxNdkPlatform.Items.IndexOf('22');
+      if index < ListBoxNdkPlatform.Items.Count then 
+      begin
+        ListBoxNdkPlatform.ItemIndex:= index;
+        StatusBarInfo.Panels.Items[0].Text:='[NDK-'+IntToStr(FNDKVersion)+' Api 22]';
+    end;
   end;
 
 end;
