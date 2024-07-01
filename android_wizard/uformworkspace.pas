@@ -2242,11 +2242,14 @@ begin
                    '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
 
 
-  FMaxNdkPlatform:= Self.GetMaxNdkPlatform(FNDKVersion);
   ListBoxNdkPlatform.Clear;
-  for i:= 16 to FMaxNdkPlatform  do  //16 is a good start point...
+  if FNDKVersion > 0 then
   begin
-     ListBoxNdkPlatform.Items.Add(IntToStr(i));
+      FMaxNdkPlatform:= Self.GetMaxNdkPlatform(FNDKVersion); //default = 22
+      for i:= 16 to FMaxNdkPlatform  do  //16 is a good start point...
+      begin
+         ListBoxNdkPlatform.Items.Add(IntToStr(i));
+      end;
   end;
 
   //default '22' is good for old 4.x, 5.x devices compatibility!!!!
@@ -2255,9 +2258,9 @@ begin
       index:= ListBoxNdkPlatform.Items.IndexOf('22');
       if index < ListBoxNdkPlatform.Items.Count then 
       begin
-        ListBoxNdkPlatform.ItemIndex:= index;
-        StatusBarInfo.Panels.Items[0].Text:='[NDK-'+IntToStr(FNDKVersion)+' Api 22]';
-    end;
+          ListBoxNdkPlatform.ItemIndex:= index;
+          StatusBarInfo.Panels.Items[0].Text:='[NDK-'+IntToStr(FNDKVersion)+' Api 22]';
+      end;
   end;
 
 end;
