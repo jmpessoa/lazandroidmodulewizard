@@ -318,7 +318,7 @@ uses
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
    cbillingclient, ctoytimerservice, bluetoothlowenergy,
    sfirebasepushnotificationlistener, batterymanager, modbus,
-   cwebsocketclient, uktoybutton, ujsarduinoaflakserial;
+   cwebsocketclient, ujsarduinoaflakserial, imagebutton;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -399,7 +399,7 @@ begin
   SetLength(Result, sizeArray);
   env^.GetByteArrayRegion(env, byteArrayData, 0, sizeArray, @Result[0] {target});
 end;
-//-------------
+
 function GetJObjectOfDynArrayOfJByte(env: PJNIEnv; var dataContent: TDynArrayOfJByte):jbyteArray; //jObject;
 var
   newSize0: integer;
@@ -1894,9 +1894,9 @@ begin
     Exit;
   end;
 
-  if Obj is KToyButton then
+  if Obj is jImageButton then
   begin
-    KToyButton(Obj).GenEvent_OnClick(Obj);
+    jImageButton(Obj).GenEvent_OnClick(Obj);
     Exit;
   end;
 
@@ -3224,6 +3224,5 @@ begin
     jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialStatusChanged(Sender,GetString(env,statusMessage));
   end;
 end;
-
 
 end.
