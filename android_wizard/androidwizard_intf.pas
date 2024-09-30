@@ -1014,10 +1014,12 @@ begin
       begin
          strAfterReplace  := StringReplace(strAfterReplace, '<!--', '', [rfReplaceAll, rfIgnoreCase]);
          strAfterReplace  := StringReplace(strAfterReplace, '-->', '', [rfReplaceAll, rfIgnoreCase]);
+         strAfterReplace  := StringReplace(strAfterReplace, 'dummyEXTRACTNATIVELIBS', '', [rfReplaceAll, rfIgnoreCase]);
          strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', '', [rfReplaceAll, rfIgnoreCase]);
       end
       else //gradle
       begin
+         strAfterReplace  := StringReplace(strAfterReplace, 'dummyEXTRACTNATIVELIBS', 'android:extractNativeLibs="true"', [rfReplaceAll, rfIgnoreCase]);
          strAfterReplace  := StringReplace(strAfterReplace, 'dummyMULTIDEX', 'android:name="androidx.multidex.MultiDexApplication"', [rfReplaceAll, rfIgnoreCase]);
       end;
 
@@ -2089,6 +2091,7 @@ begin
           strList.Add('    android:icon="@mipmap/ic_launcher"');
           strList.Add('    android:label="@string/app_name"');
           strList.Add('    android:theme="@style/AppTheme"');
+          strList.Add('    dummyEXTRACTNATIVELIBS');
           strList.Add('    dummyMULTIDEX>');
           strList.Add('    <activity');
           strList.Add('        android:name="dummyAppName"');
