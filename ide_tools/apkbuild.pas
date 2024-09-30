@@ -929,6 +929,7 @@ begin
   if CheckAvailableDevices then
   begin
     FApkRun := True;
+    FGdbCop := False; // disables debugging when more than one device
     Exit;
   end;
 
@@ -1008,7 +1009,13 @@ var
   p: integer;
 begin
   Result := False;
-  if not CheckAvailableDevices then Exit;
+  if CheckAvailableDevices then
+  begin
+    FApkRun := True;
+    FGdbCop := False; // disables debugging when more than one device
+    Exit;
+  end;
+//  if not CheckAvailableDevices then Exit;
   Tool := TIDEExternalToolOptions.Create;
   try
     Tool.Title := 'Installing APK (Ant)... ';
@@ -1447,7 +1454,7 @@ begin
                                                                 SubToolDefault);
       If Run then else raise Exception.Create
          ('Cannot start(run-as '     + Proj + ' lib/gdbserver --multi :' + Port +')');
-    end                                 else
+    end                                        else
     begin
          Run := DoAdbCommand
                 ('Start(/data/data/' + Proj + '/lib/gdbserver --multi :' + Port +')',
@@ -1644,7 +1651,7 @@ begin
                                  // Check IDE genegation debug info
                             CopyGdbServerToLibsDir;
                                  // Copy NDK gdbserver to Libs/ABI dir
-                 FApkRun  := False;
+     FApkRun              := False;
                                  // Apk is not running
 end;
 
@@ -1675,6 +1682,7 @@ begin
                                  // Scan PID of LAMW proj
     begin
       GdbCfg.ProjName   := PackageName;
+      GdbCfg.ProjPath   := FProjPath;
       GdbCfg.ProjPID    := FScanPID[0];
                                  // For PIDs List in GDBMIServerDebuggerLAMW.pas
 
@@ -1684,9 +1692,12 @@ begin
 
       If PullAppsProc(['/system/bin/app_process32',
                        '/system/bin/linker',
-                       '/system/lib/libc.so'], GetGdbSolibSearchPath) and
-                                 // Pull app_process32 & linker & libc.so
-                                 //   to GetGdbSolibSearchPath for 32 bits Target (!)
+                       '/system/lib/libc.so',
+                       '/system/lib/libm.so',
+                       '/system/lib/libdl.so'],GetGdbSolibSearchPath) and
+                                 // Pull app_process32 & linker &
+                                 //   libc.so & libm.so & libdl.so
+                                 //     to GetGdbSolibSearchPath for 32 bits Target (!)
          CopyLibCtrls(FProjPath+
                       GdbDirLAMW   +PathDelim)                        and
                                  // Copy libcontrols.so & libcontrols.dbg
