@@ -36,21 +36,24 @@ type
   //https://wiki.freepascal.org/Multithreaded_Application_Tutorial#Pure_FPC_example
 
   TShowStatusEvent = procedure(Status: String) of Object;
+  TStopStatusEvent = procedure                 of Object;
 
   TMyThread = class(TThread)
     private
-      fStatusText : string;
+      fStatusText  : string;
       FOnShowStatus: TShowStatusEvent;
+      FOnStopStatus: TStopStatusEvent;
       procedure ShowStatus;
     protected
       procedure Execute; override;
     public
-      DeviceId: string;
-      PackageName: string;
-      AdbPath:string;
-      ApkPath: string;
-      Constructor Create(CreateSuspended : boolean);
+      DeviceId     : string;
+      PackageName  : string;
+      AdbPath      : string;
+      ApkPath      : string;
+      constructor Create(CreateSuspended : Boolean);
       property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
+      property OnStopStatus: TStopStatusEvent read FOnStopStatus write FOnStopStatus;
   end;
 
   { TToolKit }
@@ -71,6 +74,7 @@ type
     procedure BtnRunClick(Sender: TObject);
     procedure BtnUpdateClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure MyThreadStop;
     procedure RunApk(DeviceId: string;
                      PackageName: string;
                      AdbPath:string;
@@ -108,8 +112,10 @@ implementation
 
 constructor TMyThread.Create(CreateSuspended : boolean);
 begin
-    inherited Create(CreateSuspended);
-    FreeOnTerminate := True;
+  inherited Create(CreateSuspended);
+  FreeOnTerminate := True;
+  FOnStopStatus   := Nil;
+  FOnStopStatus   := Nil;
 end;
 
 //https://gist.github.com/Pulimet/5013acf2cd5b28e55036c82c91bd56d8    --> adb commands...
@@ -166,6 +172,8 @@ begin
 
         done:= True;
    end; //while
+
+   If Assigned(FOnStopStatus) then FOnStopStatus;
 end;
 
 procedure TMyThread.ShowStatus;
@@ -392,34 +400,42 @@ begin
   end;
 end;
 
+procedure TToolKit.MyThreadStop;
+begin
+  MyThread := Nil;
+end;
+
 procedure TToolKit.RunApk(
                    DeviceId: string;
                    PackageName: string;
                    AdbPath:string;
                    ApkPath: string);
 begin
-
-  if MyThread <> nil then
-  begin
-    if (not MyThread.Terminated) then
-      MyThread.Terminate; //"FreeOnTerminate is true [default]" so we should not write: MyThread.Free;
-  end;
-
-  MyThread := TMyThread.Create(True);
-
+  If          MyThread <> Nil then
+    begin
+      If Not  MyThread.Terminated then
+              MyThread.Terminate;
+// This is also not safe code, since after the first check MyThread <> Nil
+// the thread may finish executing and the reference will already be zeroed,
+// but in 99% of scenarios this can be ignored
+// "FreeOnTerminate is true [default]" so we should not write: MyThread.Free;
+// At the same time, no one will install a link to the stream  MyThread:=Nil
+// Only Call from TMyThread FOnStopStatus can do this
+      While   MyThread <> Nil do Sleep(100);
+// If the thread hangs, it will be an infinite loop
+    end;
+              MyThread := TMyThread.Create(True);
   {$ifdef windows}
-  if Assigned(MyThread.FatalException) then
-       raise MyThread.FatalException;
+  If Assigned(MyThread.FatalException) then
+       raise  MyThread.FatalException;
   {$endif}
-
-
-  MyThread.OnShowStatus := @ShowStatus;
-  MyThread.DeviceId:= DeviceId;
-  MyThread.PackageName:= PackageName;
-  MyThread.AdbPath:= AdbPath;
-  MyThread.ApkPath:= ApkPath;
-  MyThread.Start;
-
+              MyThread.OnShowStatus := @ShowStatus;
+              MyThread.OnStopStatus := @MyThreadStop;
+              MyThread.DeviceId     := DeviceId;
+              MyThread.PackageName  := PackageName;
+              MyThread.AdbPath      := AdbPath;
+              MyThread.ApkPath      := ApkPath;
+              MyThread.Start;
 end;
 
 procedure TToolKit.BtnRunClick(Sender: TObject);
