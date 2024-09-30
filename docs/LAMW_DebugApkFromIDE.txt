@@ -1,20 +1,28 @@
 
-
-     Modifid lazandroidmodulewizard-master
-        for use GDB (gdbserver) for 32 bits only (!)
-
-
-   Use Gdb debudgger:
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+              How to use GNU gdb (GDB) debudgger in Lazarus IDE
+        to debug the code of the library "libcontrols.so" in LAMW projects
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
   1) Install this versin lazandroidmodulewizard-master and rebuild Lazarus IDE:
+
   2) Load or create new LAMW project (for example AppAsyncTaskDemo1)
-  3) Start device emulator
+
+  3) Start device emulator or real device
+
   4) IDE options/debugger Select debugger type: 'GNU remote debugger (gdbserver) LAMW'
+
   5) IDE options/debugger Select debugger path:
  ...android-ndk-r10e\toolchains\x86-4.9\prebuilt\windows\bin\i686-linux-android-gdb.exe
                         (for x86 emulator - tested!)
  ...android-ndk-r10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin\arm-linux-androideabi-gdb.exe
                         (for ARMv7a+Soft emulator - tested!)
+ ...android-ndk-r21e\prebuilt\windows-x86_64\bin\gdb.exe
+                        (for x86 and ARMv7a+Soft, for x86 emulator - tested!)
+ ...gdb15\bin\gdb.exe   (for x86 and ARMv7a+Soft, for x86 emulator - tested!)
+
   6) IDE options/debugger setup
        - Remote_HostName  = ''   (default) or emulator IP (Window title)
        - Remote_Port      = 2021 (default)
@@ -26,35 +34,50 @@
         gsrRunAsCommand     -> start gdbserver by command:
            '/data/data/' + PackageName + '/lib/gdbserver --multi :' + Remote_Port
            (use gsrRunAsCommand for correct bug "Can't open socket: Permission denied")
+       - Remote_ProcAttach = gpaAutoDetermVerGDB(default)
+       - Remote_CleanExec  = gceAutoDetermVerGDB(default)
+       - TimeoutForEval    = 1500
+            (mS, for real devices this time may need to be increased !)
 
   7) Project/Project Option/Compile options/Debugging:
        -> generate Dedug information,
        -> type automatic,
        -> Disp line numbers,
        -> use external gdb symb
+
   8) Project/Project Option/Compile options/Compilation and Linking:
        -> No optimization
-  9) [LAMW] Android project options/Build/Chipset
+
+  9) Set breakpoints
+
+ 10) [LAMW] Android project options/Build/Chipset
        -> x86 or ARMv7a+Soft
      Android project options/Build/Apk Builder
-       -> Ant or Gradle
- 10) Run/[LAMW] Build Android Apk and Run
-     Do not modify debugger setup until stop debugger (Run/Detach from program)
- 11) Messages:
+       -> Ant (for minimalist infrastructure) or Gradle (newest infrastructure)
+
+ 11) Run/[LAMW] Build Android Apk and Run
+     Do not modify debugger setup until stop debugger (Run/Detach from program),
+     do not run more than one device
+
+ 12) Messages:
        ... Success
        ... gdbserver --multi :2021
            Listening on port 2021
- 12) Run/Attach to program
- 13) Select program name (PackageName) & PID from IDE dialog
- 14) IDE puts fatty dots in editor
+
+ 13) Run/Attach to program
+
+ 14) Select program name (PackageName) & PID from IDE dialog
+
+ 15) IDE puts fatty dots in editor
      Messages:
        ...
            Remote debugging from host 127.0.0.1
            Attached; pid = ...
- 15) Set breakpoints
+
  16) Run (F9)
        ...
  17) Run/Detach from program or Stop (Ctrl-F2)
+
  18) Messages:
        ...
            Remote side has terminated connection.  GDBserver will reopen the connection.
@@ -64,40 +87,289 @@
        ...
            Fatal: [Exception] Failed: ... (!!!)
 
- Tested on
-   OS        : Win10-64,
-   Laz       : laz4android2.0.0,
-   LAMW      : lazandroidmodulewizard-master from 26.01.2021
-   Emulator  :
-       - GENIMOTION Version 3.0.0 | Revision 20181218-bd824f9
-          (Device Samsung Galaxy S8 [8.0-API26] & S9 [9.0-API28])
-
-       - GENIMOTION Version 3.2.0 | Revision 2101Thu-fb10f6d9a
-          (Device Samsung Galaxy S9 [8.0-API26] & S9 [9.0-API28])
-          (Device Samsung Galaxy S10[10.0-API29])
-
-       - AVD Android Emulator (Device Nexus 9 [5.1.1-API22]
-           Google APIs ARM (armeabi-v7a))
-
-       - AVD Android Emulator (Device Nexus 9 [7.1.1-API25])
-           Google APIs Intel Atom (x86))
-
-   Real Device
-       - Samsung Galaxy j7   sm-j730fm/ds [9.0-API28]
-
-   JDK       : Java\jdk1.8.0_60
-   ANT       : apache-ant-1.9.7
-   GRADLE    : gradle-4.4.1
-   NDK       : android-ndk-r10e
-   SDK       : android-sdk (platform-tools 28.0.1)
-   Target SDK version : 28
-
 //------------------------------------------------------------------------------
 
+ Tested on
+   OS        : Win10-64
+   Laz       : laz4android2.2.2, i386-win32-win32/win64
+   FPC       : 3.2.2
+   LAMW      : lazandroidmodulewizard-master 0.8.6.4 from 26.01.2021 ???
+   Emulator  :
+                - GENIMOTION Version 3.2.1 | Revision 20210419-d1afde942
+                  (Device Samsung Galaxy S8 [8.0-API26] & S9 [9.0-API28])
+
+                - GENIMOTION Version 3.2.1 | Revision 20210419-d1afde942
+                  (Device Samsung Galaxy S9 [8.0-API26] & S9 [9.0-API28])
+                  (Device Samsung Galaxy S10[10.0-API29])
+
+                - AVD Android Emulator (Device Nexus 9 [5.1.1-API22]
+                   Google APIs ARM (armeabi-v7a))
+
+                - AVD Android Emulator (Device Nexus 9 [7.1.1-API25])
+                   Google APIs Intel Atom (x86))
+
+   Real Device: - Samsung Galaxy S9+   SM-G965F [10.0-API29]
+
+
+//----------  Minimalist infrastructure (project build by ant) -----------------
+   JDK                : Java\jdk1.8.0_60
+   ANT                : apache-ant-1.9.7
+   NDK                : android-ndk-r10e
+   SDK                : android-sdk (platform-tools 28.0.1)
+   Target SDK version : 34
+//------------------------------------------------------------------------------
+
+
+//----------  The newest infrastructure (project build by gradle) --------------
+   JDK                : Java\jdk-21.0.4+7
+   GRADLE             : gradle-8.9
+   NDK                : android-ndk-r21e
+   SDK                : sdkJ21      (platform-tools 35.0.2)
+   Target SDK version : 34
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+ 	 How Lazarus IDE implements interaction with GNU gdb (GDB) debudgger
+   for debugging the code of the "libcontrols.so" library in LAMW projects
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+                Introduction
+
+  It is assumed that the Lazarus for Android program, all LAMW packages with debug
+mode support, the "Debugger for Lazarus IDE" package (lazdebuggergdbmi.lpk) and
+the infrastructure required for building and running are already installed on the
+computer. Before building the package, installing it on the device and running in
+debug mode, you should enable the debug mode itself in the FPC compiler settings
+and select Chipset. You should also disable code optimization. It is advisable to
+use the Android emulator as the device on which debugging will be performed,
+rather than a real device. This will significantly speed up the process of finding
+and eliminating debug mode configuration errors. As an active debugger, you need
+to select "GNU remote debugger (gdbserver) LAMW" and set its parameters.
+
+
+         Description of the stages of assembling a package for debugging,
+         installing it on the device and actually starting the debug mode
+
+  Before assembling the PackageName package, the DoBeforeBuildApk procedure is
+called (unit ApkBuild, procedure TApkBuilder.DoBeforeBuildApk)
+
+//------------------------------------------------------------------------------
+            DoBeforeBuildApk performs the following actions.
+//------------------------------------------------------------------------------
+  If debug mode is enabled in the compiler settings, then after successful
+assembly of the "libcontrols.so" library from the "controls.lpi" project file,
+the section <CompilerOptions> <Target> <Filename Value="..\libs\x86\libcontrols">
+Chipset is extracted. In the given example, Chipset = x86. Next, in FNdkPath
+(path to the NDK on the computer), the corresponding file "gdbserver" is located
+and copied to the directory FProjPath+"libs\x86\", where FProjPath is the
+directory of the LAMW project being debugged.
+
+  After successful assembly of the PackageName package, its installation on the
+device and launch, the procedure DoAfterRunApk (unit ApkBuild,
+procedure TApkBuilder.DoAfterRunApk) is called.
+
+//------------------------------------------------------------------------------
+            DoAfterRunApk performs the following actions.
+//------------------------------------------------------------------------------
+  If debug mode was enabled, then
+
+  1) PID[0] (process identifier) for the built and launched PackageName and PID[1]
+     possibly launched in the previous session "gdbserver" are determined.
+
+  2) If PID[0] for PackageName is found, then the directory FProjPath+GdbDirLAMW
+     (GdbDirLAMW="gdb") is created and the following files are copied into it
+     from the device:
+       "/system/bin/app_process32",
+       "/system/bin/linker",
+       "/system/lib/libc.so",
+       "/system/lib/libm.so",
+       "/system/lib/libdl.so".
+     The following files are also copied into the same GdbDirLAMW directory:
+       "libcontrols.so" and
+       "libcontrols.dbg" (if this file was generated during compilation).
+
+  3) If all files are copied successfully, then in Lazarus IDE it is set
+     HostApplicationFilename = FProjPath+GdbDirLAMW+PathDelim+"app_process32"
+     (where PathDelim depends on the operating system of the computer on which
+     debugging is performed and is equal to "/" or "\"). Then the Adb command
+     is executed port forwarding "forward tcp: "+ Remote_Port +" tcp: " +
+     Remote_Port, where the Remote_Port value is defined in the debugger
+     settings "GNU remote debugger (gdbserver) LAMW"
+
+  4) If step #3 is completed successfully, then if PID[1] of the "gdbserver"
+     process launched in the previous session is found in step #1, an attempt is
+     made to stop this process. Then, if there is no stop error or there was no
+     previously running process, a new "gdbserver" process is started either as
+     gsrRunAsPackageName (see debugger settings) or as gsrRunAsCommand.
+
+     When building with the latest versions of gradle, make sure that in the
+     main section of the project manifest "AndroidManifest.xml" the <application>
+     subsection has the attribute android:extractNativeLibs="true". Without
+     setting this attribute, both the "libcontrols.so" library and "gdbserver"
+     become unavailable on the device, "gdbserver" will not start and debugging
+     will be impossible. If a new LAMW project is created, this attribute should
+     be set automatically. For previously created projects, it should be set
+     manually.
+
+  5) If step #4 is also successful, the device goes into the mode of waiting for
+     connection to "gdbserver" from the Gdb debugger
+
+  After the program has been successfully launched in debug mode and the operations
+described in points #1-#5 have been performed, the user executes the Attach command
+from Lazarus IDE to connect to the PackageName process in the Android device. The
+list of processes after calling the Attach command consists of a single line
+containing the PID[0] of the PackageName running on the device and its name, which
+was found in point #1. By selecting this PID[0], the user starts the process of
+initial configuration of the debugger and its interaction with "gdbserver" on the
+device.
+
+
+        Description of the debugger configuration process and its interaction
+        with "gdbserver" using the Attach command from Lazarus IDE
+        (unit GDBMIServerDebuggerLAMW,
+         function TGDBMIServerDebuggerCommandAttach.DoExecute:Boolean)
+
+  Unfortunately, the Gdb debugger development team implemented different command
+sequences in different versions, which are necessary for its initial configuration
+when interacting with "gdbserver" in an Android device. Also, not all Gdb versions
+are compatible with both LAMW and Lazarus IDE. To select a specific configuration
+sequence, the parameters Remote_ProcAttach and Remote_CleanExec are used in the
+settings "GNU remote debugger (gdbserver) LAMW".
+
+
+        The process of initial configuration of Gdb and its connection
+        to "gdbserver" (unit GDBMIServerDebuggerLAMW,
+        function TGDBMIServerDebuggerCommandAttach.DoExecute:Boolean)
+
+//------------------------------------------------------------------------------
+            DoExecute performs the following actions.
+//------------------------------------------------------------------------------
+  If Remote_ProcAttach = gpaInitBeforeConnect, then the following sequence of
+Gdb commands is executed:
+
+      "set osabi GNU/Linux" ,
+      "-file-exec-and-symbols "    + FProjPath+GdbDirLAMW+"/"+"app_process32",
+      "set solib-absolute-prefix " + FProjPath+GdbDirLAMW,
+      "set solib-search-path "     + FProjPath+GdbDirLAMW,
+      "handle SIG33 nopass nostop noprint",
+      "handle SIG35 nopass nostop noprint",
+      "target extended-remote :"   + Remote_Port,
+       DoAttach (unit GDBMIServerDebuggerLAMW,
+                function TGDBMIServerDebuggerCommandAttach.DoAttach:Boolean,
+                in fact, this is a modified LAMW function from the
+                unit GDBMIDebugger (lazdebuggergdbmi.lpk),
+                function TGDBMIDebuggerCommandAttach.DoExecute: Boolean).
+
+  If Remote_ProcAttach = gpaConnectBeforeInit, then another sequence of Gdb
+commands is executed:
+
+      "target extended-remote :"   + Remote_Port,
+       DoAttach,
+      "set solib-search-path "     + FProjPath+GdbDirLAMW,
+      "handle SIG33 nopass nostop noprint",
+      "handle SIG35 nopass nostop noprint".
+
+//------------------------------------------------------------------------------
+            DoAttach performs the following actions.
+//------------------------------------------------------------------------------
+  If Remote_CleanExec = gceClneanBeforeAttach, then at the beginning of the
+execution of the DoAttach function, a reset (installation of an empty file) of
+HostApplicationFilename is performed:
+
+      "-file-exec-and-symbols "" "
+
+  If Remote_CleanExec = gceNotClnBeforeAttach, then at the beginning of the
+execution of the DoAttach function, a reset of HostApplicationFilename is not
+performed.
+
+  Then, the DoAttach function performs operations borrowed from
+TGDBMIDebuggerCommandAttach.DoExecute and transferred to GDBMIServerDebuggerLAMW.
+In DoAttach, after re-determining the NewPID of the debugged process,
+HostApplicationFilename = FProjPath+GdbDirLAMW+'/'+"app_process32" is set as the
+executable file again if the data required by Gdb for debugging does not exist.
+
+  If Remote_ProcAttach = gpaAutoDetermVerGDB, then for known LAMW versions of
+Gdb, the correct sequence and list of initialization commands will be automatically
+selected.
+
+  If Remote_CleanExec = gceAutoDetermVerGDB, then for known LAMW versions of
+Gdb, the HostApplicationFilename reset mode will be automatically selected at the
+beginning of the DoAttach function execution.
+
+  The list of LAMW projects of Gdb versions that support debugging of the
+"libcontrols.so" library and their correct configurations are located in the
+implementation section of the GDBMIServerDebuggerLAMW module.
+
+//------------------------------------------------------------------------------
+ LAMW compatible GNU gdb (GDB) and their configuration (unit GDBMIServerDebuggerLAMW)
+//------------------------------------------------------------------------------
+type                        TGdbVersionIdx = (gdb_7_7, gdb_8_3, gdb_15_1);
+const
+  lamwDBGAttachTyps : Array[TGdbVersionIdx] of
+    Record
+      VersMajor     : Integer;
+      VersMinor     : Integer;
+      ProcAttach    : TGdbProcAttach;
+      CleanExec     : TGdbCleanExec;
+    end                                    =
+    (
+// ------------- GNU gdb (GDB)  7.7 from android-ndk-r10e ----------------------
+     (VersMajor     :  7;
+      VersMinor     :  7;
+      ProcAttach    : gpaConnectBeforeInit;
+      CleanExec     : gceClneanBeforeAttach),
+// ------------- GNU gdb (GDB)  8.3 from android-ndk-r21e ----------------------
+     (VersMajor     :  8;
+      VersMinor     :  3;
+      ProcAttach    : gpaInitBeforeConnect;
+      CleanExec     : gceNotClnBeforeAttach),
+// ------------- GNU gdb (GDB) 15.1 (gdb-multiarch) ----------------------------
+     (VersMajor     : 15;
+      VersMinor     :  1;
+      ProcAttach    : gpaInitBeforeConnect;
+      CleanExec     : gceNotClnBeforeAttach)
+    );
+//------------------------------------------------------------------------------
+
+  On the Internet, GNU gdb (GDB) 15.1 (gdb-multiarch) was found and tested for
+compatibility with LAMW, which is not included in any NDK and was downloaded from
+the resource: "https://static.grumpycoder.net/pixel/gdb-multiarch-windows/".
+
+  Perhaps LAMW users will also find other Lazarus IDE-compatible assemblies of
+GNU gdb (GDB) and, accordingly, new sequences of commands for their initialization
+will appear, then it will be advisable to include these Gdb in lamwDBGAttachTyps.
+
+  To control the process of launching and running the debugger, the Log file
+FProjPath+"LogDebugLAMW.txt" is used. Classic debugging of the debugging process
+using the internal Lazarus IDE debugger (the second copy of Lazarus IDE with the
+selected "GNU remote debugger (gdbserver) LAMW", launched from the first copy)
+works unstable and does not allow full control over all stages of the debugging
+process.
+
+-------------------------------------------------------------------------------
+
+  The modern framework (infrastructure) recommended for Android application
+development (https://github.com/jmpessoa/lazandroidmodulewizard?tab=readme-ov-file)
+no longer supports Ant build. Only gradle should be used for build. When loading
+and attempting to build gradle LAMW programs from the Demo directory or other
+previously created on previous frameworks, a build error may occur:
+
+     "Execution failed for task ':processDebugMainManifest'"
+
+  To fix it, it is recommended to manually edit the manifest of previously
+developed programs, since LAMW does not fix it automatically. The following
+attributes should be added to the project manifest "AndroidManifest.xml"
+<application> <activity> section:
+
+    android:launchMode="standard" android:enabled="true" android:exported="true"'
+
+--------------------------------------------------------------------------------
+    
   E:Mail leopreo@gmail.com  Leon Preo
 
   Lazarus Forum
          https://forum.lazarus.freepascal.org/index.php/topic,52970.0.html
-
-
 
