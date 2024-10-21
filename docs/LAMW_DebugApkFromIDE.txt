@@ -16,12 +16,17 @@
 
   5) IDE options/debugger Select debugger path:
  ...android-ndk-r10e\toolchains\x86-4.9\prebuilt\windows\bin\i686-linux-android-gdb.exe
+ ...android-ndk-r10e\toolchains\x86_64-4.9\prebuilt\windows\bin\x86_64-linux-android-gdb.exe
                         (for x86 emulator - tested!)
  ...android-ndk-r10e\toolchains\arm-linux-androideabi-4.9\prebuilt\windows\bin\arm-linux-androideabi-gdb.exe
                         (for ARMv7a+Soft emulator - tested!)
+ ...android-ndk-r10e\toolchains\aarch64-linux-android-4.9\prebuilt\windows\bin\aarch64-linux-android-gdb.exe						
+                        (for arm64-v8a on real device tested)
  ...android-ndk-r21e\prebuilt\windows-x86_64\bin\gdb.exe
                         (for x86 and ARMv7a+Soft, for x86 emulator - tested!)
+                        (for arm64-v8a on real device tested)
  ...gdb15\bin\gdb.exe   (for x86 and ARMv7a+Soft, for x86 emulator - tested!)
+                        (for arm64-v8a on real device tested)
 
   6) IDE options/debugger setup
        - Remote_HostName  = ''   (default) or emulator IP (Window title)
@@ -36,8 +41,16 @@
            (use gsrRunAsCommand for correct bug "Can't open socket: Permission denied")
        - Remote_ProcAttach = gpaAutoDetermVerGDB(default)
        - Remote_CleanExec  = gceAutoDetermVerGDB(default)
+       - Remote_CopGdbServ = gcsAutoDeterminate (default)
+        gcsAutoDeterminate   - copy NDK gdbserver to target data dir for arm64-v8a only
+           (start gdbserver by command:
+            'run-as ' + PackageName + ' -arm64-gdbserver --multi :' + Remote_Port)
+        gcsUseInProjGdbServ  - use gdbserver from APK
+        gcsCopyGdbServFromNDK- copy NDK gdbserver to target anytime
+           (start gdbserver by command:
+            'run-as ' + PackageName + ' ' + Arch + '-gdbserver --multi :' + Remote_Port)
        - TimeoutForEval    = 1500
-            (mS, for real devices this time may need to be increased !)
+           (mS, for real devices this time may need to be increased !)
 
   7) Project/Project Option/Compile options/Debugging:
        -> generate Dedug information,
@@ -51,7 +64,7 @@
   9) Set breakpoints
 
  10) [LAMW] Android project options/Build/Chipset
-       -> x86 or ARMv7a+Soft
+       -> x86, ARMv7a+Soft or Aarch64
      Android project options/Build/Apk Builder
        -> Ant (for minimalist infrastructure) or Gradle (newest infrastructure)
 
@@ -64,7 +77,9 @@
        ... gdbserver --multi :2021
            Listening on port 2021
 
- 13) Run/Attach to program
+ 13) Run/Attach to program (For some debugged programs, any actions that do not
+     have breakpoints set must be manually called before Attach. Otherwise, the
+     program will not start on Run)
 
  14) Select program name (PackageName) & PID from IDE dialog
 
@@ -93,7 +108,7 @@
    OS        : Win10-64
    Laz       : laz4android2.2.2, i386-win32-win32/win64
    FPC       : 3.2.2
-   LAMW      : lazandroidmodulewizard-master 0.8.6.4 from 26.01.2021 ???
+   LAMW      : lazandroidmodulewizard-master 0.8.6.4 from 21.10.2024
    Emulator  :
                 - GENIMOTION Version 3.2.1 | Revision 20210419-d1afde942
                   (Device Samsung Galaxy S8 [8.0-API26] & S9 [9.0-API28])
@@ -102,13 +117,21 @@
                   (Device Samsung Galaxy S9 [8.0-API26] & S9 [9.0-API28])
                   (Device Samsung Galaxy S10[10.0-API29])
 
+                - GENIMOTION Version 3.7.1 | Revision 20240527-d6281e8dba
+                  (Device Samsung Galaxy S10[13.0-API33])
+
                 - AVD Android Emulator (Device Nexus 9 [5.1.1-API22]
                    Google APIs ARM (armeabi-v7a))
 
                 - AVD Android Emulator (Device Nexus 9 [7.1.1-API25])
                    Google APIs Intel Atom (x86))
 
-   Real Device: - Samsung Galaxy S9+   SM-G965F [10.0-API29]
+   Real Device:
+                - Samsung Galaxy S9+       SM-G965F   [10.0-API29] ARMv7a+Soft
+
+                - Samsung Galaxy S9+       SM-G965F   [10.0-API29] arm64-v8a
+
+                - Samsung Galaxy S24 Ultra SM-S928B/DS[14.0-API34] arm64-v8a
 
 
 //----------  Minimalist infrastructure (project build by ant) -----------------
@@ -181,18 +204,28 @@ procedure TApkBuilder.DoAfterRunApk) is called.
 
   2) If PID[0] for PackageName is found, then the directory FProjPath+GdbDirLAMW
      (GdbDirLAMW="gdb") is created and the following files are copied into it
-     from the device:
-       "/system/bin/app_process32",
-       "/system/bin/linker",
-       "/system/lib/libc.so",
-       "/system/lib/libm.so",
-       "/system/lib/libdl.so".
+     from the device
+
+       for 32bit: "/system/bin/app_process32",
+                  "/system/bin/linker",
+                  "/system/lib/libc.so",
+                  "/system/lib/libm.so",
+                  "/system/lib/libdl.so"
+
+       for 64bit: "/system/bin/app_process64",
+                  "/system/bin/linker64",
+                  "/system/lib64/libc.so",
+                  "/system/lib64/libm.so",
+                  "/system/lib64/libdl.so".
+
      The following files are also copied into the same GdbDirLAMW directory:
        "libcontrols.so" and
        "libcontrols.dbg" (if this file was generated during compilation).
 
   3) If all files are copied successfully, then in Lazarus IDE it is set
-     HostApplicationFilename = FProjPath+GdbDirLAMW+PathDelim+"app_process32"
+     HostApplicationFilename =
+       FProjPath+GdbDirLAMW+PathDelim+"app_process32"(for 32bit) or
+       FProjPath+GdbDirLAMW+PathDelim+"app_process64"(for 64bit).
      (where PathDelim depends on the operating system of the computer on which
      debugging is performed and is equal to "/" or "\"). Then the Adb command
      is executed port forwarding "forward tcp: "+ Remote_Port +" tcp: " +
@@ -204,6 +237,16 @@ procedure TApkBuilder.DoAfterRunApk) is called.
      made to stop this process. Then, if there is no stop error or there was no
      previously running process, a new "gdbserver" process is started either as
      gsrRunAsPackageName (see debugger settings) or as gsrRunAsCommand.
+
+     It has been experimentally determined that on the 64-bit architecture
+     arm64-v8a gdbserver is not extracted from the APK during package installation,
+     so it must be installed on the device forcibly. The debugger configuration
+     field Remote_CopGdbServ controls the process of installing gdbserver on the
+     device. There are three possible options:
+       - automatic (gcsAutoDeterminate), the server will be installed only for
+         arm64-v8a,
+       - do not install, use from APK (gcsUseInProjGdbServ),
+       - always install (gcsCopyGdbServFromNDK).
 
      When building with the latest versions of gradle, make sure that in the
      main section of the project manifest "AndroidManifest.xml" the <application>
@@ -256,6 +299,9 @@ Gdb commands is executed:
       "set solib-search-path "     + FProjPath+GdbDirLAMW,
       "handle SIG33 nopass nostop noprint",
       "handle SIG35 nopass nostop noprint",
+      "handle SIGSTOP nopass nostop noprint",
+      "handle SIGSEGV nostop noprint",
+      "handle SIGBUS nopass noprint", 	  	       
       "target extended-remote :"   + Remote_Port,
        DoAttach (unit GDBMIServerDebuggerLAMW,
                 function TGDBMIServerDebuggerCommandAttach.DoAttach:Boolean,
@@ -270,7 +316,10 @@ commands is executed:
        DoAttach,
       "set solib-search-path "     + FProjPath+GdbDirLAMW,
       "handle SIG33 nopass nostop noprint",
-      "handle SIG35 nopass nostop noprint".
+      "handle SIG35 nopass nostop noprint",
+      "handle SIGSTOP nopass nostop noprint",
+      "handle SIGSEGV nostop noprint",
+      "handle SIGBUS nopass noprint".
 
 //------------------------------------------------------------------------------
             DoAttach performs the following actions.
@@ -288,8 +337,8 @@ performed.
   Then, the DoAttach function performs operations borrowed from
 TGDBMIDebuggerCommandAttach.DoExecute and transferred to GDBMIServerDebuggerLAMW.
 In DoAttach, after re-determining the NewPID of the debugged process,
-HostApplicationFilename = FProjPath+GdbDirLAMW+'/'+"app_process32" is set as the
-executable file again if the data required by Gdb for debugging does not exist.
+HostApplicationFilename = FProjPath+GdbDirLAMW+'/'+"app_process32(64)" is set as
+the executable file again if the data required by Gdb for debugging does not exist.
 
   If Remote_ProcAttach = gpaAutoDetermVerGDB, then for known LAMW versions of
 Gdb, the correct sequence and list of initialization commands will be automatically
