@@ -42,7 +42,7 @@ type
     procedure RunByGradle;
     procedure DoBeforeBuildApk;
     procedure DoAfterRunApk;
-    procedure StartNewGdbServer(Proj, Port : String);
+    procedure StartNewGdbServer(Proj, Port : String; Sdk : Integer);
 
     function GetAdbPath: String;
     function CheckAvailableDevices: Boolean;
@@ -1159,16 +1159,32 @@ const
   GdbDirLAMW        = 'gdb';
   JniDirLAMW        = 'jni';
 
-type  TBigBuildMode = (bmNo,    bmArmV6Soft,   bmArmV7Soft,   bmX86);
+type  TBigBuildMode =   (bmNo,
+                               bmArmV6Soft,
+                                       bmArmV7Soft,
+                                               bmArm64v8a,
+                                                       bmX86,
+                                                               bmX86_64);
 
 const bmLibsSubDir  : Array[TBigBuildMode] of String =
-                      ('No',   'armeabi',     'armeabi-v7a', 'x86');
+                        ('No',
+                               'armeabi',
+                                       'armeabi-v7a',
+                                               'arm64-v8a',
+                                                       'x86',
+                                                               'x86_64');
 
 const bmGdbSrvMask  : Array[TBigBuildMode] of String =
-                      ('No',   'android-arm', 'android-arm', 'android-x86');
+                        ('No',
+                               'android-arm',
+                                       'android-arm',
+                                               'android-arm64',
+                                                       'android-x86',
+                                                               'android-x86_64');
 
 var CurBigBuildMode : TBigBuildMode = bmNo;
     abApkBuilder    : TApkBuilder   =  Nil;
+    GdbServer       : String        = '';
 
   { TAdbShellPidOfParser }
 
@@ -1443,31 +1459,150 @@ begin
         Exception.Create('Cannot kill last gdbserver PID='+IntTostr(FScanPID[1]));
 end;
 
-procedure TApkBuilder.StartNewGdbServer(Proj, Port:String);
-var      Run : Boolean;
-begin
-  If GdbCfg.GdbServerRun = gsrRunAsPackageName then
-    begin
-         Run := DoAdbCommand
-                ('Start(run-as '     + Proj + ' lib/gdbserver --multi :' + Port +')',
-                 'shell run-as '     + Proj + ' lib/gdbserver --multi :' + Port,
-                                                                SubToolDefault);
-      If Run then else raise Exception.Create
-         ('Cannot start(run-as '     + Proj + ' lib/gdbserver --multi :' + Port +')');
-    end                                        else
-    begin
-         Run := DoAdbCommand
-                ('Start(/data/data/' + Proj + '/lib/gdbserver --multi :' + Port +')',
-                 'shell /data/data/' + Proj + '/lib/gdbserver --multi :' + Port,
-                                                                SubToolDefault);
-      If Run then else raise Exception.Create
-         ('Cannot start(/data/data/' + Proj + '/lib/gdbserver --multi :' + Port +')');
+
+procedure TApkBuilder.StartNewGdbServer(Proj, Port:String; Sdk : Integer);
+var      Run : Boolean; Data, GdbFile, Command  : String;
+
+  function GetArch : String;
+  begin
+    Case CurBigBuildMode of
+      bmArmV6Soft,
+      bmArmV7Soft  : Result := 'arm';
+      bmArm64v8a   : Result := 'arm64';
+      bmX86        : Result := 'x86';
+      bmX86_64     : Result := 'x86_64';
+      else           Result :=  bmLibsSubDir[CurBigBuildMode];
     end;
+  end;
+
+  function GetProjData : Boolean;
+  begin
+       Result := DoAdbCommand
+         ('Get '          + Proj + ' DataDir',
+          'shell run-as ' + Proj + ' /system/bin/sh -c pwd', SubToolList) and
+         (Pos              (Proj, FAdbShellOneLine) <> 0);
+    If Result then Data := FAdbShellOneLine
+              else Data := '';
+  end;
+
+  function ChModDataDir : Boolean;
+  var Chmod_Cmd : String;
+  begin
+    Chmod_Cmd :=
+      Format('shell run-as %s %s %s %s', [Proj, 'chmod', '"a+x"', Data]);
+           Result := DoAdbCommand
+             ('Make application data directory world executable',
+               Chmod_Cmd, SubToolPull);
+
+// GdbCfg.LogStr('Chmod command = "%s"', [Chmod_Cmd]);
+
+    If Not Result then raise
+      Exception.Create
+        ('Failed to make application data directory world executable')
+  end;
+(*
+  function FindInDataDirGdbServer : Boolean;
+  begin
+    Result := DoAdbCommand
+      ('Find '         + Proj + ' gdbserver in DataDir',
+       'shell run-as ' + Proj + ' ls ' + Data + '/' + GdbFile, SubToolList) and
+      (Pos (GdbFile, FAdbShellOneLine) <> 0);
+  end;
+*)
+  function AdbPush(PushName,DestPath:String):Boolean;
+  begin
+           Result := DoAdbCommand
+             ( 'Push '  + PushName + ' to ' + DestPath,
+               'push '  + PushName +  ' '   + DestPath, SubToolPull);
+    If Not Result then raise
+      Exception.Create('Cannot push '  + PushName + ' to ' + DestPath);
+  end;
+
+  function CopyData (RemtPath,DestPath:String):Boolean;
+  var CopyCmnd :String;
+  begin
+    CopyCmnd := 'shell "cat '     + RemtPath + ' | run-as ' + Proj +
+                ' sh -c ''cat > ' + DestPath + '''"';
+
+           Result := DoAdbCommand
+             ( 'Copy from '  + RemtPath + ' to ' + DestPath,
+                CopyCmnd, SubToolPull);
+
+//  GdbCfg.LogStr('Copy command = "%s"', [CopyCmnd]);
+
+    If Not Result then raise
+      Exception.Create('Cannot copy '  + RemtPath + ' to ' + DestPath);
+  end;
+
+  function ChModGdbServer(GdbFullPath:String) : Boolean;
+  var Chmod_Cmd : String;
+  begin
+    Chmod_Cmd := Format('shell run-as %s %s %s %s',
+      [Proj, 'chmod', '700', GdbFullPath]);
+           Result := DoAdbCommand
+             ('Chmod gdbserver at ' + GdbFullPath, Chmod_Cmd, SubToolPull);
+    If Not Result then raise
+      Exception.Create('Failed to chmod gdbserver at ' + GdbFullPath);
+  end;
+
+  function CopyGdbSeverToDeviceRequired : Boolean;
+  begin
+    Case GdbCfg.GdbCopGdbServ of
+      gcsAutoDeterminate    : Result := (CurBigBuildMode in [bmArm64v8a]);
+      gcsCopyGdbServFromNDK : Result := True;
+      else                    Result := False;
+    end;
+  end;
+
+begin
+// -----------------------------------------------------------------------------
+// ----- from ...android-ndk-r21e\prebuilt\windows-x86_64\bin\ndk-gdb.py -------
+// -----------------------------------------------------------------------------
+  If CopyGdbSeverToDeviceRequired then
+//  We need to upload our gdbserver from host
+    begin
+      If GetProjData then else
+        raise Exception.Create('Cannot find datadir for ' + Proj);
+
+      GdbFile := GetArch + '-gdbserver';
+      AdbPush  (GdbServer, '/data/local/tmp/' + GdbFile);
+
+//  Applications with minSdkVersion >= 24 will have their data directories
+//  created with rwx------ permissions, preventing adbd from forwarding to
+//  the gdbserver socket. To be safe, if we're on a device >= 24, always
+//  chmod the directory.
+      If Sdk >= 24 then
+          ChModDataDir;
+
+//  Copy gdbserver into the data directory on M+, because selinux prevents
+//  execution of binaries directly from /data/local/tmp
+      If Sdk >= 23 then
+        begin
+          CopyData (       '/data/local/tmp/' + GdbFile, Data + '/' + GdbFile);
+          ChModGdbServer                                (Data + '/' + GdbFile);
+          GdbFile :=                                     Data + '/' + GdbFile;
+        end        else
+          GdbFile :=       '/data/local/tmp/' + GdbFile;
+    end                           else
+    begin
+          Data    := '/data/data/' + Proj;
+          GdbFile := 'lib/gdbserver';
+    end;
+//--------------------- Start new GdbServer (GdbFile) --------------------------
+  If GdbCfg.GdbServerRun = gsrRunAsPackageName then
+    Command:=Format('run-as %s %s --multi :%s', [Proj, GdbFile, Port])
+                                               else
+    Command:=Format(       '%s/%s --multi :%s', [Data, GdbFile, Port]);
+
+     Run := DoAdbCommand  (Format('Start(%s)',        [Command]),
+                           Format('shell %s',         [Command]), SubToolDefault);
+  If Run then else
+    raise Exception.Create(Format('Cannot start(%s)', [Command]));
 end;
 
 function  TApkBuilder.AdbPull(PullName,DestPath:String):Boolean;
 begin
-         Result   := DoAdbCommand   (' Pull '  + PullName + ' to ' + DestPath,
+         Result   := DoAdbCommand   ( 'Pull '  + PullName + ' to ' + DestPath,
                                       'pull '  + PullName +  ' '   + DestPath,
                                       SubToolPull);
   If Not Result then raise
@@ -1478,7 +1613,7 @@ function TApkBuilder.GetTargetCpuAbiList : Boolean;
 begin
   FAdbShellOneLine:='';
 
-  Result   := DoAdbCommand   (' Get CPU Abilist',
+  Result   := DoAdbCommand   ( 'Get CPU Abilist',
                                      'shell getprop ro.product.cpu.abilist',
                                       SubToolList) and (FAdbShellOneLine<>'');
   If Not Result then raise
@@ -1491,7 +1626,7 @@ begin
 
   FAdbShellOneLine:='';
 
-  Result   := DoAdbCommand    (' Get Build Version Sdk',
+  Result   := DoAdbCommand    ( 'Get Build Version Sdk',
                                     'shell getprop ro.build.version.sdk',
                                      SubToolList) and (FAdbShellOneLine<>'');
   If    Result then
@@ -1589,23 +1724,22 @@ begin
   SysUtils.FindClose(SrR);
 end;
 
+
 function  TApkBuilder.CopyGdbServerToLibsDir : Boolean;
-var  I:TBigBuildMode;
-     LibCtrlsName,GdbServer:String;
+var                I : TBigBuildMode;     LibCtrlsName : String;
 begin
-  GdbServer    := '';
-  LibCtrlsName := '';
-
-  Result := GetLibCtrlsFileName(LibCtrlsName);
-
+  GdbServer := '';
+                                          LibCtrlsName := '';
+           Result := GetLibCtrlsFileName (LibCtrlsName);
   If       Result then
      begin
-                   I := GetBigBuildMode (LibCtrlsName);
-           Result:=I<>bmNo;
+                    I := GetBigBuildMode (LibCtrlsName);
+           Result :=I <> bmNo;
        If  Result then
          begin
               Result := FindFileMaskName
-                (ExtractFileDir (FNdkPath), bmGdbSrvMask[I], 'gdbserver', GdbServer);
+                (ExtractFileDir (FNdkPath), bmGdbSrvMask[I], 'gdbserver',
+                                                                     GdbServer);
            If Result then
               Result := CopyFile(GdbServer, ExtractFilePath(LibCtrlsName)+
                  ExtractFileName(GdbServer), [cffOverwriteFile], False);
@@ -1656,7 +1790,42 @@ begin
 end;
 
 procedure TApkBuilder.DoAfterRunApk;
-var VerSdk : Integer;
+var VerSdk : Integer; HostAppFileName : String;
+
+  function PullAppProcAndLibs : Boolean;
+  begin
+    Case CurBigBuildMode of
+//-------------------------- 32 bits Application -------------------------------
+      bmArmV6Soft, bmArmV7Soft, bmX86 :
+        begin
+          Result := PullAppsProc(['/system/bin/app_process32',
+                                  '/system/bin/linker',
+                                  '/system/lib/libc.so',
+                                  '/system/lib/libm.so',
+                                  '/system/lib/libdl.so'],
+                                                          GetGdbSolibSearchPath);
+          HostAppFileName :=                  'app_process32';
+        end;
+//-------------------------- 64 bits Application -------------------------------
+      bmArm64v8a, bmX86_64 :
+        begin
+          Result := PullAppsProc(['/system/bin/app_process64',
+                                  '/system/bin/linker64',
+                                  '/system/lib64/libc.so',
+                                  '/system/lib64/libm.so',
+                                  '/system/lib64/libdl.so'],
+                                                          GetGdbSolibSearchPath);
+          HostAppFileName :=                  'app_process64';
+        end;
+//-------------------------- No Application ------------------------------------
+      else
+        begin
+          Result          := False;
+          HostAppFileName := '';
+        end;
+    end;
+  end;
+
 begin
   VerSdk := 0;
 
@@ -1685,38 +1854,30 @@ begin
       GdbCfg.ProjPath   := FProjPath;
       GdbCfg.ProjPID    := FScanPID[0];
                                  // For PIDs List in GDBMIServerDebuggerLAMW.pas
-
       If DirectoryExists(FProjPath+GdbDirLAMW) then else
                    MkDir(FProjPath+GdbDirLAMW);
                                  // Create Dir for GDB if it not Exists
-
-      If PullAppsProc(['/system/bin/app_process32',
-                       '/system/bin/linker',
-                       '/system/lib/libc.so',
-                       '/system/lib/libm.so',
-                       '/system/lib/libdl.so'],GetGdbSolibSearchPath) and
-                                 // Pull app_process32 & linker &
+      If PullAppProcAndLibs                                           and
+                                 // Pull app_process32(64) & linker(64) &
                                  //   libc.so & libm.so & libdl.so
-                                 //     to GetGdbSolibSearchPath for 32 bits Target (!)
+                                 //     to GetGdbSolibSearchPath for Target32(64)
          CopyLibCtrls(FProjPath+
                       GdbDirLAMW   +PathDelim)                        and
                                  // Copy libcontrols.so & libcontrols.dbg
                                  //   to  GdbDirLAMW
          SetHostAppFileName(FProjPath+
-                      GdbDirLAMW   +PathDelim +'app_process32')       and
-                                 // Setup HostApplicationFilename=app_process32
-
+                      GdbDirLAMW   +PathDelim + HostAppFileName)      and
+                                 // Setup HostApplicationFilename=HostAppFileName
          SetAdbForward(GdbCfg.GdbServerName, GdbCfg.GdbServerPort)    and
                                  // If GdbServerName='' then
                                  //   Adb forward tcp:+GdbServerPort+' tcp:'+GdbServerPort
-
          KillLastGdbServer(PackageName)
                                  // Kill last gdbserver
                                                                       then
-         StartNewGdbServer(PackageName, GdbCfg.GdbServerPort);
+         StartNewGdbServer(PackageName, GdbCfg.GdbServerPort, VerSdk);
                                  // Start gdbserver in mode --multi GdbServerPort
     end;
-     abApkBuilder         := Nil;
+     abApkBuilder       := Nil;
 end;
 
 
