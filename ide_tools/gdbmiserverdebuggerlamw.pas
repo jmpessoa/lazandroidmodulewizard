@@ -73,6 +73,7 @@ type
   TGdbServerRun  = (gsrRunAsPackageName, gsrRunAsCommand);
   TGdbProcAttach = (gpaAutoDetermVerGDB, gpaInitBeforeConnect,  gpaConnectBeforeInit);
   TGdbCleanExec  = (gceAutoDetermVerGDB, gceClneanBeforeAttach, gceNotClnBeforeAttach);
+  TGdbCopGdbServ = (gcsAutoDeterminate,  gcsUseInProjGdbServ,   gcsCopyGdbServFromNDK);
 
   TGDBMIServerDebuggerPropertiesLAMW = class(TGDBMIDebuggerPropertiesBase)
   private
@@ -81,6 +82,7 @@ type
     FRemote_ServerRun  : TGdbServerRun;
     FRemote_ProcAttach : TGdbProcAttach;
     FRemote_CleanExec  : TGdbCleanExec;
+    FRemote_CopGdbServ : TGdbCopGdbServ;
 
   public
     constructor Create;                                                override;
@@ -97,6 +99,8 @@ type
 
     procedure   SetRemote_CleanExec (NewCln  : TGdbCleanExec);          virtual;
 
+    procedure   SetRemote_CopGdbServ(NewCop  : TGdbCopGdbServ);         virtual;
+
   published
     property    Remote_HostName   : String
                        read FRemote_Hostname       write SetRemote_HostName;
@@ -108,7 +112,8 @@ type
                        read FRemote_ProcAttach     write SetRemote_ProcAttach;
     property    Remote_CleanExec  : TGdbCleanExec
                        read FRemote_CleanExec      write SetRemote_CleanExec;
-
+    property    Remote_CopGdbServ : TGdbCopGdbServ
+                       read FRemote_CopGdbServ     write SetRemote_CopGdbServ;
   published
     property    Debugger_Startup_Options;
     {$IFDEF UNIX}
@@ -150,6 +155,7 @@ type
     FGdbServerRun  : TGdbServerRun;      // gdbserver remote start method
     FGdbProcAttach : TGdbProcAttach;     // target process attach  method
     FGdbCleanExec  : TGdbCleanExec;      // clean exe file inform before attach
+    FGdbCopGdbServ : TGdbCopGdbServ;     // copy NDK gdbserver to target
 
     function    GetGdbServerPort      : String;                         virtual;
     procedure   SetGdbServerPort(Port : String);                        virtual;
@@ -165,6 +171,9 @@ type
 
     function    GetGdbCleanExec       : TGdbCleanExec;                  virtual;
     procedure   SetGdbCleanExec (SCln : TGdbCleanExec);                 virtual;
+
+    function    GetGdbCopGdbServ      : TGdbCopGdbServ;                 virtual;
+    procedure   SetGdbCopGdbServ(SCop : TGdbCopGdbServ);                virtual;
 
   public
     constructor Create;
@@ -201,6 +210,8 @@ type
                                                               write SetGdbProcAttach;
     property    GdbCleanExec  : TGdbCleanExec  read GetGdbCleanExec
                                                               write SetGdbCleanExec;
+    property    GdbCopGdbServ : TGdbCopGdbServ read GetGdbCopGdbServ
+                                                              write SetGdbCopGdbServ;
   end;
 
 
@@ -679,6 +690,11 @@ begin
                               'set solib-search-path '     +  DirName,
                               'handle SIG33 nopass nostop noprint',
                               'handle SIG35 nopass nostop noprint',
+//-------------------------- for 64 bits only ----------------------------------
+                              'handle SIGSTOP nopass nostop noprint',
+                              'handle SIGSEGV nostop noprint',
+                              'handle SIGBUS nopass noprint',
+//------------------------------------------------------------------------------
                                TargetExtendRemote
                                                                              ]);
       If FServSucc then
@@ -697,7 +713,12 @@ begin
                             [
                               'set solib-search-path '     +  DirName,
                               'handle SIG33 nopass nostop noprint',
-                              'handle SIG35 nopass nostop noprint'
+                              'handle SIG35 nopass nostop noprint',
+//-------------------------- for 64 bits only ----------------------------------
+                              'handle SIGSTOP nopass nostop noprint',
+                              'handle SIGSEGV nostop noprint',
+                              'handle SIGBUS nopass noprint'
+//------------------------------------------------------------------------------
                                                                              ]);
     end;
 end;
@@ -713,6 +734,7 @@ begin
       FRemote_ServerRun    := Low(TGdbServerRun);
       FRemote_ProcAttach   := Low(TGdbProcAttach);
       FRemote_CleanExec    := Low(TGdbCleanExec);
+      FRemote_CopGdbServ   := Low(TGdbCopGdbServ);
       UseAsyncCommandMode  := True;
 end;
 
@@ -731,6 +753,8 @@ begin
                  TGDBMIServerDebuggerPropertiesLAMW(Source).FRemote_ProcAttach;
       FRemote_CleanExec    :=
                  TGDBMIServerDebuggerPropertiesLAMW(Source).FRemote_CleanExec;
+      FRemote_CopGdbServ   :=
+                 TGDBMIServerDebuggerPropertiesLAMW(Source).FRemote_CopGdbServ;
       UseAsyncCommandMode  := True;
     end;
 end;
@@ -765,6 +789,11 @@ begin
   GdbCfg.GdbCleanExec      := NewCln;
 end;
 
+procedure TGDBMIServerDebuggerPropertiesLAMW.SetRemote_CopGdbServ(NewCop:TGdbCopGdbServ);
+begin
+  FRemote_CopGdbServ       := NewCop;
+  GdbCfg.GdbCopGdbServ     := NewCop;
+end;
 
   { TGDBMIServerDebuggerLAMW }
 
@@ -918,6 +947,18 @@ begin
   FModifid       := True;
 end;
 
+function    TGDBMIServerDebuggerConfigLAMW.GetGdbCopGdbServ      : TGdbCopGdbServ;
+begin
+  LoadDebuggerProperties;
+  Result := FGdbCopGdbServ;
+end;
+
+procedure   TGDBMIServerDebuggerConfigLAMW.SetGdbCopGdbServ(SCop : TGdbCopGdbServ);
+begin
+  FGdbCopGdbServ := SCop;
+  FModifid       := True;
+end;
+
 constructor TGDBMIServerDebuggerConfigLAMW.Create;
 begin
   FLogList       := TStringList.Create;     // Log List
@@ -930,6 +971,7 @@ begin
   FGdbServerRun  := Low(TGdbServerRun);     // gdbserver remote start method
   FGdbProcAttach := Low(TGdbProcAttach);    // target process attach  method
   FGdbCleanExec  := Low(TGdbCleanExec);     // clean exe file inform before attach
+  FGdbCopGdbServ := Low(TGdbCopGdbServ);    // copy NDK gdbserver to target
 end;
 
 procedure   TGDBMIServerDebuggerConfigLAMW.LoadDebuggerProperties;
@@ -953,6 +995,7 @@ begin
     GdbServerRun  := Prop.Remote_ServerRun; // gdbserver remote start method
     GdbProcAttach := Prop.Remote_ProcAttach;// target process attach  method
     GdbCleanExec  := Prop.Remote_CleanExec; // clean exe file inform before attach
+    GdbCopGdbServ := Prop.Remote_CopGdbServ;// copy NDK gdbserver to target
 
   finally
     DDef.  Free;
