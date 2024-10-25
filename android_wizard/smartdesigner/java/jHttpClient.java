@@ -182,6 +182,10 @@ public class jHttpClient /*extends ...*/ {
                 client3.setRequestProperty("Authorization", "Basic " + _base64EncodedCredentials);
             }
 
+            for (int i = 0; i < listHeaderName.size(); i++) {
+                client3.setRequestProperty(listHeaderName.get(i), listHeaderValue.get(i));
+            }
+
             int statusCode = client3.getResponseCode();
             mResponseCode = statusCode;
 
