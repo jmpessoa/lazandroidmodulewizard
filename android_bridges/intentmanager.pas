@@ -144,6 +144,7 @@ jIntentManager = class(jControl)
     function  GetShareItemLabel(_pos: integer) : String;
     function  GetShareItemPackageName(_pos: integer) : String;
     function  GetShareItemBitmap( _pos : integer ) : jObject;
+    procedure SetShareItemPackageUriPermission(_pos: integer; _uri: jObject; _modeFlags: integer);
 
     procedure SetDataPackage;
 
@@ -155,6 +156,8 @@ jIntentManager = class(jControl)
 
     function GetBundleContent(_intent: jObject; keyValueDelimiter: string): TDynArrayOfString; overload;
     function GetUriFromFile(_fullFileName: string): jObject;
+
+    function FileProviderGetUriForFile(_fullFileName: string): jObject;
 
  published
     property IntentAction: TIntentAction read FIntentAction write SetAction;
@@ -196,6 +199,9 @@ function jIntentManager_ByteArrayToString(env: PJNIEnv; _jintentmanager: JObject
 
 function jIntentManager_GetBundleContent(env: PJNIEnv; _jintentmanager: JObject; _intent: jObject; keyValueDelimiter: string): TDynArrayOfString; overload;
 function jIntentManager_GetUriFromFile(env: PJNIEnv; _jintentmanager: JObject; _fullFileName: string): jObject;
+
+function jIntentManager_FileProviderGetUriForFile(env: PJNIEnv; _jintentmanager: JObject; _fullFileName: string): jObject;
+procedure jIntentManager_SetShareItemPackageUriPermission(env: PJNIEnv; _jintentmanager: JObject; _pos: integer; _uri: jObject; _modeFlags: integer);
 
 implementation
 
@@ -1038,6 +1044,20 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jIntentManager_GetUriFromFile(gApp.jni.jEnv, FjObject, _fullFileName);
+end;
+
+function jIntentManager.FileProviderGetUriForFile(_fullFileName: string): jObject;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jIntentManager_FileProviderGetUriForFile(gApp.jni.jEnv, FjObject, _fullFileName);
+end;
+
+procedure jIntentManager.SetShareItemPackageUriPermission(_pos: integer; _uri: jObject; _modeFlags: integer);
+begin
+  //in designing component state: set value here...
+  if FInitialized then
+     jIntentManager_SetShareItemPackageUriPermission(gApp.jni.jEnv, FjObject, _pos ,_uri ,_modeFlags);
 end;
 
 {-------- jIntentManager_JNI_Bridge ----------}
@@ -2058,6 +2078,59 @@ begin
 
   Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
   env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jIntentManager_FileProviderGetUriForFile(env: PJNIEnv; _jintentmanager: JObject; _fullFileName: string): jObject;
+var
+  jParams: array[0..0] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jintentmanager = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'FileProviderGetUriForFile', '(Ljava/lang/String;)Landroid/net/Uri;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= env^.NewStringUTF(env, PChar(_fullFileName));
+
+
+  Result:= env^.CallObjectMethodA(env, _jintentmanager, jMethod, @jParams);
+  env^.DeleteLocalRef(env,jParams[0].l);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+
+procedure jIntentManager_SetShareItemPackageUriPermission(env: PJNIEnv; _jintentmanager: JObject; _pos: integer; _uri: jObject; _modeFlags: integer);
+var
+  jParams: array[0..2] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jintentmanager = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jintentmanager);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'SetShareItemPackageUriPermission', '(ILandroid/net/Uri;I)V');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].i:= _pos;
+  jParams[1].l:= _uri;
+  jParams[2].i:= _modeFlags;
+
+  env^.CallVoidMethodA(env, _jintentmanager, jMethod, @jParams);
 
   env^.DeleteLocalRef(env, jCls);
 
