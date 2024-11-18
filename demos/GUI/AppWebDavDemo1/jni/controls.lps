@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units Count="36">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="11"/>
+        <CursorPos Y="15"/>
+        <UsageCount Value="202"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jForm;jImageView;jPanel;jTextView"/>
+        </CustomData>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="40"/>
+        <CursorPos Y="93"/>
+        <UsageCount Value="202"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="unit2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FileLoaderForm"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCheckBox;jContextMenu;jCustomDialog;jEditText;jIntentManager;jListView;jPanel;jProgressBar;jSpinner;jTextView;jTimer;jWebDav"/>
+        </CustomData>
+        <EditorIndex Value="2"/>
+        <TopLine Value="497"/>
+        <CursorPos X="69" Y="549"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="webdavcontrol.pas"/>
+        <UnitName Value="WebDavControl"/>
+        <EditorIndex Value="9"/>
+        <CursorPos X="29" Y="16"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\..\..\..\..\..\lazandroidmodulewizard-master_2020\android_wizard\smartdesigner\java\jWebDav.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="236"/>
+        <CursorPos X="15" Y="250"/>
+        <UsageCount Value="16"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\..\..\..\..\..\lazandroidmodulewizard-master_2020\android_bridges\customdialog.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="24"/>
+        <CursorPos Y="421"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\..\..\..\..\..\lazandroidmodulewizard-master_2020\android_bridges\webdav.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="441"/>
+        <CursorPos X="21" Y="51"/>
+        <UsageCount Value="14"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\src\org\lamw\appwebdavdemo1\jWebDav.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="211"/>
+        <CursorPos X="54" Y="219"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\..\..\..\..\..\jHttpClient.java"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="38" Y="1522"/>
+        <UsageCount Value="4"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\..\..\android_bridges\register_extras.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="131"/>
+        <CursorPos X="15" Y="154"/>
+        <UsageCount Value="10"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\..\..\android_bridges\laz_and_controls_events.pas"/>
+        <UnitName Value="Laz_And_Controls_Events"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="268"/>
+        <CursorPos X="25" Y="3"/>
+        <UsageCount Value="101"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\..\..\android_bridges\webdav.pas"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="22"/>
+        <CursorPos X="36" Y="62"/>
+        <UsageCount Value="103"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\..\..\android_bridges\androidwidget.pas"/>
+        <UnitName Value="AndroidWidget"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="3227"/>
+        <CursorPos X="34" Y="3250"/>
+        <UsageCount Value="58"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\..\..\android_wizard\smartdesigner\java\jWebDav.java"/>
+        <EditorIndex Value="7"/>
+        <CursorPos X="53" Y="427"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\..\..\..\android_bridges\Laz_And_Controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="14016"/>
+        <UsageCount Value="10"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="webdav.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="64" Y="10"/>
+        <UsageCount Value="8"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\..\..\..\android_bridges\And_jni.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="119"/>
+        <CursorPos X="6" Y="159"/>
+        <UsageCount Value="3"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="..\..\..\..\android_bridges\intentmanager.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="117"/>
+        <CursorPos X="63" Y="144"/>
+        <UsageCount Value="91"/>
+        <Loaded Value="True"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="..\src\org\lamw\appwebdavdemo1\jIntentManager.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="586"/>
+        <CursorPos X="34" Y="609"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="..\..\..\..\ide_tools\gdbmiserverdebuggerlamw.pas"/>
+        <UnitName Value="GDBMIServerDebuggerLAMW"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="56"/>
+        <CursorPos X="39" Y="693"/>
+        <UsageCount Value="92"/>
+        <Loaded Value="True"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="..\..\..\..\ide_tools\apkbuild.pas"/>
+        <UnitName Value="ApkBuild"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="1823"/>
+        <CursorPos X="49" Y="1858"/>
+        <UsageCount Value="89"/>
+        <Loaded Value="True"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="..\..\..\..\android_bridges\contextmenu.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="34"/>
+        <CursorPos X="11" Y="88"/>
+        <UsageCount Value="10"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="..\src\org\lamw\appwebdavdemo1\jContextMenu.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="99"/>
+        <CursorPos X="57" Y="113"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="..\src\org\lamw\appwebdavdemo1\jForm.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3279"/>
+        <CursorPos X="55" Y="3288"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="..\AndroidManifest.xml"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="47" Y="39"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="XML"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="..\src\org\lamw\appwebdavdemo1\Controls.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="716"/>
+        <CursorPos X="62" Y="739"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="..\..\..\..\android_wizard\smartdesigner\java\jFileProvider.java"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="165"/>
+        <CursorPos X="52" Y="225"/>
+        <UsageCount Value="4"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="..\..\..\..\android_wizard\smartdesigner\java\jIntentManager.java"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="39" Y="13"/>
+        <UsageCount Value="73"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\..\..\..\android_wizard\smartdesigner\java\support\jSupported.java"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="62" Y="8"/>
+        <UsageCount Value="5"/>
+        <DefaultSyntaxHighlighter Value="Java"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="..\..\..\..\..\..\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1083"/>
+        <CursorPos X="55" Y="1093"/>
+        <UsageCount Value="10"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="..\..\..\..\docs\LAMW_DebugApkFromIDE.txt"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="94"/>
+        <CursorPos X="35" Y="67"/>
+        <UsageCount Value="3"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="..\..\..\..\..\..\fpc\3.2.2\source\rtl\objpas\sysutils\finah.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="24" Y="27"/>
+        <UsageCount Value="7"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="..\..\..\..\android_wizard\smartdesigner.pas"/>
+        <UnitName Value="SmartDesigner"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="127"/>
+        <CursorPos X="20" Y="4267"/>
+        <UsageCount Value="8"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="..\..\..\..\android_wizard\lamwdesigner.pas"/>
+        <UnitName Value="LamwDesigner"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1981"/>
+        <CursorPos X="44" Y="1961"/>
+        <UsageCount Value="8"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="..\..\..\..\android_wizard\androidwizard_intf.pas"/>
+        <UnitName Value="AndroidWizard_intf"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1150"/>
+        <CursorPos X="41" Y="719"/>
+        <UsageCount Value="8"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="..\..\..\..\..\..\fpc\3.2.2\source\rtl\inc\systemh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1335"/>
+        <CursorPos X="11" Y="1366"/>
+        <UsageCount Value="20"/>
+      </Unit35>
+    </Units>
+    <JumpHistory Count="23" HistoryIndex="22">
+      <Position1>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="942" TopLine="901"/>
+      </Position1>
+      <Position2>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="943" TopLine="901"/>
+      </Position2>
+      <Position3>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="942" TopLine="901"/>
+      </Position3>
+      <Position4>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="950" TopLine="901"/>
+      </Position4>
+      <Position5>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="951" TopLine="901"/>
+      </Position5>
+      <Position6>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="720" Column="24" TopLine="682"/>
+      </Position6>
+      <Position7>
+        <Filename Value="unit2.pas"/>
+      </Position7>
+      <Position8>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="124" Column="35" TopLine="71"/>
+      </Position8>
+      <Position9>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="720" Column="24" TopLine="666"/>
+      </Position9>
+      <Position10>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="821" Column="21" TopLine="783"/>
+      </Position10>
+      <Position11>
+        <Filename Value="unit2.pas"/>
+      </Position11>
+      <Position12>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="120" Column="35" TopLine="67"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\..\..\android_bridges\webdav.pas"/>
+        <Caret Line="62" Column="36" TopLine="40"/>
+      </Position13>
+      <Position14>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="887" Column="74" TopLine="877"/>
+      </Position14>
+      <Position15>
+        <Filename Value="unit2.pas"/>
+      </Position15>
+      <Position16>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="133" Column="44" TopLine="81"/>
+      </Position16>
+      <Position17>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="972" Column="19" TopLine="948"/>
+      </Position17>
+      <Position18>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="75" Column="13" TopLine="40"/>
+      </Position18>
+      <Position19>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="186" Column="33" TopLine="155"/>
+      </Position19>
+      <Position20>
+        <Filename Value="unit2.pas"/>
+        <Caret Line="70" Column="42" TopLine="37"/>
+      </Position20>
+      <Position21>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="39" Column="30" TopLine="25"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\..\..\android_bridges\androidwidget.pas"/>
+        <Caret Line="1148" Column="22" TopLine="1122"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\..\..\android_bridges\androidwidget.pas"/>
+        <Caret Line="1568" Column="96" TopLine="1515"/>
+      </Position23>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1" ActiveMode="default">
+        <Mode0 Name="default">
+          <local>
+            <HostApplicationFilename Value="C:\Android\laz4android2.2.2\components\lazandroidmodulewizard-master\demos\GUI\AppWebDavDemo1\gdb\app_process32"/>
+          </local>
+        </Mode0>
+      </Modes>
+    </RunParams>
+  </ProjectSession>
+  <Debugging>
+    <BreakPoints>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="unit1.pas"/>
+        <Line Value="93"/>
+      </Item>
+    </BreakPoints>
+    <Watches>
+      <Item>
+        <Expression Value="ResLine"/>
+      </Item>
+      <Item>
+        <Expression Value="Size"/>
+      </Item>
+      <Item>
+        <Expression Value="F_ResultStr"/>
+      </Item>
+    </Watches>
+  </Debugging>
+</CONFIG>

@@ -302,6 +302,10 @@ uses
    procedure Java_Event_pOnArduinoAflakSerialOpened(env:PJNIEnv;this:JObject;Sender:TObject);
    procedure Java_Event_pOnArduinoAflakSerialStatusChanged(env:PJNIEnv;this:JObject;Sender:TObject;statusMessage:jString);
 
+   //jWebDav
+   procedure Java_Event_pOnWebDavGetResultStr(env:PJNIEnv; this:JObject; Sender:TObject; inputLine:jString);
+   procedure Java_Event_pOnWebDavGetProgress (env:PJNIEnv; this:JObject; Sender:TObject; position :integer;Size:integer);
+
 implementation
 
 uses
@@ -318,7 +322,7 @@ uses
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
    cbillingclient, ctoytimerservice, bluetoothlowenergy,
    sfirebasepushnotificationlistener, batterymanager, modbus,
-   cwebsocketclient, ujsarduinoaflakserial, imagebutton;
+   cwebsocketclient, ujsarduinoaflakserial, imagebutton, webdav;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3224,5 +3228,26 @@ begin
     jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialStatusChanged(Sender,GetString(env,statusMessage));
   end;
 end;
+
+procedure Java_Event_pOnWebDavGetResultStr(env:PJNIEnv;this:JObject;Sender:TObject;inputLine:jString);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jWebDav then
+  begin
+    jWebDav(Sender).GenEvent_OnWebDavGetResultStr(Sender,GetString(env,inputLine));
+  end;
+end;
+
+procedure Java_Event_pOnWebDavGetProgress(env:PJNIEnv;this:JObject;Sender:TObject;position:integer;Size:integer);
+begin
+  gApp.Jni.jEnv:= env;
+  gApp.Jni.jThis:= this;
+  if Sender is jWebDav then
+  begin
+    jWebDav(Sender).GenEvent_OnWebDavGetProgress(Sender,position,Size);
+  end;
+end;
+
 
 end.

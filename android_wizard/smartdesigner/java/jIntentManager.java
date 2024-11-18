@@ -1,4 +1,4 @@
-package org.lamw.appcompatescposthermalprinterdemo1;
+package org.lamw.appwebdavdemo1;
 
 import java.io.File;
 import java.util.Iterator;
@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import android.content.ActivityNotFoundException; 
 import android.os.Build;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 
 
 /*Draft java code by "Lazarus Android Module Wizard" [1/18/2015 3:49:46]*/
@@ -982,5 +984,37 @@ Sending Data: Extras vs. URI Parameters
         return r;
     }
 
+    // https://developer.android.com/reference/androidx/core/content/FileProvider
+
+    public Uri FileProviderGetUriForFile(String _fullFileName) {
+        File file = new File(_fullFileName);
+
+        Uri r = null;
+        if (Build.VERSION.SDK_INT >= 24) {
+            //[ifdef_api24up]
+            r = FileProvider.getUriForFile(controls.GetContext(), controls.GetContext().getApplicationContext().getPackageName() + ".fileprovider", file);
+            //[endif_api24up]
+        }
+        else {
+            r = Uri.fromFile(file);
+        }
+        return r;
+    }
+
+    // Grant Permission to a Specific Package
+    // Call the method Context.grantUriPermission(package, Uri, mode_flags) for
+    // the content://Uri, using the desired mode flags. This grants temporary
+    // access permission for the content URI to the specified package, according
+    // to the value of the the mode_flags parameter, which you can set to
+    // FLAG_GRANT_READ_URI_PERMISSION, FLAG_GRANT_WRITE_URI_PERMISSION or both.
+	    
+   public void SetShareItemPackageUriPermission(int pos, Uri _uri, int _modeFlags){
+       String packageName = GetShareItemPackageName(pos);
+       if ( packageName == "" ) return;
+       if (_modeFlags   == 0  ) {
+           _modeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION;
+       }
+       context.grantUriPermission(packageName, _uri, _modeFlags);
+   }
 }
 

@@ -1,0 +1,3 @@
+public java.lang.Object jWebDav_jCreate(long _Self) {
+  return (java.lang.Object)(new jWebDav(this,_Self));
+}
