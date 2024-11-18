@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
+        <LRSInOutputDirectory Value="False"/>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="controls"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <CustomData Count="13">
+      <Item0 Name="BuildSystem" Value="Gradle"/>
+      <Item1 Name="KeepMyBuildGradleWhenReopen" Value="YES"/>
+      <Item2 Name="LAMW" Value="GUI"/>
+      <Item3 Name="LamwVersion" Value="0.8.6.4"/>
+      <Item4 Name="MinSdk" Value="19"/>
+      <Item5 Name="NdkApi" Value="android-22"/>
+      <Item6 Name="NdkPath" Value="C:\Android\android-ndk-r21e\"/>
+      <Item7 Name="Package" Value="org.lamw.appwebdavdemo1"/>
+      <Item8 Name="SdkPath" Value="C:\Android\sdkJ21\"/>
+      <Item9 Name="StartModule" Value="AndroidModule1"/>
+      <Item10 Name="Support" Value="FALSE"/>
+      <Item11 Name="TargetSdk" Value="34"/>
+      <Item12 Name="Theme" Value="Holo.Light.NoActionBar"/>
+    </CustomData>
+    <BuildModes Count="1">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="tfpandroidbridge_pack"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="3">
+      <Unit0>
+        <Filename Value="controls.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AndroidModule1"/>
+        <HasResources Value="True"/>
+        <CustomData Count="1">
+          <Item0 Name="jControls" Value="jButton;jForm;jImageView;jPanel;jTextView"/>
+        </CustomData>
+      </Unit1>
+      <Unit2>
+        <Filename Value="unit2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FileLoaderForm"/>
+        <HasResources Value="True"/>
+        <CustomData Count="2">
+          <Item0 Name="fclControls"/>
+          <Item1 Name="jControls" Value="jButton;jCheckBox;jContextMenu;jCustomDialog;jEditText;jIntentManager;jListView;jPanel;jProgressBar;jSpinner;jTextView;jTimer;jWebDav"/>
+        </CustomData>
+      </Unit2>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="..\libs\x86\libcontrols"/>
+    </Target>
+    <SearchPaths>
+      <Libraries Value="C:\Android\android-ndk-r21e\platforms\android-22\arch-x86\usr\lib\;C:\Android\android-ndk-r21e\toolchains\x86-4.9\prebuilt\windows-x86_64\lib\gcc\i686-linux-android\4.9.x\"/>
+      <UnitOutputDirectory Value="..\obj\controls"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <SyntaxMode Value="Delphi"/>
+        <CStyleMacros Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <SmartLinkUnit Value="True"/>
+      <TargetCPU Value="i386"/>
+      <TargetOS Value="android"/>
+      <Optimizations>
+        <OptimizationLevel Value="0"/>
+      </Optimizations>
+      <SmallerCode Value="True"/>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <StripSymbols Value="True"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <LinkSmart Value="True"/>
+      <Options>
+        <ExecutableType Value="Library"/>
+      </Options>
+    </Linking>
+    <Other>
+      <CustomOptions Value="-Xd -XPi686-linux-android- -FDC:\Android\android-ndk-r21e\toolchains\x86-4.9\prebuilt\windows-x86_64\bin"/>
+      <ExecuteBefore>
+        <Command Value="before_build.bat"/>
+      </ExecuteBefore>
+      <ExecuteAfter>
+        <Command Value="after_build.bat"/>
+      </ExecuteAfter>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

@@ -1,0 +1,2 @@
+public native void pOnWebDavGetResultStr(long pasobj, String inputLine);
+public native void pOnWebDavGetProgress (long pasobj, int position, int Size);
