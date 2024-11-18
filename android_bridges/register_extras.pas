@@ -8,6 +8,7 @@ interface
 
 uses
   Classes,
+  webdav,
   tonegenerator,
   modbus,
   batterymanager,
@@ -78,6 +79,7 @@ implementation
   
 Procedure Register;
 begin
+  {$I jwebdav_icon.lrs}
   {$I jtonegenerator_icon.lrs}
   {$I jmodbus_icon.lrs}
   {$I jbatterymanager_icon.lrs}
@@ -149,6 +151,7 @@ begin
 
   RegisterComponents('Android Bridges Extra',
    [
+      jWebDav,
       jToneGenerator,
       jModbus,
       jBatteryManager,
