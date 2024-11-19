@@ -1498,6 +1498,7 @@ type
     function IsBluetoothOn(): boolean;
     function GetDeviceBuildVersionApi(): integer;
     function GetDeviceBuildVersionRelease(): string;
+    procedure HideNavigationBar(); //Thanks to Fernando Banhos  ... need Android >= 4.0
 
     // Property            FjRLayout
     property View         : jObject        read FjRLayout; //layout!
@@ -5306,6 +5307,44 @@ begin
   //in designing component state: result value here...
   if FInitialized then
    Result:= jForm_GetDeviceBuildVersionRelease(gApp.jni.jEnv, FjObject);
+end;
+
+//thanks to FernandoBanhos  //need Android >= 4.0
+procedure jForm.HideNavigationBar;
+var
+  jEnv: PJNIEnv;
+  jParams: JObject;
+  viewClass: jClass;
+  setSystemUiVisibilityMethod: jMethodID;
+  flags: Integer;
+  args: array[0..0] of JValue;
+begin
+  // Obtém o ambiente JNI
+  jEnv := gApp.Jni.jEnv;
+
+  // Obtém a referência para o View do formulário principal
+  jParams := Self.View;
+
+  if jParams <> nil then
+  begin
+    // Define as flags para ocultar a barra de navegação e ativar o modo tela cheia
+    flags := 2 {SYSTEM_UI_FLAG_HIDE_NAVIGATION} or
+             4 {SYSTEM_UI_FLAG_FULLSCREEN} or
+             4096 {SYSTEM_UI_FLAG_IMMERSIVE_STICKY};
+
+    // Prepara o argumento
+    args[0].i := flags;
+
+    // Encontra a classe e o método para setSystemUiVisibility
+    viewClass := jEnv^.GetObjectClass(jEnv, jParams);
+    setSystemUiVisibilityMethod := jEnv^.GetMethodID(jEnv, viewClass, 'setSystemUiVisibility', '(I)V');
+
+    // Chama o método setSystemUiVisibility com as flags desejadas
+    jEnv^.CallVoidMethodA(jEnv, jParams, setSystemUiVisibilityMethod, @args);
+
+    // Limpeza de referências locais
+    jEnv^.DeleteLocalRef(jEnv, viewClass);
+  end;
 end;
 
 {-------- jForm_JNI_Bridge ----------}
