@@ -48,6 +48,7 @@ uses
   customcamera,
   searchview,
   zbarcodescannerview,
+  zcamview,
   paintshader,
   imagebutton;
 
@@ -115,6 +116,7 @@ begin
   {$I jframelayout_icon.lrs}
   {$I jcaptionpanel_icon.lrs}
   {$I jzbarcodescannerview_icon.lrs}
+  {$I jzcamview_icon.lrs}
   RegisterComponents('Android Bridges',
     [
       jMenu,
@@ -172,7 +174,8 @@ begin
       jLinearLayout,
       jFrameLayout,
       jCaptionPanel,
-      jZBarcodeScannerView
+      jZBarcodeScannerView,
+      jzcamview
     ]
   );
   RegisterClasses([jApp, jForm, jControl, jVisualControl{$IFNDEF Darwin}, jGLViewEvent{$ENDIF}]);

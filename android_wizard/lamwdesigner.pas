@@ -528,6 +528,13 @@ type
      procedure Draw; override;
   end;
 
+   { TDraftZCamView }
+
+  TDraftZCamView = class(TDraftWidget)
+  public
+     procedure Draw; override;
+  end;
+
   { TDraftSFloatingButton }
 
   TDraftSFloatingButton = class(TDraftWidget)
@@ -799,7 +806,7 @@ uses
   sbottomnavigationview, snestedscrollview, treelistview{, gl2SurfaceView},
   customcamera, sadmob, calendarview, searchview, zbarcodescannerview,
   scontinuousscrollableimageview, copenmapview, csignaturepad,
-  zoomableimageview, tablelayout, imagebutton, uktoybutton;
+  zoomableimageview, tablelayout, imagebutton, zcamview, uktoybutton;
 
 const
   DrawableSearchPaths: array [0..4] of string = (
@@ -1406,6 +1413,22 @@ begin
     end;
     Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
   end;
+end;
+
+{ TDraftZBarcodeScannerView }
+
+procedure TDraftZCamView.Draw;
+begin
+ with Fcanvas do
+ begin
+   if jZCamView(FAndroidWidget).BackgroundColor <> colbrDefault then
+     Brush.Color := ToTColor(jZCamView(FAndroidWidget).BackgroundColor)
+   else begin
+     Brush.Color:= clNone;
+     Brush.Style:= bsClear;
+   end;
+   Rectangle(0, 0, FAndroidWidget.Width, FAndroidWidget.Height);    // outer frame
+ end;
 end;
 
 { TDraftSBottomNavigationView }
@@ -5303,6 +5326,7 @@ initialization
   RegisterAndroidWidgetDraftClass(jToolbar, TDraftToolbar);
   RegisterAndroidWidgetDraftClass(jFrameLayout, TDraftFrameLayout);
   RegisterAndroidWidgetDraftClass(jZBarcodeScannerView, TDraftZBarcodeScannerView);
+  RegisterAndroidWidgetDraftClass(jZCamView, TDraftZCamView);
 
   RegisterAndroidWidgetDraftClass(jLinearLayout, TDraftLinearLayout);
   RegisterAndroidWidgetDraftClass(jTableLayout, TDraftTableLayout);

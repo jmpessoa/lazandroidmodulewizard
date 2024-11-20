@@ -302,6 +302,10 @@ uses
    procedure Java_Event_pOnArduinoAflakSerialOpened(env:PJNIEnv;this:JObject;Sender:TObject);
    procedure Java_Event_pOnArduinoAflakSerialStatusChanged(env:PJNIEnv;this:JObject;Sender:TObject;statusMessage:jString);
 
+   //jZCamView
+   Procedure Java_Event_pOnZCamViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                       codedata: JString; codetype: integer);
+
    //jWebDav
    procedure Java_Event_pOnWebDavGetResultStr(env:PJNIEnv; this:JObject; Sender:TObject; inputLine:jString);
    procedure Java_Event_pOnWebDavGetProgress (env:PJNIEnv; this:JObject; Sender:TObject; position :integer;Size:integer);
@@ -322,7 +326,7 @@ uses
    ftpclient, cbluetoothspp, selectdirectorydialog, mssqljdbcconnection, customspeechtotext,
    cbillingclient, ctoytimerservice, bluetoothlowenergy,
    sfirebasepushnotificationlistener, batterymanager, modbus,
-   cwebsocketclient, ujsarduinoaflakserial, imagebutton, webdav;
+   cwebsocketclient, ujsarduinoaflakserial, imagebutton, zcamview, webdav;
 
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
@@ -3226,6 +3230,27 @@ begin
   if Sender is jsArduinoAflakSerial then
   begin
     jsArduinoAflakSerial(Sender).GenEvent_OnArduinoAflakSerialStatusChanged(Sender,GetString(env,statusMessage));
+  end;
+end;
+
+Procedure Java_Event_pOnZCamViewResult(env: PJNIEnv; this: jobject; Obj: TObject;
+                                                    codedata: JString; codetype: integer);
+var
+  _jBoolean: JBoolean;
+  pascodedata: string;
+begin
+  gApp.Jni.jEnv := env;
+  if this <> nil then gApp.Jni.jThis := this;
+
+  if Obj is jZCamView then
+  begin
+    pascodedata := '';
+    if codedata <> nil then
+    begin
+      _jBoolean:= JNI_False;
+      pascodedata:= string( env^.GetStringUTFChars(env,codedata,@_jBoolean) );
+    end;
+    jZCamView(Obj).GenEvent_OnZCamViewResult(Obj,pascodedata, codetype);
   end;
 end;
 

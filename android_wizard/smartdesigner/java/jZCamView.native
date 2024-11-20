@@ -1,0 +1,1 @@
+public native void pOnZCamViewResult(long pasobj, String codedata, int codetype);
