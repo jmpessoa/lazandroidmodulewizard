@@ -35,7 +35,7 @@ class jChronometer extends Chronometer /*dummy*/ { //please, fix what GUI object
         onClickListener = new OnClickListener(){
             /*.*/public void onClick(View view){  //please, do not remove /*.*/ mask for parse invisibility!
                 if (enabled) {
-                    //controls.pOnClick(pascalObj, Const.Click_Default); //JNI event onClick!
+                    controls.pOnClickGeneric(pascalObj); //JNI event onClick!
                 }
             };
         };
