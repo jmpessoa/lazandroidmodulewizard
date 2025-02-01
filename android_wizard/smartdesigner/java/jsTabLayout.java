@@ -1,4 +1,4 @@
-package org.lamw.appcompattablayoutdemo2;
+package org.lamw.appcompatlamwproject1;
 
 
 import android.content.Context;
@@ -43,7 +43,7 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
       onClickListener = new OnClickListener(){
       public void onClick(View view){     // *.* is a mask to future parse...;
               if (enabled) {
-               //  controls.pOnClickGeneric(pascalObj); //JNI event onClick!
+               //  controls.OnClickGeneric(pascalObj); //JNI event onClick!
               }
            };
       };      
@@ -256,8 +256,12 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
       if(tabTextView == null) return t.getText().toString();       
 	  
 	  return tabTextView.getText().toString();*/
-  }   
-  
+  }
+
+  public String GetTitle(int _position) {
+      return GetText(_position);
+  }
+
   public void SetTabMode(int _tabmode) { 
 	  
 	  switch( _tabmode ) {
