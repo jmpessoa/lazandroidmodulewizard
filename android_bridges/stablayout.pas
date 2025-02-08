@@ -75,6 +75,7 @@ jsTabLayout = class(jVisualControl)
 
     procedure RemoveAllTabs();
     procedure RemoveTabAt(_position : integer);
+    function GetSelectedTabPosition(): integer;
 
  published
     property BackgroundColor: TARGBColorBridge read FColor write SetColor;
@@ -87,7 +88,7 @@ end;
 function jsTabLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
 procedure jsTabLayout_SetCustomView(env: PJNIEnv; _jstablayout: JObject; _position: integer; _view: jObject);
 function jsTabLayout_GetTabAt(env: PJNIEnv; _jstablayout: JObject; _position: integer): jObject;
-
+function jsTabLayout_GetSelectedTabPosition(env: PJNIEnv; _jstablayout: JObject): integer;
 
 implementation
 
@@ -499,6 +500,13 @@ begin
      jni_proc_i(gApp.jni.jEnv, FjObject, 'RemoveTabAt', _position);
 end;
 
+function jsTabLayout.GetSelectedTabPosition(): integer;
+begin
+  //in designing component state: result value here...
+  if FInitialized then
+   Result:= jsTabLayout_GetSelectedTabPosition(gApp.jni.jEnv, FjObject);
+end;
+
 {-------- jsTabLayout_JNI_Bridge ----------}
 
 function jsTabLayout_jCreate(env: PJNIEnv;_Self: int64; this: jObject): jObject;
@@ -574,6 +582,26 @@ begin
   _exceptionOcurred: jni_ExceptionOccurred(env);
 end;
 
+function jsTabLayout_GetSelectedTabPosition(env: PJNIEnv; _jstablayout: JObject): integer;
+var
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;
+label
+  _exceptionOcurred;
+begin
+
+  if (env = nil) or (_jstablayout = nil) then exit;
+  jCls:= env^.GetObjectClass(env, _jstablayout);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, 'GetSelectedTabPosition', '()I');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  Result:= env^.CallIntMethod(env, _jstablayout, jMethod);
+
+  env^.DeleteLocalRef(env, jCls);
+
+  _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
 
 
 end.

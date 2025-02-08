@@ -279,6 +279,10 @@ public class jsTabLayout extends TabLayout /*dummy*/ { //please, fix what GUI ob
 	 
 	 return t;
   }
+
+  public int GetSelectedTabPosition() {
+       return this.getSelectedTabPosition();
+  }
   
   //https://www.androidhive.info/2015/09/android-material-design-working-with-tabs/
   //http://en.proft.me/2016/06/21/how-organize-content-tabs-tablayout-and-viewpager-/
