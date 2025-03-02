@@ -129,7 +129,7 @@ begin
         auxList.Delimiter:= '#';
         auxList.StrictDelimiter:= True;
         auxList.DelimitedText:= smsReceived;
-        if auxList.Count > 1 then;
+        if auxList.Count > 1 then
         begin
           smsCaller:= auxList.Strings[0];
           smsBody:=  auxList.Strings[1];

@@ -214,7 +214,7 @@ begin
   if FPenColor <> colbrBlack then
      jcSignaturePad_SetPenColor(gApp.jni.jEnv, FjObject, GetARGB(FCustomColor, FPenColor));
 
-  if FMinPenStrokeWidth <> 3 then;
+  if FMinPenStrokeWidth <> 3 then
     jcSignaturePad_SetMinPenStrokeWidth(gApp.jni.jEnv, FjObject, FMinPenStrokeWidth);
 
   if FMaxPenStrokeWidth <> 7 then

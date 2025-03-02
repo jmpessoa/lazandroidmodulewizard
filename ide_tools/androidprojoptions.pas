@@ -1229,7 +1229,7 @@ var
   list: TStringList;
 begin
   newTheme:= cbTheme.Text;
-  if newTheme <> FDefaultTheme then;
+  if newTheme <> FDefaultTheme then
   begin
      list:= TStringList.Create;
 
