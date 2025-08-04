@@ -668,20 +668,20 @@ begin
   apiTarg:= StrToInt(FTargetApi);
 
 
-  if apiTarg < 33 then
+  if apiTarg < 35 then
   begin
-    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
+    ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 35'+ sLineBreak +
                  'Please, update your android "sdk/platforms" folder!' + sLineBreak +
                  'How to:'+ sLineBreak +
-                 '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                 '.open a command line terminal and go to folder "sdk\cmdline-tools\latest\bin"'+ sLineBreak +
                  '.run the command  >>sdkmanager --update'+ sLineBreak +
-                 '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
+                 '.run the command  >>sdkmanager "build-tools;35.0.0" "platforms;android-35"');
   end;
 
   FMinApi:= ListBoxMinSDK.Items[ListBoxMinSDK.ItemIndex];
 
   if not IsAllCharNumber(PChar(FMinApi))  then FMinApi:= '14';
-  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '29';
+  if not IsAllCharNumber(PChar(FTargetApi)) then FTargetApi:= '35';
 
   if StrToInt(FMinApi) > apiTarg then FMinApi:= IntToStr(apiTarg);
 
@@ -2234,12 +2234,12 @@ begin
       FMaxSdkPlatform:= FCandidateSdkPlatform;
 
   if FMaxSdkPlatform < 33 then
-       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 33'+ sLineBreak +
+       ShowMessage('Warning. Minimum Target API required by "Google Play Store" = 35'+ sLineBreak +
                    'Please, update your android sdk/platforms folder!' + sLineBreak +
                    'How to:'+ sLineBreak +
-                   '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                   '.open a command line terminal and go to folder "sdk\cmdline-tools\latest\bin"'+ sLineBreak +
                    '.run the command  >>sdkmanager --update'+ sLineBreak +
-                   '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
+                   '.run the command  >>sdkmanager "build-tools;35.0.0" "platforms;android-35"');
 
 
   ListBoxNdkPlatform.Clear;

@@ -97,6 +97,7 @@ object FormWorkspace: TFormWorkspace
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   Position = poScreenCenter
+  LCLVersion = '3.2.0.0'
   object StatusBarInfo: TStatusBar
     Left = 0
     Height = 29
