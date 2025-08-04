@@ -22,7 +22,7 @@ uses
 //tk min and max API versions for build.xml
 const
   cMinAPI = 14;
-  cMaxAPI = 35;
+  cMaxAPI = 36;
 // end tk
 
 type

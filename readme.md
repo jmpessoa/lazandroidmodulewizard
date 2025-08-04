@@ -15,15 +15,15 @@
 # [Getting Started](https://github.com/jmpessoa/lazandroidmodulewizard/blob/master/docs/LAMW_Getting_Started.txt)
 
 ### 1. Get Lazarus for Android
-- Option a) [Laz4Android 2.2.2](http://sourceforge.net/projects/laz4android/files/?source=navba) (Windows) 
+- Option a) [Laz4Android](http://sourceforge.net/projects/laz4android/files/?source=navba) (Windows) 
    - All cross-android compilers already installed!
       - arm-android/aarch64-android/i386-android/x86_64-android/jvm-android
-     - hint: Install here: "C:\laz4android2.2.2"   (not "Program Files" !!!)
+     - hint: Install like here: "C:\laz4android"   (not "Program Files" !!!)
    - How to:
-      - Install [Laz4Android2.2.2](http://sourceforge.net/projects/laz4android/files/?source=navbar)
+      - Install [Laz4Android](http://sourceforge.net/projects/laz4android/files/?source=navbar)
       - Install [LAMW](https://github.com/jmpessoa/lazandroidmodulewizard/archive/master.zip)
          - Download LAMW and unzip it in some folder 
-            - recommended folder: "C:\laz4android2.2.2\components"
+            - recommended folder: "C:\laz4android\components"
          - Packages installations order/sequence:
             - tfpandroidbridge_pack.lpk	(in "..../android_bridges" folder)
             - lazandroidwizardpack.lpk	(in ""..../android_wizard" folder)
@@ -102,7 +102,7 @@
     - create a directory tree like: C:\android\sdkJ21\cmdline-tools\latest
     - Copy all content from "temporary" folder to exactly "...\sdkJ21\cmdline-tools\latest"
     - Open a terminal or cmd and go to "...\sdkJ21\cmdline-tools\latest\bin"
-       - run the command  >> sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools"
+       - run the command  >> sdkmanager "build-tools;35.0.0" "platforms;android-35" "platform-tools"
        - hint: you can get others android components by sdkmanager...
 - recommended: supporting JDK 17 + Gradle version >= 8.1.1
   - download [commandlinetools-win-11076708_latest](https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip)
@@ -113,7 +113,7 @@
     - create a directory tree like: C:\android\sdkJ17\cmdline-tools\latest
     - Copy all content from "temporary" folder to exactly "...\sdkJ17\cmdline-tools\latest"
     - Open a terminal or cmd and go to "...\sdkJ17\cmdline-tools\latest\bin"
-       - run the command  >> sdkmanager "build-tools;33.0.2" "platforms;android-34" "platform-tools"
+       - run the command  >> sdkmanager "build-tools;35.0.0" "platforms;android-35" "platform-tools"
        - hint: you can get others android components by sdkmanager...
 - deprecated: supporting JDK 11 + Gradle version >= 6.7.1
   - download [commandlinetools-win-9123335_latest](https://dl.google.com/android/repository/commandlinetools-win-9123335_latest.zip)
@@ -124,7 +124,7 @@
     - create a directory tree like: C:\android\sdkJ11\cmdline-tools\latest
     - Copy all content from "temporary" folder to exactly "...\sdkJ11\cmdline-tools\latest"
     - Open a terminal or cmd and go to "...\sdkJ11\cmdline-tools\latest\bin"
-       - run the command  >> sdkmanager "build-tools;33.0.2" "platforms;android-33" "platform-tools"
+       - run the command  >> sdkmanager "build-tools;35.0.0" "platforms;android-35" "platform-tools"
        - hint: you can get others android components by sdkmanager...
 
 - minimalist alternative: supporting JDK 1.8 + limited but light [Ant](http://ant.apache.org/bindownload.cgi) system Apk build + Gradle <= 6.7
@@ -150,7 +150,7 @@
        - Install 7 or up package!
     - IMPORTANT: on command line terminal or cmd go to folder "sdkJ1.8\tools\bin"
        - run the command  >>sdkmanager --update
-       - run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-33"
+       - run the command  >>sdkmanager "build-tools;30.0.2" "platforms;android-35"
     - IMPORTANT: build-tools = 30.0.3 is the maximum supported in this setup!
        
 ##### 2.3 Get [Android NDK](https://developer.android.com/ndk/downloads/index.html)

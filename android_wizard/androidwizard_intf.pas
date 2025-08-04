@@ -1408,6 +1408,8 @@ begin
      31: Result:= 'Android-12.0';
      32: Result:= 'Android-13.0';
      33: Result:= 'Android-14.0';
+     34: Result:= 'Android-14.0';
+     35: Result:= 'Android-15.0';
   end;
 end;
 

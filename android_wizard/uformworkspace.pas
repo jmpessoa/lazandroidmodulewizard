@@ -425,11 +425,11 @@ begin
        FTargetApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
 
     if not IsAllCharNumber(PChar(FTargetApi))  then
-      FTargetApi:= '33';
+      FTargetApi:= '35';
 
     intTarqetApi:= StrToInt(FTargetApi);
-    if intTarqetApi  < 33 then
-       ShowMessage('Warning: remember that "Google Play Store" requires Target Api >= 33 !');
+    if intTarqetApi  < 35 then
+       ShowMessage('Warning: remember that "Google Play Store" requires Target Api >= 35 !');
 
   end;
 end;
@@ -440,14 +440,14 @@ var
 begin
    intApi:= StrToInt(ListBoxTargetAPI.Text);
 
-   if intApi < 33  then
+   if intApi < 35  then
    begin
-     ShowMessage('Warning. Target API required by "Google Play Store" = 33'+ sLineBreak +
-                  'Please, update your android sdk/platforms folder!' + sLineBreak +
+     ShowMessage('Warning. Target API required by "Google Play Store" = 35'+ sLineBreak +
+                  'Please, update your android sdk/platformss folder!' + sLineBreak +
                   'How to:'+ sLineBreak +
-                  '.open a command line terminal and go to folder "sdk/tools/bin"'+ sLineBreak +
+                  '.open a command line terminal and go to folder "sdk\cmdline-tools\latest\bin"'+ sLineBreak +
                   '.run the command  >>sdkmanager --update'+ sLineBreak +
-                  '.run the command  >>sdkmanager "build-tools;33.0.2" "platforms;android-33"');
+                  '.run the command  >>sdkmanager "build-tools;35.0.0" "platforms;android-35"');
    end;
 
 end;
@@ -1042,7 +1042,7 @@ var
 begin
 
   strTApi:= ListBoxTargetAPI.Items[ListBoxTargetAPI.ItemIndex];
-  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 30
+  if not IsAllCharNumber(PChar(strTApi))  then tApi:= 35
   else tApi:= StrToInt(strTApi);
 
   strMApi:= ListBoxMinSDK.Items.Strings[ListBoxMinSDK.ItemIndex];
