@@ -248,7 +248,7 @@ begin
   jCanvasES2_1.Texture_Load_All;
   jCanvasES2_1.Shader_Compile('simon_Vert','simon_Frag');
   jCanvasES2_1.Shader_Link;
-  jCanvasES2_1.Refresh; //dispatch Ondraw...
+  // jCanvasES2_1.Refresh; //dispatch Ondraw... <--- this line crashes the app
 end;
 
 procedure TAndroidModule11.jCanvasES2_1GLDestroy(Sender: TObject);
