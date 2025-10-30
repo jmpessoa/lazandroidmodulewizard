@@ -2086,7 +2086,9 @@ Procedure VHandler_touchesEnded_withEvent(Sender         : TObject;
   function jni_func_j_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _long: int64): string;
   function jni_func_ii_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _int1, _int2: integer): jObject;
   function jni_func_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: single): jObject;
-  function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: double; _bool: boolean): string;function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
+  function jni_func_ffz_out_t(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _float1, _float2: double; _bool: boolean): string;
+  function jni_func_bmp_f_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1: single): jObject;
+  function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _float1, _float2: single): jObject;
   function jni_func_bmp_t_out_dab(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string): TDynArrayOfJByte;
   function jni_func_bmp_t_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str: string) : boolean;
   function jni_func_bmp_tt_out_z(env: PJNIEnv; _jobject: JObject; javaFuncion : string; _bitmap: jObject; _str1, _str2: string) : boolean;
@@ -12099,6 +12101,32 @@ begin
   env^.DeleteLocalRef(env, jCls);     
 
   _exceptionOcurred: jni_ExceptionOccurred(env);
+end;
+
+function jni_func_bmp_f_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
+                                 _bitmap: jObject; _float1: single): jObject;
+var
+  jParams: array[0..1] of jValue;
+  jMethod: jMethodID=nil;
+  jCls: jClass=nil;  
+label
+  _exceptionOcurred;
+begin
+  result := nil; if (env = nil) or (_jobject = nil) then exit;
+
+  jCls:= env^.GetObjectClass(env, _jobject);
+  if jCls = nil then goto _exceptionOcurred;
+  jMethod:= env^.GetMethodID(env, jCls, PChar(javaFuncion), '(Landroid/graphics/Bitmap;F)Landroid/graphics/Bitmap;');
+  if jMethod = nil then begin env^.DeleteLocalRef(env, jCls); goto _exceptionOcurred; end;
+
+  jParams[0].l:= _bitmap;
+  jParams[1].f:= _float1;
+
+  Result:= env^.CallObjectMethodA(env, _jobject, jMethod, @jParams);
+
+  env^.DeleteLocalRef(env, jCls);     
+
+  _exceptionOcurred: if jni_ExceptionOccurred(env) then result := nil;
 end;
 
 function jni_func_bmp_ff_out_bmp(env: PJNIEnv; _jobject: JObject; javaFuncion : string;
