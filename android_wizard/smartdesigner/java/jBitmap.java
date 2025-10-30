@@ -296,6 +296,66 @@ public class jBitmap {
         //Log.i("SetByteArrayToBitmap","size="+ image.length);
     }
 
+    public Bitmap FlipHorizontal(Bitmap _bmp) {
+
+        if (_bmp == null) return null;
+
+        Matrix matrix = new Matrix();
+
+        matrix.setScale(-1, 1);
+        matrix.postTranslate( _bmp.getWidth(),0);		
+
+        Bitmap bmpRotate = Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);
+
+        if (bmpRotate != null)
+            bmpRotate.setDensity(_bmp.getDensity());
+
+        return bmpRotate;
+    }
+
+    public Bitmap FlipVertical(Bitmap _bmp) {
+
+        if (_bmp == null) return null;
+
+        Matrix matrix = new Matrix();
+
+        matrix.setScale(1,-1);
+        matrix.postTranslate( 0, _bmp.getHeight());		
+
+        Bitmap bmpRotate = Bitmap.createBitmap(_bmp, 0, 0, _bmp.getWidth(), _bmp.getHeight(), matrix, true);
+
+        if (bmpRotate != null)
+            bmpRotate.setDensity(_bmp.getDensity());
+
+        return bmpRotate;
+    }
+	
+	
+    // Rotates Bitmap without scaling of image. The program code of "Rotate" function was written by DeepSeek chatbot at October 31, 2025
+    public Bitmap Rotate(Bitmap _bmp, float _angle) {
+
+        if (_bmp == null) return null;
+
+        // Create a new bitmap with the same dimensions and config
+        Bitmap rotatedBitmap = Bitmap.createBitmap(_bmp.getWidth(), _bmp.getHeight(), _bmp.getConfig());
+    
+        // Create canvas for the new bitmap
+        Canvas canvas = new Canvas(rotatedBitmap);
+    
+        // Create matrix and set rotation around center
+        Matrix matrix = new Matrix();
+        matrix.setRotate(_angle, _bmp.getWidth() / 2f, _bmp.getHeight() / 2f);
+    
+        // Draw the original bitmap with the rotation matrix
+        canvas.drawBitmap(_bmp, matrix, null);
+    
+        if (rotatedBitmap != null)
+            rotatedBitmap.setDensity(_bmp.getDensity());
+
+        return rotatedBitmap;
+    }
+	
+
     public Bitmap ClockWise(Bitmap _bmp) {
 
         if (_bmp == null) return null;
