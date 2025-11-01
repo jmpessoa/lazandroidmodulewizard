@@ -614,6 +614,10 @@ type
     function GetInfo: boolean;
     function GetRatio: single;
 
+    function FlipHorizontal(_bmp: jObject): jObject;
+    function FlipVertical(_bmp: jObject): jObject;
+    function Rotate(_bmp: jObject; _angle: single): jObject;
+	
     function ClockWise(_bmp: jObject): jObject;
     function AntiClockWise(_bmp: jObject): jObject;
     function SetScale(_bmp: jObject; _scaleX: single; _scaleY: single): jObject;
@@ -12810,6 +12814,40 @@ begin
     PDWordPixel^[k] := not PDWordPixel^[k];  //ok
   Self.UnlockPixels;
 end;
+
+function jBitmap.FlipHorizontal(_bmp: jObject): jObject;
+begin
+  Result := nil;
+
+  if _bmp = nil then exit;
+  //in designing component state: result value here...
+  if FInitialized then
+    Result := jni_func_bmp_out_bmp(gApp.jni.jEnv, FjObject, 'FlipHorizontal', _bmp);
+end;
+
+function jBitmap.FlipVertical(_bmp: jObject): jObject;
+begin
+  Result := nil;
+
+  if _bmp = nil then exit;
+  //in designing component state: result value here...
+  if FInitialized then
+    Result := jni_func_bmp_out_bmp(gApp.jni.jEnv, FjObject, 'FlipVertical', _bmp);
+end;
+
+
+function jBitmap.Rotate(_bmp: jObject; _angle: single): jObject;
+begin
+  Result := nil;
+
+  if _bmp = nil then exit;
+  //in designing component state: result value here...
+  if FInitialized then
+	Result := jni_func_bmp_f_out_bmp(gApp.jni.jEnv, FjObject, 'Rotate', _bmp, _angle);	
+
+//     Result := jni_func_bmp_ff_out_bmp(gApp.jni.jEnv, FjObject, 'SetScale', _bmp, _scaleX, _scaleY);	
+end;
+
 
 function jBitmap.ClockWise(_bmp: jObject): jObject;
 begin
