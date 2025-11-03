@@ -2489,7 +2489,7 @@ type
     procedure DrawRect(_left, _top, _right, _bottom: single); overload;
     procedure DrawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
 
-    procedure DrawBitmap(bmp: jObject; l, b, r, t: integer); overload;
+    procedure DrawBitmap(bmp: jObject; b, l, r, t: integer); overload;
     procedure DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
     procedure DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
     procedure DrawBitmap(bmp: jBitmap; b, l, r, t: integer); overload;
