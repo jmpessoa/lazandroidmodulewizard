@@ -2489,10 +2489,10 @@ type
     procedure DrawRect(_left, _top, _right, _bottom: single); overload;
     procedure DrawRoundRect(_left, _top, _right, _bottom, _rx, _ry: single);
 
-    procedure DrawBitmap(bmp: jObject; b, l, r, t: integer); overload;
+    procedure DrawBitmap(bmp: jObject; l, b, r, t: integer); overload;
     procedure DrawBitmap(bmp: jBitmap; x1, y1, size: integer; ratio: single); overload;
     procedure DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single); overload;
-    procedure DrawBitmap(bmp: jBitmap; b, l, r, t: integer); overload;
+    procedure DrawBitmap(bmp: jBitmap; l, b, r, t: integer); overload;
     procedure DrawBitmap(_bitmap: jObject; _width: integer; _height: integer); overload;
     procedure DrawBitmap(_left: single; _top: single; _bitmap: jObject); overload;
 
@@ -13401,16 +13401,16 @@ begin
       _right, _bottom, _rx, _ry);
 end;
 
-procedure jCanvas.DrawBitmap(bmp: jObject; b, l, r, t: integer);
+procedure jCanvas.DrawBitmap(bmp: jObject; l, b, r, t: integer);
 begin
   if FInitialized then
-    jCanvas_drawBitmap(gApp.jni.jEnv, FjObject, bmp, b, l, r, t);
+    jCanvas_drawBitmap(gApp.jni.jEnv, FjObject, bmp, l, b, r, t);
 end;
 
-procedure jCanvas.DrawBitmap(bmp: jBitmap; b, l, r, t: integer);
+procedure jCanvas.DrawBitmap(bmp: jBitmap; l, b, r, t: integer);
 begin
   if FInitialized then
-    jCanvas_drawBitmap(gApp.jni.jEnv, FjObject, bmp.GetJavaBitmap, b, l, r, t);
+    jCanvas_drawBitmap(gApp.jni.jEnv, FjObject, bmp.GetJavaBitmap, l, b, r, t);
 end;
 
 procedure jCanvas.DrawBitmap(bmp: jObject; x1, y1, size: integer; ratio: single);
