@@ -2984,51 +2984,49 @@ public class jForm {
 
     //Android 11:
     public String GetTextFromUri(Uri _treeUri) {
-        StringBuilder stringBuilder = new StringBuilder();
-        
-        if(stringBuilder == null) return "";
-        
-        InputStream inputStream = null;
-        BufferedReader reader = null;
+    	       
+	 try {
+	    InputStream in = controls.activity.getContentResolver().openInputStream(_treeUri);
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    byte[] buffer = new byte[4096];
+	    int n = in.read(buffer);
+	    while (n >= 0) {
+		out.write(buffer, 0, n);
+		n = in.read(buffer);
+	    }
+	    in.close();
 
-        try {
-             inputStream = controls.activity.getContentResolver().openInputStream(_treeUri);
-             reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-             String line;
-             while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+	    return out.toString();
+	  }
+	  catch (Exception e) {
+	    e.printStackTrace();
+	  }
+	  return null;
         
-        return stringBuilder.toString();
     }
 
     //Android 11:
     public String GetTextFromUriAsString(String _treeUriAsString) {
-        StringBuilder stringBuilder = new StringBuilder();
-        
-        if(stringBuilder == null) return "";
-        
-        InputStream inputStream = null;
-        BufferedReader reader = null;
 
-        Uri _treeUri = Uri.parse(_treeUriAsString);
+	 Uri _treeUri = Uri.parse(_treeUriAsString);
+	 
+	 try {
+	    InputStream in = controls.activity.getContentResolver().openInputStream(_treeUri);
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    byte[] buffer = new byte[4096];
+	    int n = in.read(buffer);
+	    while (n >= 0) {
+		out.write(buffer, 0, n);
+		n = in.read(buffer);
+	    }
+	    in.close();
 
-        try {
-            inputStream = controls.activity.getContentResolver().openInputStream(_treeUri);
-            reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-        return stringBuilder.toString();
+	    return out.toString();
+	  }
+	  catch (Exception e) {
+	    e.printStackTrace();
+	  }
+	  return null;
     }
 
     //Android 11:
