@@ -1799,9 +1799,11 @@ public class jForm {
             fos = new FileOutputStream(outfile);  //save to data/data/your_package/files/your_file_name
             is = controls.activity.getAssets().open(_filename);
             int size = is.available();
+            if(size > 0) {
             byte[] buffer = new byte[size];
             for (int c = is.read(buffer); c != -1; c = is.read(buffer)) {
                 fos.write(buffer, 0, c);
+            }
             }
             is.close();
             fos.close();
