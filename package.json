@@ -11,8 +11,8 @@
         "jdk": "21",
 		"gradle": "8.5",
 		"android":{
-			"platform": "34",
-			"buildTools" : "34.0.0"
+			"platform": "35",
+			"buildTools" : "35.0.0"
 		}
 	}
 }
