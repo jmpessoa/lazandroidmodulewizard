@@ -3455,6 +3455,9 @@ var
 begin
   Result := mrOk;
 
+  // Check if there is an active project
+  if LazarusIDE.ActiveProject = nil then Exit;
+
   if not LazarusIDE.ActiveProject.CustomData.Contains('LAMW') then Exit;
 
   hasControls:= False;
@@ -3494,6 +3497,7 @@ begin
     controlsList.Sorted := True;
     controlsList.Duplicates := dupIgnore;
     compoundList:= TStringList.Create;
+    libList:= TStringList.Create;
 
     GetAllJControlsFromForms(controlsList);
 
