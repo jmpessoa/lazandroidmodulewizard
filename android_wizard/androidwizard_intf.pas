@@ -19,6 +19,8 @@ uses
   LCLIntf,
   LazIDEIntf,
   ProjectIntf,
+  LCLVersion,
+  ProjectResourcesIntf,//thanks to wp-xyz
   FormEditingIntf,
   //uFormAndroidProject,
   uformworkspace,
@@ -224,7 +226,9 @@ type
                                 const SourceName   : string;
                                 const ResourceName : string): string; override;
 
-    function GetResourceType: TResourceType; override;
+    //function GetResourceType: TResourceType; override;
+    function GetResourceType: {$IF LCL_FULLVERSION >= 4990000} TProjResourceType{$ELSE}TResourceType{$ENDIF}; override;
+
     function GetLocalizedName: string; override;
     function GetLocalizedDescription: string; override;
     function GetImplementationSource(const Filename     : string;
@@ -3980,7 +3984,8 @@ begin
 
 end;
 
-function TAndroidFileDescPascalUnitWithResource.GetResourceType: TResourceType;
+//function TAndroidFileDescPascalUnitWithResource.GetResourceType: TResourceType;
+function TAndroidFileDescPascalUnitWithResource.GetResourceType: {$IF LCL_FULLVERSION >= 4990000} TProjResourceType{$ELSE}TResourceType{$ENDIF};
 begin
    Result:= rtRes;
 end;

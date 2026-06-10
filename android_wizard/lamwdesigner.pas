@@ -61,7 +61,9 @@ type
     procedure OnDesignerModified(Sender: TObject{$If lcl_fullversion=1070000}; {%H-}PropName: ShortString{$ENDIF});
     procedure OnPersistentAdded(APersistent: TPersistent; {%H-}Select: boolean);
     //procedure OnPersistentDeleted;
-    procedure OnPersistentDeleted({$IF LCL_FULLVERSION >= 2010000}APersistent: TPersistent{$endif}); //thanks to @Coldzer0 !
+    //procedure OnPersistentDeleted({$IF LCL_FULLVERSION >= 2010000}APersistent: TPersistent{$endif}); //thanks to @Coldzer0 !
+    procedure OnPersistentDeleted(APersistent: {$IF LCL_FULLVERSION >= 4990000}Pointer{$else}TPersistent{$endif}); //thanks to wp-xyz
+
     procedure OnPersistentDeleting(APersistent: TPersistent);
     procedure OnSetSelection(const ASelection: TPersistentSelectionList);
     // tk
@@ -2120,8 +2122,9 @@ begin
   end else inherited GetBounds(AComponent,CurBounds);
 end;
 
-// procedure TAndroidWidgetMediator.OnPersistentDeleted(APersistent: TPersistent);
-procedure TAndroidWidgetMediator.OnPersistentDeleted({$IF LCL_FULLVERSION >= 2010000}APersistent: TPersistent{$endif});
+//procedure TAndroidWidgetMediator.OnPersistentDeleted(APersistent: TPersistent);
+//procedure TAndroidWidgetMediator.OnPersistentDeleted({$IF LCL_FULLVERSION >= 2010000}APersistent: TPersistent{$endif});
+procedure TAndroidWidgetMediator.OnPersistentDeleted(APersistent: {$IF LCL_FULLVERSION >= 4990000}Pointer{$else}TPersistent{$endif});
 begin
   if FjControlDeleted then
     UpdateJControlsList;
