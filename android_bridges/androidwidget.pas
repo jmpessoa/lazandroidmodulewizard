@@ -2701,6 +2701,14 @@ end;
 
 procedure TAndroidWidget.SetBounds(NewLeft, NewTop, NewWidth, NewHeight: integer);
 begin
+     // 18/06/2026: Lazarus 4.x up bug fix
+	 // In Lazarus 4.0 and above, if we add a component by double clicking, 
+	 // it doesn't appear because it has a width=0, height=0 size.	 
+     if (csDesigning in ComponentState) then
+     begin
+          if NewWidth=0 then NewWidth:=100;
+          if NewHeight=0 then NewHeight:=40;
+     end; 
   if (Left=NewLeft) and (Top=NewTop) and (Width=NewWidth) and (Height=NewHeight) then Exit;
   FLeft:=NewLeft;
   FTop:=NewTop;
