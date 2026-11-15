@@ -46,6 +46,12 @@ function GetJObjectOfDynArrayOfInteger(env: PJNIEnv; var dataContent: TDynArrayO
 function GetJObjectOfDynArrayOfString(env: PJNIEnv; var dataContent: TDynArrayOfString): jstringArray;  // jObject;
 function GetJBoolean(b: boolean): byte;
 
+function GetBoolean(b: jboolean): boolean; inline;
+function GetTByteArrayFromString(Source: pansichar): TDynArrayOfJByte;
+function GetEmptyTByteArray(): TDynArrayOfJByte;
+function GetStringFromTDynArrayOfJByte(Data: TDynArrayOfJByte): ansistring;
+function CheckJNIException(env: PJNIEnv): boolean;
+
 implementation
 
 function GetJBoolean(b: boolean): byte;
@@ -59,24 +65,36 @@ end;
 function GetString(env: PJNIEnv; jstr: JString): string;
 var
  _jBoolean: JBoolean;
+ lChars: PAnsiChar;
 begin
     Result := '';
     if jstr <> nil then
     begin
       _jBoolean:= JNI_False;
-      Result:= string(env^.GetStringUTFChars(env,jstr,@_jBoolean));
+      lChars:= env^.GetStringUTFChars(env,jstr,@_jBoolean);
+      if lChars <> nil then
+      begin
+        // copy into a Pascal string, then release the native buffer allocated by the JVM
+        Result:= string(lChars);
+        env^.ReleaseStringUTFChars(env, jstr, lChars);
+      end
+      else
+        // a failed Get leaves an OutOfMemoryError pending: clear it before
+        // any other JNI call (there is no Release for a nil pointer)
+        CheckJNIException(env);
     end;
 end;
 
 function GetJString(env: PJNIEnv; str: string): JString;
 begin
   Result:= env^.NewStringUTF(env, PChar(str));
+  if CheckJNIException(env) then
+    Result:= env^.NewStringUTF(env, PChar(''));
 end;
 
 function GetDynArrayOfString(env: PJNIEnv; stringArrayData: jstringArray): TDynArrayOfString;
 var
   jstr: JString;
-  jBoo: JBoolean;
   sizeArray: integer;
   i: integer;
 begin
@@ -86,13 +104,11 @@ begin
     for i:= 0 to sizeArray - 1 do
     begin
       jstr:= env^.GetObjectArrayElement(env, stringArrayData, i);
-      case jstr = nil of
-         True : Result[i]:= '';
-         False: begin
-                   jBoo:= JNI_False;
-                   Result[i]:= string(env^.GetStringUTFChars(env,jstr, @jBoo));
-                 end;
-      end;
+      // GetString handles nil, buffer Release and pending exceptions
+      Result[i]:= GetString(env, jstr);
+      // jstr is created in this iteration and does not leave this function:
+      // delete it to avoid piling up one local reference per element (nil is accepted)
+      env^.DeleteLocalRef(env, jstr);
     end;
 end;
 
@@ -187,6 +203,56 @@ begin
   for i:= 0 to newSize0 - 1 do
   begin
      env^.SetObjectArrayElement(env,Result,i,env^.NewStringUTF(env, PChar(dataContent[i])));
+  end;
+end;
+
+function GetBoolean(b: jboolean): boolean;
+begin
+  Result := b <> JNI_FALSE;
+end;
+
+function GetTByteArrayFromString(Source: pansichar): TDynArrayOfJByte;
+var
+  lLength: integer;
+begin
+  if (Source = nil) then
+  begin
+    Result := GetEmptyTByteArray();
+    exit;
+  end;
+
+  lLength := Length(Source);
+  SetLength(Result, lLength);
+  if lLength > 0 then
+    Move(Source^, Result[0], lLength);
+end;
+
+function GetEmptyTByteArray(): TDynArrayOfJByte;
+begin
+  SetLength(Result, 1);
+  Result[0] := Jbyte(#0);
+end;
+
+function GetStringFromTDynArrayOfJByte(Data: TDynArrayOfJByte): ansistring;
+begin
+  Result := '';
+  if (Data = nil) then
+    exit;
+
+  SetLength(Result, Length(Data));
+  Move(Data[0], Result[1], Length(Data));
+end;
+
+function CheckJNIException(env: PJNIEnv): boolean;
+begin
+  Result := False;
+  if (env = nil) then exit;
+  Result := GetBoolean(env^^.ExceptionCheck(env));
+
+  if (Result) then
+  begin
+    env^^.ExceptionDescribe(env);
+    env^^.ExceptionClear(env);
   end;
 end;
 
